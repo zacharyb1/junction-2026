@@ -26,7 +26,7 @@ First audience: international families in Finland, who deal with Kela, Vero, Mig
 | Case page | Working, phone first, English with Finnish labels for Finnish cases. | `src/app/c/[id]/page.tsx` |
 | Browser demo | Working with live progress. | `src/app/try/`, `/try?code=...` |
 | Landing page | Built, shows the real scorecard. Needs a human eye for wording. | `src/app/page.tsx`, `src/components/landing/` |
-| Scorecard runner | Working. Run 4, Fri 23:30, after the review fixes: 19 of 19 passed, 133 of 133 quotes found. | `eval/` |
+| Scorecard runner | Working. Runs 4 and 5 on Fri night, after the review fixes: 19 of 19 passed both times, 133 of 133 and 123 of 123 quotes found. | `eval/` |
 | Review fixes | Done Fri night: stricter grounding, conflict labels, safe page fetch, country names, demo limits, accurate page copy. See section 4 and `docs/DECISIONS.md`. | pull request 5 |
 | Highlight links | Each verified source links to the official page with the quoted sentence highlighted (text fragment, works in Chrome, Edge, Safari). | `src/app/c/[id]/page.tsx` |
 | Pitch kit | Story, numbers, criteria table, two-minute video script, demo script, judge questions. | `docs/PITCH.md` |
@@ -207,6 +207,8 @@ It writes `src/data/scorecard.json`, which the landing page shows after the next
 **Run 3, Fri 22:50, with the third page reader:** 18 of 19 passed, 126 of 127 quotes found, median 6.1 s. The failure was the car-inspection scenario.
 
 **Run 4, Fri 23:30, after the review fixes (stricter grounding, see section 4):** 19 of 19 passed, 133 of 133 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 9.6 s. Two earlier runs of the same build during the evening each failed one scenario (rent letter with no deadline or amount, parking fine with one source). Both led to a fix, and both result files are kept in `eval/results/`. Expect 18 or 19 of 19 on any given run: the search model's output varies.
+
+**Run 5, Sat 00:05, final build of the night (adds the nothing-to-research check and highlight links):** 19 of 19 passed, 123 of 123 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 8.3 s.
 
 What that number means and does not mean:
 - It proves every line shown is backed by a sentence on a page we opened, on the expected official site.

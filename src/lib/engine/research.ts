@@ -123,6 +123,9 @@ const OUTPUT_SCHEMA = {
   required: ["title", "summary", "steps"],
 } as const;
 
+const NOTHING_MESSAGE =
+  "I could not find anything to research in that message. Describe what happened in a sentence or two, for example: “Our landlord wants to raise the rent by 15 percent from next month.”";
+
 /** Countries the team decided not to serve. */
 const UNSUPPORTED_COUNTRIES = new Set(["RU"]);
 
@@ -295,7 +298,8 @@ function tidy(text: unknown): string | undefined {
   // Cut long values at a word boundary so nothing ends mid-word.
   if (value.length > 100) value = `${value.slice(0, 100).replace(/\s+\S*$/, "")}…`;
   value = value.replace(/[.;,]+$/, "");
-  if (!value || EMPTY.test(value) || JUNK.test(value) || VAGUE.test(value)) return undefined;
+  // A bare number ("2026", "14") says nothing without its words.
+  if (!value || EMPTY.test(value) || JUNK.test(value) || VAGUE.test(value) || /^\d+$/.test(value)) return undefined;
   return value;
 }
 
@@ -333,6 +337,22 @@ async function withRetry<T>(call: () => Promise<T>, attempts = 4): Promise<T> {
       await new Promise((resolve) => setTimeout(resolve, 1100 * (i + 1) + Math.random() * 600));
     }
   }
+}
+
+// Words that say nothing about a situation. Used only by the check below.
+const FILLER = new Set(
+  "there here what when where which would should could about they them their then than also been were does doing done need want just some more most very much many today tomorrow yesterday thing things something nothing anything everything please thanks thank hello okay well know think going".split(
+    " ",
+  ),
+);
+const stem = (t: string) => (t.length > 5 ? t.slice(0, 5) : t);
+
+/** Does any content word of the message come back in what the search wrote and quoted? Word starts are compared, so "pregnant" meets "pregnancy". */
+function echoes(message: string, written: string): boolean {
+  const meaningful = (text: string) => tokens(text).filter((t) => t.length >= 4 && !FILLER.has(t) && !/^\d/.test(t));
+  const asked = new Set(meaningful(message).map(stem));
+  if (!asked.size) return false;
+  return meaningful(written).some((t) => asked.has(stem(t)));
 }
 
 const UNITS = ["%", "€", "$", "£", "day", "week", "month", "year"];
@@ -475,7 +495,16 @@ export async function researchCase(
     if (lastError) {
       throw new EngineError(`Exa search failed: ${lastError instanceof Error ? lastError.message : String(lastError)}`, 502);
     }
-    throw new EngineError("No sourced steps were found for this situation.", 502);
+    // Nothing to research, or nothing found. Not a server fault, so the caller gets a message it can show.
+    throw new EngineError(NOTHING_MESSAGE, 422);
+  }
+  // Small talk or gibberish still returns pages, and a plan built from them would be an invented situation.
+  // If no word of the message comes back in anything the search wrote or quoted, there was nothing to research.
+  if (!input.document) {
+    const written = found.map((c) => `${c.title} ${c.detail ?? ""} ${c.quote}`).join(" ");
+    if (!echoes(input.situation, `${head.title ?? ""} ${head.summary ?? ""} ${written}`)) {
+      throw new EngineError(NOTHING_MESSAGE, 422);
+    }
   }
   const searchMs = since();
 

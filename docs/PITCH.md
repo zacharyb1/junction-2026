@@ -1,6 +1,6 @@
 # Pitch kit: Kaveri
 
-Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 4 (Fri 23:30). Re-run the scorecard on Saturday evening and update them before recording.
+Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 5 (Sat 00:05). Re-run the scorecard on Saturday evening and update them before recording.
 
 ## The story
 
@@ -17,8 +17,8 @@ Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 4 (Fri 2
 | Fact | Value | Where it comes from |
 |---|---|---|
 | Scenarios passed | 19 of 19 (expect 18 or 19 on any run) | `eval/results/latest.md` |
-| Quotes found on their pages | 133 of 133 | same |
-| Median time per case | 6.0 s, slowest tenth within 9.6 s | same |
+| Quotes found on their pages | 123 of 123 | same |
+| Median time per case | 6.0 s, slowest tenth within 8.3 s | same |
 | Exa searches per case | 3, in parallel | research trail on every case page |
 | Search cost per case | about $0.021 | Exa's `costDollars` in the response |
 | Official sites mapped | 12 countries, about 650 hosts, 87 for Finland | `src/data/official-sources.json` |
@@ -45,7 +45,7 @@ Do not say "100% accurate". Say: "every line shown is backed by a sentence on a 
 | 0:45 | Tap a number, the Kela page opens with the sentence highlighted | "Tap a number. The official page opens at that sentence." |
 | 1:00 | Rent letter in Finnish pasted in `/try`, live progress | "A letter in Finnish. Three Exa searches on official sites, every cited page read twice." |
 | 1:20 | Renovation case with "Two figures found" | "When two sources disagree, it shows both. It does not pick one in silence." |
-| 1:35 | Scorecard on the landing page | "19 scenarios, 133 quotes, all found on their pages. Six seconds, two cents." |
+| 1:35 | Scorecard on the landing page | "19 scenarios, 123 quotes, all found on their pages. Six seconds, two cents." |
 | 1:50 | QR code | "Kaveri. Research with sources, in your family chat." |
 
 ## Live demo, three minutes
@@ -66,4 +66,5 @@ Fallbacks: if the venue network is slow, open a case made earlier (links in `eva
 - **"Other countries?"** Twelve have a checked official-site list. Others search the open web with every source labelled.
 - **"Is this legal advice?"** No. Research with sources. It never sends, files, books or pays.
 - **"What does it cost?"** About two cents of search per case.
+- **"What if I type nonsense?"** It says it found nothing to research. It does not invent a situation.
 - **"What is not done?"** Quote translation, reminders and approvals in the chat depend on the bot runtime. Say what is live at recording time.

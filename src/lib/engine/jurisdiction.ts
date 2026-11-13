@@ -86,11 +86,12 @@ const NOT_A_COUNTRY = new Set("AN BU CS DD DY FX HV NH RH SU TP UK VD YD YU ZR E
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 const CODES = new Set<string>();
 
-/** Country names in English, Finnish and Swedish, mapped to ISO codes. */
+/** Country names in English and the other answer languages, mapped to ISO codes. */
 function nameToCode(): Map<string, string> {
   const map = new Map<string, string>();
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const locales = ["en", "fi", "sv"].map((l) => new Intl.DisplayNames([l], { type: "region" }));
+  // English first, so an English name always wins a clash. Then the other answer languages.
+  const locales = ["en", "fi", "sv", "de", "fr", "es", "et", "uk"].map((l) => new Intl.DisplayNames([l], { type: "region" }));
   for (const a of letters) {
     for (const b of letters) {
       const code = a + b;

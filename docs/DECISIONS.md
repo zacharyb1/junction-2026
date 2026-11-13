@@ -27,3 +27,5 @@ Append-only. One line per decision: `[Fri 20:14] Decision — why — who`.
 [Fri 23:35] Public demo: 20 requests per minute per address (a venue shares one), 40 in total, fast mode only. Deep research needs the bot secret.
 [Fri 23:35] Change watch: a page that does not open is reported as unreachable and keeps its last confirmed state. A quote last confirmed live must still be on a live reading.
 [Fri 23:35] The scaffold's /api/chat now needs the bot secret. The /chat page and src/lib/ai.ts are unused and can be deleted by a person.
+[Sat 00:10] A message with nothing to research (gibberish, small talk) now gets a clear answer instead of an invented plan. Asking the search model to flag it did not work, so the engine checks that a word of the message comes back in what the search wrote or quoted.
+[Sat 00:10] Each verified source links to the official page with the quoted sentence highlighted (text fragment).
