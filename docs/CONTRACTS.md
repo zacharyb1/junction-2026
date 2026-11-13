@@ -154,6 +154,8 @@ address straight to Telegram as a voice message, and the case page plays it behi
   No summary, no advice, nothing rephrased. A step with a `conflict` gets the fixed sentence
   "Two different figures were found for this step. See the case file." The connecting words are Finnish for a Finnish case.
 - At most 1,500 characters. A longer plan loses whole steps from the end, never part of a sentence.
+- Model `eleven_flash_v2_5`. A Finnish case is sent with `language_code: "fi"`, so the voice does not change language
+  on its own for an English phrase quoted inside the plan. Other cases are sent without a language.
 - Each version of the spoken text is rendered once and stored next to the case (`audio/<id>-<hash>.mp3`), so a second
   request costs nothing. An updated case gets new audio on the next request.
 - Supports `Range` requests. Sends `cache-control: private, max-age=3600`.

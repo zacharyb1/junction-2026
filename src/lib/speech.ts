@@ -45,19 +45,27 @@ export function spokenText(c: Case): string {
   return build();
 }
 
-/** Names one rendering. A changed text, voice or model gives a new name, so stale audio is never served. */
-export function speechHash(text: string): string {
-  return createHash("sha256").update(`${voiceId()}\n${MODEL}\n${text}`).digest("hex").slice(0, 16);
+/**
+ * A Finnish case is spoken as Finnish throughout. Left to itself the model changes language for an English phrase
+ * quoted inside a Finnish plan, and the figure in it came out unclear: "40 working days" was heard as "fourteen".
+ * Other cases are sent without a language, as before.
+ */
+export const spokenLanguage = (c: Case): string | undefined => (c.language.toLowerCase().startsWith("fi") ? "fi" : undefined);
+
+/** Names one rendering. A changed text, voice, model or language gives a new name, so stale audio is never served. */
+export function speechHash(text: string, language?: string): string {
+  const named = `${voiceId()}\n${MODEL}\n${text}${language ? `\n${language}` : ""}`;
+  return createHash("sha256").update(named).digest("hex").slice(0, 16);
 }
 
 /** Text to speech with ElevenLabs. Returns the MP3. */
-export async function renderSpeech(text: string): Promise<Buffer> {
+export async function renderSpeech(text: string, language?: string): Promise<Buffer> {
   const res = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId())}?output_format=mp3_44100_128`,
     {
       method: "POST",
       headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY ?? "", "content-type": "application/json" },
-      body: JSON.stringify({ text, model_id: MODEL }),
+      body: JSON.stringify({ text, model_id: MODEL, ...(language ? { language_code: language } : {}) }),
       signal: AbortSignal.timeout(20_000),
     },
   );

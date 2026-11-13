@@ -1,5 +1,5 @@
 import { allow } from "@/lib/rate-limit";
-import { renderSpeech, speechHash, spokenText } from "@/lib/speech";
+import { renderSpeech, speechHash, spokenLanguage, spokenText } from "@/lib/speech";
 import { loadAudio, loadCase, saveAudio } from "@/lib/store";
 
 export const maxDuration = 30;
@@ -38,7 +38,8 @@ export async function GET(req: Request, ctx: RouteContext<"/api/cases/[id]/audio
   if (!c) return notFound();
 
   const text = spokenText(c);
-  const hash = speechHash(text);
+  const language = spokenLanguage(c);
+  const hash = speechHash(text, language);
   const stored = await loadAudio(id, hash);
   if (stored) return audioResponse(req, stored);
 
@@ -49,7 +50,7 @@ export async function GET(req: Request, ctx: RouteContext<"/api/cases/[id]/audio
     if (!allow(req, false)) {
       return Response.json({ error: "The demo is busy. Please try again in a minute." }, { status: 429 });
     }
-    job = renderSpeech(text)
+    job = renderSpeech(text, language)
       .then(async (audio) => {
         // A failed save only means the next request renders again.
         await saveAudio(id, hash, audio).catch(() => {});
