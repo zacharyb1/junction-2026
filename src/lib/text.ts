@@ -88,7 +88,7 @@ const FIGURE_NUMBER = `(?:\\d{1,3}(?:[ \u00a0\u202f.,]\\d{3})+(?:[.,]\\d+)?|\\d+
 const FIGURE_LEAD =
   "(?:within|at least|at most|up to|no later than|no earlier than|not more than|a maximum of|a minimum of|vähintään|enintään|viimeistään|högst|minst|senast)";
 const FIGURE = new RegExp(
-  `(?<![\\p{L}\\p{N}])(?:${FIGURE_LEAD}\\s+)?(?:[€£$]\\s?${FIGURE_NUMBER}|${FIGURE_NUMBER}(?:\\s?\\(\\d+\\))?\\s?(?:${PERIOD_WORDS}|${MONEY_WORDS}))(?:\\s+in advance)?(?![\\p{L}\\p{N}])`,
+  `(?<![\\p{L}\\p{N}])(?:${FIGURE_LEAD}\\s+)?(?:(?:[€£$]|EUR|USD|GBP)\\s?${FIGURE_NUMBER}|${FIGURE_NUMBER}(?:\\s?\\(\\d+\\))?\\s?(?:${PERIOD_WORDS}|${MONEY_WORDS}))(?:\\s+in advance)?(?![\\p{L}\\p{N}])`,
   "giu",
 );
 

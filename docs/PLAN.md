@@ -210,6 +210,8 @@ It writes `src/data/scorecard.json`, which the landing page shows after the next
 
 **Run 5, Fri 23:42, final build of the night (adds the nothing-to-research check and highlight links):** 19 of 19 passed, 123 of 123 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 8.3 s.
 
+**Run 6, Sat 00:24, after the fixes from the first case audit:** 19 of 19 passed, 133 of 133 quotes found, 0 plan lines without a source, median 7.1 s, slowest tenth within 11.7 s (four build agents were using the same machine).
+
 What that number means and does not mean:
 - It proves every line shown is backed by a sentence on a page we opened, on the expected official site.
 - It does not prove the plan is complete or that every step is the most relevant one. The engine only publishes what it could ground, so "quotes verified" is high by design.
