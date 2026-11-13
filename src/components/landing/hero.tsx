@@ -31,14 +31,15 @@ export function Hero({ sampleCaseHref }: { sampleCaseHref: string | null }) {
         </TryLink>
         {sampleCaseHref && (
           <LinkButton href={sampleCaseHref} variant="outline" size="cta">
-            <FileCheck /> See a real case file
+            <FileCheck /> See a sample case file
           </LinkButton>
         )}
       </div>
 
       <p className="max-w-xl text-sm text-pretty text-muted-foreground">
         Built first for international families in Finland, who deal with Kela, Vero and landlords in a language
-        they do not read. It works for any country, so ask about yours.
+        they do not read. Twelve countries have a checked list of official sites. Elsewhere it searches the open web
+        and labels every source.
       </p>
     </section>
   );

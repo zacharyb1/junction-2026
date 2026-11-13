@@ -19,7 +19,10 @@ function Tiles({ card }: { card: ScorecardData }) {
   const tiles = [
     { label: "scenarios passed", value: `${totals.passed}/${totals.scenarios}` },
     { label: "quotes verified", value: `${totals.verifiedQuotes}/${totals.totalQuotes}` },
-    { label: totals.unsourcedClaims === 1 ? "unsourced claim" : "unsourced claims", value: String(totals.unsourcedClaims) },
+    {
+      label: totals.unsourcedClaims === 1 ? "plan line without a source" : "plan lines without a source",
+      value: String(totals.unsourcedClaims),
+    },
     { label: "median time", value: seconds(totals.medianMs) ?? DASH, note: p90 ? `90% within ${p90}` : undefined },
   ];
   return (

@@ -29,6 +29,7 @@ const en = {
     "Each page was opened again, by our own server and through Exa, to check that the quoted sentence is really there.",
   foundLive: "Quote found on the live page",
   foundExa: "Quote found in Exa's copy of the page",
+  foundOxylabs: "Quote found on the live page, read through Oxylabs",
   notFound: "Quote not found on the page",
   unreachable: "Page could not be opened",
   official: "Official source",
@@ -42,8 +43,10 @@ const en = {
   trail: (searches: number, pages: number, seconds: string) =>
     `${searches} Exa searches, ${pages} pages opened, ${seconds} seconds`,
   trailNote: (domains: number, cost: string) =>
-    `Search was limited to ${domains || "no"} official sites for this country first. Search cost: $${cost}.`,
-  footer: "This is research, not legal advice. Check the linked official pages before you act. Found with Exa.",
+    `${domains ? `Search started on ${domains} official sites for this country.` : "This search ran on the open web, and each source is labelled."} Search cost: $${cost}.`,
+  footer: "This is research, not legal advice. Check the linked pages before you act. Found with Exa.",
+  notConfirmed: "Not confirmed on a source",
+  showOnPage: "Open the page at this sentence",
 };
 
 export type Labels = typeof en;
@@ -74,6 +77,7 @@ const fi: Labels = {
     "Jokainen sivu avattiin uudelleen, omalta palvelimeltamme ja Exan kautta, jotta varmistettiin, että lainattu lause todella löytyy sivulta.",
   foundLive: "Lainaus löytyi sivulta",
   foundExa: "Lainaus löytyi Exan tallentamasta sivusta",
+  foundOxylabs: "Lainaus löytyi sivulta, luettu Oxylabsin kautta",
   notFound: "Lainausta ei löytynyt sivulta",
   unreachable: "Sivua ei voitu avata",
   official: "Virallinen lähde",
@@ -86,9 +90,11 @@ const fi: Labels = {
   researched: "Miten tämä selvitettiin",
   trail: (searches, pages, seconds) => `${searches} Exa-hakua, ${pages} sivua avattu, ${seconds} sekuntia`,
   trailNote: (domains, cost) =>
-    `Haku rajattiin ensin ${domains || "0"} viralliseen sivustoon tässä maassa. Haun hinta: $${cost}.`,
+    `${domains ? `Haku aloitettiin ${domains} virallisesta sivustosta tässä maassa.` : "Tämä haku tehtiin avoimesta verkosta, ja jokainen lähde on merkitty."} Haun hinta: $${cost}.`,
   footer:
-    "Tämä on tiedonhakua, ei oikeudellista neuvontaa. Tarkista linkitetyt viralliset sivut ennen kuin toimit. Haettu Exalla.",
+    "Tämä on tiedonhakua, ei oikeudellista neuvontaa. Tarkista linkitetyt sivut ennen kuin toimit. Haettu Exalla.",
+  notConfirmed: "Ei vahvistettu lähteestä",
+  showOnPage: "Avaa sivu tämän lauseen kohdalta",
 };
 
 const ALL: Record<string, Labels> = { en, fi };

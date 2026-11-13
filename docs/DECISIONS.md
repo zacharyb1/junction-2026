@@ -30,3 +30,12 @@ Append-only. One line per decision: `[Fri 20:14] Decision — why — who`.
 [Fri 23:15] Hostinger is revisited on Sat 14:00, only if the core is green: a scam check for messages that claim to come from an authority. Ask their booth in the morning whether we get the server — Vlad.
 [Fri 23:15] Hermes runs from a pinned install inside the repo folder (installer flags --dir, --hermes-home, --commit), with nothing installed globally. Reason: easy to remove, and a teammate can reproduce it from the repo — Vlad.
 [Fri 23:15] Beyond the Clinic, Meta glasses and MariaDB's main challenge were considered for this product and parked: no job in Kaveri, see docs/TECH_CHALLENGES.md — Vlad.
+[Fri 23:35] Review of the engine by four code reviewers and a read of 13 live cases. Fixed the same night: quotes are shown in the page's own words only; numbers match as whole numbers; a deadline or amount needs one sentence on its own page; no fact is borrowed from another page; unsourced figures are removed from titles, details and summaries.
+[Fri 23:35] Two sources with different figures for one step are both shown ("Two figures found"), instead of one silently winning. Replaces the "memory versus web" card on the landing page, which nothing in the engine produced.
+[Fri 23:35] A time limit that binds someone else (airline refund, landlord notice) is listed under entitlements, not as the family's deadline.
+[Fri 23:35] Unknown country names return 400. Before, "France" resolved to a retired code and every search failed.
+[Fri 23:35] Public demo: 20 requests per minute per address (a venue shares one), 40 in total, fast mode only. Deep research needs the bot secret.
+[Fri 23:35] Change watch: a page that does not open is reported as unreachable and keeps its last confirmed state. A quote last confirmed live must still be on a live reading.
+[Fri 23:35] The scaffold's /api/chat now needs the bot secret. The /chat page and src/lib/ai.ts are unused and can be deleted by a person.
+[Fri 23:45] A message with nothing to research (gibberish, small talk) now gets a clear answer instead of an invented plan. Asking the search model to flag it did not work, so the engine checks that a word of the message comes back in what the search wrote or quoted.
+[Fri 23:45] Each verified source links to the official page with the quoted sentence highlighted (text fragment).

@@ -18,7 +18,7 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Try it on your own life</h1>
         <p className="text-muted-foreground">
-          Same engine the butler uses in the family chat. It searches official sites for your country with Exa, opens
+          Same engine the butler uses in the family chat. It searches the live web with Exa, official sites first, opens
           every page it cites, and keeps only what it can point at.
         </p>
       </header>

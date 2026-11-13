@@ -21,7 +21,8 @@ const evidenceRefs = z
 
 export const EvidenceInput = z.object({
   n: z.number().int().positive().describe("Citation number, starting at 1."),
-  url: z.url().describe("Exact URL of the page that was read."),
+  // Only web addresses: the case page renders this as a link, so "javascript:" and the like must never get in.
+  url: z.url({ protocol: /^https?$/ }).describe("Exact URL of the page that was read. http or https only."),
   title: z.string().min(1).max(200),
   publisher: z.string().max(120).optional().describe("Who runs the page, e.g. Kela."),
   quote: z
@@ -51,6 +52,11 @@ export const StepInput = z.object({
   due: z.string().max(120).optional().describe("ISO date YYYY-MM-DD when known, otherwise a short phrase."),
   status: z.enum(["todo", "needs_approval", "done"]).default("todo"),
   confidence: z.enum(["low", "medium", "high"]).optional().describe("Exa's grounding confidence for this step, when known."),
+  conflict: z
+    .string()
+    .max(400)
+    .optional()
+    .describe("Set when two sources give different figures for this step. Names both, so the reader can check which applies."),
   evidence: evidenceRefs,
 });
 
@@ -89,12 +95,22 @@ export const CaseInput = z.object({
   openQuestions: z.array(z.string().max(300)).max(10).default([]),
 });
 
+// Patch items carry no defaults: a field that is left out keeps its stored value.
+const optionalRefs = z.array(z.number().int().positive()).optional();
+const StepPatch = StepInput.extend({ status: z.enum(["todo", "needs_approval", "done"]).optional(), evidence: optionalRefs });
+const MoneyPatch = MoneyInput.extend({ evidence: optionalRefs });
+const EvidencePatch = EvidenceInput.extend({ sourceType: z.enum(["official", "secondary"]).optional() });
+
 export const CasePatch = z.object({
   title: z.string().min(1).max(140).optional(),
   summary: z.string().min(1).max(800).optional(),
-  steps: z.array(StepInput).max(LIMITS.steps).optional().describe("Replaces steps with the same id or title, appends new ones."),
-  money: z.array(MoneyInput).max(LIMITS.money).optional(),
-  evidence: z.array(EvidenceInput).max(LIMITS.evidence).optional().describe("Replaces items with the same n, appends new ones."),
+  steps: z
+    .array(StepPatch)
+    .max(LIMITS.steps)
+    .optional()
+    .describe("Updates steps with the same title (fields you leave out are kept), appends new ones."),
+  money: z.array(MoneyPatch).max(LIMITS.money).optional(),
+  evidence: z.array(EvidencePatch).max(LIMITS.evidence).optional().describe("Replaces items with the same n, appends new ones."),
   drafts: z.array(DraftInput).max(LIMITS.drafts).optional(),
   unverified: z.array(z.string().max(300)).max(10).optional(),
   openQuestions: z.array(z.string().max(300)).max(10).optional(),
@@ -111,8 +127,11 @@ export type Evidence = EvidenceInput & {
   verification: Verification;
   /** Share of the quote's word windows found on the page, 0 to 1. */
   match: number;
-  /** live: found by our own request to the page. exa: found in Exa's reading of the page. */
-  checkedVia?: "live" | "exa";
+  /**
+   * live: found by our own request to the page. oxylabs: found on a live read through Oxylabs,
+   * for pages that refuse our request. exa: found in Exa's reading of the page.
+   */
+  checkedVia?: "live" | "exa" | "oxylabs";
 };
 
 export type Step = z.infer<typeof StepInput> & { id: string };
@@ -125,6 +144,8 @@ export type Trail = {
   pagesRead: number;
   costDollars: number;
   officialDomains: number;
+  /** Pages opened by each reader. */
+  readers?: { live: number; exa: number; oxylabs: number };
   events: { ms: number; detail: string }[];
 };
 

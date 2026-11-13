@@ -51,3 +51,6 @@ scripts/.*
 
 # repo-local Hermes install, Hermes home and local model data (hermes/setup-local.sh)
 .hermes-local/
+
+# Worktrees of background agents
+.claude/worktrees/

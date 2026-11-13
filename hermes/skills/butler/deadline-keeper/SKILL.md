@@ -38,11 +38,11 @@ Reply with the text from the job prompt and nothing else.
 1. For every "Open case <id>" entry in memory call `mcp__casefile__case_recheck` with that `id`.
 2. Every `changed` list empty: reply exactly `[SILENT]`.
 3. Otherwise, one line per changed case: "A source for <case title> changed (citations <numbers>). Re-check before acting: <url>". Do not guess what changed.
-4. A failed call means unknown, not changed: stay `[SILENT]`.
+4. A failed call means unknown, not changed: stay `[SILENT]`. The same goes for the `unreachable` list in the result: a page that did not open today says nothing about the rule.
 
 ## Step done, case finished
 
-- Step done: send the whole step from `case_get` back through `mcp__casefile__case_update` (`patch.steps`) with only `status` changed to `done`.
+- Step done: call `mcp__casefile__case_update` with `patch.steps` holding the step's exact `title` and `status: "done"`. Fields you leave out keep their stored value.
 - Case finished: remove its "Open case" entry from memory and its reminders (`cronjob_manage` `list`, then `remove`).
 
 ## Pitfalls

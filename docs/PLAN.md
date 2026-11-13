@@ -26,7 +26,10 @@ First audience: international families in Finland, who deal with Kela, Vero, Mig
 | Case page | Working, phone first, English with Finnish labels for Finnish cases. | `src/app/c/[id]/page.tsx` |
 | Browser demo | Working with live progress. | `src/app/try/`, `/try?code=...` |
 | Landing page | Built, shows the real scorecard. Needs a human eye for wording. | `src/app/page.tsx`, `src/components/landing/` |
-| Scorecard runner | Working. First real run Fri 21:40: 19 of 19 passed. | `eval/` |
+| Scorecard runner | Working. Runs 4 and 5 on Fri night, after the review fixes: 19 of 19 passed both times, 133 of 133 and 123 of 123 quotes found. | `eval/` |
+| Review fixes | Done Fri night: stricter grounding, conflict labels, safe page fetch, country names, demo limits, accurate page copy. See section 4 and `docs/DECISIONS.md`. | pull request 5 |
+| Highlight links | Each verified source links to the official page with the quoted sentence highlighted (text fragment, works in Chrome, Edge, Safari). | `src/app/c/[id]/page.tsx` |
+| Pitch kit | Story, numbers, criteria table, two-minute video script, demo script, judge questions. | `docs/PITCH.md` |
 | Bot template for Hermes | Written: runbook, persona, config, three skills, install script. Not yet run on a real machine. | `hermes/` |
 | GitHub | Private repo `zacharyb1/junction-2026`, `main` pushed. Vercel deploys from it. | github.com |
 | Production | **Live** at https://junction-2026.vercel.app: landing, `/try`, case pages, API, MCP. Research itself waits for the Exa key, see section 9. | Vercel project `junction-2026` |
@@ -79,8 +82,14 @@ Why the research moved out of the chat model and into the web app:
 1. **Jurisdiction lock.** Country and city resolve to a list of official domains (`src/data/official-sources*.json`). Exa's `includeDomains` accepts wildcards such as `*.gov`, which covers city and state sites.
 2. **Three structured searches in parallel**, `type: "auto"`, each with `outputSchema`, `systemPrompt`, `objective`, `userLocation` and highlights: actions and deadlines, money and entitlements, how and where to apply. Each returns steps with a deadline, an amount, a quoted sentence and a source URL, plus Exa's per-field grounding confidence.
 3. **Read every cited page twice, in parallel:** our own live HTTP request, and Exa Contents in one batch call. Some government sites refuse fresh crawls, so two readings matter.
-4. **Ground everything.** A quote must be on the page, or it is replaced by the closest real sentence, or the step is dropped. A deadline or amount must be stated in a sentence on a fetched page. Placeholders, formatting leaks and vague values ("as soon as possible") are discarded. Values the family supplied themselves are not treated as claims.
-5. **Publish.** Verified lines become the chat plan. Everything else is listed under "could not confirm". The case stores a research trail: every search, every page, timings and cost.
+4. **Ground everything.** The rules, tightened after the code review on Fri night (`src/lib/engine/ground.ts`, `src/lib/text.ts`):
+   - A quote is shown only in the page's own words. A model quote that is on the page word for word is kept. Anything else is replaced by the closest real sentence, or the step is dropped. A quote that only resembles the page is never shown.
+   - A deadline or amount needs one sentence, on the page it was taken from, that carries every one of its numbers as a whole number ("2" is not found inside "2026"), most of its words, and the same direction in time ("before" does not support "after"). A tiered amount may rest on up to four list lines that follow each other. A fact is never borrowed from a different page.
+   - A figure in a step title, detail, summary or open question that is on no cited page is removed, sentence by sentence. Figures the family gave us are exempt.
+   - When two sources give different figures for one step, both are shown with their numbers ("Two figures found"). Different percentages across steps are pointed out in the gaps list.
+   - A time limit that binds someone else (an airline's refund period, a landlord's notice period) is listed as an entitlement, not as the family's deadline.
+   - Placeholders, formatting leaks, vague values ("as soon as possible") and bare numbers such as form codes are discarded.
+5. **Publish.** Verified lines become the chat plan. Everything else is listed under "could not confirm". The case stores a research trail: every search, every page, timings and cost. One failed search no longer fails the case: the other searches carry it.
 
 Limits found tonight, all handled in code:
 - Exa allows 10 search requests per second per team. The engine retries with backoff. The scorecard runs with concurrency 2.
@@ -173,6 +182,9 @@ If Telegram or the laptop fails, the same story runs from `/try` on a phone. Rec
 2. **Telegram bot token** from BotFather, and a model key for the bot runtime.
 3. **Bot track decision** by Sat 10:30: Hermes or Hono with Mastra.
 4. **Bot connection values** are in `.env.bot` in this folder (not committed): engine URL, `CASEFILE_SECRET`, demo access code.
+5. **Merge the pull requests in order:** 1 (Exa skill and sources), then 4 (Oxylabs reader), then 5 (review fixes). Each is stacked on the one before. Production stays on the old build until they are merged.
+6. **Delete the scaffold chat** by hand: `src/app/chat`, `src/app/api/chat`, `src/lib/ai.ts`, and the `ai` and `@ai-sdk/*` packages. The endpoint is already locked behind the bot secret, so this is tidying, not a risk.
+7. **Read five cases as a human** before the pitch (pregnancy, rent letter, flight, renovation, one of your own) and note anything wrong in `docs/DECISIONS.md`.
 
 Resolved Fri evening: the private GitHub repo exists and is connected to Vercel, and commits carry the owner's GitHub no-reply address so Vercel accepts them.
 
@@ -191,6 +203,12 @@ It writes `src/data/scorecard.json`, which the landing page shows after the next
 **Run 1, Fri 21:40, local engine, fast mode:** 19 of 19 passed, 110 of 110 quotes found on their pages, 0 unsourced claims, median 7.0 s, slowest tenth within 14.7 s. Detail in `eval/results/latest.md`.
 
 **Run 2, Fri 22:00, final engine with the full source map and the open-web mode:** 18 of 19 passed, 120 of 121 quotes found, 0 unsourced claims, median 7.3 s, slowest tenth within 10.2 s. The one failure is the lost-passport scenario: six official sources, but no deadline or amount in the plan, which the pass rule asks for. It stays on the scorecard as a failure.
+
+**Run 3, Fri 22:50, with the third page reader:** 18 of 19 passed, 126 of 127 quotes found, median 6.1 s. The failure was the car-inspection scenario.
+
+**Run 4, Fri 23:30, after the review fixes (stricter grounding, see section 4):** 19 of 19 passed, 133 of 133 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 9.6 s. Two earlier runs of the same build during the evening each failed one scenario (rent letter with no deadline or amount, parking fine with one source). Both led to a fix, and both result files are kept in `eval/results/`. Expect 18 or 19 of 19 on any given run: the search model's output varies.
+
+**Run 5, Fri 23:42, final build of the night (adds the nothing-to-research check and highlight links):** 19 of 19 passed, 123 of 123 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 8.3 s.
 
 What that number means and does not mean:
 - It proves every line shown is backed by a sentence on a page we opened, on the expected official site.

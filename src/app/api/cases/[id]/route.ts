@@ -28,5 +28,5 @@ export async function POST(req: Request, ctx: RouteContext<"/api/cases/[id]">) {
   const { id } = await ctx.params;
   const result = await recheckCase(id);
   if (!result) return Response.json({ error: "not found" }, { status: 404 });
-  return Response.json({ id, changed: result.changed, url: `${baseUrl(req)}/c/${id}` });
+  return Response.json({ id, changed: result.changed, unreachable: result.unreachable, url: `${baseUrl(req)}/c/${id}` });
 }

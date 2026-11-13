@@ -58,37 +58,59 @@ const EU_MEMBERS = new Set(
 
 const ALIASES: Record<string, string> = {
   uk: "GB",
-  "united kingdom": "GB",
+  britain: "GB",
   "great britain": "GB",
   england: "GB",
   scotland: "GB",
   wales: "GB",
+  "northern ireland": "GB",
   usa: "US",
-  "united states": "US",
   "united states of america": "US",
   america: "US",
-  suomi: "FI",
-  deutschland: "DE",
   holland: "NL",
   "the netherlands": "NL",
-  czechia: "CZ",
+  "czech republic": "CZ",
+  turkey: "TR",
+  korea: "KR",
+  "hong kong": "HK",
+  macau: "MO",
+  "republic of ireland": "IE",
+  "ivory coast": "CI",
+  uae: "AE",
+  bosnia: "BA",
 };
 
-const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+// Codes Intl still names but no country uses any more, and codes that are not countries.
+const NOT_A_COUNTRY = new Set("AN BU CS DD DY FX HV NH RH SU TP UK VD YD YU ZR EU EZ UN ZZ XA XB QO".split(" "));
 
+const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+const CODES = new Set<string>();
+
+/** Country names in English and the other answer languages, mapped to ISO codes. */
 function nameToCode(): Map<string, string> {
   const map = new Map<string, string>();
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  // English first, so an English name always wins a clash. Then the other answer languages.
+  const locales = ["en", "fi", "sv", "de", "fr", "es", "et", "uk"].map((l) => new Intl.DisplayNames([l], { type: "region" }));
   for (const a of letters) {
     for (const b of letters) {
       const code = a + b;
-      let name: string | undefined;
-      try {
-        name = regionNames.of(code);
-      } catch {
-        name = undefined;
+      if (NOT_A_COUNTRY.has(code)) continue;
+      for (const names of locales) {
+        let name: string | undefined;
+        try {
+          name = names.of(code);
+        } catch {
+          name = undefined;
+        }
+        if (!name || name === code) continue;
+        CODES.add(code);
+        const lower = name.toLowerCase();
+        // "Bosnia & Herzegovina", "Myanmar (Burma)", "St. Lucia" should be found however they are typed.
+        for (const variant of [lower, lower.replace(/ & /g, " and "), lower.replace(/\s*\(.*\)\s*/g, "").trim(), lower.replace(/^st\. /, "saint ")]) {
+          if (variant && !map.has(variant)) map.set(variant, code);
+        }
       }
-      if (name && name !== code) map.set(name.toLowerCase(), code);
     }
   }
   return map;
@@ -106,12 +128,13 @@ export type Jurisdiction = {
 
 const uniq = (items: string[]) => [...new Set(items.map((h) => h.toLowerCase().replace(/^www\./, "")))];
 
+/** `code` is empty when the country is not recognised. Callers must not guess. */
 export function resolveJurisdiction(country: string, region?: string): Jurisdiction {
   const raw = country.trim();
-  const lower = raw.toLowerCase();
-  let code = ALIASES[lower] ?? (raw.length === 2 ? raw.toUpperCase() : NAME_TO_CODE.get(lower)) ?? "";
-  if (code === "UK") code = "GB";
-
+  // "Finland (Espoo)" and "Finland, Espoo" name the country first.
+  const lower = raw.toLowerCase().replace(/\s*[(,].*$/, "").replace(/\s+/g, " ").trim();
+  const upper = lower.toUpperCase();
+  const code = ALIASES[lower] ?? (lower.length === 2 && CODES.has(upper) ? upper : NAME_TO_CODE.get(lower)) ?? "";
   let name = raw;
   if (code) {
     try {
@@ -131,7 +154,7 @@ export function resolveJurisdiction(country: string, region?: string): Jurisdict
   }
 
   return {
-    code: code || raw.toUpperCase().slice(0, 2),
+    code,
     name: entry?.name ?? name,
     region: region?.trim() || undefined,
     officialDomains: uniq(domains),

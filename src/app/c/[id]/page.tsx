@@ -7,8 +7,10 @@ import {
   ExternalLink,
   Hand,
   HelpCircle,
+  Highlighter,
   History,
   MapPin,
+  Scale,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -25,8 +27,18 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: PageProps<"/c/[id]">): Promise<Metadata> {
   const { id } = await params;
   const c = await loadCase(id);
-  return { title: c ? c.title : "Case not found", robots: { index: false } };
+  return {
+    title: c ? c.title : "Case not found",
+    description: c ? c.summary.slice(0, 200) : undefined,
+    robots: { index: false },
+  };
 }
+
+/** A stored value that is not a real date must never break the page. */
+const validDate = (value: string | undefined) => {
+  const date = value ? new Date(value) : null;
+  return date && !Number.isNaN(date.getTime()) ? date : null;
+};
 
 const host = (url: string) => {
   try {
@@ -36,19 +48,39 @@ const host = (url: string) => {
   }
 };
 
-const when = (iso: string, t: Labels) =>
-  new Intl.DateTimeFormat(t.locale, {
+/**
+ * Link to the page with the quoted sentence highlighted, using a text fragment (`#:~:text=start,end`).
+ * Chrome, Edge and Safari scroll to the sentence and mark it. Other browsers just open the page.
+ * Not used for PDFs or for addresses that already carry a fragment.
+ */
+function highlightUrl(url: string, quote: string): string | null {
+  if (url.includes("#") || /\.pdf($|\?)/i.test(url)) return null;
+  const words = quote.replace(/\s+/g, " ").trim().split(" ");
+  if (words.length < 3) return null;
+  // A dash, comma or ampersand has a meaning inside a text fragment, so each is encoded.
+  const part = (list: string[]) => encodeURIComponent(list.join(" ")).replace(/-/g, "%2D");
+  const fragment = words.length > 10 ? `${part(words.slice(0, 5))},${part(words.slice(-5))}` : part(words);
+  return `${url}#:~:text=${fragment}`;
+}
+
+const when = (iso: string | undefined, t: Labels) => {
+  const date = validDate(iso);
+  if (!date) return "";
+  return new Intl.DateTimeFormat(t.locale, {
     day: "numeric",
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "Europe/Helsinki",
-  }).format(new Date(iso));
+  }).format(date);
+};
 
 function due(value: string | undefined, t: Labels) {
   if (!value) return null;
-  if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
-    return new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(value));
+  // Only a plain ISO date is reformatted. "2026-11-30 at the latest" stays as written.
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value.trim()) ? validDate(value.trim()) : null;
+  if (date) {
+    return new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
   }
   return value;
 }
@@ -76,10 +108,12 @@ const STATUS = {
   done: { icon: CircleCheck, label: "done", tone: "text-emerald-600 dark:text-emerald-400" },
 } as const;
 
-function StepRow({ step, t }: { step: Step; t: Labels }) {
+function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<number> }) {
   const status = STATUS[step.status];
   const Icon = status.icon;
-  const deadline = due(step.due, t);
+  // A step stands only on quotes that were found on their pages. Without one, its deadline is not shown as fact.
+  const confirmed = step.evidence.some((n) => verified.has(n));
+  const deadline = confirmed ? due(step.due, t) : null;
   return (
     <li className="flex gap-3">
       <Icon className={`mt-0.5 size-5 shrink-0 ${status.tone}`} aria-label={t[status.label]} />
@@ -89,10 +123,21 @@ function StepRow({ step, t }: { step: Step; t: Labels }) {
           <Refs refs={step.evidence} />
         </p>
         {step.detail && <p className="mt-1 text-sm text-muted-foreground">{step.detail}</p>}
+        {step.conflict && (
+          <p className="mt-2 flex gap-2 rounded-lg bg-amber-50 p-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+            <Scale className="mt-0.5 size-4 shrink-0" /> {step.conflict}
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap gap-2 text-xs">
+          {!confirmed && (
+            <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+              <CircleAlert /> {t.notConfirmed}
+            </Badge>
+          )}
           {deadline && (
-            <Badge variant="secondary">
-              <CalendarClock /> {deadline}
+            // A deadline can be a whole phrase, so the badge may wrap on a narrow screen.
+            <Badge variant="secondary" className="h-auto max-w-full items-start whitespace-normal py-1 text-left">
+              <CalendarClock className="mt-0.5" /> {deadline}
             </Badge>
           )}
           {step.owner && <Badge variant="outline">{step.owner}</Badge>}
@@ -114,7 +159,7 @@ function Mark({ e, t }: { e: Evidence; t: Labels }) {
   if (e.verification === "verified") {
     return (
       <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
-        <BadgeCheck /> {e.checkedVia === "exa" ? t.foundExa : t.foundLive}
+        <BadgeCheck /> {e.checkedVia === "exa" ? t.foundExa : e.checkedVia === "oxylabs" ? t.foundOxylabs : t.foundLive}
       </Badge>
     );
   }
@@ -149,6 +194,16 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
       </div>
       <blockquote className="mt-3 border-l-2 border-primary/40 pl-3 text-sm italic">“{e.quote}”</blockquote>
       {e.quoteTranslation && <p className="mt-2 pl-3.5 text-sm text-muted-foreground">{e.quoteTranslation}</p>}
+      {e.verification === "verified" && highlightUrl(e.url, e.quote) && (
+        <a
+          href={highlightUrl(e.url, e.quote) ?? e.url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1 pl-3.5 text-sm font-medium text-primary hover:underline"
+        >
+          <Highlighter className="size-3.5 shrink-0" /> {t.showOnPage}
+        </a>
+      )}
       {e.priorBelief && (
         <div className="mt-3 rounded-lg bg-muted p-3 text-sm">
           <p className="flex items-center gap-1.5 font-medium">
@@ -189,7 +244,8 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
 
 function Header({ c, t }: { c: Case; t: Labels }) {
   const verified = verifiedCount(c);
-  const deadlines = c.steps.filter((s) => s.due).length;
+  const found = new Set(c.evidence.filter((e) => e.verification === "verified").map((e) => e.n));
+  const deadlines = c.steps.filter((s) => s.due && s.evidence.some((n) => found.has(n))).length;
   const approvals = c.steps.filter((s) => s.status === "needs_approval").length;
   return (
     <header className="flex flex-col gap-4">
@@ -225,6 +281,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
   if (!c) notFound();
   // English unless the case itself was written in a language we have labels for.
   const t = labels(c.language);
+  const verified = new Set(c.evidence.filter((e) => e.verification === "verified").map((e) => e.n));
 
   return (
     <main lang={c.language} className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-8 sm:py-12">
@@ -234,7 +291,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
         <Section title={t.whatToDo} hint={t.whatToDoHint}>
           <ol className="flex flex-col gap-5">
             {c.steps.map((step) => (
-              <StepRow key={step.id} step={step} t={t} />
+              <StepRow key={step.id} step={step} t={t} verified={verified} />
             ))}
           </ol>
         </Section>
@@ -244,7 +301,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
         <Section title={t.money}>
           <div className="grid gap-3 sm:grid-cols-2">
             {c.money.map((m) => (
-              <Card key={m.label}>
+              <Card key={`${m.label} ${m.amount}`}>
                 <CardHeader>
                   <CardDescription>
                     {m.label}

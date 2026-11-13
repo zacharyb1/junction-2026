@@ -43,9 +43,10 @@ Request body, same fields for both:
 ```
 
 - `situation` required, 10 to 1500 characters, in the user's own words.
-- `country` required: ISO 3166-1 alpha-2 code or an English country name.
+- `country` required: ISO 3166-1 alpha-2 code or a country name in English, Finnish or Swedish. An unknown country returns 400, it is never guessed.
 - `region`, `language` (default `en`), `household`, `document` optional.
-- `depth`: `fast` (default, about 6 to 12 seconds) or `deep` (a fourth question and Exa deep search, slower).
+- `depth`: `fast` (default, about 6 to 12 seconds) or `deep` (a fourth question and Exa deep search, slower). `deep` needs the bot secret. With the public demo code the request runs as `fast`.
+- A step in the stored case can carry `conflict`: a sentence naming two different figures and their citation numbers.
 - Write `situation` in English when you can. Finnish and other languages work too.
 
 Response `200`:
@@ -66,6 +67,7 @@ Response `200`:
   "ms": 8122,
   "timings": { "searchMs": 5866, "readMs": 1620, "verifyMs": 149 },
   "exa": { "searches": 3, "contents": 5, "costDollars": 0.021 },
+  "readers": { "live": 4, "exa": 5, "oxylabs": 0 },
   "jurisdiction": { "country": "Finland", "region": "Espoo", "officialDomains": 29 }
 }
 ```
@@ -132,10 +134,28 @@ MCP tools on the same server, REST equivalents in brackets:
 | `case_publish` (`POST /api/cases`) | a full case, see `CaseInput` in `src/lib/case.ts` | id, url, verified counts, failed citation numbers |
 | `case_update` (`PATCH /api/cases/:id`) | `{ id, patch }`, see `CasePatch` | same as publish |
 | `case_get` (`GET /api/cases/:id`) | `{ id }` | the stored case with a verification mark per source |
-| `case_recheck` (`POST /api/cases/:id`) | `{ id }` | `{ id, changed: number[], url }`, empty `changed` means nothing moved |
+| `case_recheck` (`POST /api/cases/:id`) | `{ id }` | `{ id, changed: number[], unreachable: number[], url }`. `changed`: the sentence is gone from a page that still opens. `unreachable`: the page did not open this time, the last confirmed state is kept. Stay silent when `changed` is empty |
+
+`case_update` changes only the fields you send. A step is matched by its title, a money line by its label, evidence by `n`.
+A quote last confirmed on a live reading must still be on a live reading at re-check, whatever Exa's older copy says.
 
 Verification marks on each evidence item: `verified`, `not_found`, `unreachable`, plus `match` from 0 to 1
-and `checkedVia`: `live` (our own request to the page) or `exa` (Exa's reading of the page).
+and `checkedVia`: `live` (our own request to the page), `oxylabs` (a live read through the Oxylabs Web API,
+for pages that refuse our request) or `exa` (Exa's reading of the page).
+
+## Page readers
+
+Finding is always Exa. Reading a cited page to check a quote can go three ways:
+
+| Reader | When | Call |
+|---|---|---|
+| Our own request | always | plain HTTPS GET from the server |
+| Exa Contents | always, in one batch | `POST https://api.exa.ai/contents` |
+| Oxylabs Web API | only when our own request was refused, and only if `OXYLABS_API_KEY` is set | `POST https://webapi.oxylabs.io/v1/scrape` with `{ "url": "...", "output": ["markdown"] }` |
+
+In fast research the Oxylabs read is spent only on pages nothing else could open. In deep research and in `case_recheck`
+every refused page gets a live Oxylabs read. The research trail on the case page records it.
+Not yet run against the real Oxylabs API: it was tested against a local stand-in shaped like their documented response.
 
 ## What the bot does and does not do
 
@@ -151,6 +171,9 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `EXA_API_KEY` | Vercel, Hermes `.env` | engine and verifier, Hermes web search |
 | `CASEFILE_SECRET` | Vercel, Hermes `.env` | bot and script writes |
 | `DEMO_ACCESS_CODE` | Vercel | public `/try` access |
+| `DEMO_RATE_PER_MINUTE` | Vercel, optional | public requests per client address per minute, default 20 (a venue shares one address) |
+| `DEMO_RATE_TOTAL_PER_MINUTE` | Vercel, optional | all public requests per minute, default 40 |
+| `OXYLABS_API_KEY` | Vercel, optional | third page reader for sites that refuse our request |
 | `BLOB_READ_WRITE_TOKEN` | Vercel, set by the Blob store | case storage |
 | `PUBLIC_BASE_URL` | Vercel, optional | overrides the origin used in case links |
 | `NEXT_PUBLIC_BOT_USERNAME` | Vercel | QR code and links to the Telegram bot |
