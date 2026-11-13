@@ -1,0 +1,20 @@
+# Production-style run of the bot. Not used for development (that is the devcontainer).
+#   docker compose up --build
+services:
+  bot:
+    build: .
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: '4111'
+      DATABASE_URL: file:./data/mastra.db
+    ports:
+      # There is no auth on the Mastra API (/api/*), so publish on localhost only.
+      # Put a reverse proxy in front and expose just /webhooks/exa-monitor if Exa must reach it.
+      - '127.0.0.1:4111:4111'
+    volumes:
+      - bot-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  bot-data:
