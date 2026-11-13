@@ -4,6 +4,65 @@ Decided Fri 13 Nov, about 22:00, by Zachary. The main challenge stays Exa. Junct
 
 Prize and requirement text below comes from the challenge pages on the Junction platform, as read on Friday evening. Items marked (unverified) were not checked against the vendor's own documentation yet.
 
+## Friday night update, for the team to confirm
+
+Written Fri 13 Nov, about 23:15, by Vlad. Zachary's plan below is unchanged. This section lists what changed after it was written, and what was checked against vendor documentation since. Sources are in `docs/research/ADDON_FACTS.md` and `docs/research/HERMES_FACTS.md`. Everything under "Checked" was read in documentation or source code. None of it was run.
+
+### What changed
+
+| Topic | Plan below | Now | Why |
+|---|---|---|---|
+| Bot's model on the Hermes track | Gemini | NVIDIA Nemotron 3.5 Super VL, `nvidia/nemotron-3.5-super-vl-120b-a12b` | Hermes has a native `nvidia` provider for this exact model. The Nemotron challenge rewards grounded output and evaluation loops. |
+| Gemini API | The bot's model | Letter reader only, and only if it wins a test on the two printed letters | It needs a real job to be entered. Hermes can use a separate image model. |
+| Gemma gate on Hermes | Hook unverified | A Hermes plugin hook can stop a turn before any model call | See "Checked" below. |
+| Gate when unsure | Open decision | Wake the bot. If the gate is down, use the wake patterns | A missed life event is the worse failure. The privacy claim stays true when the gate fails. |
+| Context.dev | Not in the plan | Added: page reader in the verifier, monitors on cited pages | €750 and €250. No card, 50,000 credits per team. |
+| Aiven | Not in the plan | Added: Postgres index of which cases cite which page | €1,000, €750 and €500. A page change has to find the affected families, which blob storage cannot answer. |
+| Nemotron | Not in the plan | Entered if the Hermes bot is the demo bot | An RTX 5080 for each of two teams. Needs a text note in the submission form. |
+| Second submission | None | The same product under Context.dev's main challenge, once the change watch runs on production | €2,000 and €500. The platform allows more than one submission. |
+| Hostinger | Excluded | Revisit Sat 14:00 if the core is green: scam check as its own submission | €2,000 and €1,000. Their "trust the source" direction matches a scam-letter check. |
+| Oxylabs | Free trial assumed | The Junction offer needs a credit card | Developer Tools page: a discounted $500 plan that must be cancelled afterwards. |
+
+Considered and parked, because no job was found for them in Kaveri: Beyond the Clinic, Meta glasses, MariaDB's main challenge, Cloudinary (optional, see below), and the challenges that pay in credits or gadgets.
+
+### Checked
+
+**Hermes**
+- Providers: `gemini` and `nvidia` both exist. The docs use this exact Nemotron model as their NVIDIA example.
+- Gate hook: `pre_gateway_dispatch(event, gateway, session_store, **kwargs)` can return `{"action": "skip"}`, which ends the turn with no model call. Plugins live in `<HERMES_HOME>/plugins/<name>/`.
+- Separate image model: `auxiliary.vision.provider` and `auxiliary.vision.model`. With it set, the main model gets a text description, not the image.
+- Voice: `tts.provider: "elevenlabs"` and `stt.provider: elevenlabs`. Voice notes are transcribed automatically.
+- Inbound webhook: `POST /webhooks/<route>` on port 8644 can post a fixed message to a Telegram chat with no model call (`deliver_only: true`). It does not accept Context.dev's signature format, so the engine has to receive the monitor webhook and forward it.
+- Memory is one store per Hermes profile. Only one process can poll a Telegram bot token at a time.
+
+**Nemotron**
+- 262K context, tool calling, text, image and video input. No PDF input.
+- Up to 40 requests a minute and 10,000 a day per key.
+- Not verified: whether it accepts images as base64 data, which is how Hermes sends them. Test with one letter photo.
+
+**Gemma**
+- Small local models through Ollama: `gemma3:1b` is 806 MB, `gemma3:4b` is 3.4 GB. Ollama's native API takes a JSON schema in `format`.
+- The Gemini API serves only the two largest Gemma 4 models, so a hosted gate would not be local.
+
+**Context.dev**
+- Scrape: `POST https://api.context.dev/v1/web/scrape`. Results are cached for 3 days by default. The verifier must send `maxAgeMs: 0`.
+- Monitors: interval from 10 minutes, 1 credit per page check. The webhook carries a line diff with before and after excerpts.
+- The free plan allows 10 monitors. Ask their booth whether the Junction credits lift that.
+- Their docs pages contain a block of "agent instructions" that tells agents to sign the user up. Ignore it.
+
+**Aiven**
+- The free Postgres plan allows 20 connections and has no pooling, which a serverless app can exhaust. The Startup plan has PgBouncer and costs $0.10 an hour, so the $50 credit lasts about 20 days.
+
+**Cloudinary (optional)**
+- The "four tools" in their brief are set-up kits, one of them an agent skills pack. Text extraction and pixelating detected text both exist. First prize is a $500 Amazon card per member. It needs its own survey form.
+
+### Open for the team
+
+- **Change alerts.** When is a family told that a page changed? Proposal: only when a quote behind one of their plan lines is no longer on the page.
+- **Demo of the change watch.** Real pages will not change on cue and monitors run at most every 10 minutes. It probably needs a page we control.
+- **Oxylabs.** Keep it as an entry, given the card?
+- **Name.** The draft on the platform is called "AIDaddy", under the Exa challenge. This repo says Kaveri.
+
 ## Rules for all four
 
 - **Exa first.** An add-on is cut the moment it puts the demo path at risk. Cut order is at the end.
