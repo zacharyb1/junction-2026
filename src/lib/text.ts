@@ -80,3 +80,20 @@ export const isNumber = (token: string) => /^\d+(\.\d+)?$/.test(token);
 
 /** Every number in a text, as whole canonical tokens. "2" is not found inside "2026" or "12". */
 export const numbersIn = (text: string): string[] => tokens(text).filter(isNumber);
+
+const PERIOD_WORDS =
+  "working days?|days?|weeks?|months?|years?|arkipäivää|päivää|päivän|viikkoa|viikon|kuukautta|kuukauden|vuotta|vuoden|dagar|veckor|månader|år";
+const MONEY_WORDS = "€|euros?|euroa|eur|%|per ?cent|prosenttia|procent|kronor|£|pounds?|\\$|dollars?|usd";
+const FIGURE_NUMBER = `(?:\\d{1,3}(?:[ \u00a0\u202f.,]\\d{3})+(?:[.,]\\d+)?|\\d+(?:[.,]\\d+)?|${Object.keys(NUMBER_WORDS).join("|")})`;
+const FIGURE_LEAD =
+  "(?:within|at least|at most|up to|no later than|no earlier than|not more than|a maximum of|a minimum of|vähintään|enintään|viimeistään|högst|minst|senast)";
+const FIGURE = new RegExp(
+  `(?<![\\p{L}\\p{N}])(?:${FIGURE_LEAD}\\s+)?(?:(?:[€£$]|EUR|USD|GBP)\\s?${FIGURE_NUMBER}|${FIGURE_NUMBER}(?:\\s?\\(\\d+\\))?\\s?(?:${PERIOD_WORDS}|${MONEY_WORDS}))(?:\\s+in advance)?(?![\\p{L}\\p{N}])`,
+  "giu",
+);
+
+/**
+ * Periods and amounts as they are written in a text: "two months in advance", "within 30 days", "1 600 euros", "35 %".
+ * The result is the text's own wording, so a figure taken from a verified quote needs no further check.
+ */
+export const figuresIn = (text: string): string[] => [...text.matchAll(FIGURE)].map((m) => m[0].replace(/\s+/g, " ").trim());

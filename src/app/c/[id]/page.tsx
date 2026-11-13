@@ -15,6 +15,7 @@ import {
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
+import { DeadlineDate } from "@/components/deadline-date";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -27,10 +28,17 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: PageProps<"/c/[id]">): Promise<Metadata> {
   const { id } = await params;
   const c = await loadCase(id);
+  const title = c ? c.title : "Case not found";
+  // A link preview shows this under the title, so a long summary is cut between words.
+  const description =
+    c && c.summary.length > 200 ? `${c.summary.slice(0, 200).replace(/[,;:.]?\s+\S*$/, "")}…` : c?.summary;
   return {
-    title: c ? c.title : "Case not found",
-    description: c ? c.summary.slice(0, 200) : undefined,
+    title,
+    description,
     robots: { index: false },
+    // The image comes from opengraph-image.tsx in this folder.
+    openGraph: { title, description, siteName: "Kaveri", type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -150,6 +158,7 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
             <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200">{t.approveInChat}</Badge>
           )}
         </div>
+        {deadline && <DeadlineDate step={step} source={step.evidence.find((n) => verified.has(n))} locale={t.locale} t={t.date} />}
       </div>
     </li>
   );
@@ -168,6 +177,12 @@ function Mark({ e, t }: { e: Evidence; t: Labels }) {
       <CircleAlert /> {e.verification === "unreachable" ? t.unreachable : t.notFound}
     </Badge>
   );
+}
+
+/** The year the quote was checked, if the quoted sentence itself names it: a sign the rule is this year's. */
+function thisYear(e: Evidence): number | null {
+  const year = validDate(e.fetchedAt)?.getUTCFullYear();
+  return year && e.verification === "verified" && new RegExp(`(?<!\\d)${year}(?!\\d)`).test(e.quote) ? year : null;
 }
 
 function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
@@ -217,6 +232,7 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <Mark e={e} t={t} />
         <Badge variant="outline">{e.sourceType === "official" ? t.official : t.secondary}</Badge>
+        {thisYear(e) && <Badge variant="outline">{t.mentionsYear(thisYear(e) as number)}</Badge>}
         {e.pageDate && (
           <span>
             {t.pageDated} {e.pageDate}

@@ -48,6 +48,12 @@ Do not say "100% accurate". Say: "every line shown is backed by a sentence on a 
 | 1:35 | Scorecard on the landing page | "19 scenarios, 123 quotes, all found on their pages. Six seconds, two cents." |
 | 1:50 | QR code | "Kaveri. Research with sources, in your family chat." |
 
+### Voiceover files
+
+Each line of the table is rendered as its own file in `docs/pitch/voiceover/` with ElevenLabs (voice George, model `eleven_v4`), about 50 seconds of speech in total, so each can be placed on the video timeline. The words were checked by transcribing the files back to text. Nobody has listened to them yet: check by ear how the name "Kaveri" is said. Lines 02 and 08 also exist as a second take with the name spelled the way it sounds in Finnish (`02b`, `08b`).
+
+Line 07 holds the scorecard numbers. If Saturday's run gives other numbers, change the text in `docs/pitch/voiceover.json` and run `node scripts/voiceover.mjs --only 07-numbers` (needs `ELEVENLABS_API_KEY`; in a Claude cloud session run it with `NODE_USE_ENV_PROXY=1` and no key).
+
 ## Live demo, three minutes
 
 1. Landing page, one sentence on who it is for.

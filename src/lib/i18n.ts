@@ -9,6 +9,14 @@ const en = {
   quotesVerified: "quotes verified",
   deadline: "deadline",
   deadlines: "deadlines",
+  date: {
+    workOut: "Work out the date",
+    countsFrom: "Date this counts from",
+    addToCalendar: "Add to calendar",
+    sourceSays: "The source says",
+    passed: "This day has already passed.",
+    note: "Arithmetic on the source's wording. Working days skip weekends but not public holidays. The source page decides.",
+  },
   waiting: "waiting for you",
   whatToDo: "What to do",
   whatToDoHint: "Numbers link to the sentence each step is based on.",
@@ -47,6 +55,7 @@ const en = {
   footer: "This is research, not legal advice. Check the linked pages before you act. Found with Exa.",
   notConfirmed: "Not confirmed on a source",
   showOnPage: "Open the page at this sentence",
+  mentionsYear: (year: number) => `Names ${year}`,
 };
 
 export type Labels = typeof en;
@@ -57,6 +66,14 @@ const fi: Labels = {
   quotesVerified: "lainausta vahvistettu",
   deadline: "määräaika",
   deadlines: "määräaikaa",
+  date: {
+    workOut: "Laske päivämäärä",
+    countsFrom: "Päivä, josta aika lasketaan",
+    addToCalendar: "Lisää kalenteriin",
+    sourceSays: "Lähteen mukaan",
+    passed: "Tämä päivä on jo mennyt.",
+    note: "Laskettu lähteen sanamuodosta. Arkipäivissä ohitetaan viikonloput, mutta ei pyhäpäiviä. Lähdesivu ratkaisee.",
+  },
   waiting: "odottaa sinua",
   whatToDo: "Mitä tehdä",
   whatToDoHint: "Numerot vievät lauseeseen, johon kukin vaihe perustuu.",
@@ -95,6 +112,7 @@ const fi: Labels = {
     "Tämä on tiedonhakua, ei oikeudellista neuvontaa. Tarkista linkitetyt sivut ennen kuin toimit. Haettu Exalla.",
   notConfirmed: "Ei vahvistettu lähteestä",
   showOnPage: "Avaa sivu tämän lauseen kohdalta",
+  mentionsYear: (year) => `Mainitsee vuoden ${year}`,
 };
 
 const ALL: Record<string, Labels> = { en, fi };
