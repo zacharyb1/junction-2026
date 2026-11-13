@@ -38,6 +38,7 @@ Next.js 16 App Router (Cache Components off on purpose), React 19, TypeScript, T
 - Small changes, one concern per commit. `pnpm lint && pnpm typecheck && pnpm build` before pushing.
 - Demo path first. Error states on the demo path must be handled.
 - Log non-obvious decisions in `docs/DECISIONS.md`, one line with a Helsinki timestamp.
+- **Reason first.** When a request would change something logged in `docs/DECISIONS.md` or in the dated update sections of `docs/TECH_CHALLENGES.md`, show the person that decision and its logged reason in two or three lines, then make the change once they confirm. Log the change as a new line that says which decision it replaces and why.
 - Commit messages: imperative, at most 72 characters. No secrets and no model names in commits.
 
 ## Event rules that disqualify
