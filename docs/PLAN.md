@@ -221,3 +221,18 @@ What that number means and does not mean:
 ## 13. Submission items (Sun 10:00)
 
 Name, punchline, description, challenge, technologies, video up to 2:00, demo link, source link, deck PDF, phone numbers, Discord names. Details in `docs/SUBMISSION_CHECKLIST.md`. The repo is private while we build. Organizers must be able to read it at submission.
+
+## 14. Tech challenges we also enter
+
+Decided Fri about 22:00. The main challenge stays Exa. The same repo and demo also go to four tech challenges. Detail, requirements, owners and cut lines are in `docs/TECH_CHALLENGES.md`.
+
+| Challenge | Our use | Where | When |
+|---|---|---|---|
+| Gemini API | The bot's model: reads letter photos, decides when to speak, writes drafts | Bot runtime | Model choice tonight, shown in M3 |
+| ElevenLabs | Voice note in, spoken plan out, voiceover for the 2:00 video | Bot runtime, video | Voiceover in M5, bot voice in M3 |
+| Oxylabs Web API | Third reader in the quote verifier and the recheck | `src/lib/verify.ts` | M2, dropped if not merged by Sat 15:00 |
+| Gemma | Local privacy gate, so small talk never leaves the laptop | Bot runtime | After M1 is green, first to cut |
+
+Rules: Exa stays the only finder. None of these tools may add a claim to a plan. Six hours in total for all four. Claim a challenge only if its part runs in the demo.
+
+New items blocked on a human: a Gemini key and an ElevenLabs key on the bot machine, an Oxylabs key on Vercel, and Vlad and Milan agreeing tonight that the bot's model is Gemini.
