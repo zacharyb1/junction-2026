@@ -1,0 +1,632 @@
+{
+  "summary": {
+    "gate": "patterns-only",
+    "ranAt": "2026-11-13T23:33:27+0200",
+    "messages": 60,
+    "triggers": 20,
+    "smallTalk": 40,
+    "missedTriggers": 3,
+    "falseWakes": 0,
+    "byLanguage": {
+      "en": {
+        "missedTriggers": 2,
+        "falseWakes": 0
+      },
+      "fi": {
+        "missedTriggers": 1,
+        "falseWakes": 0
+      }
+    },
+    "fellBackToPatterns": 60,
+    "msMedian": 0,
+    "msMax": 3,
+    "missed": [
+      "the washing machine broke and it's only a year old",
+      "the streaming service is raising its price again next month",
+      "Kelalta tuli taas joku päätös, en ymmärrä mitä siinä lukee"
+    ],
+    "falseWakeTexts": []
+  },
+  "rows": [
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "what's for dinner?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 3,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "did you buy milk?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "who picks up the kids today?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "running 10 min late",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "lol that video was great",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "good morning everyone",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "can you grab bread on the way home?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "the bus was packed again this morning",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "I'll be home around six",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "did anyone see my keys?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "movie night on Friday?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "it's snowing already!",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "thanks, love you",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "grandma called, she says hi",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "the pizza was amazing yesterday",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "are we out of coffee?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "I paid the pizza guy already",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "football practice ends at 5 today",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "happy birthday dad!!",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "can you turn the sauna on?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "mitä syödään tänään?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "ostitko maitoa?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "kuka hakee lapset tänään?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "oon vähän myöhässä, 10 min",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "huomenta kaikille!",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "tuotko leipää kun tuut kotiin?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "bussi oli taas ihan täynnä",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "oon kotona kuuden maissa",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "onko kukaan nähnyt mun avaimia?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "leffailta perjantaina?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "ulkona sataa lunta!",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "kiitos, olet rakas",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "mummo soitti ja lähetti terveisiä",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "eilinen pizza oli tosi hyvää",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "onko kahvi loppu?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "laitatko saunan päälle?",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "treenit loppuu viideltä",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "haha hyvä video",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "muista ottaa pipo mukaan",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "nähdään illalla!",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "I'm pregnant",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "we got a letter from the landlord, rent goes up 80 euros from January",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "I was laid off today",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "our flight to London tomorrow got cancelled",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "I got a parking fine on Mannerheimintie, 80 euros",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "my residence permit expires in March, I need to renew it",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "the tax office sent something about back taxes",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "the washing machine broke and it's only a year old",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "we're moving to Tampere in February",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "the streaming service is raising its price again next month",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "olen raskaana",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "vuokranantajalta tuli kirje, vuokra nousee 80 euroa tammikuussa",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "mut irtisanottiin tänään",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "huominen lento Lontooseen peruttiin",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "sain pysäköintisakon, 80 euroa",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "mun oleskelulupa menee umpeen maaliskuussa",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "verottajalta tuli kirje jäännösverosta",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "pesukone hajosi ja se on vasta vuoden vanha",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "muutetaan Tampereelle helmikuussa",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": "URLError"
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "Kelalta tuli taas joku päätös, en ymmärrä mitä siinä lukee",
+      "wake": false,
+      "source": "patterns",
+      "got": "small_talk",
+      "ms": 0,
+      "error": "URLError"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+name: kaveri-gate
+version: 0.1.0
+description: "Kaveri privacy gate: a small local Gemma decides whether a group message may wake the cloud model. Small talk is dropped on this machine."
+author: "Kaveri team"
+provides_hooks:
+  - pre_gateway_dispatch

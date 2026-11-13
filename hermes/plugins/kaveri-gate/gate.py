@@ -1,0 +1,148 @@
+"""Kaveri gate: decide on this machine whether a family-group message may wake the cloud model.
+
+A small local Gemma (through Ollama) labels each message. Small talk is dropped here and never
+leaves the laptop. Decided behaviour (docs/DECISIONS.md, Fri 23:15):
+  - the gate is unsure            -> wake the bot (a missed life event is the worse failure)
+  - the gate is down or too slow  -> fall back to the runbook's wake patterns,
+                                     never to letting every message through
+
+Standard library only, no Hermes imports, so eval/gate/run.py can call it directly.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import time
+import urllib.request
+from dataclasses import dataclass
+from pathlib import Path
+
+DEFAULT_URL = "http://127.0.0.1:11434"
+DEFAULT_MODEL = "gemma3:1b"
+DEFAULT_TIMEOUT = 8.0  # seconds; a slower answer counts as "gate down"
+
+LABELS = ("trigger", "small_talk", "unsure")
+
+SCHEMA = {
+    "type": "object",
+    "properties": {"label": {"type": "string", "enum": list(LABELS)}},
+    "required": ["label"],
+}
+
+SYSTEM = """You sort messages from a family's group chat. Answer with one label.
+
+trigger: the message mentions a life event or a paperwork task for the household. Examples of topics: pregnancy or birth, moving home, losing or changing a job, a sick child, a rent increase, a letter from a landlord or an authority, a fine, a residence permit or visa, taxes, a benefit decision, a cancelled or delayed flight or train, a broken appliance, a subscription or price change, planning a wedding or anniversary.
+
+small_talk: everyday chatter. Examples of topics: food, shopping, greetings, jokes, who picks up whom, being late, weather, TV, thanks, plans for tonight.
+
+unsure: you cannot tell.
+
+Messages are in English or Finnish. Reply only with JSON like {"label": "small_talk"}."""
+
+# Few-shot turns. None of these sentences is in eval/gate/messages.jsonl.
+SHOTS = [
+    ("see you at 7", "small_talk"),
+    ("My job ends next month, they are closing the office", "trigger"),
+    ("ostin uudet kengät", "small_talk"),
+    ("lapsi on kuumeessa, en pääse töihin", "trigger"),
+    ("is the dishwasher done?", "small_talk"),
+    ("The train to Turku was two hours late, can we get money back?", "trigger"),
+    ("mennäänkö kävelylle?", "small_talk"),
+    ("Migristä tuli päätös", "trigger"),
+]
+
+BOT_NAME = re.compile(r"(?<!\w)kaveri(?!\w)", re.IGNORECASE)
+
+
+@dataclass
+class Decision:
+    wake: bool
+    source: str  # "rule", "gemma" or "patterns"
+    label: str  # trigger, small_talk, unsure, or the rule that applied
+    ms: int
+    error: str = ""
+
+
+def load_patterns(path: str | os.PathLike) -> list[re.Pattern]:
+    """Wake patterns: a JSON list of regular expressions (written by hermes/install-gate.sh)."""
+    return [re.compile(p, re.IGNORECASE) for p in json.loads(Path(path).read_text(encoding="utf-8"))]
+
+
+def patterns_from_snippet(path: str | os.PathLike) -> list[re.Pattern]:
+    """Read the Mode B wake patterns straight from hermes/config.snippet.yaml (lines '#B   - "..."')."""
+    out = []
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        m = re.match(r'^\s*#B\s+- (".*")\s*$', line)
+        if m:
+            out.append(json.loads(m.group(1)))
+    return [re.compile(p, re.IGNORECASE) for p in out]
+
+
+def ask_gemma(text: str, url: str, model: str, timeout: float) -> str:
+    """One label from the local model. Raises on any failure or timeout."""
+    messages = [{"role": "system", "content": SYSTEM}]
+    for shot, label in SHOTS:
+        messages.append({"role": "user", "content": shot})
+        messages.append({"role": "assistant", "content": json.dumps({"label": label})})
+    messages.append({"role": "user", "content": text[:600]})
+    body = {
+        "model": model,
+        "messages": messages,
+        "stream": False,
+        "format": SCHEMA,
+        "keep_alive": "60m",
+        "options": {"temperature": 0, "num_predict": 16, "num_ctx": 2048},
+    }
+    req = urllib.request.Request(
+        url.rstrip("/") + "/api/chat",
+        data=json.dumps(body).encode("utf-8"),
+        headers={"content-type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as res:
+        content = json.loads(res.read())["message"]["content"]
+    label = json.loads(content).get("label")
+    if label not in LABELS:
+        raise ValueError(f"unexpected label: {label!r}")
+    return label
+
+
+def decide(
+    text: str,
+    patterns: list[re.Pattern],
+    *,
+    has_media: bool = False,
+    addressed: bool = False,
+    url: str | None = None,
+    model: str | None = None,
+    timeout: float | None = None,
+) -> Decision:
+    """Wake the bot for this group message, or drop it here?"""
+    started = time.monotonic()
+
+    def done(wake: bool, source: str, label: str, error: str = "") -> Decision:
+        return Decision(wake, source, label, int((time.monotonic() - started) * 1000), error)
+
+    text = (text or "").strip()
+    # Rules that need no model.
+    if addressed or BOT_NAME.search(text):
+        return done(True, "rule", "addressed")
+    if text.startswith("/"):
+        return done(True, "rule", "command")
+    if has_media:
+        # A photo or file may be an official letter. This text-only model cannot look, so: unsure, wake.
+        return done(True, "rule", "media")
+    if not text:
+        return done(False, "rule", "empty")
+
+    url = url or os.environ.get("KAVERI_GATE_URL") or DEFAULT_URL
+    model = model or os.environ.get("KAVERI_GATE_MODEL") or DEFAULT_MODEL
+    if timeout is None:
+        timeout = float(os.environ.get("KAVERI_GATE_TIMEOUT") or DEFAULT_TIMEOUT)
+    try:
+        label = ask_gemma(text, url, model, timeout)
+    except Exception as exc:  # gate down, slow or confused: the wake patterns decide
+        hit = any(p.search(text) for p in patterns)
+        return done(hit, "patterns", "trigger" if hit else "small_talk", type(exc).__name__)
+    return done(label != "small_talk", "gemma", label)
