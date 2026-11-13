@@ -358,7 +358,11 @@ function echoes(message: string, written: string): boolean {
 const UNITS = ["%", "€", "$", "£", "day", "week", "month", "year"];
 /** What a value measures: "35 %" and "40 %" can contradict each other, "35 %" and "160 days" cannot. */
 const unitOf = (value: string) => tokens(value).find((t) => UNITS.includes(t)) ?? "";
-const sameNumbers = (a: string, b: string) => numbersIn(a).sort().join(" ") === numbersIn(b).sort().join(" ");
+/** Same figures, however often each is written: "two months" and "two (2) months" are one fact. */
+const sameNumbers = (a: string, b: string) => {
+  const distinct = (text: string) => [...new Set(numbersIn(text))].sort().join(" ");
+  return distinct(a) === distinct(b);
+};
 
 function dedupe(items: string[], max: number): string[] {
   const out: string[] = [];
@@ -598,6 +602,7 @@ export async function researchCase(
   const steps: StepDraft[] = [];
   const money: CaseInput["money"] = [];
   const dueRef = new Map<StepDraft, number>();
+  const dropped: { value: string; note: string }[] = [];
 
   for (const c of merged) {
     if (steps.length >= LIMITS.steps || evidence.length >= LIMITS.evidence - 1) break;
@@ -678,7 +683,13 @@ export async function researchCase(
       } else {
         const listed = money.find((m) => m.label === target.title);
         if (!listed) {
-          if (money.length < LIMITS.money) money.push({ label: target.title, amount: fact.value, evidence: [n] });
+          // The same figure under two steps is one entitlement. It is listed once, under the first.
+          const twin = money.find((m) => sameNumbers(m.amount, fact.value) && unitOf(m.amount) === unitOf(fact.value));
+          if (twin) {
+            if (twin.evidence.length < 3 && !twin.evidence.includes(n)) twin.evidence.push(n);
+          } else if (money.length < LIMITS.money) {
+            money.push({ label: target.title, amount: fact.value, evidence: [n] });
+          }
         } else if (sameNumbers(listed.amount, fact.value)) {
           if (listed.evidence.length < 3 && !listed.evidence.includes(n)) listed.evidence.push(n);
         } else {
@@ -686,13 +697,17 @@ export async function researchCase(
         }
       }
     }
-    // Report a figure as missing only if it is concrete and the step does not already show it from another source.
-    const shown = [target.due, money.find((m) => m.label === target.title)?.amount].filter((v): v is string => Boolean(v));
+    // Only a concrete figure is worth reporting as missing. Whether the case shows it anyway is decided at the end.
     for (const fact of missing) {
-      if (/\d/.test(fact.value) && !shown.some((v) => sameNumbers(v, fact.value))) {
-        unverified.push(`${c.title}: "${fact.value}" is not stated on ${hostOf(fact.url)}, so it is left out.`);
+      if (/\d/.test(fact.value)) {
+        dropped.push({ value: fact.value, note: `${c.title}: "${fact.value}" is not stated on ${hostOf(fact.url)}, so it is left out.` });
       }
     }
+  }
+  // A figure that another source did confirm, under this step or another, is not a gap.
+  const shown = [...steps.map((s) => s.due), ...money.map((m) => m.amount)].filter((v): v is string => Boolean(v));
+  for (const d of dropped) {
+    if (!shown.some((v) => sameNumbers(v, d.value) && unitOf(v) === unitOf(d.value))) unverified.push(d.note);
   }
 
   // Evidence that no step or amount points at would only clutter the source list.
