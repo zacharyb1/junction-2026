@@ -208,7 +208,7 @@ It writes `src/data/scorecard.json`, which the landing page shows after the next
 
 **Run 4, Fri 23:30, after the review fixes (stricter grounding, see section 4):** 19 of 19 passed, 133 of 133 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 9.6 s. Two earlier runs of the same build during the evening each failed one scenario (rent letter with no deadline or amount, parking fine with one source). Both led to a fix, and both result files are kept in `eval/results/`. Expect 18 or 19 of 19 on any given run: the search model's output varies.
 
-**Run 5, Sat 00:05, final build of the night (adds the nothing-to-research check and highlight links):** 19 of 19 passed, 123 of 123 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 8.3 s.
+**Run 5, Fri 23:42, final build of the night (adds the nothing-to-research check and highlight links):** 19 of 19 passed, 123 of 123 quotes found, 0 plan lines without a source, median 6.0 s, slowest tenth within 8.3 s.
 
 What that number means and does not mean:
 - It proves every line shown is backed by a sentence on a page we opened, on the expected official site.

@@ -1,6 +1,6 @@
 # Pitch kit: Kaveri
 
-Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 5 (Sat 00:05). Re-run the scorecard on Saturday evening and update them before recording.
+Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 5 (Fri 23:42). Re-run the scorecard on Saturday evening and update them before recording.
 
 ## The story
 
