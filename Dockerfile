@@ -1,11 +1,13 @@
 # syntax=docker/dockerfile:1
 # Production image. Separate from the devcontainer on purpose; they share only the Node version (.nvmrc).
-ARG NODE_VERSION=22.23.5
+ARG NODE_VERSION=26.13.1
 
 FROM node:${NODE_VERSION}-bookworm-slim AS base
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 WORKDIR /app
-RUN corepack enable
+# Node 25+ no longer bundles corepack. Install a pinned one; it then provides the pnpm version
+# named in package.json's "packageManager" field.
+RUN npm install -g corepack@0.36.0 && corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # All dependencies, then bundle src/ into one file with esbuild.

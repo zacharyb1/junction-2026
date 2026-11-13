@@ -22,7 +22,8 @@ let app
 let appLog = ''
 async function boot(extraEnv = {}) {
   appLog = ''
-  app = spawn('pnpm', ['exec', 'tsx', 'scripts/smoke/app.ts'], {
+  // Start Node directly (no pnpm wrapper), so SIGTERM reaches the app and frees the port on restart.
+  app = spawn(process.execPath, ['--import', 'tsx', 'scripts/smoke/app.ts'], {
     env: {
       PATH: process.env.PATH,
       HOME: process.env.HOME,
