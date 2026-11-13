@@ -266,7 +266,10 @@ const VAGUE = /^(as soon as possible|asap|immediately|promptly|without delay|mah
 /** A deadline or amount as the model wrote it, or nothing if it is a placeholder, a formatting leak or too vague to act on. */
 function tidy(text: unknown): string | undefined {
   if (typeof text !== "string") return undefined;
-  const value = clip(text, 80).replace(/[.;,]+$/, "");
+  let value = clip(text, 400);
+  // Cut long values at a word boundary so nothing ends mid-word.
+  if (value.length > 100) value = `${value.slice(0, 100).replace(/\s+\S*$/, "")}…`;
+  value = value.replace(/[.;,]+$/, "");
   if (!value || EMPTY.test(value) || JUNK.test(value) || VAGUE.test(value)) return undefined;
   return value;
 }

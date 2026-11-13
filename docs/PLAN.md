@@ -28,7 +28,8 @@ First audience: international families in Finland, who deal with Kela, Vero, Mig
 | Landing page | Built, shows the real scorecard. Needs a human eye for wording. | `src/app/page.tsx`, `src/components/landing/` |
 | Scorecard runner | Working. First real run Fri 21:40: 19 of 19 passed. | `eval/` |
 | Bot template for Hermes | Written: runbook, persona, config, three skills, install script. Not yet run on a real machine. | `hermes/` |
-| Production deploy | **Blocked**, see section 9. The old scaffold is still what is live. | Vercel project `junction-2026` |
+| GitHub | Private repo `zacharyb1/junction-2026`, `main` pushed. Vercel deploys from it. | github.com |
+| Production | **Live** at https://junction-2026.vercel.app: landing, `/try`, case pages, API, MCP. Research itself waits for the Exa key, see section 9. | Vercel project `junction-2026` |
 
 Live test results from tonight, fast mode:
 
@@ -157,7 +158,7 @@ If Telegram or the laptop fails, the same story runs from `/try` on a phone. Rec
 
 | # | When | Goal | Owner | Done when |
 |---|---|---|---|---|
-| M0 | Fri, tonight | Engine live in production | Zachary, Claude Code | Section 9 items done. `/try` works on the public URL. |
+| M0 | Fri, tonight | Engine live in production | Zachary, Claude Code | Exa key set on Vercel. `/try` returns a plan on the public URL. |
 | M0 | Fri, tonight | A bot answers | Vlad or Milan | DM to the bot returns a plan and a case link. Challenge pre-submitted before 23:59. |
 | M1 | Sat 09:00 to 11:30 | Butler in the group | bot owner | Silence works on 20 small-talk messages. Pregnancy script runs 3 times in a row. Bot track chosen at 10:30. |
 | M2 | Sat 11:30 to 15:00 | Follow-through | bot owner, Claude Code | Approval buttons, drafts attached to the case, reminders firing. Draft submission created at 12:00. |
@@ -168,11 +169,14 @@ If Telegram or the laptop fails, the same story runs from `/try` on a phone. Rec
 
 ## 9. Blocked on a human, in priority order
 
-1. **Commit identity.** Vercel refuses to deploy because the author on the local commits is not a member of the Vercel account. Decide which name and email the commits carry. Claude Code then re-authors and deploys.
-2. **`EXA_API_KEY` on Vercel.** Project `junction-2026`, Settings, Environment Variables. The key in the Claude session is injected by a proxy and cannot be copied out.
-3. **Private GitHub repo `junction-2026`.** Create it empty, then tell Claude Code to push. Connect it to the Vercel project for preview URLs.
-4. **Telegram bot token** from BotFather, and a model key for the bot runtime.
-5. **Bot connection values** are in `.env.bot` in this folder (not committed): engine URL, `CASEFILE_SECRET`, demo access code.
+1. **`EXA_API_KEY` on Vercel.** Project `junction-2026`, Settings, Environment Variables, for Production and Preview, then redeploy. Until then the public `/try` and `research_case` answer "EXA_API_KEY is not configured on the server". The key in the Claude cloud session is injected by a proxy and cannot be copied out.
+2. **Telegram bot token** from BotFather, and a model key for the bot runtime.
+3. **Bot track decision** by Sat 10:30: Hermes or Hono with Mastra.
+4. **Bot connection values** are in `.env.bot` in this folder (not committed): engine URL, `CASEFILE_SECRET`, demo access code.
+
+Resolved Fri evening: the private GitHub repo exists and is connected to Vercel, and commits carry the owner's GitHub no-reply address so Vercel accepts them.
+
+How changes reach production: work happens on a branch, a draft pull request gets a Vercel preview URL, merging to `main` deploys.
 
 ## 10. Scorecard
 

@@ -48,7 +48,7 @@ export const StepInput = z.object({
   title: z.string().min(1).max(140),
   detail: z.string().max(600).optional(),
   owner: z.string().max(60).optional().describe("Household member who does this."),
-  due: z.string().max(60).optional().describe("ISO date YYYY-MM-DD when known, otherwise a short phrase."),
+  due: z.string().max(120).optional().describe("ISO date YYYY-MM-DD when known, otherwise a short phrase."),
   status: z.enum(["todo", "needs_approval", "done"]).default("todo"),
   confidence: z.enum(["low", "medium", "high"]).optional().describe("Exa's grounding confidence for this step, when known."),
   evidence: evidenceRefs,
@@ -56,7 +56,7 @@ export const StepInput = z.object({
 
 export const MoneyInput = z.object({
   label: z.string().min(1).max(120),
-  amount: z.string().min(1).max(80).describe("Amount exactly as the source states it."),
+  amount: z.string().min(1).max(120).describe("Amount exactly as the source states it."),
   note: z.string().max(300).optional(),
   evidence: evidenceRefs,
 });
