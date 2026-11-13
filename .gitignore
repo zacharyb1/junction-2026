@@ -48,3 +48,6 @@ next-env.d.ts
 
 # temporary helper scripts
 scripts/.*
+
+# repo-local Hermes install, Hermes home and local model data (hermes/setup-local.sh)
+.hermes-local/
