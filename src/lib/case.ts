@@ -111,8 +111,11 @@ export type Evidence = EvidenceInput & {
   verification: Verification;
   /** Share of the quote's word windows found on the page, 0 to 1. */
   match: number;
-  /** live: found by our own request to the page. exa: found in Exa's reading of the page. */
-  checkedVia?: "live" | "exa";
+  /**
+   * live: found by our own request to the page. oxylabs: found on a live read through Oxylabs,
+   * for pages that refuse our request. exa: found in Exa's reading of the page.
+   */
+  checkedVia?: "live" | "exa" | "oxylabs";
 };
 
 export type Step = z.infer<typeof StepInput> & { id: string };
@@ -125,6 +128,8 @@ export type Trail = {
   pagesRead: number;
   costDollars: number;
   officialDomains: number;
+  /** Pages opened by each reader. */
+  readers?: { live: number; exa: number; oxylabs: number };
   events: { ms: number; detail: string }[];
 };
 

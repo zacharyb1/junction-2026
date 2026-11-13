@@ -146,7 +146,8 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
 export async function recheckCase(id: string): Promise<{ changed: number[]; case: Case } | null> {
   const current = await loadCase(id);
   if (!current) return null;
-  const fresh = await verifyEvidence(current.evidence);
+  // The change watch wants a live reading, so blocked pages go through Oxylabs when a key is set.
+  const fresh = await verifyEvidence(current.evidence, undefined, { oxylabs: "blocked" });
   const changed = fresh
     .filter((e, i) => current.evidence[i].verification === "verified" && e.verification === "not_found")
     .map((e) => e.n);

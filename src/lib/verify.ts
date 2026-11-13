@@ -8,6 +8,9 @@ import type { Evidence, EvidenceInput, Verification } from "@/lib/case";
 
 const DIRECT_TIMEOUT_MS = 6000;
 const EXA_TIMEOUT_MS = 9000;
+// Oxylabs says 150 s is a safe default and 10 s may fail. We wait 25 s: this reader is a fallback, not the main path.
+const OXYLABS_TIMEOUT_MS = Number(process.env.OXYLABS_TIMEOUT_MS ?? 25_000);
+const OXYLABS_MAX_PAGES = 6;
 const WINDOW = 5;
 export const VERIFY_THRESHOLD = 0.8;
 
@@ -108,42 +111,103 @@ async function fetchViaExa(urls: string[]): Promise<Map<string, string>> {
   return out;
 }
 
-/** Two independent readings of one page. Either may be missing. */
-export type FetchedPage = { direct: string | null; exa: string | null; text: string } | null;
+/**
+ * Oxylabs Web API, POST /v1/scrape: a live read through their unblocker, for pages that refuse
+ * our own request (many government sites sit behind a bot challenge). Skipped without OXYLABS_API_KEY.
+ * Docs: https://developers.oxylabs.io/products/web-api/scrape.md
+ */
+async function fetchViaOxylabs(url: string): Promise<string | null> {
+  const key = process.env.OXYLABS_API_KEY;
+  if (!key) return null;
+  try {
+    const res = await fetch(`${process.env.OXYLABS_BASE_URL ?? "https://webapi.oxylabs.io"}/v1/scrape`, {
+      method: "POST",
+      signal: AbortSignal.timeout(OXYLABS_TIMEOUT_MS),
+      headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
+      body: JSON.stringify({ url, output: ["markdown"] }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { status?: number; results?: { markdown?: string | null }[] };
+    if (typeof data.status === "number" && data.status >= 400) return null;
+    const text = data.results?.[0]?.markdown;
+    return text && text.trim().length > 200 ? text : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Up to three independent readings of one page. Any may be missing. */
+export type FetchedPage = { direct: string | null; exa: string | null; oxylabs: string | null; text: string } | null;
+
+export type ReadOptions = {
+  /**
+   * When to spend an Oxylabs read on a page our own request could not open:
+   * "unread" (default): only if Exa has no copy either, so the claim would otherwise be dropped.
+   * "blocked": always, to get a live reading. Used by the change watch and deep research.
+   */
+  oxylabs?: "unread" | "blocked";
+};
 
 /**
  * Read every URL two ways at once: our own live request, and Exa Contents.
+ * Pages our own request could not open get a third, live reading through Oxylabs when a key is set.
  * Repeated URLs are fetched once.
  */
-export async function fetchPages(urls: string[]): Promise<Map<string, FetchedPage>> {
+export async function fetchPages(urls: string[], options: ReadOptions = {}): Promise<Map<string, FetchedPage>> {
   const unique = [...new Set(urls)];
   const [direct, exa] = await Promise.all([Promise.all(unique.map((u) => fetchDirect(u))), fetchViaExa(unique)]);
+  const exaFor = (url: string) => exa.get(url) ?? exa.get(url.replace(/\/$/, "")) ?? null;
+
+  const wanted = unique
+    .filter((url, i) => !direct[i] && (options.oxylabs === "blocked" || !exaFor(url)))
+    .slice(0, OXYLABS_MAX_PAGES);
+  const oxylabs = new Map<string, string | null>(
+    await Promise.all(wanted.map(async (url) => [url, await fetchViaOxylabs(url)] as [string, string | null])),
+  );
+
   return new Map(
     unique.map((url, i) => {
       const d = direct[i];
-      const e = exa.get(url) ?? exa.get(url.replace(/\/$/, "")) ?? null;
-      return [url, d || e ? { direct: d, exa: e, text: [d, e].filter(Boolean).join("\n") } : null];
+      const e = exaFor(url);
+      const o = oxylabs.get(url) ?? null;
+      return [url, d || e || o ? { direct: d, exa: e, oxylabs: o, text: [d, o, e].filter(Boolean).join("\n") } : null];
     }),
   );
+}
+
+/** How many pages each reader managed to open. */
+export function readerCounts(pages: Map<string, FetchedPage>) {
+  const all = [...pages.values()];
+  return {
+    live: all.filter((p) => p?.direct).length,
+    exa: all.filter((p) => p?.exa).length,
+    oxylabs: all.filter((p) => p?.oxylabs).length,
+  };
 }
 
 export function judge(
   quote: string,
   page: FetchedPage,
-): { verification: Verification; match: number; checkedVia?: "live" | "exa" } {
+): { verification: Verification; match: number; checkedVia?: "live" | "exa" | "oxylabs" } {
   if (!page) return { verification: "unreachable", match: 0 };
   const round = (n: number) => Math.round(n * 100) / 100;
   const live = page.direct ? quoteMatch(quote, page.direct) : 0;
   if (live >= VERIFY_THRESHOLD) return { verification: "verified", match: round(live), checkedVia: "live" };
+  const viaOxylabs = page.oxylabs ? quoteMatch(quote, page.oxylabs) : 0;
+  if (viaOxylabs >= VERIFY_THRESHOLD) {
+    return { verification: "verified", match: round(viaOxylabs), checkedVia: "oxylabs" };
+  }
   const viaExa = page.exa ? quoteMatch(quote, page.exa) : 0;
   if (viaExa >= VERIFY_THRESHOLD) return { verification: "verified", match: round(viaExa), checkedVia: "exa" };
   // The two readings can each hold part of a long quote (different line breaks, cut-off text).
   // The engine grounds against both together, so the verdict here must use both together as well.
-  const both = page.direct && page.exa ? quoteMatch(quote, page.text) : 0;
+  const readings = [page.direct, page.oxylabs, page.exa].filter(Boolean).length;
+  const both = readings > 1 ? quoteMatch(quote, page.text) : 0;
   if (both >= VERIFY_THRESHOLD) {
-    return { verification: "verified", match: round(both), checkedVia: live >= viaExa ? "live" : "exa" };
+    const via = live >= viaOxylabs && live >= viaExa ? "live" : viaOxylabs >= viaExa ? "oxylabs" : "exa";
+    return { verification: "verified", match: round(both), checkedVia: via };
   }
-  return { verification: "not_found", match: round(Math.max(live, viaExa, both)) };
+  return { verification: "not_found", match: round(Math.max(live, viaOxylabs, viaExa, both)) };
 }
 
 /**
@@ -153,10 +217,11 @@ export function judge(
 export async function verifyEvidence(
   items: EvidenceInput[],
   pages?: Map<string, FetchedPage>,
+  options: ReadOptions = {},
 ): Promise<Evidence[]> {
   const fetchedAt = new Date().toISOString();
   const missing = items.map((i) => i.url).filter((u) => !pages?.has(u));
-  const fetched = missing.length ? await fetchPages(missing) : new Map<string, FetchedPage>();
+  const fetched = missing.length ? await fetchPages(missing, options) : new Map<string, FetchedPage>();
   return items.map((item) => {
     const page = pages?.get(item.url) ?? fetched.get(item.url) ?? null;
     return { ...item, fetchedAt, ...judge(item.quote, page) };

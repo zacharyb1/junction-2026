@@ -66,6 +66,7 @@ Response `200`:
   "ms": 8122,
   "timings": { "searchMs": 5866, "readMs": 1620, "verifyMs": 149 },
   "exa": { "searches": 3, "contents": 5, "costDollars": 0.021 },
+  "readers": { "live": 4, "exa": 5, "oxylabs": 0 },
   "jurisdiction": { "country": "Finland", "region": "Espoo", "officialDomains": 29 }
 }
 ```
@@ -135,7 +136,22 @@ MCP tools on the same server, REST equivalents in brackets:
 | `case_recheck` (`POST /api/cases/:id`) | `{ id }` | `{ id, changed: number[], url }`, empty `changed` means nothing moved |
 
 Verification marks on each evidence item: `verified`, `not_found`, `unreachable`, plus `match` from 0 to 1
-and `checkedVia`: `live` (our own request to the page) or `exa` (Exa's reading of the page).
+and `checkedVia`: `live` (our own request to the page), `oxylabs` (a live read through the Oxylabs Web API,
+for pages that refuse our request) or `exa` (Exa's reading of the page).
+
+## Page readers
+
+Finding is always Exa. Reading a cited page to check a quote can go three ways:
+
+| Reader | When | Call |
+|---|---|---|
+| Our own request | always | plain HTTPS GET from the server |
+| Exa Contents | always, in one batch | `POST https://api.exa.ai/contents` |
+| Oxylabs Web API | only when our own request was refused, and only if `OXYLABS_API_KEY` is set | `POST https://webapi.oxylabs.io/v1/scrape` with `{ "url": "...", "output": ["markdown"] }` |
+
+In fast research the Oxylabs read is spent only on pages nothing else could open. In deep research and in `case_recheck`
+every refused page gets a live Oxylabs read. The research trail on the case page records it.
+Not yet run against the real Oxylabs API: it was tested against a local stand-in shaped like their documented response.
 
 ## What the bot does and does not do
 
@@ -151,6 +167,7 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `EXA_API_KEY` | Vercel, Hermes `.env` | engine and verifier, Hermes web search |
 | `CASEFILE_SECRET` | Vercel, Hermes `.env` | bot and script writes |
 | `DEMO_ACCESS_CODE` | Vercel | public `/try` access |
+| `OXYLABS_API_KEY` | Vercel, optional | third page reader for sites that refuse our request |
 | `BLOB_READ_WRITE_TOKEN` | Vercel, set by the Blob store | case storage |
 | `PUBLIC_BASE_URL` | Vercel, optional | overrides the origin used in case links |
 | `NEXT_PUBLIC_BOT_USERNAME` | Vercel | QR code and links to the Telegram bot |

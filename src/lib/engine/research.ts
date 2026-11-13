@@ -4,7 +4,7 @@ import { type CaseInput, type EvidenceInput, LIMITS } from "@/lib/case";
 import { publishCase } from "@/lib/cases";
 import { contains, overlap, snapQuote, supportFor } from "@/lib/engine/ground";
 import { hostOf, isOfficial, type Jurisdiction, publisherOf, resolveJurisdiction } from "@/lib/engine/jurisdiction";
-import { type FetchedPage, fetchPages } from "@/lib/verify";
+import { type FetchedPage, fetchPages, readerCounts } from "@/lib/verify";
 
 /**
  * The research engine.
@@ -51,6 +51,8 @@ export type ResearchResult = {
   ms: number;
   timings: { searchMs: number; readMs: number; verifyMs: number };
   exa: { searches: number; contents: number; costDollars: number };
+  /** Pages opened by each reader: our own live request, Exa Contents, Oxylabs Web API. */
+  readers: { live: number; exa: number; oxylabs: number };
   jurisdiction: { country: string; region?: string; officialDomains: number };
 };
 
@@ -450,7 +452,10 @@ export async function researchCase(
   // Open every cited page again, live.
   const urls = [...new Set(merged.map((c) => c.url))];
   stage("read", `Opening ${urls.length} cited pages: our own live request plus Exa Contents`);
-  const pages = await fetchPages(urls);
+  // Fast mode spends an Oxylabs read only on pages nothing else could open. Deep mode reads every blocked page live.
+  const pages = await fetchPages(urls, { oxylabs: input.depth === "deep" ? "blocked" : "unread" });
+  const readers = readerCounts(pages);
+  if (readers.oxylabs) stage("read", `Read ${readers.oxylabs} blocked pages live through the Oxylabs Web API`);
   for (const url of urls) emit({ type: "source", url, title: titles.get(url) ?? hostOf(url), official: isOfficial(url, j) });
 
   usage.contents += [...pages.values()].filter((p) => p?.exa).length;
@@ -553,6 +558,7 @@ export async function researchCase(
     pagesRead: urls.length,
     costDollars: Math.round(usage.costDollars * 1000) / 1000,
     officialDomains: official.length,
+    readers,
     events: trailEvents.slice(0, 20),
   });
 
@@ -579,6 +585,7 @@ export async function researchCase(
     ms: since(),
     timings: { searchMs, readMs, verifyMs },
     exa: { ...usage, costDollars: Math.round(usage.costDollars * 1000) / 1000 },
+    readers,
     jurisdiction: { country: j.name, region: j.region, officialDomains: official.length },
   };
 }

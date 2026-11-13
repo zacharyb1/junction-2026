@@ -114,7 +114,7 @@ function Mark({ e, t }: { e: Evidence; t: Labels }) {
   if (e.verification === "verified") {
     return (
       <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
-        <BadgeCheck /> {e.checkedVia === "exa" ? t.foundExa : t.foundLive}
+        <BadgeCheck /> {e.checkedVia === "exa" ? t.foundExa : e.checkedVia === "oxylabs" ? t.foundOxylabs : t.foundLive}
       </Badge>
     );
   }
