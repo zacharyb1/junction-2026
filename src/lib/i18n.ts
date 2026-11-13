@@ -68,6 +68,7 @@ const en = {
   footer: "This is research, not legal advice. Check the linked pages before you act. Found with Exa.",
   notConfirmed: "Not confirmed on a source",
   showOnPage: "Open the page at this sentence",
+  mentionsYear: (year: number) => `Names ${year}`,
 };
 
 export type Labels = typeof en;
@@ -135,6 +136,7 @@ const fi: Labels = {
     "Tämä on tiedonhakua, ei oikeudellista neuvontaa. Tarkista linkitetyt sivut ennen kuin toimit. Haettu Exalla.",
   notConfirmed: "Ei vahvistettu lähteestä",
   showOnPage: "Avaa sivu tämän lauseen kohdalta",
+  mentionsYear: (year) => `Mainitsee vuoden ${year}`,
 };
 
 const ALL: Record<string, Labels> = { en, fi };

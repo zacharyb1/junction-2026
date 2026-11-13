@@ -21,7 +21,8 @@ const evidenceRefs = z
 
 export const EvidenceInput = z.object({
   n: z.number().int().positive().describe("Citation number, starting at 1."),
-  url: z.url().describe("Exact URL of the page that was read."),
+  // Only web addresses: the case page renders this as a link, so "javascript:" and the like must never get in.
+  url: z.url({ protocol: /^https?$/ }).describe("Exact URL of the page that was read. http or https only."),
   title: z.string().min(1).max(200),
   publisher: z.string().max(120).optional().describe("Who runs the page, e.g. Kela."),
   quote: z

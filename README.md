@@ -14,9 +14,23 @@ Someone in the family chat writes "I'm pregnant", or drops a photo of a rent-inc
 2. Pulls out what to do, by when, and what they are entitled to, each with the sentence it came from.
 3. Opens every cited page again, by its own request and through Exa, and keeps only claims it can point at.
 4. Posts a short plan in the chat and a link to the case file with every quote.
-5. Waits for a one-tap approval before drafting letters or setting reminders.
+5. Never sends, files, books or pays. What needs a decision waits for the family.
 
 Anything it could not confirm is listed as such. It is research with sources, not legal advice.
+
+## Why you can check it
+
+- **The page's own words.** A quote is shown only as it stands on the page. A model quote that merely resembles the page is replaced by the real sentence, or the step is dropped.
+- **No number without a sentence.** A deadline or amount needs one sentence on the page it came from, with every number matched as a whole number. A figure in a title, detail or summary that is on no cited page is removed.
+- **Disagreement is shown.** When two sources give different figures for one step, both appear with their sources.
+- **Each source says how it was checked:** found on the live page by our own request, on a live read through Oxylabs, or in Exa's copy of the page.
+- **One tap to the sentence.** Every verified source links to the official page with the quoted sentence highlighted.
+- **Gaps are listed.** What could not be confirmed is on the case page, not hidden.
+- **Nothing to research, nothing invented.** Small talk or gibberish gets a plain answer instead of a made-up plan.
+
+## Scorecard
+
+`eval/run.mjs` runs 19 everyday scenarios through the live engine and scores each case. The latest run is on the landing page and in `eval/results/latest.md`. Friday night, after the review fixes: 19 of 19 scenarios passed, 123 of 123 quotes found on their pages, median 6.0 seconds, about 2 cents of search per case. A pass means every line shown has a real sentence behind it. It does not mean the plan is complete.
 
 ## How it is built
 
@@ -31,7 +45,7 @@ Next.js on Vercel
   pages             /c/[id] case file, /try browser demo, / landing page
 ```
 
-A case takes about 8 seconds and three Exa searches.
+A case takes about 6 seconds and three Exa searches.
 
 ## Run locally
 
@@ -63,7 +77,9 @@ pnpm dev                     # http://localhost:3000
 | `docs/CONTRACTS.md` | API and tool contracts, how any bot calls the engine |
 | `docs/RESEARCH.md`, `docs/research/` | Feature research, competitors, Exa notes, data sources |
 | `docs/CHALLENGE.md`, `docs/DECISIONS.md` | The challenge and the decision log |
-| `docs/PLAYBOOK.md`, `docs/PITCH_TEMPLATE.md`, `docs/SUBMISSION_CHECKLIST.md` | Hackathon schedule, pitch kit, Sunday checklist |
+| `docs/PITCH.md`, `docs/pitch/` | Pitch kit: story, numbers, video script, demo script, rendered voiceover |
+| `docs/OXYLABS_NOTE.md` | Which Oxylabs endpoint we use and why |
+| `docs/PLAYBOOK.md`, `docs/PITCH_TEMPLATE.md`, `docs/SUBMISSION_CHECKLIST.md` | Hackathon schedule, pitch template, Sunday checklist |
 | `.claude/` | Slash commands and skills for Claude Code |
 
 ## Stack

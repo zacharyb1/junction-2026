@@ -171,6 +171,12 @@ function Mark({ e, t }: { e: Evidence; t: Labels }) {
   );
 }
 
+/** The year the quote was checked, if the quoted sentence itself names it: a sign the rule is this year's. */
+function thisYear(e: Evidence): number | null {
+  const year = validDate(e.fetchedAt)?.getUTCFullYear();
+  return year && e.verification === "verified" && new RegExp(`(?<!\\d)${year}(?!\\d)`).test(e.quote) ? year : null;
+}
+
 function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
   return (
     <li id={`source-${e.n}`} className="scroll-mt-4 rounded-xl border bg-card p-4">
@@ -218,6 +224,7 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <Mark e={e} t={t} />
         <Badge variant="outline">{e.sourceType === "official" ? t.official : t.secondary}</Badge>
+        {thisYear(e) && <Badge variant="outline">{t.mentionsYear(thisYear(e) as number)}</Badge>}
         {e.pageDate && (
           <span>
             {t.pageDated} {e.pageDate}

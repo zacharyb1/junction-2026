@@ -13,7 +13,7 @@ import {
   unbackedNumbers,
 } from "@/lib/engine/ground";
 import { hostOf, isOfficial, type Jurisdiction, publisherOf, resolveJurisdiction } from "@/lib/engine/jurisdiction";
-import { numbersIn, tokens } from "@/lib/text";
+import { figuresIn, numbersIn, tokens } from "@/lib/text";
 import { type FetchedPage, fetchPages, readerCounts } from "@/lib/verify";
 
 /**
@@ -358,7 +358,11 @@ function echoes(message: string, written: string): boolean {
 const UNITS = ["%", "€", "$", "£", "day", "week", "month", "year"];
 /** What a value measures: "35 %" and "40 %" can contradict each other, "35 %" and "160 days" cannot. */
 const unitOf = (value: string) => tokens(value).find((t) => UNITS.includes(t)) ?? "";
-const sameNumbers = (a: string, b: string) => numbersIn(a).sort().join(" ") === numbersIn(b).sort().join(" ");
+/** Same figures, however often each is written: "two months" and "two (2) months" are one fact. */
+const sameNumbers = (a: string, b: string) => {
+  const distinct = (text: string) => [...new Set(numbersIn(text))].sort().join(" ");
+  return distinct(a) === distinct(b);
+};
 
 function dedupe(items: string[], max: number): string[] {
   const out: string[] = [];
@@ -598,6 +602,7 @@ export async function researchCase(
   const steps: StepDraft[] = [];
   const money: CaseInput["money"] = [];
   const dueRef = new Map<StepDraft, number>();
+  const dropped: { value: string; note: string }[] = [];
 
   for (const c of merged) {
     if (steps.length >= LIMITS.steps || evidence.length >= LIMITS.evidence - 1) break;
@@ -678,7 +683,13 @@ export async function researchCase(
       } else {
         const listed = money.find((m) => m.label === target.title);
         if (!listed) {
-          if (money.length < LIMITS.money) money.push({ label: target.title, amount: fact.value, evidence: [n] });
+          // The same figure under two steps is one entitlement. It is listed once, under the first.
+          const twin = money.find((m) => sameNumbers(m.amount, fact.value) && unitOf(m.amount) === unitOf(fact.value));
+          if (twin) {
+            if (twin.evidence.length < 3 && !twin.evidence.includes(n)) twin.evidence.push(n);
+          } else if (money.length < LIMITS.money) {
+            money.push({ label: target.title, amount: fact.value, evidence: [n] });
+          }
         } else if (sameNumbers(listed.amount, fact.value)) {
           if (listed.evidence.length < 3 && !listed.evidence.includes(n)) listed.evidence.push(n);
         } else {
@@ -686,13 +697,27 @@ export async function researchCase(
         }
       }
     }
-    // Report a figure as missing only if it is concrete and the step does not already show it from another source.
-    const shown = [target.due, money.find((m) => m.label === target.title)?.amount].filter((v): v is string => Boolean(v));
+    // Only a concrete figure is worth reporting as missing. Whether the case shows it anyway is decided at the end.
     for (const fact of missing) {
-      if (/\d/.test(fact.value) && !shown.some((v) => sameNumbers(v, fact.value))) {
-        unverified.push(`${c.title}: "${fact.value}" is not stated on ${hostOf(fact.url)}, so it is left out.`);
+      if (/\d/.test(fact.value)) {
+        dropped.push({ value: fact.value, note: `${c.title}: "${fact.value}" is not stated on ${hostOf(fact.url)}, so it is left out.` });
       }
     }
+  }
+  // A step whose own sentence states exactly one period or amount shows it, in the sentence's words,
+  // even when the search model left the field empty. The text comes from a verified quote, so it is grounded as it stands.
+  for (const step of steps) {
+    if (step.due || money.length >= LIMITS.money || money.some((m) => m.label === step.title)) continue;
+    const figures = figuresIn(evidence.find((e) => e.n === step.evidence[0])?.quote ?? "").filter((f) => !contains(given, f));
+    if (figures.length !== 1) continue;
+    const twin = money.find((m) => sameNumbers(m.amount, figures[0]) && unitOf(m.amount) === unitOf(figures[0]));
+    if (!twin) money.push({ label: step.title, amount: figures[0], evidence: [step.evidence[0]] });
+  }
+
+  // A figure that another source did confirm, under this step or another, is not a gap.
+  const shown = [...steps.map((s) => s.due), ...money.map((m) => m.amount)].filter((v): v is string => Boolean(v));
+  for (const d of dropped) {
+    if (!shown.some((v) => sameNumbers(v, d.value) && unitOf(v) === unitOf(d.value))) unverified.push(d.note);
   }
 
   // Evidence that no step or amount points at would only clutter the source list.
@@ -712,16 +737,25 @@ export async function researchCase(
     evidence.push(...kept);
   }
 
-  // Percentages are where sources contradict each other most often: last year's rate and this year's.
-  // Two steps with different percentages are pointed out, so nobody reads one of them as the whole truth.
-  const rates = money.filter((m) => unitOf(m.amount) === "%" && numbersIn(m.amount).length === 1);
-  for (let i = 0; i < rates.length; i++) {
-    const other = rates.slice(i + 1).find((m) => !sameNumbers(m.amount, rates[i].amount));
-    if (other) {
+  // Two steps can carry different figures for what looks like the same rule: last year's rate and this year's,
+  // or "two months" on one site and "one month" on another. Nobody should read one of them as the whole truth.
+  // Percentages are compared across the whole case. Other figures only when their two sentences share a topic.
+  const quoteOf = (n: number) => evidence.find((e) => e.n === n)?.quote ?? "";
+  const stated = [
+    ...money.map((m) => ({ value: m.amount, ref: m.evidence[0] })),
+    ...steps.flatMap((s) => (s.due ? [{ value: s.due, ref: dueRef.get(s) ?? s.evidence[0] }] : [])),
+  ].filter((f) => unitOf(f.value) && new Set(numbersIn(f.value)).size === 1);
+  pairs: for (let i = 0; i < stated.length; i++) {
+    for (const other of stated.slice(i + 1)) {
+      const first = stated[i];
+      const unit = unitOf(first.value);
+      if (first.ref === other.ref || unit !== unitOf(other.value) || sameNumbers(first.value, other.value)) continue;
+      const sameTopic = sharedWords(quoteOf(first.ref), quoteOf(other.ref)) >= 3;
+      if (unit !== "%" && !sameTopic) continue;
       unverified.unshift(
-        `Different rates appear: "${rates[i].amount}" [${rates[i].evidence[0]}] and "${other.amount}" [${other.evidence[0]}]. They may apply to different years or cases, so read both quotes.`,
+        `Different figures appear: "${first.value}" [${first.ref}] and "${other.value}" [${other.ref}]. They may apply to different years or cases, so read both quotes.`,
       );
-      break;
+      break pairs;
     }
   }
 
