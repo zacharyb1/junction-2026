@@ -308,6 +308,38 @@ Differences from Mode A:
 
 Back to Mode A: `hermes config unset telegram.require_mention`, and the same for `telegram.observe_unmentioned_group_messages`, `telegram.reactions` and `telegram.mention_patterns` (`cli-commands.md:1376`). Restart, `/new --yes`.
 
+## The gate: small talk never leaves the laptop
+
+A Hermes plugin on the `pre_gateway_dispatch` hook decides, on this machine, whether a group message may reach the cloud model. Small talk is dropped before any model call, any transcript entry and any network request. Direct messages are never gated.
+
+Order of the decision (`hermes/plugins/kaveri-gate/gate.py`):
+
+1. **Rules, no model.** Wake when the message names Kaveri, replies to the bot, is a slash command, or carries a photo or file (it may be an official letter, and the text-only gate cannot look).
+2. **Wake patterns.** The nine Mode B patterns from `config.snippet.yaml`. A hit is a sure trigger: wake at once.
+3. **Local Gemma** (`gemma3:1b` through Ollama, JSON-schema output) labels the rest `trigger`, `small_talk` or `unsure`. Only `small_talk` is dropped. Unsure wakes the bot.
+4. **Gate down or slower than 8 seconds:** the wake patterns alone have decided. Never "let everything through".
+
+After a wake the chat stays open to the bot for 180 seconds (`KAVERI_GATE_OPEN_SECONDS`), so answers to its questions and taps on its buttons reach it. A woken bot still applies its own silence rule.
+
+```bash
+bash hermes/install-gate.sh        # copy the plugin into the Hermes home and enable it
+bash hermes/gate.sh start          # Ollama in a podman or docker container, model data in .hermes-local/ollama
+bash hermes/stop.sh && bash hermes/start.sh
+bash hermes/install-gate.sh --remove   # switch the gate off again
+```
+
+`hermes/start.sh` starts the gate model by itself once the plugin is installed. On macOS without podman or docker, install the Ollama app: `gate.sh` uses whatever answers on port 11434. Every decision is logged to `.hermes-local/home/logs/kaveri-gate.jsonl` (decision, source, label, milliseconds; message text only with `KAVERI_GATE_LOG_TEXT=1`).
+
+**Measured** on `eval/gate/messages.jsonl` (60 messages: 40 small talk, 20 triggers, half English, half Finnish), Fri night, laptop CPU, no GPU. Run it yourself with `python3 eval/gate/run.py`; results land in `eval/results/gate-*.json`.
+
+| Gate | Missed triggers | False wakes | Median per message |
+|---|---|---|---|
+| Wake patterns alone (the fallback) | 3 of 20 | 0 of 40 | under 1 ms |
+| `gemma3:1b` alone | 3 of 20 (one of them "I'm pregnant") | 4 of 40 | 3.7 s |
+| Patterns, then `gemma3:1b` (what runs) | 0 of 20 | 4 of 40 | 3.5 s for messages that reach the model, 0 for pattern hits |
+
+Read these numbers with care: the message set and the patterns were written by the same people, so the set flatters the patterns. The 1B model alone is not good enough to be the gate. A false wake costs one cloud call that should end in `[SILENT]`. A dropped message is also absent from the bot's context, so the bot cannot refer back to small talk it never saw.
+
 ## Judge mode
 
 Three ways to let a judge try the bot. All need a gateway restart after the change.
