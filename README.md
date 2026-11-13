@@ -25,6 +25,7 @@ Anything it could not confirm is listed as such. It is research with sources, no
 - **Disagreement is shown.** When two sources give different figures for one step, both appear with their sources.
 - **Each source says how it was checked:** found on the live page by our own request, on a live read through Oxylabs, or in Exa's copy of the page.
 - **One tap to the sentence.** Every verified source links to the official page with the quoted sentence highlighted.
+- **Sources are read again.** A daily job re-reads the cited pages of recent cases, and a button on the case page does it on demand. A quote that is no longer on its page is flagged there.
 - **Gaps are listed.** What could not be confirmed is on the case page, not hidden.
 - **Nothing to research, nothing invented.** Small talk or gibberish gets a plain answer instead of a made-up plan.
 

@@ -210,7 +210,8 @@ The public route behind "Check the sources again". No body, no credentials.
 
 - `changed`: every quote that is gone as of this check, not only the new ones. `fresh: false`: the pages were read less than
   10 minutes ago (a new case counts as read when it was published), so the stored result came back and nothing was fetched.
-- Readings that do fetch count against the public rate limit shared with the demo. Errors: `404` unknown id, `429` rate limited, `502` the check failed.
+- Readings that do fetch count against the public rate limit shared with the demo. Two requests for the same case
+  at the same moment share one reading (per server instance). Errors: `404` unknown id, `429` rate limited, `502` the check failed.
 
 ## Page readers
 
