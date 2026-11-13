@@ -2,9 +2,12 @@
 
 A small local Gemma (through Ollama) labels each message. Small talk is dropped here and never
 leaves the laptop. Decided behaviour (docs/DECISIONS.md, Fri 23:15):
+  - a wake pattern matches        -> wake the bot, no model call
   - the gate is unsure            -> wake the bot (a missed life event is the worse failure)
-  - the gate is down or too slow  -> fall back to the runbook's wake patterns,
-                                     never to letting every message through
+  - the gate is down or too slow  -> the runbook's wake patterns alone decide,
+                                     never "let every message through"
+
+Order: rules (addressed, command, attachment), then wake patterns, then the model.
 
 Standard library only, no Hermes imports, so eval/gate/run.py can call it directly.
 """
@@ -136,13 +139,17 @@ def decide(
     if not text:
         return done(False, "rule", "empty")
 
+    # A wake pattern is a sure trigger: wake at once, without asking the model.
+    if any(p.search(text) for p in patterns):
+        return done(True, "patterns", "trigger")
+
+    # Everything else is the model's call: it catches what the patterns cannot phrase.
     url = url or os.environ.get("KAVERI_GATE_URL") or DEFAULT_URL
     model = model or os.environ.get("KAVERI_GATE_MODEL") or DEFAULT_MODEL
     if timeout is None:
         timeout = float(os.environ.get("KAVERI_GATE_TIMEOUT") or DEFAULT_TIMEOUT)
     try:
         label = ask_gemma(text, url, model, timeout)
-    except Exception as exc:  # gate down, slow or confused: the wake patterns decide
-        hit = any(p.search(text) for p in patterns)
-        return done(hit, "patterns", "trigger" if hit else "small_talk", type(exc).__name__)
+    except Exception as exc:  # gate down, slow or confused: the patterns already said no
+        return done(False, "patterns", "small_talk", type(exc).__name__)
     return done(label != "small_talk", "gemma", label)
