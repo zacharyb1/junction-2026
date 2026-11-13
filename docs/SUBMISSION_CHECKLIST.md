@@ -30,3 +30,9 @@ Set the project to **FINAL** (not DRAFT). Drafts are not reviewed.
 - [ ] 3‑minute pitch rehearsed 3× with a timer
 - [ ] One person pitches, one drives the demo
 - [ ] Each member reviews their assigned projects on the platform (mandatory)
+
+## Tech challenges (see `docs/TECH_CHALLENGES.md`)
+- [ ] Gemini API, ElevenLabs, Oxylabs Web API and Gemma selected under Tech Challenges, each only if its part runs in the demo
+- [ ] One short note per challenge: which endpoints or models, what they do in the demo, why
+- [ ] Oxylabs: the demo makes a live Web API call and shows the source URLs
+- [ ] Any add-on that was cut is unselected before FINAL

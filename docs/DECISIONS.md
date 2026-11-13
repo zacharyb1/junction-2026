@@ -16,3 +16,4 @@ Append-only. One line per decision: `[Fri 20:14] Decision — why — who`.
 [Fri 21:21] Official-domain lists per country with wildcards such as *.gov. Reason: Exa accepts wildcards, which covers city and state sites.
 [Fri 21:21] Storage: Vercel Blob, private store junction-cases in fra1. Case ids are 16 random characters.
 [Fri 21:21] Repo stays private while building. Organizers get read access before Sunday 10:00.
+[Fri 22:00] Also enter four tech challenges with the same project: Gemini API, ElevenLabs, Oxylabs Web API, Gemma. Exa stays the only finder and the grounding rule does not change. Plan in docs/TECH_CHALLENGES.md — Zachary.
