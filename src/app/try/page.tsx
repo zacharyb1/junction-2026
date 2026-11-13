@@ -2,9 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TryForm } from "@/components/try-form";
 
+const title = "Try Kaveri in the browser";
+const description =
+  "Describe a life event, pick your country, and watch the butler research it on official sources with Exa.";
+
 export const metadata: Metadata = {
-  title: "Try Kaveri in the browser",
-  description: "Describe a life event, pick your country, and watch the butler research it on official sources with Exa.",
+  title,
+  description,
+  openGraph: { title, description, siteName: "Kaveri", type: "website" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default async function TryPage({ searchParams }: PageProps<"/try">) {
