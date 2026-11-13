@@ -30,7 +30,8 @@ First audience: international families in Finland, who deal with Kela, Vero, Mig
 | Review fixes | Done Fri night: stricter grounding, conflict labels, safe page fetch, country names, demo limits, accurate page copy. See section 4 and `docs/DECISIONS.md`. | pull request 5 |
 | Highlight links | Each verified source links to the official page with the quoted sentence highlighted (text fragment, works in Chrome, Edge, Safari). | `src/app/c/[id]/page.tsx` |
 | Pitch kit | Story, numbers, criteria table, two-minute video script, demo script, judge questions. | `docs/PITCH.md` |
-| Bot template for Hermes | Written: runbook, persona, config, three skills, install script. Not yet run on a real machine. | `hermes/` |
+| Bot on Hermes | Runs on Vlad's laptop from a pinned repo-local install (`hermes/setup-local.sh`, release v0.23.1) with NVIDIA Nemotron and a local engine. Checked Sat night: one-shot chat answers; `research_case` is called and a plan with a case link comes back from the command line. Telegram checks (DM plan, group silence) and their results: see the handover in the PR "Hermes bot track". | `hermes/` |
+| Gate (local Gemma) | Hermes plugin on `pre_gateway_dispatch`: rules, wake patterns, then `gemma3:1b` through Ollama. On 60 labelled messages: 0 of 20 triggers missed, 4 of 40 false wakes. Model alone: 3 missed. Not yet run in a live group. | `hermes/plugins/kaveri-gate/`, `eval/gate/` |
 | GitHub | Private repo `zacharyb1/junction-2026`, `main` pushed. Vercel deploys from it. | github.com |
 | Production | **Live** at https://junction-2026.vercel.app: landing, `/try`, case pages, API, MCP. Research itself waits for the Exa key, see section 9. | Vercel project `junction-2026` |
 

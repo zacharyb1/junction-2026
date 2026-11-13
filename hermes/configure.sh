@@ -84,8 +84,8 @@ if [ -n "$OWNER" ]; then
   ADMINS="[\"$(printf '%s' "$OWNER" | sed 's/,/","/g')\"]"
   set_key platforms.telegram.extra.allow_admin_from "$ADMINS"
   set_key platforms.telegram.extra.group_allow_admin_from "$ADMINS"
-  set_key platforms.telegram.extra.user_allowed_commands '["start"]'
-  set_key platforms.telegram.extra.group_user_allowed_commands '["start"]'
+  set_key platforms.telegram.extra.user_allowed_commands '["start", "new"]'
+  set_key platforms.telegram.extra.group_user_allowed_commands '["start", "new"]'
 else
   echo "Slash commands: open to every user (no TELEGRAM_ALLOWED_USERS to name as admin)"
 fi
