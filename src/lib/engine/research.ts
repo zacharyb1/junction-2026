@@ -186,6 +186,8 @@ function systemPrompt(j: Jurisdiction, language: string): string {
     "Fill `due` and `amount` only when that same page states them, and repeat them exactly as written. Never estimate, convert or invent amounts or dates.",
     "`due` is only a deadline the family itself has to meet. A time limit that binds someone else, such as an authority, an airline or a landlord, is something the family is entitled to: put it in `amount`, for example \"two months' notice\", never in `due`.",
     "Each step is one distinct action. Never describe the same action in two steps.",
+    "If the situation is about another town or country than where the family lives, for example a move, the rules and services of that place apply. Name the place you used.",
+    "The summary says only what the steps say, in plain words, with no urgency and no advice beyond the steps. Do not ask a question that the situation already answers.",
     `When the authority publishes the page in ${lang}, cite that version of the page.`,
     "Include only steps that directly help with this exact situation. Skip general information about neighbouring topics, and anything the sources do not cover.",
     "At most five steps. Five well-sourced steps beat ten vague ones.",
@@ -326,7 +328,42 @@ function tidy(text: unknown): string | undefined {
   return value;
 }
 
-const sameThing = (a: string, b: string) => Math.max(overlap(a, b), overlap(b, a)) >= 0.6;
+/** Letter triples of a text without spaces, so "job seeker" and "jobseeker" compare equal. */
+function triples(text: string): Set<string> {
+  const squashed = key(text).replace(/ /g, "");
+  const out = new Set<string>();
+  for (let i = 0; i + 3 <= squashed.length; i++) out.add(squashed.slice(i, i + 3));
+  return out;
+}
+
+/** 0 to 1: how much two short texts share, letter by letter. */
+function likeness(a: string, b: string): number {
+  const x = triples(a);
+  const y = triples(b);
+  if (!x.size || !y.size) return 0;
+  let shared = 0;
+  for (const t of x) if (y.has(t)) shared++;
+  // Either the two texts are alike as a whole, or the shorter one sits almost entirely inside the longer one
+  // ("Register as a job seeker online" and "Register as a jobseeker with employment services").
+  const smaller = Math.min(x.size, y.size);
+  return Math.max((2 * shared) / (x.size + y.size), smaller >= 10 ? (shared / smaller) * 0.92 : 0);
+}
+
+const sameThing = (a: string, b: string) => Math.max(overlap(a, b), overlap(b, a)) >= 0.6 || likeness(a, b) >= 0.72;
+
+const stems = (text: string) => new Set(tokens(text).filter((t) => t.length >= 4).map((t) => t.slice(0, 5)));
+/** Two step titles that are mostly about the same thing, without being the same step. */
+function relatedTitles(a: string, b: string): boolean {
+  const x = stems(a);
+  const y = stems(b);
+  if (!x.size || !y.size) return false;
+  let shared = 0;
+  for (const t of x) if (y.has(t)) shared++;
+  return shared / Math.min(x.size, y.size) >= 0.5;
+}
+
+// A period taken from a quote means something only with its qualifier: "within 30 days", "two months in advance".
+const QUALIFIED = /^(within|at least|at most|up to|no later than|no earlier than|not more than|a maximum of|a minimum of|vähintään|enintään|viimeistään|högst|minst|senast)\b|in advance$/i;
 
 const MONEY = /[€$£%]|\b(eur|euros?|euroa|usd|dollars?|pounds?|gbp|sek|nok|dkk|kr|kronor|chf|per ?cent|prosenttia|procent)\b/i;
 // Deadline wording in English, Finnish and Swedish.
@@ -342,7 +379,8 @@ function realAmount(amount: string | undefined, due: string | undefined): string
   if (due && TIMING.test(amount) && !MONEY.test(amount)) return undefined;
   if (/free of charge|income/i.test(amount)) return amount;
   // A bare number is not an amount: "14A" is a form, "112" a phone number. It needs money or a length of time.
-  return /\d/.test(amount) && (MONEY.test(amount) || unitOf(amount)) ? amount : undefined;
+  // Number words count: "two months' notice" is a figure.
+  return numbersIn(amount).length > 0 && (MONEY.test(amount) || unitOf(amount)) ? amount : undefined;
 }
 
 /** Exa allows 10 requests per second per team. Back off briefly and try again. A bad request is never retried. */
@@ -377,6 +415,8 @@ function echoes(message: string, written: string): boolean {
   if (!asked.size) return false;
   return meaningful(written).some((t) => asked.has(stem(t)));
 }
+
+const ENGLISH_WORDS = /\b(the|and|of|to|is|are|you|your|for|must|can|with|if|be)\b/gi;
 
 const UNITS = ["%", "€", "$", "£", "day", "week", "month", "year"];
 /** What a value measures: "35 %" and "40 %" can contradict each other, "35 %" and "160 days" cannot. */
@@ -555,7 +595,11 @@ export async function researchCase(
 
   // Official sources first (stable sort keeps the lead focus on top), then merge near-duplicates.
   // Each deadline and amount keeps the page it came from, so merging steps never moves a fact to another source.
-  found.sort((a, b) => Number(b.official) - Number(a.official));
+  // For an English answer, a source quoted in English goes before the same fact quoted in another language,
+  // so the reader gets a sentence they can read when the authority publishes one.
+  const readable = (c: Candidate) =>
+    input.language.toLowerCase().startsWith("en") && (c.quote.match(ENGLISH_WORDS) ?? []).length >= 2 ? 1 : 0;
+  found.sort((a, b) => Number(b.official) - Number(a.official) || readable(b) - readable(a));
   const merged: Candidate[] = [];
   for (const c of found) {
     const twin = merged.find(
@@ -637,7 +681,11 @@ export async function researchCase(
     }
     const anchor = `${c.title} ${c.detail ?? ""} ${quote} ${fact.quote}`;
     const onPage = supportFor(fact.value, page.text, 0.55, anchor);
-    if (onPage && sharedWords(onPage.sentence, anchor, fact.value) >= 2) return cite(fact.url, onPage.sentence);
+    if (!onPage) return null;
+    // An amount is listed under the sentence that states it, so it needs no link to the step.
+    // A deadline is shown on the step itself, so its sentence has to be about the same thing.
+    if (fact.kind === "amount" || sharedWords(onPage.sentence, anchor, fact.value) >= 2) return cite(fact.url, onPage.sentence);
+    elsewhere.add(fact);
     return null;
   };
 
@@ -646,6 +694,18 @@ export async function researchCase(
   const money: CaseInput["money"] = [];
   const dueRef = new Map<StepDraft, number>();
   const dropped: { value: string; note: string }[] = [];
+  // Deadlines that are on the page, but in a sentence about something else.
+  const elsewhere = new Set<Fact>();
+  // Every amount confirmed for a step, wherever its sentence is, to notice two that disagree.
+  const amounts = new Map<StepDraft, { value: string; ref: number }[]>();
+  /** How an amount is named when its sentence is not the step's own: by the start of that sentence. */
+  const sentenceLabel = (n: number) => {
+    const quote = evidence.find((e) => e.n === n)?.quote ?? "";
+    return `“${quote.length > 90 ? `${quote.slice(0, 90).replace(/\s+\S*$/, "")}…` : quote}”`.slice(0, 120);
+  };
+  /** The same figure is one entitlement, however many steps mention it. A value without a number must match word for word. */
+  const sameFigure = (a: string, b: string) =>
+    numbersIn(a).length ? sameNumbers(a, b) && unitOf(a) === unitOf(b) : key(a) === key(b);
 
   for (const c of merged) {
     if (steps.length >= LIMITS.steps || evidence.length >= LIMITS.evidence - 1) break;
@@ -698,6 +758,8 @@ export async function researchCase(
       if (!target.evidence.includes(n)) target.evidence.push(n);
     };
     const differ = (first: string, firstRef: number, second: string, secondRef: number) => {
+      // Two wordings can only disagree when both carry a number: "one week" and "viikon kuluessa" do not.
+      if (!numbersIn(first).length || !numbersIn(second).length) return;
       if (target.conflict || sameNumbers(first, second) || !unitOf(first) || unitOf(first) !== unitOf(second)) return;
       target.conflict = `Two figures found: "${first}" [${firstRef}] and "${second}" [${secondRef}]. Check which one applies to you.`.slice(0, 400);
       addRef(firstRef);
@@ -724,37 +786,49 @@ export async function researchCase(
           differ(target.due, first, fact.value, n);
         }
       } else {
-        const listed = money.find((m) => m.label === target.title);
-        if (!listed) {
-          // The same figure under two steps is one entitlement. It is listed once, under the first.
-          const twin = money.find((m) => sameNumbers(m.amount, fact.value) && unitOf(m.amount) === unitOf(fact.value));
-          if (twin) {
-            if (twin.evidence.length < 3 && !twin.evidence.includes(n)) twin.evidence.push(n);
-          } else if (money.length < LIMITS.money) {
-            money.push({ label: target.title, amount: fact.value, evidence: [n] });
-          }
-        } else if (sameNumbers(listed.amount, fact.value)) {
-          if (listed.evidence.length < 3 && !listed.evidence.includes(n)) listed.evidence.push(n);
-        } else {
-          differ(listed.amount, listed.evidence[0], fact.value, n);
+        // Two amounts for one step that share a unit but not a figure are shown side by side.
+        const seen = amounts.get(target) ?? [];
+        const clash = seen.find((a) => !sameNumbers(a.value, fact.value) && unitOf(a.value) === unitOf(fact.value));
+        if (clash) differ(clash.value, clash.ref, fact.value, n);
+        amounts.set(target, [...seen, { value: fact.value, ref: n }]);
+
+        const twin = money.find((m) => sameFigure(m.amount, fact.value));
+        if (twin) {
+          if (twin.evidence.length < 3 && !twin.evidence.includes(n)) twin.evidence.push(n);
+        } else if (!clash && money.length < LIMITS.money) {
+          // The amount carries the step's name only when the step's own sentence states it.
+          // Stated elsewhere on the page, it is listed under the start of its own sentence,
+          // so "40 working days" is never printed next to a step it does not belong to.
+          const label = n === main && !money.some((m) => m.label === target.title) ? target.title : sentenceLabel(n);
+          if (!money.some((m) => m.label === label)) money.push({ label, amount: fact.value, evidence: [n] });
         }
       }
     }
     // Only a concrete figure is worth reporting as missing. Whether the case shows it anyway is decided at the end.
     for (const fact of missing) {
-      if (/\d/.test(fact.value)) {
-        dropped.push({ value: fact.value, note: `${c.title}: "${fact.value}" is not stated on ${hostOf(fact.url)}, so it is left out.` });
-      }
+      // A long value is a sentence, not a figure. Reporting it as missing would only confuse.
+      if (!numbersIn(fact.value).length || fact.value.length > 60) continue;
+      const why = elsewhere.has(fact)
+        ? `is on ${hostOf(fact.url)}, but in a sentence about something else, so it is left out`
+        : `is not stated on ${hostOf(fact.url)}, so it is left out`;
+      dropped.push({ value: fact.value, note: `${c.title}: "${fact.value}" ${why}.` });
     }
   }
-  // A step whose own sentence states exactly one period or amount shows it, in the sentence's words,
-  // even when the search model left the field empty. The text comes from a verified quote, so it is grounded as it stands.
+  // What a step's own sentence states is shown even when the search model left the field empty:
+  // every money figure in it, and a single period when the step has no deadline or amount yet.
+  // The text is the verified quote's own wording, so it is grounded as it stands.
   for (const step of steps) {
-    if (step.due || money.length >= LIMITS.money || money.some((m) => m.label === step.title)) continue;
     const figures = figuresIn(evidence.find((e) => e.n === step.evidence[0])?.quote ?? "").filter((f) => !contains(given, f));
-    if (figures.length !== 1) continue;
-    const twin = money.find((m) => sameNumbers(m.amount, figures[0]) && unitOf(m.amount) === unitOf(figures[0]));
-    if (!twin) money.push({ label: step.title, amount: figures[0], evidence: [step.evidence[0]] });
+    const takes = (figure: string) => {
+      if (money.length >= LIMITS.money || money.some((m) => sameFigure(m.amount, figure))) return;
+      if (step.due && sameNumbers(step.due, figure) && unitOf(step.due) === unitOf(figure)) return;
+      const label = money.some((m) => m.label === step.title) ? sentenceLabel(step.evidence[0]) : step.title;
+      if (!money.some((m) => m.label === label)) money.push({ label, amount: figure, evidence: [step.evidence[0]] });
+    };
+    const sums = figures.filter((f) => ["€", "$", "£", "%"].includes(unitOf(f)));
+    for (const figure of sums.slice(0, 2)) takes(figure);
+    const bare = !step.due && !money.some((m) => m.label === step.title);
+    if (bare && figures.length === 1 && !sums.length && QUALIFIED.test(figures[0])) takes(figures[0]);
   }
 
   // A figure that another source did confirm, under this step or another, is not a gap.
@@ -780,23 +854,56 @@ export async function researchCase(
     evidence.push(...kept);
   }
 
-  // Two steps can carry different figures for what looks like the same rule: last year's rate and this year's,
-  // or "two months" on one site and "one month" on another. Nobody should read one of them as the whole truth.
-  // Percentages are compared across the whole case. Other figures only when their two sentences share a topic.
-  const quoteOf = (n: number) => evidence.find((e) => e.n === n)?.quote ?? "";
-  const stated = [
-    ...money.map((m) => ({ value: m.amount, ref: m.evidence[0] })),
-    ...steps.flatMap((s) => (s.due ? [{ value: s.due, ref: dueRef.get(s) ?? s.evidence[0] }] : [])),
-  ].filter((f) => unitOf(f.value) && new Set(numbersIn(f.value)).size === 1);
-  pairs: for (let i = 0; i < stated.length; i++) {
-    for (const other of stated.slice(i + 1)) {
-      const first = stated[i];
-      const unit = unitOf(first.value);
-      if (first.ref === other.ref || unit !== unitOf(other.value) || sameNumbers(first.value, other.value)) continue;
-      const sameTopic = sharedWords(quoteOf(first.ref), quoteOf(other.ref)) >= 3;
-      if (unit !== "%" && !sameTopic) continue;
+  // A money line that only repeats its step's deadline says nothing new.
+  for (let i = money.length - 1; i >= 0; i--) {
+    const owner = steps.find((s) => s.title === money[i].label);
+    if (owner?.due && (key(owner.due) === key(money[i].amount) || (numbersIn(owner.due).length > 0 && sameFigure(owner.due, money[i].amount)))) {
+      money.splice(i, 1);
+    }
+  }
+
+  // Different figures for what looks like the same rule are pointed out, so nobody reads one of them as the whole truth:
+  // last year's rate and this year's, or "two months" on one site and "one month" on another.
+  // Percentages are compared across the whole case. Other figures only between steps whose titles are about the same thing.
+  const figuresOf = (step: StepDraft) =>
+    [
+      ...(step.due ? [{ value: step.due, ref: dueRef.get(step) ?? step.evidence[0] }] : []),
+      ...(amounts.get(step) ?? []),
+      ...money.filter((m) => m.label === step.title).map((m) => ({ value: m.amount, ref: m.evidence[0] })),
+    ].filter((f) => unitOf(f.value) && new Set(numbersIn(f.value)).size === 1);
+  const differing = (
+    first: { value: string; ref: number }[],
+    second: { value: string; ref: number }[],
+    only?: string,
+  ): [{ value: string; ref: number }, { value: string; ref: number }] | null => {
+    for (const a of first) {
+      for (const b of second) {
+        const unit = unitOf(a.value);
+        if (a.ref !== b.ref && unit === unitOf(b.value) && (!only || unit === only) && !sameNumbers(a.value, b.value)) return [a, b];
+      }
+    }
+    return null;
+  };
+  // A longer word that only these two sentences of the whole case share ("notified") ties them to one rule.
+  const allQuotes = evidence.map((e) => new Set(tokens(e.quote)));
+  const sameRule = (a: number, b: number) => {
+    const x = new Set(tokens(evidence.find((e) => e.n === a)?.quote ?? ""));
+    const y = new Set(tokens(evidence.find((e) => e.n === b)?.quote ?? ""));
+    const shared = [...x].filter((t) => t.length >= 4 && !/^\d/.test(t) && y.has(t));
+    const rare = shared.some((t) => t.length >= 6 && allQuotes.filter((q) => q.has(t)).length <= 2);
+    return rare && shared.length >= 3;
+  };
+  pairs: for (let i = 0; i < steps.length; i++) {
+    for (let k = i + 1; k < steps.length; k++) {
+      const pair =
+        differing(figuresOf(steps[i]), figuresOf(steps[k]), relatedTitles(steps[i].title, steps[k].title) ? undefined : "%") ??
+        (() => {
+          const other = differing(figuresOf(steps[i]), figuresOf(steps[k]));
+          return other && sameRule(other[0].ref, other[1].ref) ? other : null;
+        })();
+      if (!pair || steps[i].conflict?.includes(`[${pair[0].ref}]`)) continue;
       unverified.unshift(
-        `Different figures appear: "${first.value}" [${first.ref}] and "${other.value}" [${other.ref}]. They may apply to different years or cases, so read both quotes.`,
+        `Different figures appear: "${pair[0].value}" [${pair[0].ref}] and "${pair[1].value}" [${pair[1].ref}]. They may apply to different years or cases, so read both quotes.`,
       );
       break pairs;
     }
@@ -812,7 +919,11 @@ export async function researchCase(
   for (const url of new Set(evidence.map((e) => e.url))) {
     for (const n of pageNumbers(pages.get(url)?.text ?? "")) cited.add(n);
   }
-  const title = backed(clip(head.title, 140), cited) ?? clip(input.situation, 80);
+  // The header shows where the family lives. A place at the end of the title adds nothing,
+  // and it is wrong when the situation is about somewhere else (a move to another town).
+  const place = [j.region, j.name].filter(Boolean).map((p) => (p as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const placeless = clip(head.title, 140).replace(new RegExp(`(?:[,:]?\\s+(?:in|for|at)\\s+(?:${place})(?:,\\s*(?:${place}))?)+\\s*$`, "i"), "");
+  const title = backed(placeless, cited) ?? clip(input.situation, 80);
   const caseInput: CaseInput = {
     title,
     event: key(title).split(" ").slice(0, 4).join("_").slice(0, 60) || "case",
