@@ -13,7 +13,7 @@ import {
   unbackedNumbers,
 } from "@/lib/engine/ground";
 import { hostOf, isOfficial, type Jurisdiction, publisherOf, resolveJurisdiction } from "@/lib/engine/jurisdiction";
-import { numbersIn, tokens } from "@/lib/text";
+import { figuresIn, numbersIn, tokens } from "@/lib/text";
 import { type FetchedPage, fetchPages, readerCounts } from "@/lib/verify";
 
 /**
@@ -704,6 +704,16 @@ export async function researchCase(
       }
     }
   }
+  // A step whose own sentence states exactly one period or amount shows it, in the sentence's words,
+  // even when the search model left the field empty. The text comes from a verified quote, so it is grounded as it stands.
+  for (const step of steps) {
+    if (step.due || money.length >= LIMITS.money || money.some((m) => m.label === step.title)) continue;
+    const figures = figuresIn(evidence.find((e) => e.n === step.evidence[0])?.quote ?? "").filter((f) => !contains(given, f));
+    if (figures.length !== 1) continue;
+    const twin = money.find((m) => sameNumbers(m.amount, figures[0]) && unitOf(m.amount) === unitOf(figures[0]));
+    if (!twin) money.push({ label: step.title, amount: figures[0], evidence: [step.evidence[0]] });
+  }
+
   // A figure that another source did confirm, under this step or another, is not a gap.
   const shown = [...steps.map((s) => s.due), ...money.map((m) => m.amount)].filter((v): v is string => Boolean(v));
   for (const d of dropped) {
@@ -727,16 +737,25 @@ export async function researchCase(
     evidence.push(...kept);
   }
 
-  // Percentages are where sources contradict each other most often: last year's rate and this year's.
-  // Two steps with different percentages are pointed out, so nobody reads one of them as the whole truth.
-  const rates = money.filter((m) => unitOf(m.amount) === "%" && numbersIn(m.amount).length === 1);
-  for (let i = 0; i < rates.length; i++) {
-    const other = rates.slice(i + 1).find((m) => !sameNumbers(m.amount, rates[i].amount));
-    if (other) {
+  // Two steps can carry different figures for what looks like the same rule: last year's rate and this year's,
+  // or "two months" on one site and "one month" on another. Nobody should read one of them as the whole truth.
+  // Percentages are compared across the whole case. Other figures only when their two sentences share a topic.
+  const quoteOf = (n: number) => evidence.find((e) => e.n === n)?.quote ?? "";
+  const stated = [
+    ...money.map((m) => ({ value: m.amount, ref: m.evidence[0] })),
+    ...steps.flatMap((s) => (s.due ? [{ value: s.due, ref: dueRef.get(s) ?? s.evidence[0] }] : [])),
+  ].filter((f) => unitOf(f.value) && new Set(numbersIn(f.value)).size === 1);
+  pairs: for (let i = 0; i < stated.length; i++) {
+    for (const other of stated.slice(i + 1)) {
+      const first = stated[i];
+      const unit = unitOf(first.value);
+      if (first.ref === other.ref || unit !== unitOf(other.value) || sameNumbers(first.value, other.value)) continue;
+      const sameTopic = sharedWords(quoteOf(first.ref), quoteOf(other.ref)) >= 3;
+      if (unit !== "%" && !sameTopic) continue;
       unverified.unshift(
-        `Different rates appear: "${rates[i].amount}" [${rates[i].evidence[0]}] and "${other.amount}" [${other.evidence[0]}]. They may apply to different years or cases, so read both quotes.`,
+        `Different figures appear: "${first.value}" [${first.ref}] and "${other.value}" [${other.ref}]. They may apply to different years or cases, so read both quotes.`,
       );
-      break;
+      break pairs;
     }
   }
 
