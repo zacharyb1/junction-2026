@@ -15,6 +15,7 @@ import {
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
+import { DeadlineDate } from "@/components/deadline-date";
 import { SourceCheckPanel } from "@/components/source-check-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -151,6 +152,7 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
             <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200">{t.approveInChat}</Badge>
           )}
         </div>
+        {deadline && <DeadlineDate step={step} source={step.evidence.find((n) => verified.has(n))} locale={t.locale} t={t.date} />}
       </div>
     </li>
   );
