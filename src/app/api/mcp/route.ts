@@ -1,0 +1,113 @@
+import { createMcpHandler } from "mcp-handler";
+import { z } from "zod";
+import { CaseInput, CasePatch } from "@/lib/case";
+import { baseUrl, isAuthorised, loadCase, publishCase, recheckCase, updateCase } from "@/lib/cases";
+import { EngineError, ResearchInput, researchCase } from "@/lib/engine/research";
+
+export const maxDuration = 300;
+
+const text = (value: unknown) => ({
+  content: [{ type: "text" as const, text: typeof value === "string" ? value : JSON.stringify(value, null, 2) }],
+});
+
+/**
+ * MCP server for the agent. Hermes connects here over Streamable HTTP:
+ *   mcp_servers.casefile.url = https://<app>/api/mcp
+ *   headers.Authorization   = Bearer <CASEFILE_SECRET>
+ */
+function handlerFor(origin: string) {
+  return createMcpHandler((server) => {
+    server.registerTool(
+      "research_case",
+      {
+        title: "Research a life event",
+        description:
+          "Research what a family must do after a life event or an official letter, and get back a finished case file. " +
+          "The server searches official sites for the family's country with Exa, opens every cited page again, " +
+          "keeps only claims whose quote, amount and deadline are on the page, and publishes the case. " +
+          "Returns the case url, up to 5 chat-ready plan lines with citation numbers, how many quotes were verified, " +
+          "what could not be verified, and open questions for the family. Typically 10 to 40 seconds. " +
+          "Use this first for any life-admin question. Pass the user's own words as `situation`.",
+        inputSchema: ResearchInput,
+      },
+      async (input) => {
+        try {
+          return text(await researchCase(input, origin));
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "research failed";
+          const hint = error instanceof EngineError && error.status === 502 ? " Tell the user you could not verify this, or retry with more detail." : "";
+          return { ...text(`research_case failed: ${message}.${hint}`), isError: true };
+        }
+      },
+    );
+
+    server.registerTool(
+      "case_publish",
+      {
+        title: "Publish case file",
+        description:
+          "Create the case file for a life event or task and get its shareable URL. " +
+          "Call this once the research is done. Every amount, deadline or rule must point to an evidence item " +
+          "whose quote is copied word for word from the page. The server re-fetches each page and checks the quote. " +
+          "Returns the url, how many quotes were verified, and which citation numbers failed.",
+        inputSchema: CaseInput,
+      },
+      async (input) => text(await publishCase(input, origin)),
+    );
+
+    server.registerTool(
+      "case_update",
+      {
+        title: "Update case file",
+        description:
+          "Add or change steps, money lines, evidence or drafts on an existing case. " +
+          "Use it to fix quotes that failed verification, to attach a draft the user approved, or to mark a step done. " +
+          "Items are matched by evidence number, step title, money label or draft title.",
+        inputSchema: z.object({ id: z.string().describe("Case id returned by case_publish."), patch: CasePatch }),
+      },
+      async ({ id, patch }) => {
+        const result = await updateCase(id, patch, origin);
+        return result ? text(result) : text(`No case with id ${id}.`);
+      },
+    );
+
+    server.registerTool(
+      "case_get",
+      {
+        title: "Read case file",
+        description: "Return the stored case as JSON, including verification status of each source.",
+        inputSchema: z.object({ id: z.string() }),
+      },
+      async ({ id }) => text((await loadCase(id)) ?? `No case with id ${id}.`),
+    );
+
+    server.registerTool(
+      "case_recheck",
+      {
+        title: "Re-check sources",
+        description:
+          "Fetch every cited page of a case again and report citation numbers whose quote is no longer on the page. " +
+          "Use it in the daily change watch. An empty list means nothing changed, so stay silent.",
+        inputSchema: z.object({ id: z.string() }),
+      },
+      async ({ id }) => {
+        const result = await recheckCase(id);
+        return result
+          ? text({ id, changed: result.changed, url: `${origin}/c/${id}` })
+          : text(`No case with id ${id}.`);
+      },
+    );
+  });
+}
+
+async function handle(req: Request) {
+  if (!isAuthorised(req)) {
+    return Response.json(
+      { jsonrpc: "2.0", error: { code: -32001, message: "Unauthorised: send Authorization: Bearer <CASEFILE_SECRET>" }, id: null },
+      { status: 401 },
+    );
+  }
+  return handlerFor(baseUrl(req))(req);
+}
+
+export { handle as GET, handle as POST, handle as DELETE };

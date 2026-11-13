@@ -1,0 +1,133 @@
+# Kaveri: the keys we set in ~/.hermes/config.yaml. Everything else in your config stays as it is.
+#
+# How to apply: README.md step 9 (Part 1) and step 14 (Part 2).
+#   - Never leave two copies of a top-level key (agent:, display:, skills:, ...) in config.yaml.
+#     Add the child lines under the key you already have.
+#   - Secrets stay in ~/.hermes/.env. ${NAME} is filled in from there when the config is loaded.
+#   - Keep the quotes around "off". YAML reads a bare off as the boolean false, and
+#     display.memory_notifications then falls back to "on".
+#   - Hermes rewrites config.yaml when it saves a setting (for example on /sethome) and comments do
+#     not survive that. This file stays the reference copy, including the Mode B lines.
+#
+# Every key is listed in CHECKS.md with the Hermes doc line it was checked against.
+
+# ======================= PART 1: apply before the first start =======================
+
+# Hermes' own web_search and web_extract go through Exa (key: EXA_API_KEY in .env).
+web:
+  backend: "exa"
+
+mcp_servers:
+  # Our case engine. The model sees its tools as mcp__casefile__research_case, mcp__casefile__case_update,
+  # mcp__casefile__case_get, mcp__casefile__case_recheck and mcp__casefile__case_publish.
+  casefile:
+    url: "${CASEFILE_URL}"
+    headers:
+      Authorization: "Bearer ${CASEFILE_SECRET}"
+    timeout: 240          # seconds per tool call. research_case: under 45 s in fast mode, about 3 min in deep mode
+  # Exa's hosted MCP server. Used only when research_case fails.
+  # The model sees mcp__exa__web_search_advanced_exa and mcp__exa__web_fetch_exa.
+  # Append ,agent_run to the tools list only if you accept its cost per run.
+  exa:
+    url: "https://mcp.exa.ai/mcp?tools=web_search_advanced_exa,web_fetch_exa"
+    headers:
+      x-api-key: "${EXA_API_KEY}"
+    timeout: 120
+    supports_parallel_tool_calls: true   # read-only searches may run side by side
+
+skills:
+  external_dirs:
+    - /ABSOLUTE/PATH/TO/junction-2026/hermes/skills   # install.sh prints the real path
+  auto_load:               # loaded into every new session, so no skill_view round trip before the first plan
+    - life-event-butler
+    - letter-decoder
+    - deadline-keeper
+  write_approval: true     # the bot may not rewrite skills on its own; changes wait in /skills pending
+
+agent:
+  # A bot that strangers can talk to gets no shell, no files, no code and no browser.
+  # session_search is off because it could surface one chat's history in another chat.
+  disabled_toolsets:
+    - terminal
+    - file
+    - code_execution
+    - browser
+    - computer_use
+    - delegation
+    - image_gen
+    - video_gen
+    - session_search
+  clarify_timeout: 300     # seconds the approval buttons stay live (default 90)
+  reasoning_effort: low    # the research runs on our server; the bot must acknowledge within 5 seconds
+
+tools:
+  tool_search:
+    enabled: "off"         # keep MCP tools directly callable instead of behind tool_search / tool_call
+
+# One conversation per group, not one per member, so the family shares context and anyone can tap a button.
+group_sessions_per_user: false
+
+# Reminders and the daily change watch run on Helsinki time.
+timezone: "Europe/Helsinki"
+
+display:
+  busy_input_mode: queue         # a message sent while research runs waits its turn instead of redirecting it
+  busy_ack_enabled: false        # no "queued" notice in the family chat
+  memory_notifications: "off"    # no "Memory updated" lines in the family chat (must be the quoted string)
+  platforms:
+    telegram:
+      tool_progress: "off"                 # no tool breadcrumbs
+      interim_assistant_messages: true     # the one-line acknowledgement is sent before research_case returns
+      long_running_notifications: false    # no "Working, 3 min" bubble during a deep run or an open button prompt
+
+auxiliary:
+  background_review:
+    enabled: false         # no unattended memory or skill writes after a turn; the butler saves facts itself
+
+cron:
+  wrap_response: false     # reminders arrive as plain text, without the "Cronjob Response" header and footer
+
+# ============ PART 2: apply after /sethome has told you the group chat ID ============
+# Replace -100FAMILYCHATID (3 places) with the ID from the /sethome reply. Keep the quotes.
+# Do not apply Part 2 with the placeholder still in it: the bot would then ignore every group.
+
+platforms:
+  telegram:
+    gateway_restart_notification: false   # no "gateway restarted" pings in the family group
+    # typing_indicator: false             # optional: hides "typing..." while the bot reads each message in Mode A
+    channel_overrides:
+      "-100FAMILYCHATID":
+        allow_silence: true               # a bare [SILENT] stays silent, also on a question or a wake word
+
+telegram:
+  allowed_chats:                          # the only group the bot acts in
+    - "-100FAMILYCHATID"
+  group_allowed_chats:                    # every member of that group may trigger the bot
+    - "-100FAMILYCHATID"
+  # unauthorized_dm_behavior: pair        # judge mode, option 1: an unknown DM gets a pairing code
+  #
+  # Mode A (ambient) is active while the lines below stay switched off: require_mention is unset,
+  # every group message reaches the model, and the model answers [SILENT] unless a trigger applies.
+  #
+  # Mode B (wake patterns): remove the "#B " prefix from every line below, restart the gateway
+  # and send /new --yes in the group. The bot still records the whole chat as context, but wakes
+  # only on a pattern, an @mention or a reply to one of its messages.
+  # Patterns are Python regular expressions, matched case-insensitively against text and captions.
+  # Backslashes are doubled because the strings are double-quoted, as in the Hermes docs example.
+  #B require_mention: true
+  #B observe_unmentioned_group_messages: true
+  #B reactions: true
+  #B mention_patterns:
+  #B   # the bot's name at the start of a message
+  #B   - "^\\s*(hey\\s+|hei\\s+)?kaveri\\b"
+  #B   # English: family, home and work, letters and money, travel and consumer
+  #B   - "\\b(pregnan\\w*|expecting (a|our|another) (baby|child)|having a baby|due date|gave birth|giving birth|newborn|maternity|paternity|parental leave|daycare|(kid|child|son|daughter|baby) (is|has|got) (sick|ill|a fever))\\b"
+  #B   - "\\b(moving (out|in|house|home|to)|we are moving|new (flat|apartment|lease)|change of address|landlord|rent (increase|rise|hike)|rais\\w+ (the|our) rent|evict\\w*|laid off|layoffs?|made redundant|redundancy|got fired|lost my job|losing my job|new job|job offer|unemploy\\w*|resign\\w*)\\b"
+  #B   - "\\b(letter from|got a letter|official letter|invoice|(parking|speeding|traffic) (fine|ticket)|got fined|penalty (fee|charge|notice)|debt collection|tax (letter|return|card|refund|decision|office|bill)|back taxes|residence permit|work permit|visa|citizenship|immigration)\\b"
+  #B   - "\\b((flight|train|ferry)\\b.{0,40}\\b(cancel\\w*|delay\\w*)|(cancel\\w*|delay\\w*)\\b.{0,40}\\b(flight|train|ferry)|missed (the |our |my )?(flight|connection)|lost (luggage|baggage|passport)|warranty|stopped working|broke down|subscription|price (increase|rise|hike)|rais\\w+ (the|their) prices?|anniversary|wedding|birthday (party|dinner)|book(ing)? a (table|restaurant|venue))\\b"
+  #B   # Finnish: family and home, work and letters, travel and consumer
+  #B   - "(?<!\\w)(raskaa\\w*|raskau\\w*|odota(n|mme)\\s+vauvaa|laskettu\\s+aika|synnyt\\w*|vastasyntyn\\w*|äitiys\\w*|isyys\\w*|vanhempainvapaa\\w*|neuvola\\w*|päiväkot\\w*|lapsi\\s+on\\s+(sairas|kipeä)|kuume\\w*|muutto\\w*|muutamme|muutetaan|muutimme|uusi\\s+asunto|vuokranantaj\\w*|vuokrankorotu\\w*|vuokra\\w*\\s+nous\\w*|vuokrasopimu\\w*)"
+  #B   - "(?<!\\w)(irtisano\\w*|lomaut\\w*|sain\\s+potkut|työttöm\\w*|uusi\\s+työ\\w*|työtarjou\\w*|\\w*sak(ko|on|ot)\\w*|pysäköintivirhemaksu\\w*|oleskelulup\\w*|viisumi\\w*|migri\\w*|kansalaisuu\\w*|verokort\\w*|veroilmoitu\\w*|veropäätö\\w*|verotoimisto\\w*|veronpalautu\\w*|jäännösver\\w*|mätky\\w*|kirje\\w*|lasku(n|t|ja)?\\b|perintä\\w*)"
+  #B   - "(?<!\\w)((lento|juna|laiva)\\w*\\W+(\\w+\\W+){0,3}(peru\\w*|myöhä\\w*)|(peruttu|peruutettu|myöhäs\\w*)\\W+(\\w+\\W+){0,3}(lento|juna)\\w*|takuu\\w*|meni\\s+rikki|hajosi|tilau\\w*|hinnankorotu\\w*|hääpäiv\\w*|vuosipäiv\\w*|syntymäpäiväjuhl\\w*|häät)"
+  #B   # Swedish (optional third language; delete this line if you do not need it)
+  #B   - "(?<!\\w)(gravid\\w*|väntar\\s+(barn|bebis)|förlossning\\w*|nyfödd\\w*|föräldraledig\\w*|barnet\\s+är\\s+sjuk\\w*|feber|flytt\\w*|hyresvärd\\w*|hyreshöj\\w*|hyresavtal\\w*|uppsagd\\w*|uppsägning\\w*|permitter\\w*|arbetslös\\w*|nytt\\s+jobb|jobberbjudande\\w*|böter|parkeringsbot\\w*|uppehållstillstånd\\w*|visum|medborgarskap\\w*|skattekort\\w*|deklaration\\w*|kvarskatt\\w*|brev\\s+från|faktura\\w*|inkasso\\w*|(flyg|tåg|färja)\\w*\\W+(\\w+\\W+){0,3}(inställ\\w*|ställ\\w*\\s+in|försen\\w*)|garanti\\w*|gick\\s+sönder|prenumeration\\w*|prishöjning\\w*|bröllopsdag\\w*|årsdag\\w*)"

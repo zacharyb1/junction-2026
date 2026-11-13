@@ -1,0 +1,127 @@
+{
+  "title": "Expecting a baby: what to do and when",
+  "event": "pregnancy",
+  "language": "en",
+  "jurisdiction": { "country": "Finland", "region": "Espoo" },
+  "summary": "Sample case built from live official pages. Three things have deadlines: the clinic visit that unlocks the maternity grant, the grant application itself, and telling the employer about parental leave. Every line below points to the sentence it came from.",
+  "steps": [
+    {
+      "title": "Book the maternity clinic check-up",
+      "detail": "The examination must happen before the end of the fourth month of pregnancy, or the maternity grant is not available.",
+      "owner": "Anna",
+      "due": "Before the end of month 4",
+      "status": "todo",
+      "evidence": [1]
+    },
+    {
+      "title": "Choose the maternity package or the cash benefit",
+      "detail": "It is one or the other. Decide before applying.",
+      "owner": "Anna and Mikko",
+      "status": "todo",
+      "evidence": [2]
+    },
+    {
+      "title": "Apply for the maternity grant from Kela",
+      "detail": "Needs the pregnancy certificate from the clinic.",
+      "owner": "Anna",
+      "due": "2 months before the due date",
+      "status": "todo",
+      "evidence": [3]
+    },
+    {
+      "title": "Tell both employers about parental leave",
+      "detail": "A draft notice is ready below. Approve it and I will adapt it for each employer.",
+      "owner": "Anna and Mikko",
+      "due": "2 months before leave begins",
+      "status": "needs_approval",
+      "evidence": [5]
+    },
+    {
+      "title": "Apply for parental allowance from Kela",
+      "detail": "Check first whether the employer pays salary during leave. Kela asks for that in the application.",
+      "owner": "Anna and Mikko",
+      "due": "2 months before leave begins",
+      "status": "todo",
+      "evidence": [6]
+    }
+  ],
+  "money": [
+    {
+      "label": "Parental allowance, both parents together",
+      "amount": "320 working days, about 13 months",
+      "note": "Half of the days belong to each parent.",
+      "evidence": [4]
+    },
+    {
+      "label": "Maternity grant",
+      "amount": "Maternity package or a cash benefit",
+      "note": "The page says the value increased this year. The amount itself is listed under unverified.",
+      "evidence": [2]
+    }
+  ],
+  "evidence": [
+    {
+      "n": 1,
+      "url": "https://www.kela.fi/maternity-grant",
+      "title": "Maternity grant",
+      "publisher": "Kela",
+      "quote": "You can apply for maternity grant if you are pregnant and have undergone a medical examination by a doctor or at a maternity and child welfare clinic before the end of the fourth month of pregnancy",
+      "sourceType": "official"
+    },
+    {
+      "n": 2,
+      "url": "https://www.kela.fi/maternity-grant",
+      "title": "Maternity grant",
+      "publisher": "Kela",
+      "quote": "You can choose between a maternity package (äitiyspakkaus) and a cash benefit.",
+      "sourceType": "official"
+    },
+    {
+      "n": 3,
+      "url": "https://www.kela.fi/maternity-grant",
+      "title": "Maternity grant",
+      "publisher": "Kela",
+      "quote": "You should apply for the maternity grant no later than two months before the expected date of birth of the child.",
+      "sourceType": "official"
+    },
+    {
+      "n": 4,
+      "url": "https://www.infofinland.fi/en/family/financial-support-for-families/benefits-for-a-family-after-a-child-is-born",
+      "title": "Benefits for a family after a child is born",
+      "publisher": "InfoFinland",
+      "quote": "Parents can receive parental allowance for a total of 320 working days, i.e. for approximately 13 months. Both parents are entitled to half of the days, or 160 days, of the parental allowance period.",
+      "sourceType": "official",
+      "priorBelief": "Separate maternity, paternity and parental leave periods of different lengths, with most of the days going to the mother."
+    },
+    {
+      "n": 5,
+      "url": "https://www.infofinland.fi/en/family/financial-support-for-families/benefits-for-a-family-after-a-child-is-born",
+      "title": "Benefits for a family after a child is born",
+      "publisher": "InfoFinland",
+      "quote": "If you have a job, notify your employer about your parental leave two (2) months before it begins.",
+      "sourceType": "official"
+    },
+    {
+      "n": 6,
+      "url": "https://www.infofinland.fi/en/family/financial-support-for-families/benefits-for-a-family-after-a-child-is-born",
+      "title": "Benefits for a family after a child is born",
+      "publisher": "InfoFinland",
+      "quote": "Apply for parental allowance at least two (2) months before you begin your parental leave.",
+      "sourceType": "official"
+    }
+  ],
+  "drafts": [
+    {
+      "title": "Parental leave notice to employer",
+      "kind": "email",
+      "body": "Subject: Notice of parental leave\n\nHi [manager],\n\nI am expecting a child, with a due date of [date]. I plan to take parental leave from [start date] to [end date].\n\nI am giving this notice at least two months before the leave begins. Could you confirm whether salary is paid during any part of the leave? Kela asks for this in the parental allowance application.\n\nI am happy to plan the handover with you.\n\nBest regards,\n[name]"
+    }
+  ],
+  "unverified": [
+    "The amount of the cash benefit for this year. The Kela page says the value increased but I did not capture the figure, so I am not stating one."
+  ],
+  "openQuestions": [
+    "What is the due date? I need it to turn the two-month deadlines into calendar dates.",
+    "Do your employment contracts or collective agreements pay salary during part of the leave?"
+  ]
+}

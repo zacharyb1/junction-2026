@@ -10,7 +10,7 @@ Set the project to **FINAL** (not DRAFT). Drafts are not reviewed.
 - [ ] Technologies used
 - [ ] **Video pitch ≤ 2:00** uploaded (YouTube/Vimeo, viewable by everyone, not private). Check length to the second.
 - [ ] Demo link (deployed Vercel URL, works from a fresh browser with no login, or with a prefilled demo account)
-- [ ] Source code link (public GitHub repo, MIT license file present)
+- [ ] Source code link (GitHub repo, MIT license file present). The repo is private while we build: make it public, or add the organizers as collaborators, before setting the submission to FINAL.
 - [ ] Source code publicity answered
 - [ ] "Do you want to be credited?" answered
 - [ ] Pitch deck (PDF)

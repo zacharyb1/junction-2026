@@ -1,50 +1,45 @@
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import type { Metadata } from "next";
+import { AddBot } from "@/components/landing/add-bot";
+import { ChatIllustration } from "@/components/landing/chat-illustration";
+import { landingConfig } from "@/components/landing/config";
+import { Hero } from "@/components/landing/hero";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { Privacy } from "@/components/landing/privacy";
+import { Scorecard } from "@/components/landing/scorecard";
+import { SiteFooter } from "@/components/landing/site-footer";
+import { Trust } from "@/components/landing/trust";
 
-/** Placeholder landing page. Replace with the product once the challenge is chosen. */
+const title = "Kaveri: the butler in your family group chat";
+const description =
+  "A butler in your family group chat. Silent until a life event comes up, then it researches the live web with Exa and posts a plan with a source on every line.";
+
+export const metadata: Metadata = {
+  title,
+  description,
+  openGraph: { title, description, type: "website" },
+};
+
+/**
+ * Landing page. Static: the environment (see landingConfig) and src/data/scorecard.json
+ * are read when the page is built, so a new scorecard or bot name shows after the next deploy.
+ */
 export default function Home() {
+  const { botUsername, sampleCaseHref, repoUrl } = landingConfig();
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center gap-8 p-6">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <Badge variant="secondary">Junction 2026 · European Tech Renaissance</Badge>
-        <h1 className="text-4xl font-semibold tracking-tight">Scaffold is live.</h1>
-        <p className="max-w-prose text-muted-foreground">
-          Next.js 16, Tailwind 4, shadcn/ui and the Vercel AI SDK, deployed on Vercel. Product
-          code starts when the challenge is known.
-        </p>
-      </div>
-      <div className="grid w-full gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Chat smoke test</CardTitle>
-            <CardDescription>Proves streaming LLM wiring end-to-end.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button render={<Link href="/chat" />}>
-              Open /chat
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Health</CardTitle>
-            <CardDescription>Provider, commit and time of this deployment.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" render={<Link href="/api/health" />}>
-              GET /api/health
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    </main>
+    <>
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-4 py-10 sm:gap-20 sm:px-6 sm:py-14 lg:gap-24 lg:py-16">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-14">
+          <Hero sampleCaseHref={sampleCaseHref} />
+          <ChatIllustration caseHref={sampleCaseHref} className="max-w-md lg:max-w-none" />
+        </div>
+        <HowItWorks />
+        <Trust />
+        <AddBot username={botUsername} />
+        <Scorecard />
+        <Privacy />
+      </main>
+      <SiteFooter repoUrl={repoUrl} />
+    </>
   );
 }
