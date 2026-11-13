@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { AddBot } from "@/components/landing/add-bot";
-import { ChatIllustration } from "@/components/landing/chat-illustration";
 import { landingConfig } from "@/components/landing/config";
+import { boardFont, signFont } from "@/components/landing/fonts";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Privacy } from "@/components/landing/privacy";
 import { Scorecard } from "@/components/landing/scorecard";
+import { loadScorecard } from "@/components/landing/scorecard-data";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { Trust } from "@/components/landing/trust";
+import "@/components/landing/landing.css";
 
 const title = "Kaveri: the butler in your family group chat";
 const description =
@@ -20,27 +22,31 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
+/** The phone's browser bar takes the colour of the overhead sign. Same value as --sign-yellow in landing.css. */
+export const viewport: Viewport = { themeColor: "#ffd109" };
+
 /**
  * Landing page. Static: the environment (see landingConfig) and src/data/scorecard.json
  * are read when the page is built, so a new scorecard or bot name shows after the next deploy.
+ *
+ * The .landing wrapper carries the page's own visual world (landing.css, DESIGN.md).
+ * Nothing outside it changes, so /try and /c/[id] keep the shared look.
  */
-export default function Home() {
+export default async function Home() {
   const { botUsername, sampleCaseHref, repoUrl } = landingConfig();
+  const card = await loadScorecard();
 
   return (
-    <>
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-4 py-10 sm:gap-20 sm:px-6 sm:py-14 lg:gap-24 lg:py-16">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-14">
-          <Hero sampleCaseHref={sampleCaseHref} />
-          <ChatIllustration caseHref={sampleCaseHref} className="max-w-md lg:max-w-none" />
-        </div>
+    <div className={`landing ${signFont.variable} ${boardFont.variable}`}>
+      <main>
+        <Hero sampleCaseHref={sampleCaseHref} totals={card?.totals ?? null} />
         <HowItWorks />
         <Trust />
         <AddBot username={botUsername} />
-        <Scorecard />
+        <Scorecard card={card} />
         <Privacy />
       </main>
       <SiteFooter repoUrl={repoUrl} />
-    </>
+    </div>
   );
 }

@@ -1,0 +1,1557 @@
+/*
+ * The landing page's visual world: "Opaste", a station sign system. See DESIGN.md.
+ *
+ * Every rule is scoped to .landing, the wrapper in src/app/page.tsx. /try and /c/[id] keep
+ * the shared tokens in src/app/globals.css and never match anything in this file.
+ */
+
+/* The phone's overscroll area continues the overhead sign. */
+body:has(.landing) {
+  background: oklch(0.875 0.178 92);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.landing) {
+    scroll-behavior: smooth;
+  }
+}
+
+.landing {
+  /* Palette. Yellow directs, blue routes, black carries type and boards, green and red are board statuses. */
+  --sign-yellow: oklch(0.875 0.178 92);
+  --sign-black: oklch(0.205 0.012 262);
+  --concourse: oklch(0.962 0.004 250);
+  --panel: oklch(1 0 0);
+  --route-blue: oklch(0.43 0.16 258);
+  --status-go: oklch(0.5 0.14 152);
+  --status-go-lit: oklch(0.84 0.19 150);
+  --status-stop: oklch(0.53 0.19 32);
+  --status-stop-lit: oklch(0.78 0.15 40);
+
+  /* Secondary text, tinted from the field it sits on. */
+  --ink-soft: oklch(0.42 0.015 262);
+  --on-yellow-soft: oklch(0.34 0.06 92);
+  --on-black-soft: oklch(0.82 0.01 262);
+  --on-blue-soft: oklch(0.92 0.03 258);
+  --rule: oklch(0.205 0.012 262 / 0.16);
+  --rule-lit: oklch(1 0 0 / 0.2);
+
+  /* The type ramp. Every font-size on the page is one of these. */
+  --text-note: 0.875rem;
+  --text-label: 0.9375rem;
+  --text-body: 1.0625rem;
+  --text-title: 1.375rem;
+  --text-figure: 2.25rem;
+  --text-lead: clamp(1.1875rem, 1.05rem + 0.55vw, 1.5rem);
+  --text-statement: clamp(1.375rem, 1rem + 1.3vw, 2rem);
+  --text-headline: clamp(2rem, 1.3rem + 3vw, 3.5rem);
+  --text-display: clamp(2.625rem, 1.2rem + 6.1vw, 5.5rem);
+
+  /* Geometry and motion. */
+  --gutter: 1rem;
+  --corner: 4px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* What a field sets for the things placed on it. */
+  --soft: var(--ink-soft);
+  --focus: var(--route-blue);
+  --link: var(--route-blue);
+  --field: var(--concourse);
+  /* The arrow square of a hovered direction row: a colour the field itself does not use. */
+  --arrow-hover: var(--route-blue);
+  --arrow-hover-ink: var(--panel);
+
+  /* The shared components read these, so anything borrowed from src/components/ui follows the world. */
+  --background: var(--concourse);
+  --foreground: var(--sign-black);
+  --card: var(--panel);
+  --card-foreground: var(--sign-black);
+  --primary: var(--sign-black);
+  --primary-foreground: var(--panel);
+  --muted: var(--concourse);
+  --muted-foreground: var(--ink-soft);
+  --border: var(--rule);
+  --ring: var(--route-blue);
+
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--concourse);
+  color: var(--sign-black);
+  font-family: var(--font-sign), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--text-body);
+  line-height: 1.45;
+  font-variant-numeric: lining-nums;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 40rem) {
+  .landing {
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .landing {
+    --gutter: 2.5rem;
+  }
+}
+
+/* ---------- Browser surfaces ---------- */
+
+.landing ::selection {
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing :focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---------- Fields: a colour that owns a whole region ---------- */
+
+.landing .l-field--yellow {
+  --field: var(--sign-yellow);
+  background: var(--field);
+  --soft: var(--on-yellow-soft);
+  --focus: var(--sign-black);
+  --link: var(--sign-black);
+}
+
+.landing .l-field--white {
+  --field: var(--panel);
+  background: var(--field);
+}
+
+.landing .l-field--blue {
+  --field: var(--route-blue);
+  --arrow-hover: var(--panel);
+  --arrow-hover-ink: var(--sign-black);
+  background: var(--field);
+  color: var(--panel);
+  --soft: var(--on-blue-soft);
+  --focus: var(--sign-yellow);
+  --link: var(--panel);
+}
+
+.landing .l-field--black {
+  --field: var(--sign-black);
+  --arrow-hover: var(--sign-yellow);
+  --arrow-hover-ink: var(--sign-black);
+  background: var(--field);
+  color: var(--panel);
+  --soft: var(--on-black-soft);
+  --focus: var(--sign-yellow);
+  --link: var(--panel);
+}
+
+.landing .l-field--blue ::selection,
+.landing .l-field--black ::selection {
+  background: var(--sign-yellow);
+  color: var(--sign-black);
+}
+
+/* ---------- Layout ---------- */
+
+.landing .l-wrap {
+  width: 100%;
+  max-width: 84rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.landing .l-section {
+  padding-block: 3.5rem;
+}
+
+.landing .l-section-head {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 64rem) {
+  .landing .l-section {
+    padding-block: 6rem;
+  }
+
+  .landing .l-section-head {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    column-gap: 8%;
+    align-items: end;
+    margin-bottom: 3.5rem;
+  }
+}
+
+/* ---------- Type ---------- */
+
+.landing h1 {
+  font-size: var(--text-display);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+
+.landing h2 {
+  font-size: var(--text-headline);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.landing h3 {
+  font-size: var(--text-title);
+  font-weight: 800;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.landing .l-hint {
+  max-width: 46ch;
+  color: var(--soft);
+  font-size: var(--text-body);
+  font-weight: 500;
+  text-wrap: pretty;
+}
+
+.landing .l-link {
+  color: var(--link);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.landing .l-link:hover {
+  text-decoration-thickness: 3px;
+}
+
+/* ---------- Glyphs: arrow, check, cross, attention, bell. One stroke, square ends. ---------- */
+
+.landing .l-glyph {
+  display: block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+}
+
+.landing .l-mark .l-glyph {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.landing .l-way-arrow .l-glyph {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.landing .l-way--primary .l-way-arrow .l-glyph {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.landing .l-lamp .l-glyph {
+  width: 0.9375rem;
+  height: 0.9375rem;
+}
+
+.landing .l-close .l-way-arrow .l-glyph {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* ---------- The overhead sign ---------- */
+
+.landing .l-sign {
+  padding-top: 0.75rem;
+}
+
+.landing .l-id {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.landing .l-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.625rem;
+  font-size: var(--text-title);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.landing .l-mark {
+  display: grid;
+  width: 1.875rem;
+  height: 1.875rem;
+  place-items: center;
+  border-radius: 3px;
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing .l-gloss {
+  color: var(--soft);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.landing .l-nav {
+  display: none;
+}
+
+.landing .l-sign h1 {
+  margin-top: 0.875rem;
+}
+
+.landing .l-sign-row {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.625rem;
+}
+
+.landing .l-lead {
+  font-size: var(--text-lead);
+  font-weight: 500;
+  line-height: 1.24;
+  text-wrap: pretty;
+}
+
+.landing .l-lead strong,
+.landing .l-pitch strong {
+  font-weight: 800;
+}
+
+@media (min-width: 64rem) {
+  .landing .l-sign {
+    padding-top: 1.5rem;
+  }
+
+  .landing .l-nav {
+    display: flex;
+    gap: 1.75rem;
+    font-size: var(--text-label);
+    font-weight: 700;
+  }
+
+  .landing .l-nav a {
+    margin-block: -0.75rem;
+    padding-block: 0.75rem;
+    text-decoration: none;
+    text-underline-offset: 0.3em;
+  }
+
+  .landing .l-nav a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  .landing .l-sign h1 {
+    margin-top: 3rem;
+  }
+
+  .landing .l-way {
+    min-height: 3.25rem;
+  }
+
+  .landing .l-way--primary {
+    min-height: 3.75rem;
+  }
+
+  .landing .l-msgs {
+    gap: 0.625rem;
+  }
+
+  .landing .l-sign-row {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    column-gap: 8%;
+    align-items: end;
+    margin-top: 1.75rem;
+  }
+
+  .landing .l-lead {
+    max-width: 46ch;
+    padding-bottom: 2.25rem;
+  }
+}
+
+/* ---------- Direction rows: a label and an arrow square, edge to edge on a phone ---------- */
+
+.landing .l-ways {
+  display: grid;
+  margin-inline: calc(var(--gutter) * -1);
+}
+
+.landing .l-way {
+  -webkit-tap-highlight-color: transparent;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 3rem;
+  background: var(--panel);
+  color: var(--sign-black);
+  font-size: var(--text-body);
+  font-weight: 700;
+  line-height: 1.15;
+  text-decoration: none;
+}
+
+.landing .l-way-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.125rem;
+  min-width: 0;
+  padding: 0.625rem var(--gutter);
+}
+
+.landing .l-way-detail {
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-note);
+  font-weight: 500;
+}
+
+.landing .l-way-arrow {
+  display: grid;
+  width: 3.5rem;
+  place-items: center;
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing .l-way--primary {
+  min-height: 3.5rem;
+  background: var(--sign-black);
+  color: var(--panel);
+  font-size: var(--text-title);
+}
+
+.landing .l-way--primary .l-way-arrow {
+  background: var(--route-blue);
+  color: var(--panel);
+}
+
+.landing .l-way--blue {
+  background: var(--route-blue);
+  color: var(--panel);
+}
+
+.landing .l-way--yellow {
+  background: var(--sign-yellow);
+  color: var(--sign-black);
+}
+
+/* Part of the example, not a link: it keeps the look and loses the pointer. */
+.landing .l-way--static {
+  cursor: default;
+}
+
+.landing .l-way.l-way--static:hover .l-way-arrow {
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing .l-way.l-way--static:hover .l-way-arrow .l-glyph {
+  translate: none;
+}
+
+/* A row that stands alone inside a section is a panel, with corners. */
+.landing .l-way--panel {
+  overflow: hidden;
+  border-radius: var(--corner);
+}
+
+.landing .l-way--panel .l-way-label {
+  padding-inline: 1rem;
+}
+
+.landing .l-way:hover .l-way-arrow {
+  background: var(--arrow-hover);
+  color: var(--arrow-hover-ink);
+}
+
+/* A blue square on the primary row, or any square on a blue row, turns white. */
+.landing .l-way--primary:hover .l-way-arrow,
+.landing .l-way--blue:hover .l-way-arrow {
+  background: var(--panel);
+  color: var(--sign-black);
+}
+
+.landing .l-way:focus-visible {
+  outline: 3px solid var(--route-blue);
+  outline-offset: -3px;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 6px var(--panel);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing .l-way-arrow {
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+
+  .landing .l-way-arrow .l-glyph {
+    transition: translate 0.25s var(--ease);
+  }
+
+  .landing .l-way:hover .l-way-arrow .l-glyph {
+    translate: calc(var(--dx, 1) * 0.25rem) calc(var(--dy, 0) * 0.25rem);
+  }
+
+  .landing .l-way:active .l-way-arrow .l-glyph {
+    translate: calc(var(--dx, 1) * 0.5rem) calc(var(--dy, 0) * 0.5rem);
+  }
+}
+
+@media (min-width: 64rem) {
+  .landing .l-ways {
+    margin-inline: 0;
+  }
+
+  .landing .l-way-label {
+    padding-inline: 1.25rem;
+  }
+}
+
+/* ---------- The example: a family chat that ends in a plan board ---------- */
+
+.landing .l-hero-body {
+  padding-block: 0.5rem 3.5rem;
+}
+
+.landing .l-thread {
+  overflow: hidden;
+  border-radius: var(--corner);
+  background: var(--panel);
+}
+
+.landing .l-thread-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--sign-black);
+  color: var(--panel);
+  font-size: var(--text-label);
+  line-height: 1.2;
+}
+
+.landing .l-thread-head b {
+  margin-right: 0.5rem;
+  font-weight: 800;
+}
+
+.landing .l-thread-head p span {
+  color: var(--on-black-soft);
+}
+
+.landing .l-tag {
+  flex: none;
+  padding: 0.25rem 0.4375rem;
+  border-radius: 3px;
+  background: var(--sign-yellow);
+  color: var(--sign-black);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-note);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.landing .l-thread-body {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 0.875rem 0.875rem;
+}
+
+.landing .l-msgs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.landing .l-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1875rem;
+}
+
+.landing .l-msg--self {
+  align-items: flex-end;
+}
+
+.landing .l-from {
+  padding-inline: 0.25rem;
+  color: var(--ink-soft);
+  font-size: var(--text-note);
+  font-weight: 700;
+}
+
+.landing .l-bubble {
+  max-width: 88%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  background: var(--concourse);
+  line-height: 1.35;
+}
+
+.landing .l-msg--other .l-bubble,
+.landing .l-msg--bot .l-bubble {
+  border-top-left-radius: var(--corner);
+}
+
+.landing .l-msg--self .l-bubble {
+  border-top-right-radius: var(--corner);
+  background: var(--sign-black);
+  color: var(--panel);
+}
+
+/* Kaveri speaks in the sign's own yellow. */
+.landing .l-msg--bot .l-bubble {
+  background: var(--sign-yellow);
+  font-weight: 600;
+}
+
+/* A phone shows the small-talk beat as its note alone, so the plan's first row stays on the first screen. */
+@media (max-width: 39.99rem) {
+  .landing .l-msgs .l-msg--small-talk {
+    display: none;
+  }
+}
+
+.landing .l-note {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.125rem;
+  color: var(--ink-soft);
+  font-size: var(--text-note);
+  font-weight: 600;
+}
+
+.landing .l-note::before,
+.landing .l-note::after {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+  content: "";
+}
+
+.landing .l-board {
+  overflow: hidden;
+  border-radius: var(--corner);
+  background: var(--concourse);
+}
+
+.landing .l-board-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: 0.75rem;
+  padding: 0.5625rem 0.75rem;
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing .l-board-title {
+  font-size: var(--text-body);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* The name of the number column, centred over the squares. */
+.landing .l-board-col {
+  min-width: 2.25rem;
+  color: var(--on-black-soft);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-note);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.landing .l-board-hint {
+  padding: 0.375rem 0.75rem;
+  color: var(--ink-soft);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-note);
+  font-weight: 500;
+}
+
+
+
+.landing .l-plan > li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.landing .l-plan summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.75rem;
+  min-height: 3.5rem;
+  padding: 0.5625rem 0.75rem;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  list-style: none;
+}
+
+.landing .l-plan summary::-webkit-details-marker {
+  display: none;
+}
+
+.landing .l-plan summary:focus-visible {
+  outline-offset: -3px;
+}
+
+.landing .l-plan-what {
+  grid-column: 1;
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.landing .l-plan-when {
+  grid-column: 1;
+  color: var(--ink-soft);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+/* The source number: a yellow square everywhere it appears. */
+.landing .l-num {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 3px;
+  background: var(--sign-yellow);
+  color: var(--sign-black);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-title);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.landing .l-plan .l-num {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+}
+
+.landing .l-plan summary:hover .l-num,
+.landing .l-plan details[open] .l-num {
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing .l-quote {
+  margin: 0 0.75rem 0.75rem;
+  padding: 0.75rem;
+  border-radius: 3px;
+  background: var(--panel);
+  transform-origin: top;
+}
+
+.landing .l-quote blockquote {
+  font-weight: 500;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.landing .l-quote-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.375rem 1rem;
+  margin-top: 0.625rem;
+  color: var(--ink-soft);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.landing .l-quote-source .l-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  margin-block: -0.625rem;
+}
+
+.landing .l-board-foot {
+  border-top: 1px solid var(--rule);
+}
+
+.landing .l-board-foot .l-way-label {
+  padding-inline: 0.75rem;
+}
+
+.landing .l-caption {
+  max-width: 60ch;
+  margin-top: 0.625rem;
+  color: var(--ink-soft);
+  font-size: var(--text-note);
+  text-wrap: pretty;
+}
+
+.landing .l-pitch {
+  display: grid;
+  gap: 1rem;
+  padding-top: 2rem;
+}
+
+.landing .l-pitch-main {
+  font-size: var(--text-statement);
+  font-weight: 600;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.landing .l-pitch-for {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+@media (min-width: 64rem) {
+  .landing .l-hero-body {
+    padding-block: 2.5rem 6rem;
+  }
+
+  .landing .l-thread-body {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: start;
+    gap: 2.5rem;
+    /* Room for the longest quote, so the thread keeps its height when another row is opened. */
+    min-height: 27rem;
+    padding: 1.5rem;
+  }
+
+  .landing .l-plan summary {
+    min-height: 4rem;
+  }
+
+  .landing .l-plan .l-num {
+    width: 3.25rem;
+    height: 3.25rem;
+    font-size: var(--text-figure);
+  }
+
+  .landing .l-board-col {
+    min-width: 3.25rem;
+  }
+
+  .landing .l-pitch {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    column-gap: 8%;
+    align-items: start;
+    padding-top: 3.5rem;
+  }
+}
+
+/* The departure-board flap: a row turns down from its top edge. */
+@keyframes kaveri-flap {
+  from {
+    opacity: 0;
+    transform: perspective(40rem) rotateX(-90deg);
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 1;
+    transform: perspective(40rem) rotateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing .l-plan > li {
+    transform-origin: top;
+  }
+
+  .landing .l-plan details[open] .l-quote {
+    animation: kaveri-flap 0.4s var(--ease);
+  }
+
+  /* On a wide screen the board is in view when the page opens, so the rows arrive once, in order.
+     On a phone it is below the first screen: there only an opened quote moves. */
+  @media (min-width: 64rem) {
+    .landing .l-plan > li {
+      animation: kaveri-flap 0.55s var(--ease) backwards;
+      animation-delay: calc(0.35s + var(--i, 0) * 0.11s);
+    }
+  }
+}
+
+/* ---------- How it works: a line map ---------- */
+
+.landing .l-line {
+  --dot: 1.5rem;
+  --track: 0.375rem;
+  --step: 2rem;
+  display: grid;
+  gap: var(--step);
+  max-width: 44rem;
+  padding-left: calc(var(--dot) + 1rem);
+}
+
+.landing .l-stop {
+  position: relative;
+}
+
+.landing .l-stop::before {
+  position: absolute;
+  top: 0;
+  left: calc((var(--dot) + 1rem) * -1);
+  z-index: 1;
+  width: var(--dot);
+  height: var(--dot);
+  border: var(--track) solid var(--route-blue);
+  border-radius: 50%;
+  background: var(--field);
+  content: "";
+}
+
+.landing .l-stop:not(:last-child)::after {
+  position: absolute;
+  top: calc(var(--dot) / 2);
+  left: calc((var(--dot) + 1rem) * -1 + (var(--dot) - var(--track)) / 2);
+  width: var(--track);
+  height: calc(100% + var(--step));
+  background: var(--route-blue);
+  content: "";
+}
+
+.landing .l-stop p {
+  margin-top: 0.5rem;
+  text-wrap: pretty;
+}
+
+@media (min-width: 64rem) {
+  .landing .l-line {
+    --step: 2.5rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: none;
+    padding-top: calc(var(--dot) + 1.5rem);
+    padding-left: 0;
+  }
+
+  .landing .l-stop::before {
+    top: calc((var(--dot) + 1.5rem) * -1);
+    left: 0;
+  }
+
+  .landing .l-stop:not(:last-child)::after {
+    top: calc((var(--dot) + 1.5rem) * -1 + (var(--dot) - var(--track)) / 2);
+    left: calc(var(--dot) / 2);
+    width: calc(100% + var(--step));
+    height: var(--track);
+  }
+}
+
+/* ---------- Trust: the claim on one side, what it looks like in a case file on the other ---------- */
+
+.landing .l-claim {
+  display: grid;
+  gap: 1rem;
+  padding-block: 1.5rem 1.75rem;
+  border-top: 2px solid var(--sign-black);
+}
+
+.landing .l-claim:last-child {
+  padding-bottom: 0;
+}
+
+.landing .l-claim-text p {
+  max-width: 46ch;
+  margin-top: 0.5rem;
+  text-wrap: pretty;
+}
+
+.landing .l-specimen {
+  padding: 1rem;
+  border-radius: var(--corner);
+  background: var(--panel);
+}
+
+.landing .l-legend {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.landing .l-legend dd {
+  margin-top: 0.125rem;
+  padding-left: 1.75rem;
+  color: var(--ink-soft);
+}
+
+.landing .l-fields {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.landing .l-fields dt {
+  color: var(--ink-soft);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-note);
+  font-weight: 600;
+}
+
+.landing .l-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  line-height: 1.3;
+}
+
+.landing .l-status--strong {
+  font-weight: 700;
+}
+
+.landing .l-lamp {
+  display: grid;
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.0625rem;
+  place-items: center;
+  border-radius: 2px;
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing .l-lamp--go {
+  background: var(--status-go);
+  color: var(--panel);
+}
+
+.landing .l-lamp--stop {
+  background: var(--status-stop);
+  color: var(--panel);
+}
+
+.landing .l-chip {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  background: var(--sign-yellow);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-label);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@media (min-width: 64rem) {
+  .landing .l-claim {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    column-gap: 8%;
+    align-items: start;
+    padding-block: 2.25rem 2.5rem;
+  }
+
+  .landing .l-specimen {
+    padding: 1.25rem;
+  }
+}
+
+/* ---------- Add the bot: the information point ---------- */
+
+.landing .l-bot {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.landing .l-bot-text {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+}
+
+.landing .l-bot-text > p {
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+
+.landing .l-bot-text p .l-link {
+  display: inline-block;
+  margin-block: -0.75rem;
+  padding-block: 0.75rem;
+}
+
+.landing .l-bot-text .l-way {
+  width: 100%;
+  max-width: 26rem;
+}
+
+.landing .l-handle {
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-body);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* A QR code stays dark on white with a quiet margin, or it does not scan. */
+.landing .l-qr {
+  width: 11rem;
+  height: 11rem;
+  padding: 0.5rem;
+  border-radius: var(--corner);
+  background: #fff;
+}
+
+.landing .l-qr > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 48rem) {
+  .landing .l-bot {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .landing .l-qr {
+    width: 15rem;
+    height: 15rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .landing .l-bot {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    column-gap: 8%;
+    align-items: start;
+  }
+}
+
+/* ---------- Scorecard: the departure board ---------- */
+
+/* One board: a strip with the run and its clock, a header line of totals, then the lanes. */
+.landing .l-scoreboard {
+  border-top: 2px solid var(--panel);
+}
+
+.landing .l-board-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.125rem 1.5rem;
+  padding-block: 0.625rem;
+  border-bottom: 1px solid var(--rule-lit);
+  color: var(--on-black-soft);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.landing .l-board-clock {
+  color: var(--panel);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two shared columns, so every figure gets the width of the widest one. */
+.landing .l-totals {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.875rem;
+  padding-block: 0.5rem 1.75rem;
+}
+
+.landing .l-total {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: baseline;
+  padding-block: 0.375rem;
+  border-bottom: 1px solid var(--rule-lit);
+}
+
+.landing .l-total dd {
+  grid-row: 1;
+  grid-column: 1;
+  color: var(--sign-yellow);
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-size: var(--text-figure);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.landing .l-total dt {
+  grid-row: 1;
+  grid-column: 2;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.landing .l-total-note {
+  color: var(--on-black-soft);
+  font-weight: 400;
+}
+
+.landing .l-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-board), var(--font-sign), sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.landing .l-table th,
+.landing .l-table td {
+  padding: 0.5rem 0.375rem;
+  border-color: var(--rule-lit);
+  text-align: left;
+  vertical-align: top;
+}
+
+.landing .l-table th:first-child,
+.landing .l-table td:first-child {
+  padding-left: 0;
+}
+
+/* The result lane is as narrow as its content: a lamp on a phone, a lamp and a word from 48rem. */
+.landing .l-table .l-lane {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.landing .l-table thead .l-lane {
+  font-size: 0;
+}
+
+.landing .l-table td:last-child,
+.landing .l-table th:last-child {
+  padding-right: 0;
+}
+
+.landing .l-table .l-right {
+  text-align: right;
+}
+
+.landing .l-table thead th {
+  padding-block: 0.5rem;
+  border-bottom: 2px solid var(--panel);
+  color: var(--on-black-soft);
+  font-size: var(--text-note);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.landing .l-table tbody tr {
+  border-top: 1px solid var(--rule-lit);
+}
+
+.landing .l-table tbody th[scope="row"] {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.landing .l-table .l-group th {
+  padding-block: 1.5rem 0.375rem;
+  color: var(--sign-yellow);
+  font-size: var(--text-body);
+  font-weight: 800;
+}
+
+.landing .l-table .l-group th::first-letter {
+  text-transform: uppercase;
+}
+
+.landing .l-table tbody:first-of-type .l-group,
+.landing .l-table .l-group {
+  border-top: 0;
+}
+
+.landing .l-row-detail {
+  display: block;
+  margin-top: 0.125rem;
+  color: var(--on-black-soft);
+  font-size: var(--text-label);
+  font-weight: 500;
+}
+
+.landing .l-row-error {
+  display: block;
+  margin-top: 0.125rem;
+  color: var(--status-stop-lit);
+  font-size: var(--text-label);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.landing .l-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.landing .l-result .l-lamp {
+  margin-top: 0;
+}
+
+/* On a phone the lamp's glyph says pass or fail, and the word stays for screen readers. */
+.landing .l-result-word {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.landing .l-table tbody .l-lane {
+  padding-top: 0.5625rem;
+}
+
+.landing .l-result .l-lamp--go {
+  background: var(--status-go-lit);
+  color: var(--sign-black);
+}
+
+.landing .l-result .l-lamp--stop {
+  background: var(--status-stop-lit);
+  color: var(--sign-black);
+}
+
+/* The negative margin gives a 44px tap target without making the row taller. */
+.landing .l-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  margin-block: -0.5rem;
+  padding-left: 0.5rem;
+  white-space: nowrap;
+}
+
+.landing .l-placeholder {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  max-width: 40rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid currentColor;
+}
+
+.landing .l-placeholder .l-way {
+  width: 100%;
+  max-width: 26rem;
+}
+
+.landing .l-placeholder p {
+  color: var(--soft);
+  text-wrap: pretty;
+}
+
+@media (min-width: 48rem) {
+  /* From here up the table has its own columns for country, quotes and time. */
+  .landing .l-row-detail {
+    display: none;
+  }
+
+  /* With room, the totals run across the board as one line: figure, then label. */
+  .landing .l-totals {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 2.5rem;
+    padding-block: 0.875rem 2.25rem;
+  }
+
+  .landing .l-total {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+    padding-block: 0;
+    border-bottom: 0;
+  }
+
+  .landing .l-total dd {
+    order: -1;
+  }
+
+  .landing .l-table thead .l-lane {
+    font-size: var(--text-note);
+  }
+
+  .landing .l-result-word {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .landing .l-table tbody .l-lane {
+    padding-top: 0.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .landing .l-table th,
+  .landing .l-table td {
+    vertical-align: middle;
+  }
+
+  .landing .l-table th,
+  .landing .l-table td {
+    padding-inline: 0.75rem;
+  }
+}
+
+/* ---------- Privacy and limits: notices ---------- */
+
+.landing .l-notices {
+  display: grid;
+}
+
+.landing .l-notice {
+  padding-block: 1.25rem 1.75rem;
+  border-top: 2px solid var(--sign-black);
+}
+
+.landing .l-notice p {
+  max-width: 46ch;
+  margin-top: 0.5rem;
+  text-wrap: pretty;
+}
+
+.landing .l-small-print {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 62ch;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: var(--text-label);
+}
+
+.landing .l-small-print li {
+  position: relative;
+  padding-left: 1.125rem;
+  text-wrap: pretty;
+}
+
+.landing .l-small-print li::before {
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 0.375rem;
+  height: 0.375rem;
+  background: var(--sign-black);
+  content: "";
+}
+
+@media (min-width: 48rem) {
+  .landing .l-notices {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 2.5rem;
+  }
+}
+
+/* ---------- The last sign and the footer ---------- */
+
+.landing .l-close {
+  -webkit-tap-highlight-color: transparent;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  color: var(--sign-black);
+  font-size: var(--text-headline);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.012em;
+  text-decoration: none;
+}
+
+/* The label starts where the page's content starts, the arrow square ends where the sign ends.
+   100cqi is the footer's width, so the sum matches .l-wrap whatever the scrollbar does. */
+.landing footer {
+  container-type: inline-size;
+}
+
+.landing .l-close-label {
+  align-self: center;
+  padding-block: 1.75rem;
+  padding-left: max(var(--gutter), calc((100cqi - 84rem) / 2 + var(--gutter)));
+}
+
+.landing .l-close .l-way-arrow {
+  width: clamp(4.5rem, 14vw, 9rem);
+  background: var(--sign-black);
+  color: var(--sign-yellow);
+}
+
+.landing .l-close:hover .l-way-arrow {
+  background: var(--arrow-hover);
+  color: var(--arrow-hover-ink);
+}
+
+.landing .l-close:focus-visible {
+  outline-offset: -6px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing .l-close .l-way-arrow .l-glyph {
+    transition: translate 0.25s var(--ease);
+  }
+
+  .landing .l-close:hover .l-way-arrow .l-glyph {
+    translate: 0.5rem 0;
+  }
+}
+
+.landing .l-footer {
+  padding-block: 2rem 2.5rem;
+  font-size: var(--text-label);
+}
+
+.landing .l-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+}
+
+.landing .l-footer .l-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  margin-block: -0.75rem;
+}
+
+.landing .l-footer small {
+  display: block;
+  max-width: 60ch;
+  margin-top: 0.75rem;
+  color: var(--soft);
+  font-size: var(--text-note);
+}
+
+@media (min-width: 64rem) {
+  .landing .l-close-label {
+    padding-block: 2.75rem;
+  }
+}

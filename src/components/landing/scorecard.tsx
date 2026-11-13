@@ -1,9 +1,8 @@
-import { ArrowUpRight, CircleCheck, CircleX, ClipboardList } from "lucide-react";
+import { Arrow, Check, Cross } from "@/components/landing/glyphs";
 import {
   caseLink,
   groupRows,
   hostOf,
-  loadScorecard,
   ranAt,
   type Scorecard as ScorecardData,
   type ScorecardRow,
@@ -13,10 +12,11 @@ import { Section } from "@/components/landing/section";
 
 const DASH = "–";
 
-function Tiles({ card }: { card: ScorecardData }) {
+/** The board's header line: each total is a figure with its label beside it, in one row of the board. */
+function Totals({ card }: { card: ScorecardData }) {
   const { totals } = card;
   const p90 = seconds(totals.p90Ms);
-  const tiles = [
+  const items = [
     { label: "scenarios passed", value: `${totals.passed}/${totals.scenarios}` },
     { label: "quotes verified", value: `${totals.verifiedQuotes}/${totals.totalQuotes}` },
     {
@@ -26,13 +26,15 @@ function Tiles({ card }: { card: ScorecardData }) {
     { label: "median time", value: seconds(totals.medianMs) ?? DASH, note: p90 ? `90% within ${p90}` : undefined },
   ];
   return (
-    <dl className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
-      {tiles.map((tile) => (
+    <dl className="l-totals">
+      {items.map((item) => (
         // The label comes first for screen readers, the number comes first for the eye.
-        <div key={tile.label} className="flex flex-col rounded-xl border bg-card px-2 py-3">
-          <dt className="order-2 text-xs text-muted-foreground">{tile.label}</dt>
-          <dd className="order-1 text-xl font-semibold tabular-nums">{tile.value}</dd>
-          {tile.note && <dd className="order-3 text-xs text-muted-foreground">{tile.note}</dd>}
+        <div key={item.label} className="l-total">
+          <dt>
+            {item.label}
+            {item.note && <span className="l-total-note">, {item.note}</span>}
+          </dt>
+          <dd>{item.value}</dd>
         </div>
       ))}
     </dl>
@@ -40,11 +42,13 @@ function Tiles({ card }: { card: ScorecardData }) {
 }
 
 function Result({ pass }: { pass: boolean }) {
-  const Icon = pass ? CircleCheck : CircleX;
+  const Glyph = pass ? Check : Cross;
   return (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-      <Icon className={pass ? "size-4 text-emerald-600 dark:text-emerald-400" : "size-4 text-destructive"} />
-      {pass ? "Pass" : "Fail"}
+    <span className="l-result">
+      <span className={pass ? "l-lamp l-lamp--go" : "l-lamp l-lamp--stop"}>
+        <Glyph />
+      </span>
+      <span className="l-result-word">{pass ? "Pass" : "Fail"}</span>
     </span>
   );
 }
@@ -53,35 +57,31 @@ function Row({ row }: { row: ScorecardRow }) {
   const quotes = row.evidence > 0 ? `${row.verified}/${row.evidence}` : null;
   const time = seconds(row.ms);
   const href = caseLink(row.url);
-  // Below the md breakpoint the middle columns fold into one line under the title.
+  // Below the md breakpoint the middle columns fold into one line under the title (see .l-row-detail).
   const folded = [row.country, quotes && `${quotes} quotes`, time].filter(Boolean).join(" · ");
-  const cell = "px-2 py-2.5 sm:px-3";
 
   return (
-    <tr className="border-t align-top">
-      <th scope="row" className={`${cell} text-left font-normal`}>
-        <span className="block font-medium">{row.title}</span>
-        {folded && <span className="mt-0.5 block text-xs text-muted-foreground md:hidden">{folded}</span>}
-        {row.error && <span className="mt-0.5 block text-xs break-words text-destructive">{row.error}</span>}
-      </th>
-      <td className={`${cell} hidden md:table-cell`}>{row.country || DASH}</td>
-      <td className={cell}>
+    <tr>
+      <td className="l-lane">
         <Result pass={row.pass} />
       </td>
-      <td className={`${cell} hidden text-right tabular-nums md:table-cell`}>{quotes ?? DASH}</td>
-      <td className={`${cell} hidden text-right whitespace-nowrap tabular-nums md:table-cell`}>{time ?? DASH}</td>
-      <td className={`${cell} text-right`}>
+      <th scope="row">
+        {row.title}
+        {folded && <span className="l-row-detail">{folded}</span>}
+        {row.error && <span className="l-row-error">{row.error}</span>}
+      </th>
+      <td className="hidden md:table-cell">{row.country || DASH}</td>
+      <td className="l-right hidden md:table-cell">{quotes ?? DASH}</td>
+      <td className="l-right hidden whitespace-nowrap md:table-cell">{time ?? DASH}</td>
+      <td className="l-right">
         {href ? (
-          // The negative margin gives a taller tap target without making the row taller.
-          <a
-            href={href}
-            className="-my-1.5 inline-flex items-center gap-0.5 py-1.5 font-medium whitespace-nowrap underline-offset-4 hover:underline"
-          >
+          <a href={href} className="l-link l-open">
             Open<span className="sr-only"> the case file for: {row.title}</span>
-            <ArrowUpRight className="size-3.5" />
+            {/* A site path stays on this site. An absolute address may lead to another deployment. */}
+            <Arrow dir={href.startsWith("/") ? "right" : "up-right"} />
           </a>
         ) : (
-          <span className="text-muted-foreground">
+          <span>
             <span aria-hidden>{DASH}</span>
             <span className="sr-only">No case file</span>
           </span>
@@ -92,66 +92,61 @@ function Row({ row }: { row: ScorecardRow }) {
 }
 
 function Table({ rows }: { rows: ScorecardRow[] }) {
-  const head = "px-2 py-2 font-medium whitespace-nowrap sm:px-3";
   return (
-    <div className="overflow-hidden rounded-xl border bg-card">
-      <table className="w-full text-sm">
-        <caption className="sr-only">Result of each scenario in this run</caption>
-        <thead className="bg-muted/50 text-left text-xs text-foreground/70">
-          <tr>
-            <th scope="col" className={head}>
-              Scenario
-            </th>
-            <th scope="col" className={`${head} hidden md:table-cell`}>
-              Country
-            </th>
-            <th scope="col" className={head}>
-              Result
-            </th>
-            <th scope="col" className={`${head} hidden text-right md:table-cell`}>
-              Quotes verified
-            </th>
-            <th scope="col" className={`${head} hidden text-right md:table-cell`}>
-              Time
-            </th>
-            <th scope="col" className={`${head} text-right`}>
-              Case file
-            </th>
-          </tr>
-        </thead>
-        {groupRows(rows).map((group, g) => (
-          <tbody key={`${g}-${group.name}`}>
-            {group.name && (
-              <tr className="border-t">
-                <th
-                  scope="rowgroup"
-                  colSpan={6}
-                  className="px-2 pt-3 pb-1 text-left text-xs font-medium tracking-wide text-muted-foreground uppercase sm:px-3"
-                >
-                  {group.name}
-                </th>
-              </tr>
-            )}
-            {group.rows.map((row, i) => (
-              <Row key={`${i}-${row.id}`} row={row} />
-            ))}
-          </tbody>
-        ))}
-      </table>
-    </div>
+    <table className="l-table">
+      <caption className="sr-only">Result of each scenario in this run</caption>
+      <thead>
+        <tr>
+          <th scope="col" className="l-lane">
+            Result
+          </th>
+          <th scope="col">Scenario</th>
+          <th scope="col" className="hidden md:table-cell">
+            Country
+          </th>
+          <th scope="col" className="l-right hidden md:table-cell">
+            Quotes verified
+          </th>
+          <th scope="col" className="l-right hidden md:table-cell">
+            Time
+          </th>
+          <th scope="col" className="l-right">
+            Case file
+          </th>
+        </tr>
+      </thead>
+      {groupRows(rows).map((group, g) => (
+        <tbody key={`${g}-${group.name}`}>
+          {group.name && (
+            <tr className="l-group">
+              <th scope="rowgroup" colSpan={6}>
+                {group.name}
+              </th>
+            </tr>
+          )}
+          {group.rows.map((row, i) => (
+            <Row key={`${i}-${row.id}`} row={row} />
+          ))}
+        </tbody>
+      ))}
+    </table>
   );
 }
 
 function Results({ card }: { card: ScorecardData }) {
   const when = ranAt(card.ranAt);
   const host = hostOf(card.base);
-  const about = [card.label, when && `Ran ${when}`, card.depth && `${card.depth} mode`, host && `against ${host}`]
-    .filter(Boolean)
-    .join(" · ");
+  const run = [card.label, card.depth && `${card.depth} mode`, host && `against ${host}`].filter(Boolean).join(" · ");
   return (
-    <div className="flex flex-col gap-3">
-      <Tiles card={card} />
-      {about && <p className="text-xs text-muted-foreground">{about}</p>}
+    <div className="l-scoreboard">
+      {(run || when) && (
+        // The board's top strip: which run this is, and when it ran.
+        <p className="l-board-strip">
+          <span>{run}</span>
+          {when && <span className="l-board-clock">Ran {when}</span>}
+        </p>
+      )}
+      <Totals card={card} />
       {card.rows.length > 0 && <Table rows={card.rows} />}
     </div>
   );
@@ -159,12 +154,9 @@ function Results({ card }: { card: ScorecardData }) {
 
 function Coming() {
   return (
-    <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed p-5 sm:p-6">
-      <span className="flex size-9 items-center justify-center rounded-lg bg-muted">
-        <ClipboardList className="size-4" />
-      </span>
-      <h3 className="font-medium">First scorecard run is coming</h3>
-      <p className="max-w-prose text-sm text-pretty text-muted-foreground">
+    <div className="l-placeholder">
+      <h3>First scorecard run is coming</h3>
+      <p>
         Each scenario will get a row here: whether it passed, how many of its quotes were verified, how long it took
         and a link to the case file it produced.
       </p>
@@ -172,12 +164,15 @@ function Coming() {
   );
 }
 
-/** Totals and one row per scenario from src/data/scorecard.json, or a placeholder until the first run. */
-export async function Scorecard() {
-  const card = await loadScorecard();
+/**
+ * The departure board: totals and one row per scenario from src/data/scorecard.json,
+ * or a placeholder until the first run. The page loads the file once and hands it in.
+ */
+export function Scorecard({ card }: { card: ScorecardData | null }) {
   return (
     <Section
       id="scorecard"
+      field="black"
       title="Scorecard"
       hint="We run a fixed set of everyday scenarios through the live engine and show what happened, failures included."
     >
