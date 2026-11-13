@@ -1,0 +1,32 @@
+# Submission checklist (deadline Sun 15.11 10:00, form closes automatically)
+
+Set the project to **FINAL** (not DRAFT). Drafts are not reviewed.
+
+## Required fields
+- [ ] Project name
+- [ ] Punchline (one sentence, ≤ 15 words, says what it does and for whom)
+- [ ] Description (problem → solution → how it works → what is real in the demo → what is next)
+- [ ] Challenge(s) selected (you may submit to multiple challenges)
+- [ ] Technologies used
+- [ ] **Video pitch ≤ 2:00** uploaded (YouTube/Vimeo, viewable by everyone, not private). Check length to the second.
+- [ ] Demo link (deployed Vercel URL, works from a fresh browser with no login, or with a prefilled demo account)
+- [ ] Source code link (public GitHub repo, MIT license file present)
+- [ ] Source code publicity answered
+- [ ] "Do you want to be credited?" answered
+- [ ] Pitch deck (PDF)
+- [ ] Phone numbers of all team members
+- [ ] Discord usernames
+
+## Demo hygiene
+- [ ] Deployed URL opens in < 3 s, no console errors on the demo path
+- [ ] Seed/demo data present so the first screen is not empty
+- [ ] API keys set in Vercel env, not in the repo
+- [ ] Works on the venue Wi‑Fi and on a phone hotspot (fallback)
+- [ ] A recorded backup video of the live demo path exists (in case Wi‑Fi dies at the table)
+- [ ] README: what it is, screenshot, how to run, team
+
+## Peer review table
+- [ ] Laptop charged + charger
+- [ ] 3‑minute pitch rehearsed 3× with a timer
+- [ ] One person pitches, one drives the demo
+- [ ] Each member reviews their assigned projects on the platform (mandatory)
