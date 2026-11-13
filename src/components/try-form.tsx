@@ -1,27 +1,14 @@
 "use client";
 
-import { ArrowRight, BadgeCheck, CircleAlert, ExternalLink, Loader2, Search } from "lucide-react";
+import { CircleAlert, Loader2, Search } from "lucide-react";
 import { useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { advance, Elapsed, NO_PROGRESS, type Progress, Timeline } from "@/components/try-progress";
+import { TryResult } from "@/components/try-result";
 import { Button } from "@/components/ui/button";
-import { linkButtonClasses } from "@/components/landing/link-button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
-type Stage = { name: string; detail: string; ms: number };
-type Source = { url: string; title: string; official: boolean };
-type Result = {
-  url: string;
-  title: string;
-  plan: string[];
-  evidenceTotal: number;
-  evidenceVerified: number;
-  unverified: string[];
-  openQuestions: string[];
-  ms: number;
-  exa: { searches: number; contents: number; costDollars: number };
-};
+import type { EngineEvent, ResearchResult } from "@/lib/engine/research";
 
 const COUNTRIES = [
   ["FI", "Finland"],
@@ -66,9 +53,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
   const [document, setDocument] = useState("");
   const [code, setCode] = useState(initialCode);
   const [busy, setBusy] = useState(false);
-  const [stages, setStages] = useState<Stage[]>([]);
-  const [sources, setSources] = useState<Source[]>([]);
-  const [result, setResult] = useState<Result | null>(null);
+  const [progress, setProgress] = useState<Progress>(NO_PROGRESS);
+  const [result, setResult] = useState<ResearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   // A code from the link that the server refused: show the field so it can be corrected.
   const [rejected, setRejected] = useState(false);
@@ -78,8 +64,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
     event.preventDefault();
     if (busy) return;
     setBusy(true);
-    setStages([]);
-    setSources([]);
+    setProgress(NO_PROGRESS);
     setResult(null);
     setError(null);
     try {
@@ -119,15 +104,16 @@ export function TryForm({ code: initialCode }: { code: string }) {
           const data = block.match(/^data: (.+)$/m)?.[1];
           if (!name || !data) continue;
           const payload = JSON.parse(data);
-          if (name === "stage") setStages((s) => [...s, payload as Stage]);
-          else if (name === "source") setSources((s) => [...s, payload as Source]);
-          else if (name === "done") {
+          if (name === "done") {
             finished = true;
-            setResult(payload as Result);
+            setResult(payload as ResearchResult);
             setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
           } else if (name === "error") {
             finished = true;
             setError((payload as { error: string }).error);
+          } else {
+            // Every other event is one of the engine's, named after its type.
+            setProgress((p) => advance(p, payload as EngineEvent));
           }
         }
       }
@@ -243,35 +229,19 @@ export function TryForm({ code: initialCode }: { code: string }) {
         </Button>
       </form>
 
-      {(stages.length > 0 || error) && (
+      {(progress.stages.length > 0 || error) && (
         <Card aria-live="polite">
           <CardHeader>
             <CardTitle className="text-base">What is happening</CardTitle>
-            <CardDescription>Each stage of the research, as it runs.</CardDescription>
+            <CardDescription>Each search, each page and each check, as it happens.</CardDescription>
+            {progress.stages.length > 0 && (
+              <CardAction>
+                <Elapsed busy={busy} />
+              </CardAction>
+            )}
           </CardHeader>
           <CardContent className="flex flex-col gap-3 text-sm">
-            <ol className="flex flex-col gap-1.5">
-              {stages.map((s, i) => (
-                <li key={i} className="flex items-baseline gap-2">
-                  <span className="w-12 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
-                    {(s.ms / 1000).toFixed(1)}s
-                  </span>
-                  <span>{s.detail}</span>
-                </li>
-              ))}
-            </ol>
-            {sources.length > 0 && (
-              <ul className="flex flex-col gap-1 border-t pt-3">
-                {sources.map((s) => (
-                  <li key={s.url} className="flex items-center gap-2">
-                    <Badge variant={s.official ? "secondary" : "outline"}>{s.official ? "Official" : "Secondary"}</Badge>
-                    <a href={s.url} target="_blank" rel="noreferrer" className="truncate hover:underline">
-                      {s.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <Timeline progress={progress} busy={busy} finished={Boolean(result)} />
             {error && (
               <p className="flex items-start gap-2 text-destructive">
                 <CircleAlert className="mt-0.5 size-4 shrink-0" /> {error}
@@ -281,49 +251,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
         </Card>
       )}
 
-      {result && (
-        <Card ref={resultRef} className="scroll-mt-4 border-primary/40">
-          <CardHeader>
-            <CardTitle>{result.title}</CardTitle>
-            <CardDescription className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
-                <BadgeCheck /> {result.evidenceVerified} of {result.evidenceTotal} quotes found on their pages
-              </Badge>
-              <span>
-                {(result.ms / 1000).toFixed(1)} s · {result.exa.searches} Exa searches · {result.exa.contents} pages read through Exa
-              </span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <ol className="flex list-decimal flex-col gap-2 pl-5">
-              {result.plan.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ol>
-            {result.unverified.length > 0 && (
-              <div className="rounded-lg bg-muted p-3 text-sm">
-                <p className="font-medium">Left out because I could not confirm it</p>
-                <ul className="mt-1 list-disc pl-5 text-muted-foreground">
-                  {result.unverified.slice(0, 4).map((u) => (
-                    <li key={u}>{u}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <a href={result.url} className={linkButtonClasses({ size: "cta" })}>
-              Open the case file with every quote <ArrowRight />
-            </a>
-            <a
-              href={result.url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 self-center text-xs text-muted-foreground hover:underline"
-            >
-              Open in a new tab <ExternalLink className="size-3" />
-            </a>
-          </CardContent>
-        </Card>
-      )}
+      {result && <TryResult result={result} ref={resultRef} />}
     </div>
   );
 }
