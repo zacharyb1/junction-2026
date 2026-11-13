@@ -14,7 +14,8 @@ All times Helsinki (EET, UTC+2).
 2. `/grill-me` (Matt Pocock's skill) or `/grill-plan` (same, with hackathon context) → stress-test the idea; answers logged to `docs/DECISIONS.md`.
 3. `/plan` → `docs/PLAN.md` with demo script, milestones, cut lines, work split.
 4. Build on branches → PR → Vercel preview → merge to `main` (auto-deploys production). `/ship` does lint/typecheck/build/commit/push.
-5. `/demo-check [url]` → Playwright walk of the demo path. `/pitch` → video script, stage pitch, slides, submission copy. `/submit-check` Sunday morning.
+5. Skills on demand: `prototype` (throwaway spike to answer a design question), `diagnosing-bugs`, `tdd`, `research`, `grill-with-docs` (grill + write ADRs/glossary), `handoff` (pass context to a teammate's session).
+6. `/demo-check [url]` → Playwright walk of the demo path. `/pitch` → video script, stage pitch, slides, submission copy. `/submit-check` Sunday morning.
 
 ## Stack (do not add infra without a reason on the demo path)
 - Next.js 16 App Router, React 19, TypeScript, Tailwind 4, shadcn/ui (`pnpm dlx shadcn@latest add <component>`), pnpm.

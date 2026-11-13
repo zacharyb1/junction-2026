@@ -43,7 +43,7 @@ Rule of thumb: **this repo is already the default starter** (Next.js 16 + TypeSc
 ## Tier 4 — Claude Code tooling (installed in `.claude/`)
 | Repo | What |
 |---|---|
-| [mattpocock/skills](https://github.com/mattpocock/skills) | `grill-me`, `grilling`, `handoff` copied into `.claude/skills/` (MIT). |
+| [mattpocock/skills](https://github.com/mattpocock/skills) | Ten skills copied into `.claude/skills/` (MIT): `grill-me`, `grilling`, `grill-with-docs`, `prototype`, `tdd`, `diagnosing-bugs`, `research`, `domain-modeling`, `codebase-design`, `handoff`. |
 | [obra/superpowers](https://github.com/obra/superpowers) | Brainstorming, TDD, systematic debugging, plan writing. `/plugin marketplace add obra/superpowers`. |
 | [hesreallyhim/awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) | Index of commands, skills, hooks. |
 

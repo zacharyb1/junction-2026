@@ -30,7 +30,7 @@ Next.js 16 · React 19 · TypeScript · Tailwind 4 · shadcn/ui · Vercel AI SDK
 | `docs/STARTERS.md` | Which starter repo / library to grab per need |
 | `docs/PITCH_TEMPLATE.md`, `docs/SUBMISSION_CHECKLIST.md` | Pitch kit and Sunday checklist |
 | `.claude/commands/` | `/challenge`, `/grill-plan`, `/plan`, `/ship`, `/demo-check`, `/pitch`, `/submit-check` |
-| `.claude/skills/` | `grill-me`, `grilling`, `handoff` (from mattpocock/skills, MIT) |
+| `.claude/skills/` | `grill-me`, `grilling`, `grill-with-docs`, `prototype`, `tdd`, `diagnosing-bugs`, `research`, `domain-modeling`, `codebase-design`, `handoff` (from mattpocock/skills, MIT) |
 | `src/lib/ai.ts` | Single place for model/provider selection |
 | `src/app/api/chat` + `src/app/chat` | Streaming chat smoke test |
 | `scripts/smoke.mjs` | Playwright smoke test of a deployed URL |
