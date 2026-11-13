@@ -49,3 +49,41 @@ export async function loadCase(id: string): Promise<Case | null> {
     return null;
   }
 }
+
+const AUDIO_DIR = path.join(process.cwd(), ".data", "audio");
+const audioName = (id: string, hash: string) => `${id}-${hash}.mp3`;
+const safeHash = (hash: string) => /^[a-f0-9]{8,64}$/.test(hash);
+
+/** The spoken version of a case, stored next to it. The hash names one version of the spoken text. */
+export async function saveAudio(id: string, hash: string, audio: Buffer): Promise<void> {
+  if (!safeId(id) || !safeHash(hash)) return;
+  if (blobEnabled()) {
+    await put(`audio/${audioName(id, hash)}`, audio, {
+      access: "private",
+      contentType: "audio/mpeg",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    });
+    return;
+  }
+  await mkdir(AUDIO_DIR, { recursive: true });
+  await writeFile(path.join(AUDIO_DIR, audioName(id, hash)), audio);
+}
+
+export async function loadAudio(id: string, hash: string): Promise<Buffer | null> {
+  if (!safeId(id) || !safeHash(hash)) return null;
+  if (blobEnabled()) {
+    try {
+      const result = await get(`audio/${audioName(id, hash)}`, { access: "private" });
+      if (!result || result.statusCode !== 200) return null;
+      return Buffer.from(await new Response(result.stream).arrayBuffer());
+    } catch {
+      return null;
+    }
+  }
+  try {
+    return await readFile(path.join(AUDIO_DIR, audioName(id, hash)));
+  } catch {
+    return null;
+  }
+}
