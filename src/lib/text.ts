@@ -37,8 +37,12 @@ const numerals = (text: string) => text.replace(NUMBER_WORD_RE, (w) => NUMBER_WO
 const NUMBER = /(?<!\d)((?:\d{1,3}(?:[   .,]\d{3}(?!\d))+|\d+))((?:[.,]\d+(?!\d))?)/g;
 
 const canonNumbers = (text: string) =>
-  text.replace(NUMBER, (_, whole: string, fraction: string) => {
-    const decimals = fraction.slice(1).replace(/0+$/, "");
+  text.replace(NUMBER, (match: string, whole: string, fraction: string, at: number) => {
+    const digits = fraction.slice(1);
+    // "2,50" is 2.5, but a date keeps its zero: "20.10." is 20 October and must not read as "20.1.", 20 January.
+    const next = at + match.length;
+    const date = digits === "10" || (fraction[0] === "." && text[next] === "." && /\d/.test(text[next + 1] ?? ""));
+    const decimals = date ? digits : digits.replace(/0+$/, "");
     return whole.replace(/\D/g, "") + (decimals ? `.${decimals}` : "");
   });
 
@@ -66,7 +70,8 @@ export function tokens(text: string): string[] {
   return normalise(canonNumbers(numerals(text)))
     .replace(/(\d)(?=[\p{L}%€$£])/gu, "$1 ")
     .replace(/([\p{L}%€$£])(?=\d)/gu, "$1 ")
-    .replace(/(\d)-(?=\d)/g, "$1 ")
+    // A hyphen never hides a figure: "3-month", "under-18s" and "2026-11-14" all give whole numbers.
+    .replace(/(?<=\d)-|-(?=\d)/g, " ")
     .replace(/\b(?:no|not) later than\b|\bat the latest\b/g, "latest")
     .replace(/\bprior to\b/g, "before")
     .replace(/\bper cent\b/g, "percent")
@@ -76,7 +81,30 @@ export function tokens(text: string): string[] {
     .filter((t) => t && (t.length > 1 || /[\d%€$£]/.test(t)) && !STOP.has(t));
 }
 
-export const isNumber = (token: string) => /^\d+(\.\d+)?$/.test(token);
+/** A figure, or a dotted date such as "14.11.2026", which has to match as a whole like any other figure. */
+export const isNumber = (token: string) => /^\d+(\.\d+)*$/.test(token);
 
 /** Every number in a text, as whole canonical tokens. "2" is not found inside "2026" or "12". */
 export const numbersIn = (text: string): string[] => tokens(text).filter(isNumber);
+
+const JOINED = /[\p{L}\p{N}'-]/u;
+
+/**
+ * True when `needle` is in `hay` as whole words and whole numbers. Both must be normalised.
+ * "able to apply" is not in "unable to apply", "2 months" not in "12 months", "600 euros" not in "1 600 euros".
+ */
+export function includesWhole(hay: string, needle: string): boolean {
+  if (!needle) return false;
+  const digitFirst = /^\d/.test(needle);
+  const digitLast = /\d$/.test(needle);
+  for (let at = hay.indexOf(needle); at >= 0; at = hay.indexOf(needle, at + 1)) {
+    const end = at + needle.length;
+    const before = hay.slice(Math.max(0, at - 2), at);
+    const after = hay.slice(end, end + 2);
+    if (JOINED.test(before.slice(-1)) || JOINED.test(after.slice(0, 1))) continue;
+    // A digit one separator away is part of the same number: "1 600", "1,600", "2.5".
+    if ((digitFirst && /\d[ .,]$/.test(before)) || (digitLast && /^[ .,]\d/.test(after))) continue;
+    return true;
+  }
+  return false;
+}

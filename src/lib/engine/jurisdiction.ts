@@ -106,8 +106,8 @@ function nameToCode(): Map<string, string> {
         if (!name || name === code) continue;
         CODES.add(code);
         const lower = name.toLowerCase();
-        // "Bosnia & Herzegovina", "Myanmar (Burma)", "St. Lucia" should be found however they are typed.
-        for (const variant of [lower, lower.replace(/ & /g, " and "), lower.replace(/\s*\(.*\)\s*/g, "").trim(), lower.replace(/^st\. /, "saint ")]) {
+        // "Bosnia & Herzegovina", "Myanmar (Burma)", "St. Lucia", "Côte d’Ivoire" should be found however they are typed.
+        for (const variant of [lower, lower.replace(/ & /g, " and "), lower.replace(/\s*\(.*\)\s*/g, "").trim(), lower.replace(/^st\. /, "saint "), lower.replace(/’/g, "'")]) {
           if (variant && !map.has(variant)) map.set(variant, code);
         }
       }

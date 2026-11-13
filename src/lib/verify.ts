@@ -1,6 +1,6 @@
 import { lookup } from "node:dns/promises";
 import type { Evidence, EvidenceInput, Verification } from "@/lib/case";
-import { normalise, numbersIn } from "@/lib/text";
+import { includesWhole, normalise, numbersIn } from "@/lib/text";
 
 export { normalise };
 
@@ -40,25 +40,26 @@ export function htmlToText(html: string): string {
     .replace(/\n{2,}/g, "\n");
 }
 
-/** Share of the quote's five-word windows that occur in the page, 0 to 1. */
+/** Share of the quote's five-word windows that occur in the page as whole words, 0 to 1. */
 export function quoteMatch(quote: string, page: string): number {
   const q = normalise(quote);
   const p = normalise(page);
   if (!q || !p) return 0;
-  if (p.includes(q)) return 1;
+  if (includesWhole(p, q)) return 1;
   const words = q.split(" ");
   if (words.length < WINDOW) return 0;
   let hits = 0;
   const total = words.length - WINDOW + 1;
   for (let i = 0; i < total; i++) {
-    if (p.includes(words.slice(i, i + WINDOW).join(" "))) hits++;
+    if (includesWhole(p, words.slice(i, i + WINDOW).join(" "))) hits++;
   }
   return hits / total;
 }
 
 const PRIVATE_HOST =
   /^(localhost|.*\.(local|localhost|internal|lan|home|corp)|\[.*\]|0\.\d+\.\d+\.\d+|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|169\.254\.\d+\.\d+|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d+\.\d+)$/i;
-const PRIVATE_ADDRESS = /^(0\.|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|::1$|f[cd][0-9a-f]{2}:|fe80:)/i;
+// IPv6: unspecified, loopback, IPv4-mapped (it can carry any of the private IPv4 ranges), unique local, link-local.
+const PRIVATE_ADDRESS = /^(0\.|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|::1?$|::ffff:|f[cd][0-9a-f]{2}:|fe[89ab][0-9a-f]:)/i;
 
 /**
  * Cited URLs come from a language model and from callers of the API, so our own request
@@ -73,8 +74,10 @@ export async function isPublicUrl(raw: string): Promise<boolean> {
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return false;
   if (url.port || url.username || url.password) return false;
-  if (PRIVATE_HOST.test(url.hostname)) return false;
-  if (/^\d+\.\d+\.\d+\.\d+$/.test(url.hostname)) return true;
+  // "localhost." with the root dot is the same host as "localhost".
+  const host = url.hostname.replace(/\.$/, "");
+  if (PRIVATE_HOST.test(host)) return false;
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) return true;
   try {
     const { address } = await lookup(url.hostname);
     return !PRIVATE_ADDRESS.test(address);
@@ -247,16 +250,27 @@ export function readerCounts(pages: Map<string, FetchedPage>) {
   };
 }
 
+/** Letters and spaces only: what is left of a text without its figures, footnote marks and punctuation. */
+const wordsOnly = (text: string) => normalise(text).replace(/[^\p{L} ]+/gu, "").replace(/ +/g, " ").trim();
+
 /**
- * How much of the quote is on this reading, 0 to 1. A quote that is not there word for word
- * can still pass on wording alone (line breaks, footnote marks), but never with a number the page does not have.
+ * How much of the quote is on this reading, 0 to 1. A quote that is not there word for word can still
+ * pass when only punctuation or a footnote mark differs. It never passes with a word dropped, added or
+ * changed, with two distant sentences joined, or with a figure the page does not have in that place.
  */
 function matchOn(quote: string, text: string | null): number {
   if (!text) return 0;
   const match = quoteMatch(quote, text);
   if (match >= 1 || match < VERIFY_THRESHOLD) return match;
   const onPage = new Set(numbersIn(text));
-  return numbersIn(quote).every((n) => onPage.has(n)) ? match : VERIFY_THRESHOLD - 0.01;
+  const page = normalise(text);
+  const words = normalise(quote).split(" ");
+  const near =
+    numbersIn(quote).every((n) => onPage.has(n)) &&
+    // Each figure stands between the same two words as on the page.
+    words.every((w, i) => !/\d/.test(w) || includesWhole(page, words.slice(Math.max(0, i - 1), i + 2).join(" "))) &&
+    includesWhole(wordsOnly(text), wordsOnly(quote));
+  return near ? match : VERIFY_THRESHOLD - 0.01;
 }
 
 /**
