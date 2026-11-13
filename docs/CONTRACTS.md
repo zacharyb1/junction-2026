@@ -155,3 +155,4 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `PUBLIC_BASE_URL` | Vercel, optional | overrides the origin used in case links |
 | `NEXT_PUBLIC_BOT_USERNAME` | Vercel | QR code and links to the Telegram bot |
 | `NEXT_PUBLIC_SAMPLE_CASE_ID` | Vercel | sample case linked from the landing page |
+| `NEXT_PUBLIC_REPO_URL` | Vercel, optional | source link in the landing page footer |

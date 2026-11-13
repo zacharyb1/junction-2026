@@ -164,7 +164,8 @@ function frame(input: ResearchInput, j: Jurisdiction): string {
 type Focus = { name: string; ask: string; keywords: string; lead?: boolean };
 
 const CHOICE = /\b(restaurants?|dinner|lunch|brunch|caf[eé]s?|bars?|anniversary|birthday|party|gifts?|presents?|hotels?|trip|holiday|vacation|weekend|date night|things to do|activit(y|ies)|concerts?|babysitters?|plumbers?|electricians?|movers?|moving compan(y|ies)|cleaners?|gyms?|recipes?)\b/i;
-const RULES = /\b(benefits?|allowances?|permits?|visa|tax(es)?|fines?|landlord|rent|lease|contract|compensation|refunds?|deadline|law|legal|rights?|cancelled|delayed|pregnan\w*|unemploy\w*|laid off|warranty|insurance|letter)\b/i;
+const RULES =
+  /\b(benefits?|allowances?|permits?|visa|tax(es)?|fines?|landlord|rent|lease|contract|compensation|refunds?|deadline|law|legal|rights?|cancell?ed|delayed|pregnan\w*|unemploy\w*|laid off|warranty|insurance|letter|passport|stolen|theft|lost|police|embassy|consulate|emergency|accident|hospital|sick|illness|died|death|divorce|marri(ed|age)|baby|daycare|school|moving|relocat\w*|residen\w*|citizen\w*|parking|invoice|debt|eviction)\b/i;
 
 /** Rules and benefits live on official sites. Choices such as restaurants or gifts live on the open web. */
 function resolveScope(input: ResearchInput): "official" | "open" {

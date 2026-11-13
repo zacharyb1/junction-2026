@@ -78,12 +78,12 @@ export function groupRows(rows: ScorecardRow[]): { name: string; rows: Scorecard
   return groups;
 }
 
-/** "31 s", "8.4 s", "<0.1 s", or null when there is no timing. The space does not break. */
+/** "8.4 s", "31.3 s", "125 s", "<0.1 s", or null when there is no timing. The space does not break. */
 export function seconds(ms: number | null | undefined): string | null {
   if (ms == null || !Number.isFinite(ms) || ms <= 0) return null;
   if (ms < 100) return "<0.1\u00a0s";
   const s = ms / 1000;
-  return `${s >= 10 ? Math.round(s) : Math.round(s * 10) / 10}\u00a0s`;
+  return `${s < 100 ? s.toFixed(1) : Math.round(s)}\u00a0s`;
 }
 
 /** Day and time in Helsinki, the same format as the case page. */
@@ -99,9 +99,12 @@ export function ranAt(iso: string): string | null {
   }).format(date);
 }
 
+/** The public host a run was made against. A run against a local server has no host worth showing. */
 export function hostOf(url: string): string | null {
   try {
-    return new URL(url).host.replace(/^www\./, "");
+    const { host, hostname } = new URL(url);
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]") return null;
+    return host.replace(/^www\./, "");
   } catch {
     return null;
   }

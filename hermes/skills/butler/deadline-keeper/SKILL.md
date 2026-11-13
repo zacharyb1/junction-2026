@@ -18,7 +18,7 @@ The family approves "Set reminders"; you run as a scheduled job (a reminder or t
 
 ## Set reminders
 
-1. Call `mcp__casefile__case_get` with the case `id`. Use only steps that have a `due` date. Never invent a date.
+1. Call `mcp__casefile__case_get` with the case `id`. Use only steps whose `due` is a calendar date (YYYY-MM-DD). Never invent a date.
 2. For each such step call `cronjob_manage` with:
    - `action`: `create`
    - `schedule`: ISO timestamp, 09:00 two days before the due date (tomorrow 09:00 if that has passed)

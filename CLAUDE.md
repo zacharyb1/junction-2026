@@ -32,7 +32,7 @@ A butler in a family's Telegram group. It stays silent until someone mentions a 
 - Slash commands in `.claude/commands/`: `/plan`, `/ship`, `/demo-check`, `/pitch`, `/submit-check`, `/grill-plan`. Skills in `.claude/skills/`.
 
 ## Stack
-Next.js 16 App Router (Cache Components off on purpose), React 19, TypeScript, Tailwind 4, shadcn/ui on Base UI (`render={<Link />}`, there is no `asChild`), pnpm, `exa-js`, `mcp-handler`, `@vercel/blob`, zod 4. Deployed on Vercel, region fra1.
+Next.js 16 App Router (Cache Components off on purpose), React 19, TypeScript, Tailwind 4, shadcn/ui on Base UI (no `asChild`; for a link that looks like a button use `LinkButton` or `linkButtonClasses` from `src/components/landing/link-button.tsx`), pnpm, `exa-js`, `mcp-handler`, `@vercel/blob`, zod 4. Deployed on Vercel, region fra1.
 
 ## Conventions
 - Small changes, one concern per commit. `pnpm lint && pnpm typecheck && pnpm build` before pushing.

@@ -56,7 +56,7 @@ Pick a provider and paste its key (`quickstart.md:84`). The model must call tool
 hermes chat --oneshot -q "Reply with the single word: ready"
 ```
 
-Expect: `ready`. If this fails, fix it before going on (`cli-commands.md:130`, `quickstart.md:49`).
+Expect: `ready`. If your release does not know `--oneshot` (it arrived with 0.21), drop it. If the chat fails, fix it before going on (`cli-commands.md:130`, `quickstart.md:49`).
 
 ### 4. Create the bot and turn privacy mode off
 
@@ -85,7 +85,7 @@ Expect: `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ALLOWED_USERS` in `~/.hermes/.env` (`
 hermes config env-path          # prints the .env location
 ```
 
-Open that file and add the three lines from `hermes/env.example`: `EXA_API_KEY`, `CASEFILE_URL`, `CASEFILE_SECRET`. Secrets belong in `.env`, not in `config.yaml` (`configuration.md:67`). `CASEFILE_SECRET` must be identical to the value in the Vercel project.
+Open that file (`cli-commands.md:1378`) and add the three lines from `hermes/env.example`: `EXA_API_KEY`, `CASEFILE_URL`, `CASEFILE_SECRET`. The last two are in `.env.bot` in the repo root, which is not committed: get it from whoever deployed the web app. `CASEFILE_URL` is `https://junction-2026.vercel.app/api/mcp`. Secrets belong in `.env`, not in `config.yaml` (`configuration.md:67`). `CASEFILE_SECRET` must be identical to the value in the Vercel project.
 
 ### 7. Install the persona
 
@@ -156,7 +156,7 @@ hermes skills list | grep -E 'life-event-butler|letter-decoder|deadline-keeper'
 
 Expect:
 
-- `config check` and `doctor` report no broken config. If `config.yaml` does not parse, Hermes silently serves the last good copy and warns at every start (`configuration.md:253`), so a wrong value from `config get` usually means a YAML error.
+- `config check` and `doctor` report no broken config (commands: `cli-commands.md:1379`, `:1001`, `:1374`, `:1653`, `:1437`). If `config.yaml` does not parse, Hermes silently serves the last good copy and warns at every start (`configuration.md:253`), so a wrong value from `config get` usually means a YAML error.
 - `mcp test casefile` lists five tools: `research_case`, `case_publish`, `case_update`, `case_get`, `case_recheck`. `mcp test exa` lists `web_search_advanced_exa` and `web_fetch_exa` (`use-mcp-with-hermes.md:90`). A `401` means the secret or key is wrong. A message naming `${CASEFILE_URL}` or `${CASEFILE_SECRET}` means that variable is missing from `.env` (`mcp-config-reference.md:90`).
 - Three skill names. None listed means the `skills.external_dirs` path is wrong: a missing directory is skipped without an error (`skills.md:428`).
 
@@ -174,7 +174,7 @@ In Telegram, open a DM with the bot and send, one at a time:
 
 1. `hello`. Expect a short answer in the Kaveri voice.
 2. `List the exact names of every tool you can call whose name starts with mcp`. Expect the seven `mcp__...` names listed above. If they come back with single underscores (`mcp_casefile_research_case`), your release uses the older prefix: see `CHECKS.md`, U2, for the one-line fix.
-3. `We live in Espoo, Finland. I'm pregnant, due in May. We both work full time.` Expect, in this order: one acknowledgement line within about 5 seconds, then one message with at most five plan lines carrying `[1]`-style numbers, a line "N of M quotes checked on the live pages", the case URL, and buttons such as Draft the notice, Set reminders, Not now.
+3. `We live in Espoo, Finland. I'm pregnant, due in May. We both work full time.` Expect, in this order: one acknowledgement line within about 5 seconds, then one message with at most five plan lines carrying `[1]`-style numbers, a line "N of M quotes checked on their pages", the case URL, and the buttons Draft the notice, Set reminders, Why I spoke, Not now. The engine itself answers in about 6 to 12 seconds in fast mode.
 
 If step 3 fails, read "The six most likely failures" before touching the group.
 
@@ -207,7 +207,7 @@ hermes config set telegram.group_allowed_chats "[\"$CHAT_ID\"]"
 
 **Option B, by hand.** `hermes config edit`, copy Part 2 of `config.snippet.yaml`, replace `-100FAMILYCHATID` in all three places. `/sethome` has already created a `platforms:` block with `telegram:` and `home_channel:` in it: add `gateway_restart_notification` and `channel_overrides` inside that block.
 
-Then restart: press Ctrl+C in the gateway terminal, run `hermes gateway run` again, and send `/new --yes` in the group (`slash-commands.md:248`). A running conversation keeps its old tools and prompt until a new session starts (`kanban.md:448`, `use-soul-with-hermes.md:226`).
+Then restart: press Ctrl+C in the gateway terminal, run `hermes gateway run` again, and send `/new --yes` in the group (`slash-commands.md:248`). A running conversation keeps its old tools and prompt until a new session starts (`kanban.md:448-450`, `use-soul-with-hermes.md:226`).
 
 What Part 2 does: `allowed_chats` limits the bot to this group, `group_allowed_chats` lets every member trigger it without listing user IDs (`telegram.md:284-294`, `:1298`), and `allow_silence` lets a bare `[SILENT]` stand even when the message contains a question mark (`messaging/index.md:356-380`).
 
@@ -225,7 +225,7 @@ In the group:
 Mode A is what Part 1 and Part 2 give you: every group message reaches the model and it answers `[SILENT]` unless a trigger applies (`telegram.md:722-735`).
 
 1. From the second account send 20 ordinary messages. Make at least five of them questions (`what's for dinner?`, `did you buy milk?`, `who picks up the kids?`). Expect: nothing from the bot. Not a notice, not a reaction.
-2. Send `I'm pregnant`. Expect the acknowledgement within 5 seconds and the plan within 75 seconds.
+2. Send `I'm pregnant`. Expect the acknowledgement within 5 seconds and the plan within about 30 seconds.
 3. Open the link, then tap **Draft the notice**. Expect the draft in the chat and on the case page. Tap **Set reminders**. Expect a one-line confirmation, and `hermes cron list` shows the reminder jobs (`cron.md:293`).
 4. Send a photo of an official letter. Expect four lines of explanation, then a plan.
 
@@ -242,7 +242,7 @@ hermes cron run "Kaveri change watch"
 hermes cron runs
 ```
 
-`--deliver telegram` means the home channel from step 11 (`cron.md:653`, `:997`). A reply of `[SILENT]` sends nothing (`cron.md:908`). Expect after `cron run`: a completed run in `hermes cron runs` and no message in the group while nothing has changed. Jobs only run while the gateway is running (`cron.md:423`).
+`--deliver telegram` means the home channel from step 11 (`cron.md:653`, `:997`). A reply of `[SILENT]` sends nothing (`cron.md:908`). `cron run` queues the job for the next scheduler tick, so wait about a minute (`cli-commands.md:795`). Expect a completed run in `hermes cron runs` and no message in the group while nothing has changed. Jobs only run while the gateway is running (`cron.md:423`).
 
 ## Mode B: wake patterns
 
@@ -283,6 +283,7 @@ Two warnings:
 
 - **Memory is one store per Hermes profile, not per chat** (`memory.md:82`). A judge's country and city land in the same memory as the family's. `SOUL.md` tells the model to label facts by chat and never mix them, which is a rule, not a wall. The clean way is a second bot on a second profile: `hermes profile create judges --clone`, give it its own bot token, empty its `memories/` folder, and start it with `hermes -p judges gateway run` (`cli-commands.md:2050`, `telegram.md:739`).
 - Option 3 depends on how guest mode and sender authorization combine, which the docs do not spell out (`CHECKS.md`, U5). Test it with an account that is not in `TELEGRAM_ALLOWED_USERS`.
+- By default every allowed user can run every slash command, `/sethome` and `/new` included (`telegram.md:1346`). Before judges get access, add the admin list described in `CHECKS.md`, U10. It is not in the config snippet yet.
 
 ## Keep the laptop awake
 
@@ -297,7 +298,7 @@ When the laptop was asleep or offline:
 - A one-time reminder that was missed by more than 120 seconds is dropped unless it was created with `catch_up` (`cron.md:1187-1193`). The `deadline-keeper` skill sets `catch_up`.
 - If the venue Wi-Fi drops, switch the laptop to a phone hotspot. Long polling needs no public address.
 
-To survive a crash, install the service instead of running in the foreground: `hermes gateway install`, then `hermes gateway start`, `hermes gateway status` (`messaging/index.md:654-728`). Never do both: a second process on the same token causes `Telegram polling conflict` (`telegram.md:1563`).
+To survive a crash, install the service instead of running in the foreground: `hermes gateway install`, then `hermes gateway start`, `hermes gateway status` (`messaging/index.md:657-660`, `:723-726`). Never do both: a second process on the same token causes `Telegram polling conflict` (`telegram.md:1563`).
 
 ## Logs
 
@@ -334,7 +335,7 @@ Check in this order (`telegram.md:796-819`):
 Run `hermes mcp test casefile`. `401`: `CASEFILE_SECRET` differs from Vercel. Variable named in the error: missing from `.env`. Connects but lists no `research_case`: the deployed app is older than the contract, redeploy. Tools listed but the model does not call them: check the names (step 10, item 2) and send `/new --yes`.
 
 **3. The plan is slow or the call times out.**
-Fast mode should return within 45 seconds. The server's function limit is set in `src/app/api/mcp/route.ts` (`maxDuration`). Hermes waits up to `mcp_servers.casefile.timeout` (240 s). After a failure the skill falls back to the Exa tools and `case_publish`, which takes longer. If only deep mode fails, stay on fast for the demo.
+`research_case` takes about 6 to 12 seconds in fast mode and about 80 seconds in deep mode. The server stops a call at 300 seconds (`maxDuration` in `src/app/api/mcp/route.ts`) and Hermes waits up to `mcp_servers.casefile.timeout` (240 s). After a failure the skill falls back to the Exa tools and `case_publish`, which takes longer. If only deep mode fails, stay on fast for the demo.
 
 **4. The bot chatters.**
 - `The model returned only a silence marker...` on questions: `allow_silence` is not in effect. Check the chat ID under `platforms.telegram.channel_overrides`, restart, `/new --yes`. If your release does not support it, use Mode B.
@@ -348,12 +349,12 @@ Almost always one of: the gateway was not restarted, `/new --yes` was not sent, 
 
 **6. A letter cannot be read.**
 - PDF: the bot has no file tools, so it asks for a photo. This is deliberate. Reading PDFs needs the `file` toolset (`document-extraction.md:9-19`), which also gives the bot read and write access to the laptop. Do not enable it on a bot that judges can reach.
-- Photo text unreadable: uncomment nothing in Part 1, add `vision.embed_target_bytes: 1048576` to `config.yaml` (`vision.md:232-243`), restart, `/new --yes`, and send a sharper photo.
+- Photo text unreadable: send a sharper photo, one page per photo. If the model still calls figures unreadable, set `vision.embed_target_bytes: 1048576` in `config.yaml` (`vision.md:232-243`), restart, `/new --yes`.
 - The model cannot see images at all: pick a vision-capable model in `hermes model` (`vision.md:197-206`).
 
 ## Known limits
 
 - **"forget everything"** removes the household entries from memory and the reminder jobs. It does not delete the chat transcript on the laptop (`~/.hermes/state.db`) or the published case pages. Say so if asked.
-- **Approval buttons** stay live for 300 seconds. Any other message sent in the group while they are open cancels them (`configuration.md:3259`). A typed answer such as `draft the notice` still works.
+- **Approval buttons** stay live for 300 seconds. Any other message sent in the group while they are open cancels them (`configuration.md:3259`). After that, reply to the bot's message with `draft the notice`.
 - **Voice notes** without a caption cannot be judged by the silence rule and are transcribed only if speech-to-text is set up (`telegram.md:515-521`, `:735`).
 - **No acknowledgement line?** It is the text the model writes next to its first tool call (`configuration.md:2540`). Some models call the tool without writing text. The typing indicator is then the only sign of life. Try another model.

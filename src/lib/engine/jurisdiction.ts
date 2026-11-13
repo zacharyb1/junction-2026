@@ -1,4 +1,5 @@
-import sources from "@/data/official-sources.seed.json";
+import researched from "@/data/official-sources.json";
+import seed from "@/data/official-sources.seed.json";
 
 /**
  * Jurisdiction lock. Every case is pinned to a country. Search starts on that
@@ -13,7 +14,43 @@ type SourcesFile = {
   publishers?: Record<string, string>;
 };
 
-const DATA = sources as SourcesFile;
+const union = (...lists: (string[] | undefined)[]) => [...new Set(lists.flatMap((l) => l ?? []))];
+
+function mergeTopics(a: TopicMap = {}, b: TopicMap = {}): TopicMap {
+  const out: TopicMap = {};
+  for (const topic of union(Object.keys(a), Object.keys(b))) out[topic] = union(a[topic], b[topic]);
+  return out;
+}
+
+/**
+ * Two files: `official-sources.json` is the researched map (every hostname was checked to answer),
+ * `official-sources.seed.json` holds hand-picked additions and publisher names. The researched map wins on order.
+ */
+function mergeSources(main: SourcesFile, extra: SourcesFile): SourcesFile {
+  const countries: Record<string, CountryEntry> = {};
+  for (const code of union(Object.keys(main.countries), Object.keys(extra.countries))) {
+    const a = main.countries[code];
+    const b = extra.countries[code];
+    countries[code] = {
+      name: a?.name ?? b?.name ?? code,
+      languages: a?.languages ?? b?.languages,
+      wildcards: union(a?.wildcards, b?.wildcards),
+      general: union(a?.general, b?.general),
+      topics: mergeTopics(a?.topics, b?.topics),
+    };
+  }
+  return {
+    countries,
+    eu: {
+      wildcards: union(main.eu?.wildcards, extra.eu?.wildcards),
+      general: union(main.eu?.general, extra.eu?.general),
+      topics: mergeTopics(main.eu?.topics, extra.eu?.topics),
+    },
+    publishers: { ...extra.publishers, ...main.publishers },
+  };
+}
+
+const DATA = mergeSources(researched as SourcesFile, seed as SourcesFile);
 
 const EU_MEMBERS = new Set(
   "AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE".split(" "),

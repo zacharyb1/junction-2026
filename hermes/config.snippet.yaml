@@ -1,6 +1,6 @@
 # Kaveri: the keys we set in ~/.hermes/config.yaml. Everything else in your config stays as it is.
 #
-# How to apply: README.md step 9 (Part 1) and step 14 (Part 2).
+# How to apply: README.md step 8 (Part 1) and step 12 (Part 2).
 #   - Never leave two copies of a top-level key (agent:, display:, skills:, ...) in config.yaml.
 #     Add the child lines under the key you already have.
 #   - Secrets stay in ~/.hermes/.env. ${NAME} is filled in from there when the config is loaded.
@@ -24,7 +24,7 @@ mcp_servers:
     url: "${CASEFILE_URL}"
     headers:
       Authorization: "Bearer ${CASEFILE_SECRET}"
-    timeout: 240          # seconds per tool call. research_case: under 45 s in fast mode, about 3 min in deep mode
+    timeout: 240          # seconds Hermes waits for one tool call. research_case: 6 to 12 s in fast mode, about 80 s in deep mode
   # Exa's hosted MCP server. Used only when research_case fails.
   # The model sees mcp__exa__web_search_advanced_exa and mcp__exa__web_fetch_exa.
   # Append ,agent_run to the tools list only if you accept its cost per run.

@@ -190,6 +190,8 @@ It writes `src/data/scorecard.json`, which the landing page shows after the next
 
 **Run 1, Fri 21:40, local engine, fast mode:** 19 of 19 passed, 110 of 110 quotes found on their pages, 0 unsourced claims, median 7.0 s, slowest tenth within 14.7 s. Detail in `eval/results/latest.md`.
 
+**Run 2, Fri 22:00, final engine with the full source map and the open-web mode:** 18 of 19 passed, 120 of 121 quotes found, 0 unsourced claims, median 7.3 s, slowest tenth within 10.2 s. The one failure is the lost-passport scenario: six official sources, but no deadline or amount in the plan, which the pass rule asks for. It stays on the scorecard as a failure.
+
 What that number means and does not mean:
 - It proves every line shown is backed by a sentence on a page we opened, on the expected official site.
 - It does not prove the plan is complete or that every step is the most relevant one. The engine only publishes what it could ground, so "quotes verified" is high by design.

@@ -20,8 +20,8 @@ export function Hero({ sampleCaseHref }: { sampleCaseHref: string | null }) {
 
       <p className="max-w-xl text-lg text-pretty text-muted-foreground">
         It reads along and <strong className="font-medium text-foreground">says nothing</strong>, until someone
-        mentions a life event. Then it researches the live web with Exa and posts a short plan: money, deadlines,
-        who does what. Every line carries{" "}
+        mentions a life event. Then it researches the live web with Exa and posts a short plan: what to do, by
+        when, and what you are entitled to. Every line carries{" "}
         <strong className="font-medium text-foreground">a source you can check</strong>.
       </p>
 

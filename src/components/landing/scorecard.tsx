@@ -142,7 +142,7 @@ function Table({ rows }: { rows: ScorecardRow[] }) {
 function Results({ card }: { card: ScorecardData }) {
   const when = ranAt(card.ranAt);
   const host = hostOf(card.base);
-  const about = [card.label, when && `Ran ${when}`, card.depth && `${card.depth} depth`, host && `against ${host}`]
+  const about = [card.label, when && `Ran ${when}`, card.depth && `${card.depth} mode`, host && `against ${host}`]
     .filter(Boolean)
     .join(" · ");
   return (

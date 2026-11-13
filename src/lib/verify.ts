@@ -137,7 +137,13 @@ export function judge(
   if (live >= VERIFY_THRESHOLD) return { verification: "verified", match: round(live), checkedVia: "live" };
   const viaExa = page.exa ? quoteMatch(quote, page.exa) : 0;
   if (viaExa >= VERIFY_THRESHOLD) return { verification: "verified", match: round(viaExa), checkedVia: "exa" };
-  return { verification: "not_found", match: round(Math.max(live, viaExa)) };
+  // The two readings can each hold part of a long quote (different line breaks, cut-off text).
+  // The engine grounds against both together, so the verdict here must use both together as well.
+  const both = page.direct && page.exa ? quoteMatch(quote, page.text) : 0;
+  if (both >= VERIFY_THRESHOLD) {
+    return { verification: "verified", match: round(both), checkedVia: live >= viaExa ? "live" : "exa" };
+  }
+  return { verification: "not_found", match: round(Math.max(live, viaExa, both)) };
 }
 
 /**

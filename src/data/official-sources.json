@@ -1,0 +1,1364 @@
+{
+  "countries": {
+    "FI": {
+      "name": "Finland",
+      "languages": [
+        "fi",
+        "sv",
+        "en"
+      ],
+      "general": [
+        "suomi.fi",
+        "infofinland.fi",
+        "finlex.fi",
+        "valtioneuvosto.fi",
+        "dvv.fi",
+        "oikeus.fi",
+        "poliisi.fi",
+        "oikeusasiamies.fi",
+        "hel.fi",
+        "espoo.fi",
+        "vantaa.fi",
+        "tampere.fi",
+        "turku.fi",
+        "oulu.fi"
+      ],
+      "topics": {
+        "family": [
+          "kela.fi",
+          "tyosuojelu.fi",
+          "thl.fi",
+          "stm.fi",
+          "okm.fi",
+          "oph.fi",
+          "tasa-arvo.fi",
+          "luvn.fi"
+        ],
+        "housing": [
+          "kkv.fi",
+          "kuluttajariita.fi",
+          "finlex.fi",
+          "kela.fi",
+          "ym.fi",
+          "varke.fi",
+          "stat.fi",
+          "dvv.fi"
+        ],
+        "work": [
+          "tyosuojelu.fi",
+          "tyomarkkinatori.fi",
+          "kela.fi",
+          "tem.fi",
+          "tyollisyysrahasto.fi",
+          "tyoelake.fi",
+          "tasa-arvo.fi",
+          "yhdenvertaisuusvaltuutettu.fi"
+        ],
+        "tax": [
+          "vero.fi",
+          "vm.fi",
+          "tulli.fi",
+          "kho.fi",
+          "finlex.fi"
+        ],
+        "immigration": [
+          "migri.fi",
+          "enterfinland.fi",
+          "infofinland.fi",
+          "dvv.fi",
+          "um.fi",
+          "finlandabroad.fi",
+          "intermin.fi",
+          "workinfinland.com"
+        ],
+        "consumer": [
+          "kkv.fi",
+          "kuluttajariita.fi",
+          "ecc.fi",
+          "traficom.fi",
+          "tukes.fi",
+          "finanssivalvonta.fi",
+          "energiavirasto.fi",
+          "tietosuoja.fi"
+        ],
+        "travel": [
+          "um.fi",
+          "finlandabroad.fi",
+          "kkv.fi",
+          "traficom.fi",
+          "kuluttajariita.fi",
+          "ecc.fi",
+          "poliisi.fi",
+          "tulli.fi"
+        ],
+        "health": [
+          "kela.fi",
+          "thl.fi",
+          "kanta.fi",
+          "omaolo.fi",
+          "terveyskyla.fi",
+          "stm.fi",
+          "lvv.fi",
+          "luvn.fi"
+        ],
+        "transport": [
+          "traficom.fi",
+          "poliisi.fi",
+          "kkv.fi",
+          "hsl.fi",
+          "vayla.fi",
+          "fintraffic.fi",
+          "lvm.fi"
+        ]
+      }
+    },
+    "SE": {
+      "name": "Sweden",
+      "languages": [
+        "sv",
+        "en"
+      ],
+      "general": [
+        "government.se",
+        "regeringen.se",
+        "riksdagen.se",
+        "lagrummet.se",
+        "domstol.se",
+        "informationsverige.se",
+        "skatteverket.se"
+      ],
+      "topics": {
+        "family": [
+          "forsakringskassan.se",
+          "skatteverket.se",
+          "1177.se",
+          "skolverket.se",
+          "mfof.se",
+          "socialstyrelsen.se",
+          "av.se",
+          "do.se"
+        ],
+        "housing": [
+          "boverket.se",
+          "domstol.se",
+          "hallakonsument.se",
+          "konsumentverket.se",
+          "skatteverket.se",
+          "forsakringskassan.se",
+          "kronofogden.se",
+          "lantmateriet.se"
+        ],
+        "work": [
+          "arbetsformedlingen.se",
+          "av.se",
+          "forsakringskassan.se",
+          "iaf.se",
+          "mi.se",
+          "do.se",
+          "arbetsdomstolen.se",
+          "pensionsmyndigheten.se"
+        ],
+        "tax": [
+          "skatteverket.se",
+          "tullverket.se",
+          "kronofogden.se",
+          "skatterattsnamnden.se"
+        ],
+        "immigration": [
+          "migrationsverket.se",
+          "skatteverket.se",
+          "swedenabroad.se",
+          "polisen.se",
+          "informationsverige.se",
+          "uhr.se",
+          "domstol.se"
+        ],
+        "consumer": [
+          "konsumentverket.se",
+          "hallakonsument.se",
+          "arn.se",
+          "konsumenteuropa.se",
+          "pts.se",
+          "ei.se",
+          "fi.se",
+          "imy.se"
+        ],
+        "travel": [
+          "swedenabroad.se",
+          "regeringen.se",
+          "polisen.se",
+          "hallakonsument.se",
+          "arn.se",
+          "konsumenteuropa.se",
+          "kammarkollegiet.se",
+          "tullverket.se"
+        ],
+        "health": [
+          "1177.se",
+          "forsakringskassan.se",
+          "socialstyrelsen.se",
+          "folkhalsomyndigheten.se",
+          "ivo.se",
+          "lakemedelsverket.se",
+          "tlv.se",
+          "ehalsomyndigheten.se"
+        ],
+        "transport": [
+          "transportstyrelsen.se",
+          "trafikverket.se",
+          "polisen.se",
+          "kronofogden.se",
+          "stockholm.se",
+          "sl.se"
+        ]
+      }
+    },
+    "EE": {
+      "name": "Estonia",
+      "languages": [
+        "et",
+        "en"
+      ],
+      "general": [
+        "eesti.ee",
+        "riigiteataja.ee",
+        "valitsus.ee",
+        "kohus.ee",
+        "oiguskantsler.ee",
+        "rik.ee",
+        "justdigi.ee"
+      ],
+      "topics": {
+        "family": [
+          "sotsiaalkindlustusamet.ee",
+          "sm.ee",
+          "tervisekassa.ee",
+          "rahvastikuregister.ee",
+          "tooelu.ee",
+          "hm.ee",
+          "tallinn.ee"
+        ],
+        "housing": [
+          "kliimaministeerium.ee",
+          "tallinn.ee",
+          "rahvastikuregister.ee",
+          "ttja.ee",
+          "kohus.ee",
+          "rik.ee",
+          "eis.ee",
+          "maaruum.ee"
+        ],
+        "work": [
+          "tooelu.ee",
+          "ti.ee",
+          "tootukassa.ee",
+          "mkm.ee",
+          "sotsiaalkindlustusamet.ee",
+          "volinik.ee",
+          "workinestonia.com"
+        ],
+        "tax": [
+          "emta.ee",
+          "fin.ee",
+          "riigiteataja.ee"
+        ],
+        "immigration": [
+          "politsei.ee",
+          "siseministeerium.ee",
+          "vm.ee",
+          "settleinestonia.ee",
+          "workinestonia.com",
+          "e-resident.gov.ee",
+          "integratsioon.ee",
+          "studyinestonia.ee"
+        ],
+        "consumer": [
+          "ttja.ee",
+          "consumer.ee",
+          "fi.ee",
+          "minuraha.ee",
+          "konkurentsiamet.ee",
+          "aki.ee"
+        ],
+        "travel": [
+          "reisitargalt.vm.ee",
+          "vm.ee",
+          "politsei.ee",
+          "ttja.ee",
+          "consumer.ee",
+          "emta.ee"
+        ],
+        "health": [
+          "tervisekassa.ee",
+          "terviseamet.ee",
+          "terviseportaal.ee",
+          "sm.ee",
+          "ravimiamet.ee",
+          "1220.ee"
+        ],
+        "transport": [
+          "transpordiamet.ee",
+          "politsei.ee",
+          "tallinn.ee",
+          "peatus.ee",
+          "tarktee.ee",
+          "kliimaministeerium.ee"
+        ]
+      }
+    },
+    "DE": {
+      "name": "Germany",
+      "languages": [
+        "de",
+        "en"
+      ],
+      "general": [
+        "verwaltung.bund.de",
+        "bundesregierung.de",
+        "www.gesetze-im-internet.de",
+        "recht.bund.de",
+        "bmjv.de",
+        "justiz.de",
+        "bundesgerichtshof.de",
+        "bundesverfassungsgericht.de"
+      ],
+      "topics": {
+        "family": [
+          "familienportal.de",
+          "bmbfsfj.bund.de",
+          "bmfsfj.de",
+          "elterngeld-digital.de",
+          "arbeitsagentur.de",
+          "bundesamtsozialesicherung.de",
+          "bundesstiftung-mutter-und-kind.de",
+          "familienplanung.de"
+        ],
+        "housing": [
+          "bmwsb.bund.de",
+          "bmjv.de",
+          "www.gesetze-im-internet.de",
+          "bundesgerichtshof.de",
+          "verbraucherzentrale.de",
+          "kfw.de",
+          "bafa.de",
+          "energiewechsel.de"
+        ],
+        "work": [
+          "arbeitsagentur.de",
+          "bmas.de",
+          "zoll.de",
+          "deutsche-rentenversicherung.de",
+          "minijob-zentrale.de",
+          "bundesarbeitsgericht.de",
+          "antidiskriminierungsstelle.de",
+          "baua.de"
+        ],
+        "tax": [
+          "bundesfinanzministerium.de",
+          "elster.de",
+          "bzst.de",
+          "bundesfinanzhof.de",
+          "bmf-steuerrechner.de",
+          "zoll.de"
+        ],
+        "immigration": [
+          "bamf.de",
+          "make-it-in-germany.com",
+          "auswaertiges-amt.de",
+          "bmi.bund.de",
+          "digital.diplo.de",
+          "anerkennung-in-deutschland.de",
+          "integrationsbeauftragte.de",
+          "eu-gleichbehandlungsstelle.de"
+        ],
+        "consumer": [
+          "verbraucherzentrale.de",
+          "evz.de",
+          "bundesnetzagentur.de",
+          "bafin.de",
+          "bundesjustizamt.de",
+          "universalschlichtungsstelle.de",
+          "bmjv.de",
+          "bundeskartellamt.de"
+        ],
+        "travel": [
+          "auswaertiges-amt.de",
+          "lba.de",
+          "bundesjustizamt.de",
+          "eba.bund.de",
+          "evz.de",
+          "schlichtung-reise-und-verkehr.de",
+          "zoll.de",
+          "bundespolizei.de"
+        ],
+        "health": [
+          "bundesgesundheitsministerium.de",
+          "gesund.bund.de",
+          "116117.de",
+          "www.gesundheitsinformation.de",
+          "gkv-spitzenverband.de",
+          "g-ba.de",
+          "rki.de",
+          "dvka.de"
+        ],
+        "transport": [
+          "kba.de",
+          "eba.bund.de",
+          "bast.de",
+          "balm.bund.de",
+          "autobahn.de",
+          "bundesnetzagentur.de",
+          "www.gesetze-im-internet.de"
+        ]
+      },
+      "wildcards": [
+        "*.bund.de"
+      ]
+    },
+    "FR": {
+      "name": "France",
+      "languages": [
+        "fr",
+        "en"
+      ],
+      "general": [
+        "service-public.gouv.fr",
+        "service-public.fr",
+        "legifrance.gouv.fr",
+        "info.gouv.fr",
+        "justice.fr",
+        "justice.gouv.fr",
+        "defenseurdesdroits.fr",
+        "conseil-etat.fr"
+      ],
+      "topics": {
+        "family": [
+          "caf.fr",
+          "monenfant.fr",
+          "ameli.fr",
+          "service-public.gouv.fr",
+          "solidarites.gouv.fr",
+          "travail-emploi.gouv.fr",
+          "1000-premiers-jours.fr",
+          "mesdroitssociaux.gouv.fr"
+        ],
+        "housing": [
+          "anil.org",
+          "service-public.gouv.fr",
+          "ecologie.gouv.fr",
+          "anah.gouv.fr",
+          "caf.fr",
+          "www.demande-logement-social.gouv.fr",
+          "dossierfacile.logement.gouv.fr",
+          "legifrance.gouv.fr"
+        ],
+        "work": [
+          "travail-emploi.gouv.fr",
+          "code.travail.gouv.fr",
+          "francetravail.fr",
+          "service-public.gouv.fr",
+          "unedic.org",
+          "moncompteformation.gouv.fr",
+          "info-retraite.fr",
+          "lassuranceretraite.fr"
+        ],
+        "tax": [
+          "impots.gouv.fr",
+          "bofip.impots.gouv.fr",
+          "economie.gouv.fr",
+          "douane.gouv.fr",
+          "service-public.gouv.fr"
+        ],
+        "immigration": [
+          "immigration.interieur.gouv.fr",
+          "administration-etrangers-en-france.interieur.gouv.fr",
+          "france-visas.gouv.fr",
+          "ofii.fr",
+          "ofpra.gouv.fr",
+          "service-public.gouv.fr",
+          "interieur.gouv.fr",
+          "welcometofrance.com"
+        ],
+        "consumer": [
+          "economie.gouv.fr",
+          "www.conso.gouv.fr",
+          "signal.conso.gouv.fr",
+          "inc-conso.fr",
+          "europe-consommateurs.eu",
+          "rappel.conso.gouv.fr",
+          "arcep.fr",
+          "energie-info.fr"
+        ],
+        "travel": [
+          "diplomatie.gouv.fr",
+          "ecologie.gouv.fr",
+          "europe-consommateurs.eu",
+          "service-public.gouv.fr",
+          "douane.gouv.fr",
+          "ants.gouv.fr",
+          "autorite-transports.fr",
+          "economie.gouv.fr"
+        ],
+        "health": [
+          "ameli.fr",
+          "sante.fr",
+          "santepubliquefrance.fr",
+          "has-sante.fr",
+          "ansm.sante.fr",
+          "monespacesante.fr",
+          "www.cleiss.fr",
+          "complementaire-sante-solidaire.gouv.fr"
+        ],
+        "transport": [
+          "www.securite-routiere.gouv.fr",
+          "antai.gouv.fr",
+          "amendes.gouv.fr",
+          "ants.gouv.fr",
+          "tribunal-stationnement-payant.fr",
+          "ecologie.gouv.fr",
+          "autorite-transports.fr",
+          "bison-fute.gouv.fr"
+        ]
+      },
+      "wildcards": [
+        "*.gouv.fr"
+      ]
+    },
+    "ES": {
+      "name": "Spain",
+      "languages": [
+        "es",
+        "en"
+      ],
+      "general": [
+        "administracion.gob.es",
+        "boe.es",
+        "sede.administracion.gob.es",
+        "www.poderjudicial.es",
+        "defensordelpueblo.es",
+        "tribunalconstitucional.es"
+      ],
+      "topics": {
+        "family": [
+          "www.seg-social.es",
+          "sede.seg-social.gob.es",
+          "www.inclusion.gob.es",
+          "sede.agenciatributaria.gob.es",
+          "igualdad.gob.es",
+          "www.inmujeres.gob.es",
+          "educacionfpydeportes.gob.es",
+          "sanidad.gob.es"
+        ],
+        "housing": [
+          "mivau.gob.es",
+          "serpavi.mivau.gob.es",
+          "ine.es",
+          "boe.es",
+          "www.sedecatastro.gob.es",
+          "www.poderjudicial.es",
+          "sede.agenciatributaria.gob.es"
+        ],
+        "work": [
+          "sepe.es",
+          "www.seg-social.es",
+          "sede.sepe.gob.es",
+          "insst.es",
+          "boe.es",
+          "www.poderjudicial.es"
+        ],
+        "tax": [
+          "sede.agenciatributaria.gob.es",
+          "www.agenciatributaria.gob.es",
+          "www.sedecatastro.gob.es",
+          "boe.es"
+        ],
+        "immigration": [
+          "extranjeros.inclusion.gob.es",
+          "www.inclusion.gob.es",
+          "www.interior.gob.es",
+          "exteriores.gob.es",
+          "sede.administracionespublicas.gob.es",
+          "administracion.gob.es"
+        ],
+        "consumer": [
+          "www.dsca.gob.es",
+          "aesan.gob.es",
+          "cnmc.es",
+          "bde.es",
+          "aepd.es",
+          "usuariosteleco.digital.gob.es",
+          "cnmv.es"
+        ],
+        "travel": [
+          "exteriores.gob.es",
+          "www.seguridadaerea.gob.es",
+          "transportes.gob.es",
+          "www.interior.gob.es",
+          "sanidad.gob.es"
+        ],
+        "health": [
+          "sanidad.gob.es",
+          "ingesa.sanidad.gob.es",
+          "www.aemps.gob.es",
+          "www.seg-social.es",
+          "isciii.es"
+        ],
+        "transport": [
+          "dgt.es",
+          "sede.dgt.gob.es",
+          "transportes.gob.es",
+          "www.guardiacivil.es",
+          "www.interior.gob.es",
+          "seguridadferroviaria.es"
+        ]
+      },
+      "wildcards": [
+        "*.gob.es"
+      ]
+    },
+    "NL": {
+      "name": "Netherlands",
+      "languages": [
+        "nl",
+        "en"
+      ],
+      "general": [
+        "rijksoverheid.nl",
+        "government.nl",
+        "rechtspraak.nl",
+        "juridischloket.nl",
+        "nationaleombudsman.nl",
+        "officielebekendmakingen.nl",
+        "business.gov.nl"
+      ],
+      "topics": {
+        "family": [
+          "svb.nl",
+          "belastingdienst.nl",
+          "uwv.nl",
+          "rijksoverheid.nl",
+          "landelijkregisterkinderopvang.nl",
+          "duo.nl",
+          "pns.nl",
+          "arboportaal.nl"
+        ],
+        "housing": [
+          "huurcommissie.nl",
+          "rijksoverheid.nl",
+          "volkshuisvestingnederland.nl",
+          "juridischloket.nl",
+          "rechtspraak.nl",
+          "belastingdienst.nl",
+          "kadaster.nl",
+          "rvo.nl"
+        ],
+        "work": [
+          "uwv.nl",
+          "werk.nl",
+          "rijksoverheid.nl",
+          "nlarbeidsinspectie.nl",
+          "arboportaal.nl",
+          "juridischloket.nl",
+          "mensenrechten.nl",
+          "workinnl.nl"
+        ],
+        "tax": [
+          "belastingdienst.nl",
+          "douane.nl",
+          "rijksoverheid.nl",
+          "business.gov.nl",
+          "rijksfinancien.nl"
+        ],
+        "immigration": [
+          "ind.nl",
+          "government.nl",
+          "netherlandsworldwide.nl",
+          "rijksoverheid.nl",
+          "duo.nl",
+          "rvig.nl",
+          "nuffic.nl",
+          "idw.nl"
+        ],
+        "consumer": [
+          "acm.nl",
+          "consuwijzer.nl",
+          "eccnederland.nl",
+          "degeschillencommissie.nl",
+          "kifid.nl",
+          "afm.nl",
+          "autoriteitpersoonsgegevens.nl",
+          "rdi.nl"
+        ],
+        "travel": [
+          "nederlandwereldwijd.nl",
+          "netherlandsworldwide.nl",
+          "ilent.nl",
+          "eccnederland.nl",
+          "marechaussee.nl",
+          "rijksoverheid.nl",
+          "douane.nl",
+          "consuwijzer.nl"
+        ],
+        "health": [
+          "rijksoverheid.nl",
+          "zorginstituutnederland.nl",
+          "rivm.nl",
+          "igj.nl",
+          "nza.nl",
+          "hetcak.nl",
+          "regelhulp.nl",
+          "skgz.nl"
+        ],
+        "transport": [
+          "rdw.nl",
+          "cjib.nl",
+          "om.nl",
+          "ilent.nl",
+          "rijkswaterstaat.nl",
+          "politie.nl",
+          "rijksoverheid.nl"
+        ]
+      },
+      "wildcards": [
+        "*.overheid.nl"
+      ]
+    },
+    "IT": {
+      "name": "Italy",
+      "languages": [
+        "it",
+        "en"
+      ],
+      "general": [
+        "governo.it",
+        "www.normattiva.it",
+        "www.gazzettaufficiale.it",
+        "giustizia.it",
+        "cortecostituzionale.it",
+        "cortedicassazione.it",
+        "interno.gov.it",
+        "anagrafenazionale.interno.it"
+      ],
+      "topics": {
+        "family": [
+          "inps.it",
+          "lavoro.gov.it",
+          "www.salute.gov.it",
+          "agenziaentrate.gov.it",
+          "mim.gov.it",
+          "garanteinfanzia.org",
+          "governo.it"
+        ],
+        "housing": [
+          "agenziaentrate.gov.it",
+          "www.istat.it",
+          "rivaluta.istat.it",
+          "efficienzaenergetica.enea.it",
+          "www.normattiva.it",
+          "giustizia.it"
+        ],
+        "work": [
+          "lavoro.gov.it",
+          "inps.it",
+          "ispettorato.gov.it",
+          "inail.it",
+          "cliclavoro.gov.it",
+          "cnel.it",
+          "cortedicassazione.it"
+        ],
+        "tax": [
+          "agenziaentrate.gov.it",
+          "www.mef.gov.it",
+          "finanze.gov.it",
+          "adm.gov.it",
+          "agenziaentrateriscossione.gov.it",
+          "www.gdf.gov.it"
+        ],
+        "immigration": [
+          "interno.gov.it",
+          "poliziadistato.it",
+          "www.portaleimmigrazione.it",
+          "integrazionemigranti.gov.it",
+          "esteri.it",
+          "vistoperitalia.esteri.it",
+          "libertaciviliimmigrazione.dlci.interno.gov.it",
+          "questure.poliziadistato.it"
+        ],
+        "consumer": [
+          "agcm.it",
+          "ecc-netitalia.it",
+          "www.agcom.it",
+          "conciliaweb.agcom.it",
+          "arera.it",
+          "www.arbitrobancariofinanziario.it",
+          "garanteprivacy.it",
+          "www.ivass.it"
+        ],
+        "travel": [
+          "esteri.it",
+          "www.viaggiaresicuri.it",
+          "www.enac.gov.it",
+          "autorita-trasporti.it",
+          "poliziadistato.it",
+          "passaportonline.poliziadistato.it",
+          "ecc-netitalia.it",
+          "adm.gov.it"
+        ],
+        "health": [
+          "www.salute.gov.it",
+          "aifa.gov.it",
+          "fascicolosanitario.gov.it",
+          "agenas.gov.it",
+          "sistemats1.sanita.finanze.it",
+          "inps.it",
+          "inail.it"
+        ],
+        "transport": [
+          "ilportaledellautomobilista.it",
+          "aci.it",
+          "autorita-trasporti.it",
+          "poliziadistato.it",
+          "prefettura.interno.gov.it",
+          "www.enac.gov.it",
+          "giustizia.it"
+        ]
+      },
+      "wildcards": [
+        "*.gov.it"
+      ]
+    },
+    "IE": {
+      "name": "Ireland",
+      "languages": [
+        "en",
+        "ga"
+      ],
+      "general": [
+        "gov.ie",
+        "citizensinformation.ie",
+        "www.irishstatutebook.ie",
+        "courts.ie",
+        "lawreform.ie",
+        "ombudsman.ie",
+        "legalaidboard.ie",
+        "oireachtas.ie"
+      ],
+      "topics": {
+        "family": [
+          "citizensinformation.ie",
+          "gov.ie",
+          "mywelfare.ie",
+          "hse.ie",
+          "www2.hse.ie",
+          "tusla.ie",
+          "workplacerelations.ie",
+          "revenue.ie"
+        ],
+        "housing": [
+          "rtb.ie",
+          "citizensinformation.ie",
+          "gov.ie",
+          "housingagency.ie",
+          "hap.ie",
+          "seai.ie",
+          "psr.ie",
+          "tailte.ie"
+        ],
+        "work": [
+          "workplacerelations.ie",
+          "citizensinformation.ie",
+          "gov.ie",
+          "mywelfare.ie",
+          "enterprise.gov.ie",
+          "hsa.ie",
+          "labourcourt.ie",
+          "ihrec.ie"
+        ],
+        "tax": [
+          "revenue.ie",
+          "citizensinformation.ie",
+          "taxappeals.ie",
+          "ros.ie",
+          "gov.ie"
+        ],
+        "immigration": [
+          "irishimmigration.ie",
+          "enterprise.gov.ie",
+          "ireland.ie",
+          "citizensinformation.ie",
+          "garda.ie",
+          "qqi.ie",
+          "gov.ie"
+        ],
+        "consumer": [
+          "ccpc.ie",
+          "eccireland.ie",
+          "comreg.ie",
+          "cru.ie",
+          "centralbank.ie",
+          "fspo.ie",
+          "citizensinformation.ie",
+          "courts.ie"
+        ],
+        "travel": [
+          "ireland.ie",
+          "iaa.ie",
+          "nationaltransport.ie",
+          "eccireland.ie",
+          "ccpc.ie",
+          "citizensinformation.ie",
+          "revenue.ie",
+          "garda.ie"
+        ],
+        "health": [
+          "hse.ie",
+          "www2.hse.ie",
+          "citizensinformation.ie",
+          "gov.ie",
+          "hiqa.ie",
+          "hpra.ie",
+          "hia.ie",
+          "mymedicalcard.ie"
+        ],
+        "transport": [
+          "rsa.ie",
+          "ncts.ie",
+          "ndls.ie",
+          "www.motortax.ie",
+          "nationaltransport.ie",
+          "transportforireland.ie",
+          "garda.ie",
+          "www.tii.ie"
+        ]
+      },
+      "wildcards": [
+        "*.gov.ie"
+      ]
+    },
+    "GB": {
+      "name": "United Kingdom",
+      "languages": [
+        "en",
+        "cy"
+      ],
+      "general": [
+        "gov.uk",
+        "legislation.gov.uk",
+        "citizensadvice.org.uk",
+        "judiciary.uk",
+        "nidirect.gov.uk",
+        "mygov.scot",
+        "gov.scot",
+        "gov.wales"
+      ],
+      "topics": {
+        "family": [
+          "gov.uk",
+          "nhs.uk",
+          "acas.org.uk",
+          "childcarechoices.gov.uk",
+          "socialsecurity.gov.scot",
+          "nidirect.gov.uk",
+          "hse.gov.uk",
+          "equalityhumanrights.com"
+        ],
+        "housing": [
+          "gov.uk",
+          "citizensadvice.org.uk",
+          "housing-ombudsman.org.uk",
+          "legislation.gov.uk",
+          "mygov.scot",
+          "housingandpropertychamber.scot",
+          "rentsmart.gov.wales",
+          "nihe.gov.uk"
+        ],
+        "work": [
+          "gov.uk",
+          "acas.org.uk",
+          "hse.gov.uk",
+          "equalityhumanrights.com",
+          "citizensadvice.org.uk",
+          "moneyhelper.org.uk",
+          "lra.org.uk",
+          "nidirect.gov.uk"
+        ],
+        "tax": [
+          "gov.uk",
+          "tax.service.gov.uk",
+          "revenue.scot",
+          "gov.wales",
+          "mygov.scot",
+          "moneyhelper.org.uk"
+        ],
+        "immigration": [
+          "gov.uk",
+          "visas-immigration.service.gov.uk",
+          "legislation.gov.uk",
+          "judiciary.uk",
+          "enic.org.uk",
+          "nidirect.gov.uk"
+        ],
+        "consumer": [
+          "gov.uk",
+          "citizensadvice.org.uk",
+          "ofcom.org.uk",
+          "ofgem.gov.uk",
+          "fca.org.uk",
+          "financial-ombudsman.org.uk",
+          "consumeradvice.scot",
+          "ico.org.uk"
+        ],
+        "travel": [
+          "gov.uk",
+          "caa.co.uk",
+          "orr.gov.uk",
+          "nationalrail.co.uk",
+          "railombudsman.org",
+          "www.transportfocus.org.uk",
+          "atol.org",
+          "nhsbsa.nhs.uk"
+        ],
+        "health": [
+          "nhs.uk",
+          "111.nhs.uk",
+          "england.nhs.uk",
+          "nhsbsa.nhs.uk",
+          "nhsinform.scot",
+          "111.wales.nhs.uk",
+          "nice.org.uk",
+          "cqc.org.uk"
+        ],
+        "transport": [
+          "gov.uk",
+          "tfl.gov.uk",
+          "tpt.gov.uk",
+          "londontribunals.gov.uk",
+          "orr.gov.uk",
+          "nationalhighways.co.uk",
+          "transport.gov.scot",
+          "nidirect.gov.uk"
+        ]
+      },
+      "wildcards": [
+        "*.gov.uk",
+        "*.nhs.uk",
+        "*.gov.scot",
+        "*.gov.wales"
+      ]
+    },
+    "US": {
+      "name": "United States",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "general": [
+        "usa.gov",
+        "congress.gov",
+        "ecfr.gov",
+        "federalregister.gov",
+        "govinfo.gov",
+        "uscourts.gov",
+        "ca.gov",
+        "ny.gov"
+      ],
+      "topics": {
+        "family": [
+          "usa.gov",
+          "www.ssa.gov",
+          "dol.gov",
+          "healthcare.gov",
+          "childcare.gov",
+          "fns.usda.gov",
+          "irs.gov",
+          "edd.ca.gov"
+        ],
+        "housing": [
+          "hud.gov",
+          "consumerfinance.gov",
+          "usa.gov",
+          "sf.gov",
+          "selfhelp.courts.ca.gov",
+          "oag.ca.gov",
+          "leginfo.legislature.ca.gov",
+          "hcr.ny.gov"
+        ],
+        "work": [
+          "dol.gov",
+          "eeoc.gov",
+          "nlrb.gov",
+          "osha.gov",
+          "careeronestop.org",
+          "unemployment.gov",
+          "edd.ca.gov",
+          "dir.ca.gov"
+        ],
+        "tax": [
+          "irs.gov",
+          "taxpayeradvocate.irs.gov",
+          "treasury.gov",
+          "ustaxcourt.gov",
+          "ftb.ca.gov",
+          "tax.ny.gov",
+          "energystar.gov"
+        ],
+        "immigration": [
+          "uscis.gov",
+          "travel.state.gov",
+          "cbp.gov",
+          "i94.cbp.dhs.gov",
+          "dhs.gov",
+          "studyinthestates.dhs.gov",
+          "justice.gov",
+          "flag.dol.gov"
+        ],
+        "consumer": [
+          "ftc.gov",
+          "consumer.ftc.gov",
+          "consumerfinance.gov",
+          "cpsc.gov",
+          "fcc.gov",
+          "reportfraud.ftc.gov",
+          "oag.ca.gov",
+          "dca.ca.gov"
+        ],
+        "travel": [
+          "travel.state.gov",
+          "transportation.gov",
+          "flightrights.gov",
+          "faa.gov",
+          "tsa.gov",
+          "cbp.gov",
+          "usembassy.gov",
+          "wwwnc.cdc.gov"
+        ],
+        "health": [
+          "healthcare.gov",
+          "medicare.gov",
+          "medicaid.gov",
+          "cms.gov",
+          "cdc.gov",
+          "hhs.gov",
+          "medlineplus.gov",
+          "coveredca.com"
+        ],
+        "transport": [
+          "nhtsa.gov",
+          "transportation.gov",
+          "usa.gov",
+          "dmv.ca.gov",
+          "bar.ca.gov",
+          "sfmta.com",
+          "dmv.ny.gov",
+          "nyc.gov"
+        ]
+      },
+      "wildcards": [
+        "*.gov"
+      ]
+    },
+    "CA": {
+      "name": "Canada",
+      "languages": [
+        "en",
+        "fr"
+      ],
+      "general": [
+        "canada.ca",
+        "laws-lois.justice.gc.ca",
+        "justice.gc.ca",
+        "ontario.ca",
+        "quebec.ca",
+        "gov.bc.ca",
+        "alberta.ca",
+        "scc-csc.ca"
+      ],
+      "topics": {
+        "family": [
+          "canada.ca",
+          "rqap.gouv.qc.ca",
+          "retraitequebec.gouv.qc.ca",
+          "ontario.ca",
+          "quebec.ca",
+          "gov.bc.ca",
+          "alberta.ca",
+          "cnesst.gouv.qc.ca"
+        ],
+        "housing": [
+          "cmhc-schl.gc.ca",
+          "tribunalsontario.ca",
+          "ontario.ca",
+          "www.tal.gouv.qc.ca",
+          "gov.bc.ca",
+          "alberta.ca",
+          "canada.ca",
+          "toronto.ca"
+        ],
+        "work": [
+          "canada.ca",
+          "jobbank.gc.ca",
+          "ontario.ca",
+          "cnesst.gouv.qc.ca",
+          "gov.bc.ca",
+          "alberta.ca",
+          "ccohs.ca",
+          "sst-tss.gc.ca"
+        ],
+        "tax": [
+          "canada.ca",
+          "revenuquebec.ca",
+          "www.tcc-cci.gc.ca",
+          "ontario.ca",
+          "gov.bc.ca",
+          "alberta.ca"
+        ],
+        "immigration": [
+          "canada.ca",
+          "ircc.canada.ca",
+          "irb-cisr.gc.ca",
+          "www.cbsa-asfc.gc.ca",
+          "international.gc.ca",
+          "quebec.ca",
+          "welcomebc.ca",
+          "college-ic.ca"
+        ],
+        "consumer": [
+          "canada.ca",
+          "competition-bureau.canada.ca",
+          "ised-isde.canada.ca",
+          "crtc.gc.ca",
+          "ccts-cprst.ca",
+          "opc.gouv.qc.ca",
+          "consumerprotectionbc.ca",
+          "ontario.ca"
+        ],
+        "travel": [
+          "travel.gc.ca",
+          "rppa-appr.ca",
+          "protection-passager-passenger.otc-cta.gc.ca",
+          "tc.canada.ca",
+          "www.cbsa-asfc.gc.ca",
+          "catsa-acsta.gc.ca",
+          "international.gc.ca",
+          "canada.ca"
+        ],
+        "health": [
+          "canada.ca",
+          "ontario.ca",
+          "ramq.gouv.qc.ca",
+          "quebec.ca",
+          "healthlinkbc.ca",
+          "gov.bc.ca",
+          "albertahealthservices.ca",
+          "myhealth.alberta.ca"
+        ],
+        "transport": [
+          "tc.canada.ca",
+          "ontario.ca",
+          "drivetest.ca",
+          "saaq.gouv.qc.ca",
+          "icbc.com",
+          "alberta.ca",
+          "toronto.ca",
+          "gov.bc.ca"
+        ]
+      },
+      "wildcards": [
+        "*.gc.ca",
+        "*.canada.ca",
+        "*.gouv.qc.ca"
+      ]
+    }
+  },
+  "eu": {
+    "general": [
+      "europa.eu",
+      "european-union.europa.eu",
+      "www.eur-lex.europa.eu",
+      "commission.europa.eu",
+      "ec.europa.eu",
+      "curia.europa.eu",
+      "e-justice.europa.eu",
+      "publications.europa.eu"
+    ],
+    "topics": {
+      "family": [
+        "europa.eu",
+        "employment-social-affairs.ec.europa.eu",
+        "e-justice.europa.eu"
+      ],
+      "housing": [],
+      "work": [
+        "europa.eu",
+        "eures.europa.eu",
+        "employment-social-affairs.ec.europa.eu",
+        "ela.europa.eu",
+        "osha.europa.eu",
+        "www.eur-lex.europa.eu"
+      ],
+      "tax": [
+        "europa.eu",
+        "taxation-customs.ec.europa.eu",
+        "ec.europa.eu"
+      ],
+      "immigration": [
+        "europa.eu",
+        "home-affairs.ec.europa.eu",
+        "travel-europe.europa.eu",
+        "euaa.europa.eu",
+        "eures.europa.eu"
+      ],
+      "consumer": [
+        "europa.eu",
+        "commission.europa.eu",
+        "eccnet.eu",
+        "consumer-redress.ec.europa.eu",
+        "www.eur-lex.europa.eu",
+        "ec.europa.eu",
+        "edpb.europa.eu",
+        "berec.europa.eu"
+      ],
+      "travel": [
+        "europa.eu",
+        "transport.ec.europa.eu",
+        "www.eur-lex.europa.eu",
+        "eccnet.eu",
+        "travel-europe.europa.eu",
+        "home-affairs.ec.europa.eu",
+        "curia.europa.eu",
+        "easa.europa.eu"
+      ],
+      "health": [
+        "europa.eu",
+        "health.ec.europa.eu",
+        "employment-social-affairs.ec.europa.eu",
+        "ema.europa.eu",
+        "ecdc.europa.eu"
+      ],
+      "transport": [
+        "europa.eu",
+        "transport.ec.europa.eu",
+        "road-safety.transport.ec.europa.eu",
+        "era.europa.eu",
+        "easa.europa.eu"
+      ]
+    },
+    "wildcards": [
+      "*.europa.eu"
+    ]
+  },
+  "notes": [
+    "Lists are in priority order. Every hostname answered curl -s -o /dev/null -m 10 -w '%{http_code}' https://<host> on 2026-11-13; a 403 or a redirect counts as answering.",
+    "A leading www. means the bare host did not answer HTTPS from the check machine. jurisdiction.ts already strips it.",
+    "wildcards are official namespace patterns for Exa includeDomains, not checked hostnames. Countries without a government suffix (FI, SE, EE) have none.",
+    "Exa includeDomains, tested live: a bare host also returns its subdomains (europa.eu returned eur-lex.europa.eu and transport.ec.europa.eu), and www. entries work.",
+    "Public information services, not authorities: infofinland.fi, citizensinformation.ie, citizensadvice.org.uk, nationalrail.co.uk, verbraucherzentrale.de, anil.org, juridischloket.nl. Good for plain-language rules; prefer the authority or the statute for amounts and deadlines.",
+    "European Consumer Centres (ecc.fi, konsumenteuropa.se, consumer.ee, evz.de, europe-consommateurs.eu, eccnederland.nl, ecc-netitalia.it, eccireland.ie, eccnet.eu) handle cross-border purchases only.",
+    "Dispute boards and ombudsmen, decisions are recommendations or sector-specific: kuluttajariita.fi, arn.se, degeschillencommissie.nl, kifid.nl, skgz.nl, universalschlichtungsstelle.de, schlichtung-reise-und-verkehr.de, railombudsman.org, financial-ombudsman.org.uk, housing-ombudsman.org.uk, fspo.ie, ccts-cprst.ca.",
+    "Official bodies on commercial-looking domains: workinfinland.com, workinestonia.com, make-it-in-germany.com, welcometofrance.com, equalityhumanrights.com, coveredca.com, sfmta.com, icbc.com, careeronestop.org, garanteinfanzia.org, unedic.org.",
+    "Renamed in 2025 and 2026, old hosts redirect: ara.fi to varke.fi, avi.fi and valvira.fi to lvv.fi, ely-keskus.fi to elinvoimakeskus.fi, te-palvelut.fi to tyomarkkinatori.fi, service-public.fr to service-public.gouv.fr, bmfsfj.de to bmbfsfj.bund.de, bmj.de to bmjv.de, dfa.ie to ireland.ie, benefits.gov to usa.gov.",
+    "These Finnish hosts answer a plain server request with a 403 bot challenge, so read them through Exa Contents: dvv.fi, energiavirasto.fi, finlandabroad.fi, hsl.fi, intermin.fi, lvm.fi, lvv.fi, migri.fi, oikeusasiamies.fi, okm.fi, poliisi.fi, stm.fi, tasa-arvo.fi, tem.fi, terveyskyla.fi, thl.fi, tietosuoja.fi, tukes.fi, tulli.fi, tyosuojelu.fi, um.fi, valtioneuvosto.fi, vayla.fi, vm.fi, yhdenvertaisuusvaltuutettu.fi, ym.fi.",
+    "US and CA lists mix federal hosts with California, New York, San Francisco, Ontario, Quebec, British Columbia and Alberta. For another state or province add its own portal.",
+    "The eu block applies to member states only. Your Europe lives under europa.eu/youreurope."
+  ]
+}

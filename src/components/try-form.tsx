@@ -4,6 +4,7 @@ import { ArrowRight, BadgeCheck, CircleAlert, ExternalLink, Loader2, Search } fr
 import { useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { linkButtonClasses } from "@/components/landing/link-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -298,9 +299,9 @@ export function TryForm({ code: initialCode }: { code: string }) {
                 </ul>
               </div>
             )}
-            <Button size="lg" render={<a href={result.url} />}>
+            <a href={result.url} className={linkButtonClasses({ size: "cta" })}>
               Open the case file with every quote <ArrowRight />
-            </Button>
+            </a>
             <a
               href={result.url}
               target="_blank"

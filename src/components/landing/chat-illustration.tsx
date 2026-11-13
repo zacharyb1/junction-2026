@@ -5,15 +5,17 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
- * The plan below is copied from src/data/sample-case.json: the case title, three of its
- * steps (owner, title, deadline) and the citation number each step carries on the case page.
+ * The plan below is copied from src/data/sample-case.json: the case title, three of its steps
+ * (title and deadline) and the citation number each step carries on the case page. The lines are
+ * laid out the way the engine writes plan lines for the chat: "what: by when [n]".
+ * The acknowledgement is the line from hermes/skills/butler/life-event-butler/SKILL.md.
  * Only the two lines of small talk are invented. Keep it that way when you edit.
  */
 const PLAN_TITLE = "Expecting a baby: what to do and when";
-const PLAN: { who: string; what: string; source: number }[] = [
-  { who: "Anna", what: "book the maternity clinic check-up before the end of month 4", source: 1 },
-  { who: "Anna", what: "apply for the maternity grant from Kela 2 months before the due date", source: 3 },
-  { who: "Anna and Mikko", what: "tell both employers about parental leave 2 months before it begins", source: 5 },
+const PLAN: { what: string; when: string; source: number }[] = [
+  { what: "Book the maternity clinic check-up", when: "before the end of month 4", source: 1 },
+  { what: "Apply for the maternity grant from Kela", when: "2 months before the due date", source: 3 },
+  { what: "Tell both employers about parental leave", when: "2 months before leave begins", source: 5 },
 ];
 
 const BUBBLE = {
@@ -105,14 +107,14 @@ export function ChatIllustration({ caseHref, className }: { caseHref: string | n
           <Note>A life event. Kaveri steps in.</Note>
 
           <Message from="Kaveri" kind="bot">
-            On it. Checking official sources for Finland.
+            On it, checking official sources for Finland.
           </Message>
           <Message from="Kaveri" kind="bot" hideSender>
             <p className="font-medium">{PLAN_TITLE}</p>
             <ol className="mt-2 flex list-decimal flex-col gap-1.5 pl-5 marker:text-muted-foreground">
               {PLAN.map((line) => (
                 <li key={line.source}>
-                  <span className="font-medium">{line.who}:</span> {line.what}
+                  <span className="font-medium">{line.what}:</span> {line.when}
                   {/* A non-breaking space keeps the number on the same line as the last word. */}
                   {"\u00a0"}
                   <SourceChip n={line.source} />

@@ -16,3 +16,7 @@ Append-only. One line per decision: `[Fri 20:14] Decision — why — who`.
 [Fri 21:21] Official-domain lists per country with wildcards such as *.gov. Reason: Exa accepts wildcards, which covers city and state sites.
 [Fri 21:21] Storage: Vercel Blob, private store junction-cases in fra1. Case ids are 16 random characters.
 [Fri 21:21] Repo stays private while building. Organizers get read access before Sunday 10:00.
+[Fri 22:05] Official-source map: 12 countries, about 650 hostnames that were checked to answer, plus wildcards such as *.gov. Merged with the seed list in jurisdiction.ts.
+[Fri 22:05] Demo material found by the data research, to confirm with a live engine run before pitching: Finnish rent-increase rules changed on 1 Oct 2026 (Act 531/2026 on Finlex), and EU air passenger rights were amended by Regulation (EU) 2026/2202, which applies from 23 Oct 2027. Both are "memory versus web" examples.
+[Fri 22:05] About 25 Finnish government hosts refuse a plain server request. Their pages can only be confirmed through Exa Contents, which the verifier already uses as its second reading.
+[Fri 22:05] Dark mode is not wired (no .dark class is ever set). Light theme only for the demo.

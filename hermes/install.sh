@@ -171,7 +171,7 @@ else
   say "     All five required names are present."
 fi
 say ""
-say "  2. Config. Apply Part 1 of $SCRIPT_DIR/config.snippet.yaml (README step 9)."
+say "  2. Config. Apply Part 1 of $SCRIPT_DIR/config.snippet.yaml (README step 8)."
 say "     The skills line for this machine is:"
 say "       hermes config set skills.external_dirs '[\"$SKILLS_DIR\"]'"
 if [ -n "$CONFIG_NOTES" ]; then
@@ -193,4 +193,4 @@ say ""
 say "  5. In every Telegram chat that already talked to the bot, send:  /new --yes"
 say "     A running conversation keeps its old persona, skills and tools until then."
 say ""
-say "  6. Group setup, /sethome and Part 2 of the config: README steps 13 and 14."
+say "  6. Group setup, /sethome and Part 2 of the config: README steps 11 and 12."
