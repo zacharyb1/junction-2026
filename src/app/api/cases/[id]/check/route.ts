@@ -1,10 +1,12 @@
 import { latestCheck, type SourceCheck, verifiedCount } from "@/lib/case";
-import { loadCase, recheckSources } from "@/lib/cases";
+import { loadCase, type RecheckResult, recheckSources } from "@/lib/cases";
 import { allow } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
 const COOLDOWN_MS = 10 * 60_000;
+// Readings under way on this server instance. A second click on the same case joins the first instead of fetching again.
+const running = new Map<string, Promise<RecheckResult>>();
 
 /**
  * The "Check the sources again" button on the case page. Whoever holds the unguessable link may ask.
@@ -30,11 +32,16 @@ export async function POST(req: Request, ctx: RouteContext<"/api/cases/[id]/chec
   // A new case counts as checked when it was published. An answer from the store costs nothing, so it is not limited.
   const last = latestCheck(found);
   if (!last || Date.now() - new Date(last.at).getTime() < COOLDOWN_MS) return answer(last, false);
-  if (!allow(req, false)) {
-    return Response.json({ error: "Too many checks right now. Please try again in a minute." }, { status: 429 });
+  let reading = running.get(id);
+  if (!reading) {
+    if (!allow(req, false)) {
+      return Response.json({ error: "Too many checks right now. Please try again in a minute." }, { status: 429 });
+    }
+    reading = recheckSources(found, "page").finally(() => running.delete(id));
+    running.set(id, reading);
   }
   try {
-    const result = await recheckSources(found, "page");
+    const result = await reading;
     // Not fresh when the case was updated during the reading: that check is dropped and the stored one comes back.
     return answer(result.check, result.check.at !== last.at, result.case);
   } catch {
