@@ -54,6 +54,7 @@ pnpm dev                     # http://localhost:3000
 | `src/lib/verify.ts` | Quote verifier |
 | `src/lib/case.ts`, `src/lib/cases.ts`, `src/lib/store.ts` | Case contract, operations, storage |
 | `src/app/api/research`, `src/app/api/cases`, `src/app/api/mcp` | REST API and MCP server |
+| `src/app/api/cron/recheck` | Daily source re-check, scheduled in `vercel.json` |
 | `src/app/c/[id]`, `src/app/try`, `src/app/page.tsx` | Case file, browser demo, landing page |
 | `src/data/` | Official source lists per country, sample case, scorecard |
 | `hermes/` | Bot setup for Hermes Agent: persona, config, skills, runbook |

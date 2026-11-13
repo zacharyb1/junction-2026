@@ -4,11 +4,15 @@ import {
   type Case,
   type CaseInput,
   type CasePatch,
+  CHECKS_KEPT,
   type Draft,
   type Evidence,
+  latestCheck,
+  type SourceCheck,
   type Step,
   type Trail,
   verifiedCount,
+  type Watcher,
 } from "@/lib/case";
 import { loadCase, saveCase } from "@/lib/store";
 import { type FetchedPage, verifyEvidence } from "@/lib/verify";
@@ -160,32 +164,55 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
   return resultFor(next, origin);
 }
 
+export type RecheckResult = {
+  /** News for this caller: citation numbers found gone since its own last check. Each watcher hears of a change once. */
+  changed: number[];
+  unreachable: number[];
+  /** The state after this check, as stored on the case: every quote that is gone, not only the new ones. */
+  check: SourceCheck;
+  case: Case;
+};
+
 /**
- * Re-fetches every cited page. Used by the daily change watch.
- * `changed`: the sentence is gone from a page that still opens. `unreachable`: the page did not open
- * this time, which says nothing about the rule, so the last confirmed state is kept.
+ * Re-fetches every cited page of a stored case and records the result on it. Used by the bot's change watch,
+ * the daily job and the button on the case page.
+ * Gone: the sentence was confirmed earlier and is not on a page that still opens. Unreachable: the page did not
+ * open this time, which says nothing about the rule, so what was known about a once confirmed quote is kept.
  */
-export async function recheckCase(
-  id: string,
-): Promise<{ changed: number[]; unreachable: number[]; case: Case } | null> {
-  const current = await loadCase(id);
-  if (!current) return null;
+export async function recheckSources(current: Case, by: Watcher): Promise<RecheckResult> {
   // The change watch wants a live reading, so blocked pages go through Oxylabs when a key is set.
   const fresh = await verifyEvidence(current.evidence, undefined, { oxylabs: "blocked", recheck: true });
-  const changed: number[] = [];
+  const earlier = current.checks ?? [];
+  const goneBefore = new Set(latestCheck(current)?.changed);
+  const gone: number[] = [];
   const unreachable: number[] = [];
   const evidence = fresh.map((e, i) => {
     const before = current.evidence[i];
-    if (e.verification === "unreachable") {
-      unreachable.push(e.n);
-      return before.verification === "verified" ? before : e;
-    }
-    if (before.verification === "verified" && e.verification === "not_found") changed.push(e.n);
-    return e;
+    const wasConfirmed = before.verification === "verified" || goneBefore.has(e.n);
+    if (e.verification === "unreachable") unreachable.push(e.n);
+    const now = e.verification === "unreachable" && wasConfirmed ? before : e;
+    if (wasConfirmed && now.verification !== "verified") gone.push(e.n);
+    return now;
   });
-  const next = { ...current, evidence, updatedAt: new Date().toISOString() };
+  const check: SourceCheck = { at: new Date().toISOString(), by, changed: gone, unreachable };
+  const told = new Set(earlier.findLast((c) => c.by === by)?.changed);
+  const changed = gone.filter((n) => !told.has(n));
+
+  // The case was updated while its pages were being read. That update wins: this check is not stored,
+  // and the next one reads the new content.
+  const latest = await loadCase(current.id);
+  if (latest && latest.updatedAt !== current.updatedAt) {
+    return { changed: [], unreachable: [], check: latestCheck(latest) ?? check, case: latest };
+  }
+  // `updatedAt` stays: it marks the last change to the content, and the daily job stops watching 14 days after it.
+  const next: Case = { ...current, evidence, checks: [...earlier, check].slice(-CHECKS_KEPT) };
   await saveCase(next);
-  return { changed, unreachable, case: next };
+  return { changed, unreachable, check, case: next };
+}
+
+export async function recheckCase(id: string, by: Watcher = "bot"): Promise<RecheckResult | null> {
+  const current = await loadCase(id);
+  return current ? recheckSources(current, by) : null;
 }
 
 export { loadCase };

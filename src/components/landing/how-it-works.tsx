@@ -20,7 +20,7 @@ const STEPS: { icon: LucideIcon; title: string; text: string }[] = [
   {
     icon: BellRing,
     title: "Follows through",
-    text: "The plan stays as a case file: one link with every step, deadline and source. A re-check opens each cited page again and reports a quote that is no longer there. Nothing is sent, filed, booked or paid without you.",
+    text: "The plan stays as a case file: one link with every step, deadline and source. A daily job opens the cited pages of recent cases again, a button on the case file does the same on demand, and a quote that is no longer there is flagged. Nothing is sent, filed, booked or paid without you.",
   },
 ];
 
