@@ -9,6 +9,39 @@ From an empty laptop to "the bot answers in the family group". Follow the steps 
 - **Version drift.** The installer puts you on the latest stable release (`installation.md:90`), which can be older than the docs above. If a documented feature is missing, see "UNVERIFIED" at the top of `CHECKS.md`.
 - **Contract.** The bot does not research. It calls `research_case` on our web app and posts what comes back (`docs/CONTRACTS.md`).
 
+## Quick start: the repo-local install
+
+This is the path that was actually run (Fedora, Fri night 13 Nov). It installs nothing outside this repository folder: no `hermes` on your PATH, no line in your shell profile, no sudo. The long runbook below explains each setting and still applies; where it says `hermes ...`, run `hermes/bin/hermes ...`, or put the wrapper on your PATH for one terminal with `export PATH="$PWD/hermes/bin:$PATH"`.
+
+Needs: macOS or Linux, git, curl, Node 22 or newer with npx (only for a local engine), podman or docker (only for the gate).
+
+```bash
+# 1. Hermes, pinned to release v0.23.1 (commit 3b421578), into .hermes-local/ (git-ignored). 10 to 30 minutes on venue Wi-Fi.
+bash hermes/setup-local.sh
+
+# 2. Secrets. Clone the team's private keys repo next to this checkout once, then:
+git clone https://github.com/kapuchai/junction-2026-keys.git ../junction-2026-keys
+bash hermes/secrets.sh                  # production engine (needs CASEFILE_SECRET in the keys repo)
+bash hermes/secrets.sh --local-engine   # or: engine on this machine, case links open only here
+
+# 3. Model, Part 1 of the config, persona and skills
+bash hermes/configure.sh
+
+# 4. Start and stop: engine (if local), gate model (if installed), gateway. Logs in .hermes-local/run/
+bash hermes/start.sh
+bash hermes/stop.sh
+```
+
+Then follow the runbook from step 10 (direct message test). After `/sethome` in the family group, step 12 is one command: `bash hermes/configure.sh --group <CHAT_ID>`, then stop and start.
+
+- **One poller per bot token.** The keys repo shares one `TELEGRAM_BOT_TOKEN`. Before you start, make sure nobody else's copy is running, or one of the two fails with `Telegram polling conflict`.
+- **Secrets** live only in `.hermes-local/home/.env` and `.env.local`, both git-ignored. `bash hermes/secrets.sh --status` shows which names are set and never prints values. A value entered there goes through the keys repo's `./put` (hidden input) and is pushed to the team.
+- **If the install is interrupted**, run `bash hermes/setup-local.sh` again. It continues from the stage that failed.
+- **Do not move or rename the repository folder** after installing: Hermes' launcher stores absolute paths. Move it, then delete `.hermes-local/agent` and install again.
+- **Remove everything:** `bash hermes/stop.sh && rm -rf .hermes-local .env.local`. The gate's container image is the only thing stored elsewhere: `podman rmi docker.io/ollama/ollama:0.40.16`.
+
+The gate (a small local Gemma that drops small talk before any cloud call) has its own section below.
+
 ## What is in this folder
 
 | File | Purpose |
@@ -19,6 +52,12 @@ From an empty laptop to "the bot answers in the family group". Follow the steps 
 | `skills/butler/*/SKILL.md` | `life-event-butler`, `letter-decoder`, `deadline-keeper`. Hermes loads them from here. |
 | `install.sh` | Installs `SOUL.md`, reports what is missing, prints next steps. Changes nothing else. |
 | `CHECKS.md` | Where each fact was confirmed, and what could not be confirmed. |
+| `setup-local.sh` | Installs Hermes, pinned, into `.hermes-local/`. Nothing global. |
+| `bin/hermes` | Wrapper: runs the repo-local Hermes with its repo-local home. |
+| `secrets.sh` | Copies values from the team's keys repo into the git-ignored env files. |
+| `configure.sh` | Writes the model and the keys from `config.snippet.yaml` into the Hermes home. |
+| `start.sh`, `stop.sh` | Start and stop the engine (if local), the gate model and the gateway. |
+| `plugins/kaveri-gate/`, `install-gate.sh`, `gate.sh` | The gate: plugin source, its installer, and the local model's start and stop. |
 
 Tool names as the model sees them (`mcp-config-reference.md:302-321`):
 `mcp__casefile__research_case`, `mcp__casefile__case_update`, `mcp__casefile__case_get`, `mcp__casefile__case_recheck`, `mcp__casefile__case_publish`, `mcp__exa__web_search_advanced_exa`, `mcp__exa__web_fetch_exa`, plus the built-ins `clarify`, `memory`, `cronjob_manage`, `vision_analyze`.
