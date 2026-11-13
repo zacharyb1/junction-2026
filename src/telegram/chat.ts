@@ -26,13 +26,13 @@ export async function postToThread(
   return chat.thread(threadId).post(message)
 }
 
-const runtimeFile = () => resolve('data/runtime.json')
+const runtimeFile = () => resolve(env.DATA_DIR, 'runtime.json')
 
 /** Remember the last group chat we saw, so monitor alerts have somewhere to go. */
 export function rememberGroupThread(threadId: string) {
   try {
     if (readRuntime().lastGroupThreadId === threadId) return
-    mkdirSync(resolve('data'), { recursive: true })
+    mkdirSync(resolve(env.DATA_DIR), { recursive: true })
     writeFileSync(runtimeFile(), JSON.stringify({ lastGroupThreadId: threadId }, null, 2))
   } catch {
     // best effort

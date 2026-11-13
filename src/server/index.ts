@@ -29,8 +29,19 @@ const http = serve({ fetch: app.fetch, port: env.PORT, hostname: '0.0.0.0' }, (i
   )
   const missing = missingConfig()
   if (missing.length > 0) console.warn(`[server] not configured:\n  - ${missing.join('\n  - ')}`)
-  console.log(`[server] telegram: ${getChat(mastra) ? 'polling' : 'not running'}`)
+  void reportTelegram()
 })
+
+/** The channel connects in the background after startup; report once it is up (or clearly is not). */
+async function reportTelegram() {
+  if (!env.TELEGRAM_BOT_TOKEN) return
+  for (let i = 0; i < 40 && !getChat(mastra); i++) await new Promise((r) => setTimeout(r, 250))
+  console.log(
+    getChat(mastra)
+      ? '[server] telegram: channel ready (polling)'
+      : '[server] telegram: channel did NOT start within 10s, check the bot token and the log above',
+  )
+}
 
 const shutdown = () => {
   http.close(() => process.exit(0))

@@ -9,7 +9,7 @@ export class ExaUnavailableError extends Error {}
 let client: Exa | undefined
 function exa(): Exa {
   if (!env.EXA_API_KEY) throw new ExaUnavailableError('EXA_API_KEY is not set')
-  client ??= new Exa(env.EXA_API_KEY)
+  client ??= new Exa(env.EXA_API_KEY, env.EXA_BASE_URL)
   return client
 }
 

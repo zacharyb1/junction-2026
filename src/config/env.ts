@@ -8,12 +8,16 @@ const schema = z.object({
   NODE_ENV: z.preprocess(blank, z.enum(['development', 'production', 'test']).default('development')),
   PORT: z.preprocess(blank, z.coerce.number().int().default(4111)),
   MODEL: z.preprocess(blank, z.string().default('anthropic/claude-sonnet-5-5')),
-  DATABASE_URL: z.preprocess(blank, z.string().default('file:./data/mastra.db')),
+  /** Folder for local state: LibSQL file, Exa cache, remembered chat. */
+  DATA_DIR: z.preprocess(blank, z.string().default('data')),
+  DATABASE_URL: opt,
   TELEGRAM_BOT_TOKEN: opt,
   TELEGRAM_BOT_USERNAME: opt,
   TELEGRAM_ALLOWED_USER_IDS: opt,
   TELEGRAM_DEMO_CHAT_ID: opt,
   EXA_API_KEY: opt,
+  /** Only for the offline smoke test, which points the Exa client at a local fake. */
+  EXA_BASE_URL: opt,
   EXA_WEBHOOK_SECRET: opt,
   EXA_CACHE: z.preprocess(blank, z.enum(['on', 'off']).optional()),
 })
@@ -22,6 +26,7 @@ const parsed = schema.parse(process.env)
 
 export const env = {
   ...parsed,
+  DATABASE_URL: parsed.DATABASE_URL ?? `file:./${parsed.DATA_DIR}/mastra.db`,
   isProd: parsed.NODE_ENV === 'production',
   /** Exa cache: on in dev unless switched off, off in production unless switched on. */
   exaCache: parsed.EXA_CACHE ? parsed.EXA_CACHE === 'on' : parsed.NODE_ENV !== 'production',

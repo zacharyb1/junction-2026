@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { env } from '../../config/env'
 
-const dir = () => resolve('data/exa-cache')
+const dir = () => resolve(env.DATA_DIR, 'exa-cache')
 
 function fileFor(method: string, request: unknown): string {
   const key = createHash('sha256')
