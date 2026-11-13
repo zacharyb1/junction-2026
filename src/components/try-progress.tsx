@@ -52,10 +52,10 @@ const count = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const ORDER: StageName[] = ["plan", "search", "read", "verify", "publish"];
 
 const READ_BY: Record<Of<"page">["via"], string> = {
-  live: "Read live",
-  oxylabs: "Live via Oxylabs",
+  live: "read live",
+  oxylabs: "live via Oxylabs",
   exa: "Exa's copy",
-  none: "Not opened",
+  none: "not opened",
 };
 
 type State = "running" | "done" | "stopped";
@@ -71,8 +71,18 @@ function searchHeading(searches: Of<"search">[]) {
   if (!searches.length || back < searches.length) {
     return `Searching with Exa${searches.length ? `: ${back} of ${searches.length} back` : ""}`;
   }
-  const steps = searches.reduce((sum, s) => sum + s.steps, 0);
-  return `${searches.length} Exa search${searches.length === 1 ? "" : "es"} proposed ${count(steps, "step")}`;
+  // A failed search says so in its own row.
+  const done = searches.filter((s) => s.status === "done");
+  const steps = done.reduce((sum, s) => sum + s.steps, 0);
+  return `${done.length} Exa search${done.length === 1 ? "" : "es"} proposed ${count(steps, "step")}`;
+}
+
+/** "8 cited pages: 6 read live, 2 Exa's copy" */
+function readHeading(pages: Of<"page">[]) {
+  const readers = (Object.keys(READ_BY) as Of<"page">["via"][])
+    .map((via) => [pages.filter((p) => p.via === via).length, READ_BY[via]] as const)
+    .filter(([n]) => n > 0);
+  return `${count(pages.length, "cited page")}: ${readers.map(([n, how]) => `${n} ${how}`).join(", ")}`;
 }
 
 function SearchRow({ search, busy }: { search: Of<"search">; busy: boolean }) {
@@ -162,6 +172,10 @@ export function Timeline({ progress, busy, finished }: { progress: Progress; bus
                       {confirmed.verified} of {count(confirmed.total, "quote")} confirmed on{" "}
                       {confirmed.total === 1 ? "its page" : "their pages"}
                     </span>
+                  ) : name === "read" && state === "done" && progress.pages.length > 0 ? (
+                    readHeading(progress.pages)
+                  ) : name === "publish" && finished ? (
+                    "Case file ready"
                   ) : (
                     first.detail
                   )}
