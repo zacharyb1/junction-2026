@@ -26,7 +26,10 @@ First audience: international families in Finland, who deal with Kela, Vero, Mig
 | Case page | Working, phone first, English with Finnish labels for Finnish cases. | `src/app/c/[id]/page.tsx` |
 | Browser demo | Working with live progress. | `src/app/try/`, `/try?code=...` |
 | Landing page | Built, shows the real scorecard. Needs a human eye for wording. | `src/app/page.tsx`, `src/components/landing/` |
-| Scorecard runner | Working. First real run Fri 21:40: 19 of 19 passed. | `eval/` |
+| Scorecard runner | Working. Run 4, Fri 23:30, after the review fixes: 19 of 19 passed, 133 of 133 quotes found. | `eval/` |
+| Review fixes | Done Fri night: stricter grounding, conflict labels, safe page fetch, country names, demo limits, accurate page copy. See section 4 and `docs/DECISIONS.md`. | pull request 5 |
+| Highlight links | Each verified source links to the official page with the quoted sentence highlighted (text fragment, works in Chrome, Edge, Safari). | `src/app/c/[id]/page.tsx` |
+| Pitch kit | Story, numbers, criteria table, two-minute video script, demo script, judge questions. | `docs/PITCH.md` |
 | Bot template for Hermes | Written: runbook, persona, config, three skills, install script. Not yet run on a real machine. | `hermes/` |
 | GitHub | Private repo `zacharyb1/junction-2026`, `main` pushed. Vercel deploys from it. | github.com |
 | Production | **Live** at https://junction-2026.vercel.app: landing, `/try`, case pages, API, MCP. Research itself waits for the Exa key, see section 9. | Vercel project `junction-2026` |
@@ -179,6 +182,9 @@ If Telegram or the laptop fails, the same story runs from `/try` on a phone. Rec
 2. **Telegram bot token** from BotFather, and a model key for the bot runtime.
 3. **Bot track decision** by Sat 10:30: Hermes or Hono with Mastra.
 4. **Bot connection values** are in `.env.bot` in this folder (not committed): engine URL, `CASEFILE_SECRET`, demo access code.
+5. **Merge the pull requests in order:** 1 (Exa skill and sources), then 4 (Oxylabs reader), then 5 (review fixes). Each is stacked on the one before. Production stays on the old build until they are merged.
+6. **Delete the scaffold chat** by hand: `src/app/chat`, `src/app/api/chat`, `src/lib/ai.ts`, and the `ai` and `@ai-sdk/*` packages. The endpoint is already locked behind the bot secret, so this is tidying, not a risk.
+7. **Read five cases as a human** before the pitch (pregnancy, rent letter, flight, renovation, one of your own) and note anything wrong in `docs/DECISIONS.md`.
 
 Resolved Fri evening: the private GitHub repo exists and is connected to Vercel, and commits carry the owner's GitHub no-reply address so Vercel accepts them.
 

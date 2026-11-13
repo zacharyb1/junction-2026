@@ -132,6 +132,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
         }
       }
       if (!finished) setError("The connection closed before the research finished. Please try again.");
+      // A wrong code was corrected by hand: the field has done its job.
+      else setRejected(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {

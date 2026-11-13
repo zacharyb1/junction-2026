@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Hand,
   HelpCircle,
+  Highlighter,
   History,
   MapPin,
   Scale,
@@ -46,6 +47,21 @@ const host = (url: string) => {
     return url;
   }
 };
+
+/**
+ * Link to the page with the quoted sentence highlighted, using a text fragment (`#:~:text=start,end`).
+ * Chrome, Edge and Safari scroll to the sentence and mark it. Other browsers just open the page.
+ * Not used for PDFs or for addresses that already carry a fragment.
+ */
+function highlightUrl(url: string, quote: string): string | null {
+  if (url.includes("#") || /\.pdf($|\?)/i.test(url)) return null;
+  const words = quote.replace(/\s+/g, " ").trim().split(" ");
+  if (words.length < 3) return null;
+  // A dash, comma or ampersand has a meaning inside a text fragment, so each is encoded.
+  const part = (list: string[]) => encodeURIComponent(list.join(" ")).replace(/-/g, "%2D");
+  const fragment = words.length > 10 ? `${part(words.slice(0, 5))},${part(words.slice(-5))}` : part(words);
+  return `${url}#:~:text=${fragment}`;
+}
 
 const when = (iso: string | undefined, t: Labels) => {
   const date = validDate(iso);
@@ -178,6 +194,16 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
       </div>
       <blockquote className="mt-3 border-l-2 border-primary/40 pl-3 text-sm italic">“{e.quote}”</blockquote>
       {e.quoteTranslation && <p className="mt-2 pl-3.5 text-sm text-muted-foreground">{e.quoteTranslation}</p>}
+      {e.verification === "verified" && highlightUrl(e.url, e.quote) && (
+        <a
+          href={highlightUrl(e.url, e.quote) ?? e.url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1 pl-3.5 text-sm font-medium text-primary hover:underline"
+        >
+          <Highlighter className="size-3.5 shrink-0" /> {t.showOnPage}
+        </a>
+      )}
       {e.priorBelief && (
         <div className="mt-3 rounded-lg bg-muted p-3 text-sm">
           <p className="flex items-center gap-1.5 font-medium">
