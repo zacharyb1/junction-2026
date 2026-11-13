@@ -73,6 +73,7 @@ function searchHeading(searches: Of<"search">[]) {
   }
   // A failed search says so in its own row.
   const done = searches.filter((s) => s.status === "done");
+  if (!done.length) return "No Exa search came back";
   const steps = done.reduce((sum, s) => sum + s.steps, 0);
   return `${done.length} Exa search${done.length === 1 ? "" : "es"} proposed ${count(steps, "step")}`;
 }
