@@ -84,6 +84,30 @@ function resultFor(c: Case, origin: string): PublishResult {
   };
 }
 
+/** Money cards show amounts as facts, so every citation must identify verified evidence. */
+function withVerifiedMoney(c: Case): Case {
+  const citations = new Map<number, Evidence | null>();
+  for (const item of c.evidence) {
+    citations.set(item.n, citations.has(item.n) ? null : item);
+  }
+  const withheld: string[] = [];
+  const corrected = new Set<string>();
+  const money = c.money.filter((item) => {
+    const explanation = `Amount "${item.label}": supporting citations could not be verified.`;
+    if (item.evidence.length && item.evidence.every((n) => citations.get(n)?.verification === "verified")) {
+      corrected.add(explanation);
+      return true;
+    }
+    withheld.push(explanation);
+    return false;
+  });
+  return {
+    ...c,
+    money,
+    unverified: [...new Set([...withheld, ...c.unverified.filter((note) => !corrected.has(note))])].slice(0, 10),
+  };
+}
+
 /** `pages`: page texts the caller already fetched, so the verifier does not download them twice. */
 export async function publishCase(
   input: CaseInput,
@@ -92,7 +116,7 @@ export async function publishCase(
   trail?: Trail,
 ): Promise<PublishResult> {
   const now = new Date().toISOString();
-  const c: Case = {
+  const c = withVerifiedMoney({
     ...input,
     id: nanoid(16),
     createdAt: now,
@@ -101,7 +125,7 @@ export async function publishCase(
     drafts: withIds(input.drafts) as Draft[],
     evidence: await verifyEvidence(input.evidence, pages),
     trail,
-  };
+  });
   await saveCase(c);
   return resultFor(c, origin);
 }
@@ -138,7 +162,7 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
     evidence = mergeBy(evidence, checked, (e) => e.n).sort((a, b) => a.n - b.n);
   }
 
-  const next: Case = {
+  const next = withVerifiedMoney({
     ...current,
     title: patch.title ?? current.title,
     summary: patch.summary ?? current.summary,
@@ -155,7 +179,7 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
     unverified: patch.unverified ?? current.unverified,
     openQuestions: patch.openQuestions ?? current.openQuestions,
     updatedAt: new Date().toISOString(),
-  };
+  });
   await saveCase(next);
   return resultFor(next, origin);
 }
