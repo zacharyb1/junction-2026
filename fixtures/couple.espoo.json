@@ -1,0 +1,30 @@
+{
+  "_notice": "FICTIONAL DEMO DATA. These people and both employers are invented for the Junction demo. Any resemblance to real persons or companies is coincidental. The municipality, the collective agreement names and Kela are real, because the bot researches them live.",
+  "fictional": true,
+  "id": "demo-couple-espoo",
+  "country": "FI",
+  "municipality": "Espoo",
+  "languages": ["en", "fi"],
+  "partners": [
+    {
+      "name": "Aino Lehtonen",
+      "expecting": true,
+      "employer": {
+        "name": "Tapiolan Hoivakoti Oy (fictional)",
+        "sector": "private social services",
+        "role": "practical nurse",
+        "collectiveAgreement": "Yksityisen sosiaalipalvelualan työehtosopimus"
+      }
+    },
+    {
+      "name": "Mikko Lehtonen",
+      "expecting": false,
+      "employer": {
+        "name": "Otaniemi Software Oy (fictional)",
+        "sector": "IT services",
+        "role": "software developer",
+        "collectiveAgreement": "Tietotekniikan palvelualan työehtosopimus"
+      }
+    }
+  ]
+}

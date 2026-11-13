@@ -1,0 +1,10 @@
+# Single package. This file only holds pnpm settings shared by everyone.
+# esbuild (used by tsx and the production build) needs its postinstall script.
+allowBuilds:
+  esbuild: true
+
+# vite-plus ships Vite as an alias of its own core (version 1.x), which vitest's
+# peer range (^6 || ^7 || ^8) does not recognise. Vite+ documents this as fine.
+peerDependencyRules:
+  allowedVersions:
+    vite: '*'

@@ -1,0 +1,18 @@
+{
+  "_notice": "SAMPLE PAYLOAD for POST /simulate/monitor. Shape follows Exa's monitor.run.completed webhook; the result below is a placeholder link to Kela's front page, not a real monitor finding.",
+  "id": "event_sample",
+  "object": "event",
+  "type": "monitor.run.completed",
+  "data": {
+    "id": "run_sample",
+    "monitorId": "monitor_sample",
+    "status": "completed",
+    "output": {
+      "results": [{ "title": "Sample result (placeholder)", "url": "https://www.kela.fi/" }],
+      "content": "placeholder"
+    },
+    "failReason": null,
+    "metadata": null
+  },
+  "createdAt": "2026-11-13T00:00:00.000Z"
+}
