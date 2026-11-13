@@ -236,7 +236,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
             <CardDescription>Each search, each page and each check, as it happens.</CardDescription>
             {progress.stages.length > 0 && (
               <CardAction>
-                <Elapsed busy={busy} />
+                <Elapsed busy={busy} final={result?.ms} />
               </CardAction>
             )}
           </CardHeader>

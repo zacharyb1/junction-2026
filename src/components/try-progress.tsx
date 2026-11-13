@@ -62,8 +62,8 @@ type State = "running" | "done" | "stopped";
 
 function StateIcon({ state, className = "" }: { state: State; className?: string }) {
   if (state === "running") return <Loader2 className={`animate-spin text-muted-foreground ${className}`} aria-label="Running" />;
-  if (state === "stopped") return <CircleAlert className={`text-amber-600 ${className}`} aria-label="Stopped" />;
-  return <CircleCheck className={`text-emerald-600 ${className}`} aria-label="Done" />;
+  if (state === "stopped") return <CircleAlert className={`text-amber-600 dark:text-amber-400 ${className}`} aria-label="Stopped" />;
+  return <CircleCheck className={`text-emerald-600 dark:text-emerald-400 ${className}`} aria-label="Done" />;
 }
 
 function searchHeading(searches: Of<"search">[]) {
@@ -109,15 +109,15 @@ function PageRow({ page }: { page: Of<"page"> }) {
         {host}
         {page.title !== host && <span className="text-muted-foreground"> · {page.title}</span>}
       </a>
-      <span className={`shrink-0 text-xs ${page.via === "none" ? "text-amber-700" : "text-muted-foreground"}`}>
+      <span className={`shrink-0 text-xs ${page.via === "none" ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground"}`}>
         {READ_BY[page.via]}
       </span>
     </li>
   );
 }
 
-/** Seconds since the research started, counting while it runs. */
-export function Elapsed({ busy }: { busy: boolean }) {
+/** Seconds since the research started, counting while it runs. `final` is the engine's own total, once it is known. */
+export function Elapsed({ busy, final }: { busy: boolean; final?: number }) {
   const [ms, setMs] = useState(0);
   useEffect(() => {
     if (!busy) return;
@@ -128,7 +128,7 @@ export function Elapsed({ busy }: { busy: boolean }) {
   // Hidden from screen readers: a live region must not announce every tick.
   return (
     <span aria-hidden className="font-mono text-xs tabular-nums text-muted-foreground">
-      {seconds(ms)}
+      {seconds(final ?? ms)}
     </span>
   );
 }
@@ -139,12 +139,16 @@ export function Elapsed({ busy }: { busy: boolean }) {
  */
 export function Timeline({ progress, busy, finished }: { progress: Progress; busy: boolean; finished: boolean }) {
   const started = ORDER.filter((name) => progress.stages.some((s) => s.name === name));
+  const startOf = (name: StageName) => progress.stages.find((s) => s.name === name)?.ms ?? 0;
   return (
     <ol className="flex flex-col gap-3">
       {started.map((name, i) => {
         const [first, ...later] = progress.stages.filter((s) => s.name === name);
         const state: State = finished || i < started.length - 1 ? "done" : busy ? "running" : "stopped";
         const confirmed = name === "verify" ? progress.verified : undefined;
+        // A stage ends when the next one starts. The last one ends when the case is stored.
+        const end = i < started.length - 1 ? startOf(started[i + 1]) : (progress.verified?.ms ?? first.ms);
+        const took = end - first.ms;
         return (
           <li key={name} className="flex animate-in gap-2.5 fade-in">
             <StateIcon state={state} className="mt-0.5 size-4 shrink-0" />
@@ -154,7 +158,7 @@ export function Timeline({ progress, busy, finished }: { progress: Progress; bus
                   {name === "search" ? (
                     searchHeading(progress.searches)
                   ) : confirmed ? (
-                    <span className="font-medium text-emerald-800">
+                    <span className="font-medium text-emerald-800 dark:text-emerald-300">
                       {confirmed.verified} of {count(confirmed.total, "quote")} confirmed on{" "}
                       {confirmed.total === 1 ? "its page" : "their pages"}
                     </span>
@@ -162,7 +166,10 @@ export function Timeline({ progress, busy, finished }: { progress: Progress; bus
                     first.detail
                   )}
                 </p>
-                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{seconds(first.ms)}</span>
+                {/* How long the stage took, like the search rows. Not worth a number when it was instant. */}
+                {state === "done" && took >= 50 && (
+                  <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{seconds(took)}</span>
+                )}
               </div>
               {name === "search" && progress.searches.length > 0 && (
                 <ul className="flex flex-col gap-1">

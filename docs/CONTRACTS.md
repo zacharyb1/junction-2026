@@ -97,7 +97,7 @@ name as `type`. `ms` is the time since the research started.
 | Event | Data | Sent |
 |---|---|---|
 | `stage` | `{ "name": "plan" \| "search" \| "read" \| "verify" \| "publish", "detail": "…", "ms": 2 }` | when a stage starts; the same lines are stored as the research trail |
-| `search` | `{ "focus": "money and entitlements", "web": "official" \| "open", "status": "running" \| "done" \| "failed", "steps": 5, "pages": 4, "tookMs": 6118, "ms": 6130 }` | when one Exa search starts, and again when it returns: `steps` it proposed, distinct `pages` those steps cite, and how long it took. The counts are 0 until `done` |
+| `search` | `{ "focus": "money and entitlements", "web": "official" \| "open", "status": "running" \| "done" \| "failed", "steps": 5, "pages": 4, "tookMs": 6118, "ms": 6130 }` | when one Exa search starts, and again when it returns or fails: `steps` it proposed, distinct `pages` those steps cite, and how long it took. The counts are 0 unless the status is `done` |
 | `page` | `{ "url": "…", "title": "…", "official": true, "via": "live" \| "oxylabs" \| "exa" \| "none", "ms": 7185 }` | once per cited page, as soon as it has been read. `via` is the most direct reader that opened it: our own request, a live read through Oxylabs, Exa's copy, or `none` when nothing could open it |
 | `source` | `{ "url": "…", "title": "…", "official": true }` | once per cited page after all pages are read (kept for older clients; `page` says more) |
 | `verified` | `{ "verified": 6, "total": 6, "ms": 8884 }` | once the case is stored: how many quotes were confirmed on their pages |

@@ -56,11 +56,11 @@ function Sentence({ e }: { e: Cited }) {
           {hostOf(e.url)} <ExternalLink className="size-3 shrink-0" />
         </a>
         {verified ? (
-          <span className="inline-flex items-center gap-1 text-emerald-800">
+          <span className="inline-flex items-center gap-1 text-emerald-800 dark:text-emerald-300">
             <BadgeCheck className="size-3.5 shrink-0" /> {FOUND[e.checkedVia ?? "live"]}
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-amber-800">
+          <span className="inline-flex items-center gap-1 text-amber-800 dark:text-amber-300">
             <CircleAlert className="size-3.5 shrink-0" />{" "}
             {e.verification === "unreachable" ? "page could not be opened" : "not found on the page"}
           </span>
