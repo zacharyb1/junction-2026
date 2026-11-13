@@ -3,7 +3,8 @@
 # Values are never printed, logged, passed on a command line or written into this repository's history.
 #
 #   bash hermes/secrets.sh                  pull the keys repo, copy its values, offer to enter missing ones
-#   bash hermes/secrets.sh --local-engine   the same, and point the bot at an engine on this machine
+#   bash hermes/secrets.sh --local-engine   the same, and point the bot at an engine on this machine (sticks)
+#   bash hermes/secrets.sh --production     the same, and point the bot back at the deployed engine
 #   bash hermes/secrets.sh --status         show which names are set, change nothing
 #
 # Keys repo: $KAVERI_KEYS, else a folder junction-2026-keys next to this checkout (or next to the
@@ -24,7 +25,10 @@ BOT_REQUIRED="NVIDIA_API_KEY TELEGRAM_BOT_TOKEN TELEGRAM_ALLOWED_USERS EXA_API_K
 APP_REQUIRED="EXA_API_KEY CASEFILE_SECRET DEMO_ACCESS_CODE"
 
 MODE="${1:-}"
-case "$MODE" in ""|--status|--local-engine) ;; *) echo "usage: bash hermes/secrets.sh [--local-engine|--status]" >&2; exit 2 ;; esac
+case "$MODE" in ""|--status|--local-engine|--production) ;; *) echo "usage: bash hermes/secrets.sh [--local-engine|--production|--status]" >&2; exit 2 ;; esac
+# The engine choice sticks: after --local-engine a plain run keeps the bot on the local engine.
+# --production switches back to the URL and secret from the keys repo.
+if [ -z "$MODE" ] && grep -q '^KAVERI_ENGINE=local' "$BOT_ENV" 2>/dev/null; then MODE="--local-engine"; fi
 
 find_keys() {
   local main
@@ -53,8 +57,13 @@ status() {
   local name
   echo "Keys repo:    ${KEYS:-not found (set KAVERI_KEYS or clone it next to this checkout)}"
   echo "Hermes home:  $BOT_ENV"
-  for name in $BOT_REQUIRED ELEVENLABS_API_KEY; do
-    if has "$BOT_ENV" "$name"; then echo "  [set]     $name"; else echo "  [missing] $name"; fi
+  for name in $BOT_REQUIRED; do
+    if has "$BOT_ENV" "$name"; then echo "  [set]     $name"
+    elif [ "$name" = TELEGRAM_ALLOWED_USERS ] && has "$BOT_ENV" TELEGRAM_ALLOW_ALL_USERS; then echo "  [optional] $name (the bot is open to everyone)"
+    else echo "  [missing] $name"; fi
+  done
+  for name in TELEGRAM_ALLOW_ALL_USERS ELEVENLABS_API_KEY; do
+    if has "$BOT_ENV" "$name"; then echo "  [set]     $name"; else echo "  [optional] $name"; fi
   done
   echo "Local engine: $APP_ENV"
   for name in $APP_REQUIRED; do
@@ -116,6 +125,11 @@ else
   fi
 fi
 
+if [ "$MODE" = "--production" ]; then
+  tmp="$(mktemp "${BOT_ENV}.XXXXXX")"; chmod 600 "$tmp"; grep -v '^KAVERI_ENGINE=' "$BOT_ENV" > "$tmp" || true; mv "$tmp" "$BOT_ENV"
+  has "$BOT_ENV" CASEFILE_URL || put "$BOT_ENV" CASEFILE_URL "$PROD_URL"
+fi
+
 if [ "$MODE" = "--local-engine" ]; then
   # The engine runs on this machine. Its secret and demo code are made here when the keys repo has none.
   has "$BOT_ENV" EXA_API_KEY || { echo "The local engine needs EXA_API_KEY." >&2; status; exit 1; }
@@ -125,6 +139,7 @@ if [ "$MODE" = "--local-engine" ]; then
   put "$APP_ENV" PUBLIC_BASE_URL "http://localhost:$ENGINE_PORT"
   put "$BOT_ENV" CASEFILE_SECRET "$(get "$APP_ENV" CASEFILE_SECRET)"
   put "$BOT_ENV" CASEFILE_URL "http://localhost:$ENGINE_PORT/api/mcp"
+  put "$BOT_ENV" KAVERI_ENGINE local
   echo "The bot is pointed at a local engine on port $ENGINE_PORT. Case links open only on this machine."
 fi
 

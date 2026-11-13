@@ -76,6 +76,20 @@ set_key display.platforms.telegram.long_running_notifications false
 set_key auxiliary.background_review.enabled false
 set_key cron.wrap_response false
 
+# Slash commands (/sethome, /new, /model ...) only for the owner. Without this every user the bot
+# answers can run them, which matters once TELEGRAM_ALLOW_ALL_USERS is on (CHECKS.md, U10).
+OWNER="$(sed -n 's/^TELEGRAM_ALLOWED_USERS=//p' "${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home/.env" 2>/dev/null | tail -n 1 | tr -d '[:space:]')"
+if [ -n "$OWNER" ]; then
+  echo "Slash commands: admin only"
+  ADMINS="[\"$(printf '%s' "$OWNER" | sed 's/,/","/g')\"]"
+  set_key platforms.telegram.extra.allow_admin_from "$ADMINS"
+  set_key platforms.telegram.extra.group_allow_admin_from "$ADMINS"
+  set_key platforms.telegram.extra.user_allowed_commands '["start"]'
+  set_key platforms.telegram.extra.group_user_allowed_commands '["start"]'
+else
+  echo "Slash commands: open to every user (no TELEGRAM_ALLOWED_USERS to name as admin)"
+fi
+
 echo "Persona"
 PATH="$ROOT/hermes/bin:$PATH" bash "$ROOT/hermes/install.sh" --home "${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home" | sed -n '1,6p'
 

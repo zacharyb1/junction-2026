@@ -38,7 +38,8 @@ if grep -Eq '^CASEFILE_URL=http://(localhost|127\.0\.0\.1)' "$BOT_ENV"; then
       echo "engine: building (about a minute)"
       (cd "$ENGINE_DIR" && pnpm build) >> "$RUN/engine-build.log" 2>&1 || { echo "engine build failed, see $RUN/engine-build.log" >&2; exit 1; }
     fi
-    (cd "$ENGINE_DIR" && NEXT_TELEMETRY_DISABLED=1 nohup node node_modules/next/dist/bin/next start -p "$ENGINE_PORT" > "$RUN/engine.log" 2>&1 & echo $! > "$RUN/engine.pid")
+    (cd "$ENGINE_DIR" && NEXT_TELEMETRY_DISABLED=1 exec nohup node node_modules/next/dist/bin/next start -p "$ENGINE_PORT" > "$RUN/engine.log" 2>&1 < /dev/null) &
+    echo $! > "$RUN/engine.pid"
     for _ in $(seq 1 30); do curl -fsS -o /dev/null --max-time 2 "http://localhost:$ENGINE_PORT/" 2>/dev/null && break; sleep 1; done
     curl -fsS -o /dev/null --max-time 5 "http://localhost:$ENGINE_PORT/" || { echo "engine did not start, see $RUN/engine.log" >&2; exit 1; }
     echo "engine: http://localhost:$ENGINE_PORT (pid $(cat "$RUN/engine.pid"), log $RUN/engine.log)"
@@ -58,7 +59,7 @@ fi
 if alive gateway; then
   echo "gateway: already running (pid $(cat "$RUN/gateway.pid"))"
 else
-  nohup "$ROOT/hermes/bin/hermes" gateway run > "$RUN/gateway.log" 2>&1 &
+  nohup "$ROOT/hermes/bin/hermes" gateway run > "$RUN/gateway.log" 2>&1 < /dev/null &
   echo $! > "$RUN/gateway.pid"
   sleep 8
   if alive gateway; then
