@@ -1,0 +1,18 @@
+{
+  "note": "Voiceover for the two-minute video. Lines match the table in docs/PITCH.md. Re-render after the Saturday scorecard run if the numbers in line 7 change: node scripts/voiceover.mjs",
+  "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+  "voiceName": "George, warm British storyteller (ElevenLabs premade voice)",
+  "model": "eleven_v4",
+  "lines": [
+    { "id": "01-deadlines", "at": "0:00", "text": "Good news starts a list of deadlines. In a country whose language you do not read." },
+    { "id": "02-silent", "at": "0:12", "text": "Kaveri reads along and says nothing, until life happens. Then it researches the live web with Exa." },
+    { "id": "03-sentence", "at": "0:30", "text": "Each line has the sentence it came from. Our server opened that page again, and found the sentence." },
+    { "id": "04-tap", "at": "0:45", "text": "Tap a number. The official page opens at that sentence." },
+    { "id": "05-letter", "at": "1:00", "text": "A letter in Finnish. Three Exa searches on official sites, every cited page read twice." },
+    { "id": "06-disagree", "at": "1:20", "text": "When two sources disagree, it shows both. It does not pick one in silence." },
+    { "id": "07-numbers", "at": "1:35", "text": "Nineteen scenarios, one hundred and twenty-three quotes, all found on their pages. Six seconds, two cents." },
+    { "id": "08-close", "at": "1:50", "text": "Kaveri. Research with sources, in your family chat." },
+    { "id": "02b-silent-finnish-name", "at": "0:12", "text": "Kah-veh-ri reads along and says nothing, until life happens. Then it researches the live web with Exa.", "alternative": "Same as 02, with the name spelled the way it sounds in Finnish. Use whichever take says the name right." },
+    { "id": "08b-close-finnish-name", "at": "1:50", "text": "Kah-veh-ri. Research with sources, in your family chat.", "alternative": "Same as 08, with the name spelled the way it sounds in Finnish." }
+  ]
+}
