@@ -15,12 +15,12 @@ const STEPS: { icon: LucideIcon; title: string; text: string }[] = [
   {
     icon: BadgeCheck,
     title: "Verifies every quote",
-    text: "Every claim keeps the sentence it came from. Our server opens each cited page again and checks the sentence is really there. A line that fails the check is left out of the plan.",
+    text: "Every claim keeps the sentence it came from. Our server opens each cited page again and checks the sentence is really there. A step whose sentence is not on the page is left out, and a figure without a sentence is removed.",
   },
   {
     icon: BellRing,
     title: "Follows through",
-    text: "Next steps wait for your one-tap approval. Deadlines become reminders in the chat. A daily job re-checks the sources and tells you when a quote is no longer on its page.",
+    text: "The plan stays as a case file: one link with every step, deadline and source. A re-check opens each cited page again and reports a quote that is no longer there. Nothing is sent, filed, booked or paid without you.",
   },
 ];
 

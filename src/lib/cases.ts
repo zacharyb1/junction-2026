@@ -67,6 +67,7 @@ function resultFor(c: Case, origin: string): PublishResult {
   const failed = c.evidence
     .filter((e) => e.verification !== "verified")
     .map((e) => ({ n: e.n, reason: e.verification, match: e.match }));
+  const unsourced = c.steps.filter((s) => !s.evidence.length).length;
   return {
     id: c.id,
     url: `${origin}/c/${c.id}`,
@@ -75,7 +76,11 @@ function resultFor(c: Case, origin: string): PublishResult {
     failed,
     advice: failed.length
       ? "Some quotes were not found on their pages. Re-read those pages and send the exact sentence with case_update, or remove the claims that depend on them and say you could not verify them."
-      : "All quotes were found on their pages. Share the url with the user.",
+      : !c.evidence.length
+        ? "This case has no evidence, so nothing in it is confirmed. Add a quote and URL for every step with case_update before you share it."
+        : unsourced
+          ? `All quotes were found on their pages, but ${unsourced} step${unsourced === 1 ? " has" : "s have"} no evidence number. The case page marks them as not confirmed. Add evidence or remove them.`
+          : "All quotes were found on their pages. Share the url with the user.",
   };
 }
 
@@ -101,13 +106,19 @@ export async function publishCase(
   return resultFor(c, origin);
 }
 
-function mergeBy<T>(current: T[], incoming: T[] | undefined, key: (item: T) => string | number): T[] {
+/** Items that match by key are updated field by field. New items get the defaults a full item would have. */
+function mergeBy<T>(
+  current: T[],
+  incoming: Partial<T>[] | undefined,
+  key: (item: Partial<T>) => string | number | undefined,
+  defaults: Partial<T> = {},
+): T[] {
   if (!incoming) return current;
   const out = [...current];
   for (const item of incoming) {
     const i = out.findIndex((existing) => key(existing) === key(item));
     if (i >= 0) out[i] = { ...out[i], ...item };
-    else out.push(item);
+    else out.push({ ...defaults, ...item } as T);
   }
   return out;
 }
@@ -123,15 +134,22 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
       const old = current.evidence.find((e) => e.n === item.n);
       return !old || old.url !== item.url || old.quote !== item.quote;
     });
-    evidence = mergeBy(evidence, await verifyEvidence(changed), (e) => e.n).sort((a, b) => a.n - b.n);
+    const checked = await verifyEvidence(changed.map((item) => ({ sourceType: "secondary" as const, ...item })));
+    evidence = mergeBy(evidence, checked, (e) => e.n).sort((a, b) => a.n - b.n);
   }
 
   const next: Case = {
     ...current,
     title: patch.title ?? current.title,
     summary: patch.summary ?? current.summary,
-    steps: mergeBy(current.steps, patch.steps ? (withIds(patch.steps) as Step[]) : undefined, (s) => s.title),
-    money: mergeBy(current.money, patch.money, (m) => m.label),
+    steps: mergeBy<Step>(
+      current.steps,
+      // An id is only made up for a step that is new. A patched step keeps the one it has.
+      patch.steps?.map((s, i) => (current.steps.some((old) => old.title === s.title) ? s : { ...s, id: s.id ?? slug(s.title, current.steps.length + i) })),
+      (s) => s.title,
+      { status: "todo", evidence: [] },
+    ),
+    money: mergeBy(current.money, patch.money, (m) => m.label, { evidence: [] }),
     drafts: mergeBy(current.drafts, patch.drafts ? (withIds(patch.drafts) as Draft[]) : undefined, (d) => d.title),
     evidence,
     unverified: patch.unverified ?? current.unverified,
@@ -142,18 +160,32 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
   return resultFor(next, origin);
 }
 
-/** Re-fetches every cited page. Used by the daily change watch. */
-export async function recheckCase(id: string): Promise<{ changed: number[]; case: Case } | null> {
+/**
+ * Re-fetches every cited page. Used by the daily change watch.
+ * `changed`: the sentence is gone from a page that still opens. `unreachable`: the page did not open
+ * this time, which says nothing about the rule, so the last confirmed state is kept.
+ */
+export async function recheckCase(
+  id: string,
+): Promise<{ changed: number[]; unreachable: number[]; case: Case } | null> {
   const current = await loadCase(id);
   if (!current) return null;
   // The change watch wants a live reading, so blocked pages go through Oxylabs when a key is set.
-  const fresh = await verifyEvidence(current.evidence, undefined, { oxylabs: "blocked" });
-  const changed = fresh
-    .filter((e, i) => current.evidence[i].verification === "verified" && e.verification === "not_found")
-    .map((e) => e.n);
-  const next = { ...current, evidence: fresh, updatedAt: new Date().toISOString() };
+  const fresh = await verifyEvidence(current.evidence, undefined, { oxylabs: "blocked", recheck: true });
+  const changed: number[] = [];
+  const unreachable: number[] = [];
+  const evidence = fresh.map((e, i) => {
+    const before = current.evidence[i];
+    if (e.verification === "unreachable") {
+      unreachable.push(e.n);
+      return before.verification === "verified" ? before : e;
+    }
+    if (before.verification === "verified" && e.verification === "not_found") changed.push(e.n);
+    return e;
+  });
+  const next = { ...current, evidence, updatedAt: new Date().toISOString() };
   await saveCase(next);
-  return { changed, case: next };
+  return { changed, unreachable, case: next };
 }
 
 export { loadCase };

@@ -11,7 +11,7 @@ A butler in a family's Telegram group. It stays silent until someone mentions a 
 - **English is the main language** for product copy, code, comments and docs. Finnish is available as an answer language and for case-page labels.
 - **Supported languages and countries are a team decision.** Answer languages are the ones in `LANGUAGE_NAMES` in `src/lib/engine/research.ts`, and `UNSUPPORTED_COUNTRIES` there lists country codes the engine rejects. Do not add a language, a country source list, examples or test data outside those lists without the team saying so.
 - Research with sources, never "legal advice".
-- Nothing reaches the user without a sentence on a fetched page to back it. Do not weaken the grounding in `src/lib/engine/ground.ts` or `src/lib/verify.ts` to make a test pass.
+- Nothing reaches the user without a sentence on a fetched page to back it. Do not weaken the grounding in `src/lib/engine/ground.ts`, `src/lib/text.ts` or `src/lib/verify.ts` to make a test pass. Quotes are shown in the page's own words only, numbers match as whole numbers, and a fact is never borrowed from another page.
 - The bot never sends, files, books or pays. Approval first.
 - No secrets in the repo. `.env*` is git-ignored except `.env.example`.
 

@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Junction 2026",
-  description: "Junction 2026 hackathon project",
+  title: { default: "Kaveri", template: "%s · Kaveri" },
+  description:
+    "A butler for your family chat. It researches life events on the live web with Exa, and every line of the plan carries a quote checked on its page.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

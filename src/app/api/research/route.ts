@@ -12,10 +12,14 @@ const json = (body: unknown, status: number) => Response.json(body, { status });
  */
 export async function POST(req: Request) {
   if (!mayResearch(req)) return json({ error: "unauthorised" }, 401);
-  if (!allow(req, isAuthorised(req))) return json({ error: "rate limited, try again in a minute" }, 429);
+  const trusted = isAuthorised(req);
 
   const parsed = ResearchInput.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return json({ error: "invalid input", issues: parsed.error.issues }, 400);
+  // A request that fails validation costs nothing, so only valid ones count against the limit.
+  if (!allow(req, trusted)) return json({ error: "The demo is busy. Please try again in a minute." }, 429);
+  // Deep research costs several times more. The public demo code only buys the fast mode.
+  if (!trusted) parsed.data.depth = "fast";
   const origin = baseUrl(req);
 
   if (!(req.headers.get("accept") ?? "").includes("text/event-stream")) {
@@ -31,7 +35,11 @@ export async function POST(req: Request) {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const send = (event: string, data: unknown) =>
-        controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `event: ${event}\ndata: ${JSON.stringify(data).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029")}\n\n`,
+          ),
+        );
       try {
         const result = await researchCase(parsed.data, origin, (e: EngineEvent) => send(e.type, e));
         send("done", result);

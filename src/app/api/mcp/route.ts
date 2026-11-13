@@ -87,13 +87,14 @@ function handlerFor(origin: string) {
         title: "Re-check sources",
         description:
           "Fetch every cited page of a case again and report citation numbers whose quote is no longer on the page. " +
-          "Use it in the daily change watch. An empty list means nothing changed, so stay silent.",
+          "Use it in the daily change watch. An empty `changed` list means nothing changed, so stay silent. " +
+          "`unreachable` lists pages that did not open this time. That is not a change: say nothing about them.",
         inputSchema: z.object({ id: z.string() }),
       },
       async ({ id }) => {
         const result = await recheckCase(id);
         return result
-          ? text({ id, changed: result.changed, url: `${origin}/c/${id}` })
+          ? text({ id, changed: result.changed, unreachable: result.unreachable, url: `${origin}/c/${id}` })
           : text(`No case with id ${id}.`);
       },
     );

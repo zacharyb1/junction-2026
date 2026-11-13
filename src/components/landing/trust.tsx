@@ -1,4 +1,4 @@
-import { BadgeCheck, CircleAlert, Hand, History, type LucideIcon } from "lucide-react";
+import { BadgeCheck, CircleAlert, Hand, Scale, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Section } from "@/components/landing/section";
 import { Badge } from "@/components/ui/badge";
@@ -86,25 +86,20 @@ export function Trust() {
         </TrustCard>
 
         <TrustCard
-          icon={History}
-          title="Memory versus web"
-          text="Before it searches, the assistant writes down what it expects from memory. Where the live page says something else, the case file shows both, and the page wins."
+          icon={Scale}
+          title="When sources disagree"
+          text="Two pages can give different figures for the same step, for example last year's rate and this year's. The case file shows both with their sources. It does not pick one for you in silence."
         >
           <dl className="flex flex-col gap-2">
             <div>
-              <dt className="text-xs font-medium text-muted-foreground">From memory</dt>
-              <dd>
-                Separate maternity, paternity and parental leave periods of different lengths, with most of the days
-                going to the mother.
-              </dd>
+              <dt className="text-xs font-medium text-muted-foreground">Step</dt>
+              <dd>Claim the tax credit for household expenses</dd>
             </div>
             <div>
-              <dt className="text-xs font-medium text-muted-foreground">On the live page</dt>
-              <dd className="border-l-2 border-primary/40 pl-3 italic">
-                “Both parents are entitled to half of the days, or 160 days, of the parental allowance period.”
-              </dd>
-              <dd className="mt-1 text-xs text-muted-foreground">
-                InfoFinland, “Benefits for a family after a child is born”
+              <dt className="text-xs font-medium text-muted-foreground">In the case file</dt>
+              <dd className="flex gap-2">
+                <Scale className={WARN_ICON} />
+                <span>Two figures found: “35 %” [2] and “40 %” [5]. Check which one applies to you.</span>
               </dd>
             </div>
           </dl>
@@ -127,7 +122,7 @@ export function Trust() {
         <TrustCard
           icon={Hand}
           title="Nothing is sent without you"
-          text="It writes the draft. You read it and approve with one tap in the chat. It never sends, files, books or pays on its own."
+          text="Kaveri researches and prepares. It never sends, files, books or pays on its own. A step that needs your decision is marked and waits for you."
         >
           <div className="flex gap-2">
             <Hand className={WARN_ICON} />

@@ -70,6 +70,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
   const [sources, setSources] = useState<Source[]>([]);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // A code from the link that the server refused: show the field so it can be corrected.
+  const [rejected, setRejected] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
   async function run(event: React.FormEvent) {
@@ -92,17 +94,19 @@ export function TryForm({ code: initialCode }: { code: string }) {
           document: document || undefined,
         }),
       });
+      if (res.status === 401) setRejected(true);
       if (!res.ok || !res.body) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(
           res.status === 401
-            ? "That access code is not valid. Scan the QR code at our table, or ask us for the code."
+            ? "That access code is not valid. Enter the code from the QR code at our table, or ask us for it."
             : (body?.error ?? `Request failed (${res.status})`),
         );
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
+      let finished = false;
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -118,11 +122,16 @@ export function TryForm({ code: initialCode }: { code: string }) {
           if (name === "stage") setStages((s) => [...s, payload as Stage]);
           else if (name === "source") setSources((s) => [...s, payload as Source]);
           else if (name === "done") {
+            finished = true;
             setResult(payload as Result);
             setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-          } else if (name === "error") setError((payload as { error: string }).error);
+          } else if (name === "error") {
+            finished = true;
+            setError((payload as { error: string }).error);
+          }
         }
       }
+      if (!finished) setError("The connection closed before the research finished. Please try again.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
@@ -213,11 +222,11 @@ export function TryForm({ code: initialCode }: { code: string }) {
             maxLength={6000}
             value={document}
             onChange={(e) => setDocument(e.target.value)}
-            placeholder="Paste the letter in its original language. In the chat you would just send a photo."
+            placeholder="Paste the text of the letter, in its original language."
           />
         </details>
 
-        {!initialCode && (
+        {(!initialCode || rejected) && (
           <div className="flex flex-col gap-2">
             <label htmlFor="code" className="text-sm font-medium">
               Access code
@@ -236,7 +245,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
         <Card aria-live="polite">
           <CardHeader>
             <CardTitle className="text-base">What is happening</CardTitle>
-            <CardDescription>Every search and every page read, as it runs.</CardDescription>
+            <CardDescription>Each stage of the research, as it runs.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 text-sm">
             <ol className="flex flex-col gap-1.5">
