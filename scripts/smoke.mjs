@@ -1,13 +1,14 @@
 // Usage: node scripts/smoke.mjs [url]   (default http://localhost:3000)
 // Opens the URL headless, fails on HTTP errors, console errors or failed requests, saves a screenshot.
 import { chromium } from "playwright";
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 
 const url = process.argv[2] ?? "http://localhost:3000";
 const outDir = "/tmp/demo-check";
 mkdirSync(outDir, { recursive: true });
 
-const browser = await chromium.launch();
+const preinstalled = "/opt/pw-browsers/chromium";
+const browser = await chromium.launch(existsSync(preinstalled) ? { executablePath: preinstalled } : {});
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 const consoleErrors = [];
 const failedRequests = [];
