@@ -48,3 +48,6 @@ next-env.d.ts
 
 # temporary helper scripts
 scripts/.*
+
+# Worktrees of background agents
+.claude/worktrees/
