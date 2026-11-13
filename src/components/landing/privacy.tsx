@@ -1,16 +1,20 @@
 import { Eraser, Eye, type LucideIcon, Scale } from "lucide-react";
 import { Section } from "@/components/landing/section";
 
+/**
+ * Keep every line in this file true. What the bot reads, remembers and forgets follows hermes/SOUL.md
+ * and the "Known limits" in hermes/README.md. The small print follows src/lib/verify.ts and docs/CONTRACTS.md.
+ */
 const POINTS: { icon: LucideIcon; title: string; text: string }[] = [
   {
     icon: Eye,
     title: "What it reads",
-    text: "The messages in the chats it has been added to, and the letters and photos shared there. It uses them to notice a life event and to research for your country and city.",
+    text: "The messages in the chats it has been added to, and the letters and photos shared there. That is how it notices a life event. It remembers household basics only: country, city, first names and open cases.",
   },
   {
     icon: Eraser,
     title: "“Forget everything”",
-    text: "Say “forget everything” and it erases what it remembers about your household. Remove it from the chat and it stops reading.",
+    text: "Say “forget everything” and it wipes what it remembers about your household and cancels its reminders. Published case files stay online, and so do logs on the machine that runs the bot.",
   },
   {
     icon: Scale,
@@ -19,7 +23,6 @@ const POINTS: { icon: LucideIcon; title: string; text: string }[] = [
   },
 ];
 
-/** Limits that follow from how the product is built. Keep them true: see src/lib/verify.ts and docs/CONTRACTS.md. */
 const SMALL_PRINT = [
   "A checked quote shows that the sentence is on the page. It does not show that the rule fits your exact situation.",
   "A case file is a web page with a random address. Anyone who has the link can open it.",

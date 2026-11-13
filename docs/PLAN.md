@@ -25,9 +25,9 @@ First audience: international families in Finland, who deal with Kela, Vero, Mig
 | MCP server | `research_case`, `case_publish`, `case_update`, `case_get`, `case_recheck`. Tested with the MCP client version Hermes pins. | `src/app/api/mcp/route.ts` |
 | Case page | Working, phone first, English with Finnish labels for Finnish cases. | `src/app/c/[id]/page.tsx` |
 | Browser demo | Working with live progress. | `src/app/try/`, `/try?code=...` |
-| Landing page | Built by a parallel agent, needs a look from a human. | `src/app/page.tsx`, `src/components/landing/` |
-| Scorecard runner | Built and tested against a mock. First real run in progress. | `eval/` |
-| Bot template for Hermes | Being written by a parallel agent. | `hermes/` |
+| Landing page | Built, shows the real scorecard. Needs a human eye for wording. | `src/app/page.tsx`, `src/components/landing/` |
+| Scorecard runner | Working. First real run Fri 21:40: 19 of 19 passed. | `eval/` |
+| Bot template for Hermes | Written: runbook, persona, config, three skills, install script. Not yet run on a real machine. | `hermes/` |
 | Production deploy | **Blocked**, see section 9. The old scaffold is still what is live. | Vercel project `junction-2026` |
 
 Live test results from tonight, fast mode:
@@ -183,6 +183,14 @@ CASEFILE_SECRET=... node eval/run.mjs --base https://junction-2026.vercel.app --
 ```
 
 It writes `src/data/scorecard.json`, which the landing page shows after the next deploy. Target for the pitch: at least 16 of 18 pass, zero unsourced claims.
+
+**Run 1, Fri 21:40, local engine, fast mode:** 19 of 19 passed, 110 of 110 quotes found on their pages, 0 unsourced claims, median 7.0 s, slowest tenth within 14.7 s. Detail in `eval/results/latest.md`.
+
+What that number means and does not mean:
+- It proves every line shown is backed by a sentence on a page we opened, on the expected official site.
+- It does not prove the plan is complete or that every step is the most relevant one. The engine only publishes what it could ground, so "quotes verified" is high by design.
+- A human has to read the cases. Do that Saturday morning: open each case from the landing page table and note wrong or irrelevant steps in `docs/DECISIONS.md`.
+- Known weak spot found this way: the restaurant scenario returned generic places from official city pages. Fixed by the open-web mode for choices (`scope`), re-test in run 2.
 
 ## 11. Risks and fallbacks
 
