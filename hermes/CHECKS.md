@@ -22,7 +22,15 @@ Hermes v0.23.1 (commit `3b421578`), installed by `hermes/setup-local.sh`. Model 
 | `pre_gateway_dispatch` | Works: the gate skipped four small-talk messages in the live group with no model call. |
 | A second profile (`hermes profile create X --clone`) | Copies `.env` with the bot token. The running gateway then serves it too. `eval/bot/rehearse.py` strips the `TELEGRAM_` lines. |
 
-Not run: U5 (guest mode), U6 (the consent note was not looked for), reminders and `cronjob_manage` (U11 `catch_up`), the daily change watch, Mode B in a live chat, PDFs (U13), `scope` (U14), a direct message from an account outside `TELEGRAM_ALLOWED_USERS`, voice.
+Not run: U5 (guest mode), U6 (the consent note was not looked for), reminder delivery and catch-up after sleep (U11), the daily change watch, Mode B in a live chat, PDFs (U13), `scope` (U14), a direct message from an account outside `TELEGRAM_ALLOWED_USERS`, voice.
+
+## Continuation checks, Sat 02:37
+
+- Gateway and repository-root engine processes are alive; localhost returns HTTP 200.
+- Prior session deleted the isolated engine and its local cases during the switch to the root engine. The 02:30 reminder was created after two failed case updates (`No case with id …`); its link is broken. Reminder delivery was not tested.
+- The 02:36 washing-machine message arrived in the **group**, reused an earlier plan without `research_case`, and linked to a case whose API returns HTTP 404. This does not pass the DM milestone.
+- The full 20-message silence check (at least five questions) and three consecutive pregnancy triggers remain unconfirmed.
+- See `docs/HERMES_HANDOVER.md` for the current state, commands and outstanding checks.
 
 ## UNVERIFIED: test these first
 

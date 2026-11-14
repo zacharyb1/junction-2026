@@ -34,6 +34,7 @@ bash hermes/stop.sh
 
 Then follow the runbook from step 10 (direct message test). After `/sethome` in the family group, step 12 is one command: `bash hermes/configure.sh --group <CHAT_ID>`, then stop and start.
 
+- **Local case data:** preserve `.data/cases` in the engine working directory when moving the engine or deleting an isolated checkout. Earlier test cases were lost during such a switch; see `docs/HERMES_HANDOVER.md`.
 - **One poller per bot token.** The keys repo shares one `TELEGRAM_BOT_TOKEN`. Before you start, make sure nobody else's copy is running, or one of the two fails with `Telegram polling conflict`.
 - **Secrets** live only in `.hermes-local/home/.env` and `.env.local`, both git-ignored. `bash hermes/secrets.sh --status` shows which names are set and never prints values. A value entered there goes through the keys repo's `./put` (hidden input) and is pushed to the team.
 - **If the install is interrupted**, run `bash hermes/setup-local.sh` again. It continues from the stage that failed.
