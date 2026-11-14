@@ -142,7 +142,7 @@ def verify(home):
         # No gate on the web: every message there is addressed to UKK. Memory and jobs stay off.
         disabled = config["agent"]["disabled_toolsets"]
         assert "memory" in disabled and "cronjob" in disabled
-        assert config["mcp_servers"]["casefile"]["tools"]["include"] == ["research_case", "case_get", "find_gifts"]
+        assert config["mcp_servers"]["casefile"]["tools"]["include"] == ["research_case", "case_get", "find_products"]
         return
     plugin = home / "plugins" / "kaveri-gate"
     assert (plugin / "plugin.yaml").is_file()

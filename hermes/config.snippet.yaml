@@ -19,7 +19,7 @@ web:
 
 mcp_servers:
   # Our case engine. The model sees its tools as mcp__casefile__research_case, mcp__casefile__case_update,
-  # mcp__casefile__case_get, mcp__casefile__case_recheck, mcp__casefile__case_publish and mcp__casefile__find_gifts.
+  # mcp__casefile__case_get, mcp__casefile__case_recheck, mcp__casefile__case_publish and mcp__casefile__find_products.
   casefile:
     url: "${CASEFILE_URL}"
     headers:
