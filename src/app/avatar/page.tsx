@@ -9,16 +9,16 @@ import { validateManifest } from "@/lib/avatar/scheduler";
 import type { Manifest } from "@/lib/avatar/types";
 import testProfile from "../../../public/avatar/test/manifest.json";
 
-export const metadata: Metadata = { title: "Avatar concept", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Your companion", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 export default async function AvatarPage({ searchParams }: PageProps<"/avatar">) {
   const params = await searchParams;
   const profiles: Manifest[] = [];
-  for (const name of ["ari", "noor"]) {
+  for (const name of ["studio", "ari", "noor"]) {
     try {
       const profile = JSON.parse(await readFile(path.join(process.cwd(), `public/avatar/${name}/manifest.json`), "utf8")) as Manifest;
-      if (profile.medium === "illustrated" && !validateManifest(profile).length) profiles.push(profile);
+      if ((profile.medium === "illustrated" || profile.medium === "stock") && !validateManifest(profile).length) profiles.push(profile);
     } catch { /* Locally rendered characters are optional before asset preparation. */ }
   }
   if (!profiles.length) profiles.push(testProfile as Manifest);
@@ -33,14 +33,8 @@ export default async function AvatarPage({ searchParams }: PageProps<"/avatar">)
     if (!validateManifest(generated).length) profiles.unshift(generated);
   } catch { /* A generated profile is optional; the offline walkthrough is always available. */ }
   return (
-    <SiteShell>
-      <main className="avatar-concept">
-        <header><p className="text-sm text-muted-foreground">Separate prototype · for team review</p>
-          <h1>An assistant with a presence</h1>
-          <p>Watch the assistant turn to its work, then return to you. Pre-rendered movements follow the actions of the agent.</p>
-        </header>
-        <AvatarDemo profiles={profiles} code={typeof params.code === "string" ? params.code : ""} needsCode={demoCodeRequired()} liveConfigured={Boolean(process.env.AVATAR_UPSTREAM || ukkConfigured())} />
-      </main>
+    <SiteShell bare>
+      <AvatarDemo profiles={profiles} code={typeof params.code === "string" ? params.code : ""} needsCode={demoCodeRequired()} liveConfigured={Boolean(process.env.AVATAR_UPSTREAM || ukkConfigured())} voiceConfigured={Boolean(process.env.ELEVENLABS_API_KEY)} />
     </SiteShell>
   );
 }

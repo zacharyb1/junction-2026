@@ -301,3 +301,197 @@ The Telegram section shows a working action and QR only when configured; otherwi
 - **Don't** turn every paragraph into a card, or introduce a dark departure-board field.
 - **Don't** use an annotation, color or decorative icon as the only label for meaning or status.
 - **Don't** present sample evidence as a live check, illustrative figures as measured results, or a scorecard pass as completeness.
+
+
+<!-- impeccable:scoped-design route="/avatar" tokens="avatar-studio" -->
+# Scoped Design System: Avatar studio (`/avatar`)
+
+This appendix records only the built `/avatar` prototype on 15 November 2026. The preceding reading-table document, its frontmatter and the main site's design authority remain unchanged. The avatar tokens below use an `avatar-` prefix and apply only inside this route; they are a separate YAML token document, not additions to the reading-table palette. `.impeccable/design.json` points to this block and extends it with scoped component samples, motion and responsive behavior.
+
+```yaml
+name: AIDaddy — Avatar studio (/avatar only)
+description: A chalk-sage companion scene with a pine-ink conversation and natural movement.
+colors:
+  avatar-ground: '#f3f4ee'
+  avatar-ink: '#263d34'
+  avatar-muted: '#637167'
+  avatar-line: '#dce1d7'
+  avatar-pine: '#355b48'
+  avatar-pine-hover: '#244534'
+  avatar-paper: '#fffef9'
+  avatar-selection: '#d4e0c9'
+  avatar-scene: '#d9ded2'
+  avatar-control-hover: '#e7ebe1'
+  avatar-input-line: '#ccd6c6'
+  avatar-input-ground: '#f7f8f2'
+  avatar-message-inset: '#edf0e6'
+typography:
+  avatar-body:
+    fontFamily: Geist, sans-serif
+    fontSize: 14px
+    lineHeight: 1.55
+  avatar-name:
+    fontFamily: Geist, sans-serif
+    fontSize: 30px
+    fontWeight: 500
+    lineHeight: 1.25
+    letterSpacing: -.9px
+  avatar-welcome:
+    fontFamily: Geist, sans-serif
+    fontSize: 32px
+    fontWeight: 450
+    lineHeight: 1.2
+    letterSpacing: -.95px
+  avatar-welcome-mobile:
+    fontFamily: Geist, sans-serif
+    fontSize: 22px
+    fontWeight: 450
+    lineHeight: 1.2
+    letterSpacing: -.5px
+  avatar-prose:
+    fontFamily: Geist, sans-serif
+    fontSize: 13px
+    lineHeight: 1.7
+  avatar-panel-title:
+    fontFamily: Geist, sans-serif
+    fontSize: 14px
+    fontWeight: 550
+    lineHeight: 1.55
+  avatar-field-label:
+    fontFamily: Geist, sans-serif
+    fontSize: 12px
+    fontWeight: 550
+    lineHeight: 1.55
+rounded:
+  avatar-scene: 16px
+  avatar-panel: 12px
+  avatar-composer: 10px
+  avatar-control: 7px
+  avatar-send: 8px
+  avatar-choice: 6px
+spacing:
+  avatar-small-gap: 8px
+  avatar-control-gap: 12px
+  avatar-inset: 24px
+  avatar-shell: 48px
+  avatar-shell-medium: 30px
+  avatar-shell-mobile: 16px
+components:
+  avatar-button-primary:
+    backgroundColor: '{colors.avatar-pine}'
+    textColor: '{colors.avatar-paper}'
+    rounded: '{rounded.avatar-control}'
+    padding: 11px 15px
+  avatar-button-primary-hover:
+    backgroundColor: '{colors.avatar-pine-hover}'
+    textColor: '{colors.avatar-paper}'
+  avatar-send:
+    backgroundColor: '{colors.avatar-pine}'
+    textColor: '{colors.avatar-paper}'
+    rounded: '{rounded.avatar-send}'
+    height: 44px
+    width: 44px
+  avatar-name-input:
+    backgroundColor: '{colors.avatar-paper}'
+    textColor: '{colors.avatar-ink}'
+    rounded: '{rounded.avatar-control}'
+    padding: 9px 11px
+    width: 100%
+  avatar-conversation-panel:
+    backgroundColor: '{colors.avatar-paper}'
+    textColor: '{colors.avatar-ink}'
+    rounded: '{rounded.avatar-panel}'
+  avatar-composer:
+    backgroundColor: '{colors.avatar-input-ground}'
+    textColor: '{colors.avatar-ink}'
+    rounded: '{rounded.avatar-composer}'
+    padding: 10px 9px 10px 14px
+```
+
+## Overview
+
+**Creative North Star: "Humanist field guide to a personal companion"**
+
+Avatar studio is a humanist field guide to a personal companion: chalk-sage ground, pine ink, natural media and plain sans typography. The filmed or illustrated scene carries presence; the conversation carries useful words. Soft corners and fine rules organize the controls without competing with the person.
+
+`src/app/avatar/page.tsx` renders `SiteShell bare`. The light frame override requires a site wrapper containing the avatar studio; the avatar stylesheet owns this route's visual rules. This is an isolated concept, not a replacement for Zachary's main UI or the reading-table world. The scene-led composition is recorded in the companion surface brief and is not a global page template.
+
+**Key Characteristics:**
+- A large scene beside a narrower conversation, followed by a single-column mobile sequence.
+- Pine text and actions on pale sage and warm paper, with quiet tonal insets.
+- Natural media motion and explicit text status; the user can pause movement.
+- Names, focus and tone are real settings, with honest distinctions between filmed, illustrated and recorded material.
+
+## Colors
+
+### Primary
+- **Pine action** (`avatar-pine`) supplies send/save fills, selected outlines, input focus and carets; **deep pine** (`avatar-pine-hover`) is the filled-action hover.
+
+### Neutral
+- **Chalk sage** (`avatar-ground`) is the page ground; **warm paper** (`avatar-paper`) is the conversation, fields and scene controls.
+- **Pine ink** (`avatar-ink`) and **quiet sage ink** (`avatar-muted`) separate reading text from supporting labels.
+- **Sage rule** (`avatar-line`) divides groups. **Input rule** (`avatar-input-line`) defines fields, and **input ground** (`avatar-input-ground`) separates the composer.
+- **Scene sage** (`avatar-scene`) is the media fallback. **Control wash** (`avatar-control-hover`), **message inset** (`avatar-message-inset`) and **selection sage** (`avatar-selection`) are purposeful state surfaces.
+
+**The Scoped World Rule.** These tokens belong to `/avatar`; the existing site and reading-table tokens keep their meanings and authority.
+
+## Typography
+
+Geist loads through the existing root `next/font` setup and reaches the avatar through `var(--font-sans), sans-serif`. The body, companion name, welcome line, replies and field labels use the extracted roles above. Diagnostic event text uses the existing Geist Mono variable only inside the secondary disclosure.
+
+The name is the primary page heading; the welcome line is a conversation invitation. Below 540px the name is 26px. At 900px and below, the welcome switches to the compact `avatar-welcome-mobile` role and shorter text. Replies use the prose role with paragraph gaps, explicit lists and underlined links. On small phones the composer text becomes 16px. The implementation also uses compact 9–12px hints and supporting labels; these are observed details, not a recommended global minimum text scale.
+
+## Layout
+
+The page is centered at a maximum width of 1600px. Its default side inset is `avatar-shell`; it becomes `avatar-shell-medium` at 1200px, `avatar-inset` at 900px, and `avatar-shell-mobile` at 540px. The topbar is 96px high, then 78px at 900px and 72px at 540px.
+
+Above 900px, the grid gives the scene the remaining width beside a 390px conversation column, with a 40px gap. At 1200px and below the column is 350px with a 24px gap; at 1500px and above it is 420px with a 48px gap. The scene uses an 8:5 frame with cover-cropped media. The desktop conversation panel height is `clamp(610px, calc(100dvh - 190px), 790px)`; its thread scrolls and its composer remains a flex child beneath it.
+
+At 900px and below the scene leads a single column, capped at 380px high. The stage keeps an explicit 100% width, so this height cap preserves a full-width tablet scene with cover-cropped media. The empty conversation is content-sized, with a compact invitation and prompt rows; below 540px only the first prompt is shown. Once messages exist, the conversation height is `clamp(360px, 60dvh, 560px)` and the thread scrolls within the remaining space. The composer stays in normal document flow beneath that thread: it is neither sticky nor a floating overlay. The settings panel has its own vertical scrolling and a 760px mobile maximum height.
+
+**The In-Flow Conversation Rule.** Preserve the bounded message thread and its in-flow composer together; the composer must not cover messages or controls at the bottom of the panel.
+
+## Elevation & Depth
+
+Depth is mostly tonal: warm paper against chalk sage, a pale user-message inset and fine borders. Only the media status note and round pause control use the soft shadow (`0 1px 5px #182a2412`). Focused composers and selected portraits use a 1px pine spread ring. The sidecar records these exact shadows; no global elevated-card system is inferred from them.
+
+## Shapes
+
+The scene, conversation panel, composer and small controls use the separate radius tokens above. The scene reduces to a 10px radius at 540px. The pause control is circular. Portrait options and inputs have small corners; tone choices use the choice radius. Controls retain a 44px minimum height, and icon-only actions have accessible names.
+
+## Components
+
+### Actions and navigation
+
+Send and Save companion use pine fills, warm-paper text and deep-pine hover. Personalize is a transparent, outlined control whose hover and expanded state share a pale wash. Voice and the recorded-example action are quiet text-and-icon buttons beneath the scene. A compact brand link returns home. The prototype information lives in a footer disclosure.
+
+Buttons transition background and text color over 140ms with `ease`; disabled buttons use opacity .42. Focusable elements receive a 2px pine outline with a 4px offset. The composer instead shows a pine border and 1px spread ring while focus is within it. These states are separate from the data state and remain visible without motion.
+
+### Scene and motion
+
+The scene uses local posters and two muted video layers, revealing a new clip only after a decoded frame is available. Activity chooses a complete clip and shared pose; there is no CSS crossfade between faces. Movement pauses on the explicit control or document hiding, and reduced motion retains the poster and explanatory text. The tiny active status dot breathes over 1.7s; the page disables CSS animations and transitions under reduced motion. A motion preview remains inside the secondary disclosure.
+
+Natural uses edited footage credited in the interface to Edmond Dantès / Pexels; Ari and Noor are original illustrated alternatives. The Natural JPEG carries a verified `impeccable:prompt` COM comment naming its source frame, creator, source/license URLs and edit script. Keep that embedded record alongside the manifest and `docs/AVATAR_STOCK_ASSETS.md`. These media are stand-ins for this concept; custom generation and lip-sync are not included.
+
+### Conversation and sources
+
+Messages use named bylines and readable paragraphs. User messages receive a pale inset; assistant replies remain on paper. Saved citations expand through a native disclosure into source links and quoted text. Completed replies may expose a read-aloud action. Loading, failure, stopped and incomplete replies have explicit text states. The recorded conversation is labeled and its memory separation is explained above the composer.
+
+### Personalization and fields
+
+Personalize replaces the conversation panel with settings. Three ready-made look choices show local previews; the selected look has a pine ring and check. The name field accepts up to 32 characters. Focus choices are Everyday support, Letters & paperwork and Thoughtful shopping; response tones are Calm, To the point and Warm. Saving applies the selected name, focus and tone to subsequent live requests and stores preferences in this browser. Escape and the back action restore focus to Personalize.
+
+## Do's and Don'ts
+
+### Do:
+- **Do** keep this world scoped to /avatar and preserve the main site and reading-table designs.
+- **Do** keep the mobile composer in normal flow beneath the bounded conversation thread.
+- **Do** keep text status, visible focus, 44px button targets and the reduced-motion poster available.
+- **Do** preserve source and license attribution and the embedded provenance when replacing or optimizing the Natural poster.
+- **Do** show Natural as a filmed stand-in, Ari and Noor as illustrations, and the recorded conversation as a saved example.
+
+### Don't:
+- **Don’t** extend these colors, type roles or scene geometry to other routes.
+- **Don’t** describe the stock footage as custom generation or lip-sync.
+- **Don’t** use motion or a colored dot as the only indication of the assistant’s state.
+- **Don’t** turn the movement diagnostics into the primary conversation interface.

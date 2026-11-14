@@ -35,10 +35,10 @@ const timedEvents = events
   .sort((a, b) => a.event.atMs - b.event.atMs || a.index - b.index)
   .map(({ event }) => event);
 
-const sources = Array.from(new Map(replay.result.evidence.map((entry) => [
-  entry.url,
-  { label: entry.title, url: entry.url },
-])).values()).slice(0, 4);
+// Preserve citation numbers: different quotes on the same page are distinct evidence.
+const sources = replay.result.evidence.map((entry) => ({
+  n: entry.n, label: entry.title, url: entry.url, quote: entry.quote,
+}));
 
 /**
  * The MP3 was saved for this same Case (IRZUhuWnAtPEZVHw).
@@ -50,7 +50,7 @@ export const RECORDED_EXAMPLE: {
   title: string;
   plan: string[];
   audio: string;
-  sources: { label: string; url: string }[];
+  sources: { n: number; label: string; url: string; quote: string }[];
   recordedAt: string;
 } = {
   run: {

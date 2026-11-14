@@ -2,6 +2,17 @@ import { describe, expect, it, vi } from "vitest";
 import { activityNote, cancelAgentState, initialAgentState, readAvatarStream, reduceAgentEvent, replayRun } from "@/lib/avatar/events";
 import { nextClip, validateManifest } from "@/lib/avatar/scheduler";
 import type { AgentEvent, Manifest } from "@/lib/avatar/types";
+import { RECORDED_EXAMPLE } from "@/lib/avatar/recorded-example";
+
+it("keeps the recorded plan’s citation IDs mapped to their original evidence", () => {
+  const text = RECORDED_EXAMPLE.plan.join("\n");
+  const references = [...text.matchAll(/\[(\d+)\]/g)].map((match) => Number(match[1]));
+  for (const n of references) {
+    expect(RECORDED_EXAMPLE.sources.find((source) => source.n === n)).toMatchObject({ n, quote: expect.any(String), url: expect.stringMatching(/^https:\/\//) });
+  }
+  expect(RECORDED_EXAMPLE.sources.find((source) => source.n === 8)?.url).toContain("suomi.fi/guides/having-a-child/");
+  expect(RECORDED_EXAMPLE.sources.find((source) => source.n === 10)?.url).toBe("https://www.kela.fi/during-pregnancy");
+});
 
 const manifest: Manifest = {
   profile: "test", label: "Test", poster: "/test.png", restPose: "front", width: 640, height: 360,

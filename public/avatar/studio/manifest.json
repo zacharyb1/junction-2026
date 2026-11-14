@@ -1,0 +1,117 @@
+{
+  "profile": "studio",
+  "label": "Studio · filmed portrait",
+  "width": 1152,
+  "height": 720,
+  "poster": "/avatar/studio/poster.jpg",
+  "restPose": "front",
+  "placeholder": false,
+  "clips": [
+    {
+      "id": "idle",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/studio/idle.mp4"
+    },
+    {
+      "id": "listening",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2500,
+      "file": "/avatar/studio/listening.mp4"
+    },
+    {
+      "id": "thinking",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/studio/thinking.mp4"
+    },
+    {
+      "id": "speaking",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 3000,
+      "file": "/avatar/studio/speaking.mp4"
+    },
+    {
+      "id": "to-desk",
+      "from": "front",
+      "to": "desk",
+      "kind": "transition",
+      "durationMs": 2000,
+      "file": "/avatar/studio/to-desk.mp4"
+    },
+    {
+      "id": "working-a",
+      "from": "desk",
+      "to": "desk",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/studio/working-a.mp4"
+    },
+    {
+      "id": "working-b",
+      "from": "desk",
+      "to": "desk",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/studio/working-b.mp4"
+    },
+    {
+      "id": "to-front",
+      "from": "desk",
+      "to": "front",
+      "kind": "transition",
+      "durationMs": 2000,
+      "file": "/avatar/studio/to-front.mp4"
+    }
+  ],
+  "activities": {
+    "idle": {
+      "pose": "front",
+      "loops": [
+        "idle"
+      ]
+    },
+    "listening": {
+      "pose": "front",
+      "loops": [
+        "listening"
+      ]
+    },
+    "thinking": {
+      "pose": "front",
+      "loops": [
+        "thinking"
+      ]
+    },
+    "speaking": {
+      "pose": "front",
+      "loops": [
+        "speaking"
+      ]
+    },
+    "working": {
+      "pose": "desk",
+      "loops": [
+        "working-a",
+        "working-b"
+      ]
+    }
+  },
+  "medium": "stock",
+  "attribution": {
+    "creator": "Edmond Dantès",
+    "title": "Man Using a Laptop Looking at the Camera",
+    "sourceUrl": "https://www.pexels.com/video/man-using-a-laptop-looking-at-the-camera-8643569/",
+    "license": "Pexels License",
+    "licenseUrl": "https://www.pexels.com/license/",
+    "note": "Licensed actor footage, edited for this concept. People shown do not endorse the product. Not generated video or lip sync."
+  }
+}

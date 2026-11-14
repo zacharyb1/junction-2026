@@ -1,60 +1,56 @@
-# Avatar proof of concept (issue 65)
+# Companion proof of concept (issue 65)
 
-Branch: `vlad/avatar-concept`. Route: `/avatar`. The question is whether an assistant with a visible character and purposeful actions is worth making central to the product. This prototype can be shown before buying any generation access. Zachary's existing pages and the shared bot are unchanged.
+Branch: `vlad/avatar-concept`. Route: `/avatar`. This separate product concept tests whether a visible, personalizable companion makes the existing assistant more useful and engaging. It uses the team's existing chat and research service; it does not add another specialist engine or change the shared Telegram bot.
 
 ## Show it
 
-```sh
-DEMO_OPEN=1 pnpm dev --port 3111 --hostname 127.0.0.1
-```
-
-Open `http://127.0.0.1:3111/avatar`.
-
-1. Choose **Ari · home office** or **Noor · studio**.
-2. Press **Watch recorded example**. The character turns to the laptop while the recorded searches run, returns to the conversation, and speaks when the associated recording plays. The complete example lasts about 49 seconds; uncheck **Include the recorded voice** for the nine-second version.
-3. Change character and compare. **Try the movements** exposes listening, thinking, working, speaking and idle individually. Pause freezes the current pose; Resume continues from it. Stop cancels the example and its audio.
-
-The example uses the public Engine recording in `src/data/replay.json`: the original pregnancy question, search start/end times, stored plan and source URLs. It does not make a new search or model call. The MP3 is the matching earlier ElevenLabs pregnancy-plan recording in `public/hud/plan.mp3`. The written plan is not a complete audio transcript, and this older recording is not evidence of the later custom UKK voice. If a browser blocks automatic audio, **Hear recorded plan** starts it explicitly.
-
-## What is implemented
-
-- Two original illustrated adults, each with eight pre-rendered MP4 clips. Their faces, hair, clothing and room palettes differ, while acting rules remain shared.
-- Blinking, breathing, a listening nod, a thoughtful glance/hand movement, a speaking gesture, laptop work and turns in both directions.
-- The same scheduler and video player for illustrated, fixture and future generated profiles. Pose-compatible transitions are chosen at clip boundaries, without queuing stale actions.
-- Speech state follows actual audio playback, including buffering and cancellation. Text arrival alone never animates speech. Lip synchronization is not implemented.
-- Incoming video is decoded before replacing the outgoing frame. A slow download can hold a frame; this is not a guarantee of uninterrupted playback on every device.
-- Reduced motion displays a still. No microphone capture is implemented in this concept; listening is a manual preview.
-
-Regenerate the two illustrated profiles locally:
+The current production-mode preview is at **http://127.0.0.1:3111/avatar**. To serve an already-built checkout on that address:
 
 ```sh
-node scripts/avatar/make-illustrated-clips.mjs
+DEMO_OPEN=1 pnpm start --port 3111 --hostname 127.0.0.1
 ```
 
-The original vector rig lives in `scripts/avatar/illustrated-scene.mjs`. Rendering uses the installed `sharp` dependency and `ffmpeg`, with no service requests. Outputs are in `public/avatar/ari/` and `public/avatar/noor/`, labelled `medium: "illustrated"`. Idle is 1.5 seconds, work loops two seconds, listening/thinking 2.5 seconds, speaking three seconds and turns one second. Files are 800×450, H.264, 24 fps.
+1. The default **Natural** look is a filmed person at a laptop. Open **Personalize** to select Ari or Noor, change the companion's name, choose everyday support / letters and paperwork / shopping, and set its tone.
+2. Select **Try a recorded conversation**. The portrait turns toward its work during recorded searches, returns to the viewer, and enters its speaking state when audio actually plays. Allow about 50 seconds with voice on, or nine seconds with voice off.
+3. Ask a live question and then a follow-up. **Start a new conversation** clears the browser's conversation token, including after a reload. **Stop reply and voice** cancels the current client operation and audio.
+4. Pause movement, compare the available looks, or open **About this prototype → Movement and event preview** to exercise each state without a model request. Listening is a movement preview; there is no microphone capture.
 
-## Optional live question
+## Media and playback
 
-```sh
-DEMO_OPEN=1 AVATAR_UPSTREAM=https://86.38.238.136.sslip.io pnpm dev --port 3111 --hostname 127.0.0.1
-```
+The default `studio` profile contains eight edited stock clips, a poster and a manifest, totaling **1,554,293 bytes (about 1.55 MB)**. These are actual licensed frames of an actor, not generated video. Source, permission, editing compromises and reproduction commands are in [AVATAR_STOCK_ASSETS.md](AVATAR_STOCK_ASSETS.md). The actor does not endorse the product; software names and focus choices do not describe his identity or qualifications.
 
-A live question uses the team's research service and credits. Without `AVATAR_UPSTREAM`, the page uses the existing local UKK configuration. Without `DEMO_OPEN=1`, normal demo-code checks apply. The relay uses only the configured HTTPS origin and fixed `/api/aidaddy` path, without forwarding cookies or authentication tokens. This remote path follows the team's rename in PR #64; the isolated branch's local handler remains `/api/ukk`. Remote turns have no conversation memory. Dynamic voice needs the local ElevenLabs key; missing access does not prevent reading the reply or playing the recorded example.
+Ari and Noor are original illustrated alternatives, each with eight locally rendered clips. Regenerate them with `node scripts/avatar/make-illustrated-clips.mjs`; the vector rig is in `scripts/avatar/illustrated-scene.mjs`.
 
-Live Hermes tool events drive the same actions as the recorded example. This page changes presentation only: research, grounding, approvals, roles and the Telegram runtime are unchanged.
+All looks share the same pose-based scheduler and two-video player. Actions are reconsidered at clip boundaries, and an incoming frame is decoded before replacing the outgoing image. Pause preserves the current movement; reduced-motion preferences show a still. Failed media displays a retry message while the conversation remains usable. Slow downloads can hold a frame, and matching source endpoints do not guarantee perceptually seamless playback on every device.
 
-## Decision after the demonstration
+The stock front-facing activities reuse attentive footage; they are not distinct scripted performances. Some loops and the turn to the laptop reverse the original motion. The speaking state follows audio playback, including buffering and cancellation, but the lips are not synchronized.
 
-Watch the example before reading the event log. Can a viewer tell when the assistant is attending to them and when it is working? Does the movement make the wait more understandable? Does choosing a different character change the experience enough to matter? These are the questions this prototype lets the team judge; they have not been established by automated tests.
+## Conversation and personalization
 
-This does **not** establish natural photorealistic motion, consistent identity from a generation model, arbitrary new appearances, or convincing generated-video joins. Those need a later bounded media experiment if the team finds the experience worthwhile. A free Gemini key exists locally, but no paid avatar generation has run. Gemini integration remains planned for the original image/video jobs, not a substituted narration feature. See [asset workflow and generation notes](AVATAR_GENERATION.md).
+`/api/avatar/chat` uses the existing local `/api/ukk` handler unless `AVATAR_UPSTREAM` explicitly selects an HTTPS origin. Remote requests use the fixed `/api/aidaddy` path. Normal demo-code and rate limits remain active; `DEMO_OPEN=1` opens the configured demo. Live questions consume the team's existing service credits.
 
-## Validation
+The server validates name, focus and tone, then maps them to bounded presentation instructions while retaining source checks and tool limits. A personalized message can contain up to 1,200 characters. This changes how the existing assistant responds; it does not create professional credentials or a separately trained doctor, lawyer or shopping agent.
 
-The production build, TypeScript, ESLint and 31 existing avatar tests pass. The build retains the unrelated Chiron Sung HK fallback-font warning. Source frames at every illustrated clip endpoint match the corresponding canonical front/desk pose exactly; compressed video and playback are checked separately in the browser.
+Only the designated signed chat-session cookie passes through the relay. It becomes an HttpOnly, SameSite=Lax `avatar_session` cookie scoped to `/api/avatar/chat`, with Secure on HTTPS. Unrelated cookies and authorization tokens never reach the remote service. `DELETE /api/avatar/chat` expires this browser token without calling the backend or deleting its stored history. The normal chat's cookie remains separate.
 
-Earlier integration validation included one live rent question through the public server, with 1,227 reply characters, tool events and a clickable Case link. The local voice endpoint correctly reported unavailable without falsely animating speech. No new live model request is needed to validate the offline proof of concept.
+The visible thread lives in page memory: reloading hides it but retains the server session until reset or cookie expiry. Appearance, name, focus and tone are stored in browser preferences. Live tool events drive the portrait's movements; partial or failed replies remain marked incomplete rather than becoming completed answers.
 
-The complete recorded example was checked in Chromium: search → desk work → return → speech → idle, with matching stored plan and four source links, zero API requests, and zero blank frames in 504 samples at 100 ms intervals. This sampling is not a sub-frame smoothness guarantee. Stop/restart during a turn, audio cancellation, denied autoplay followed by manual voice playback, and normal audio completion passed. Pause preserved the same transition video at exactly 0.0562 seconds; rapid pause/resume also recovered. Both characters played, reduced motion showed the poster, and widths 320/390/768/1024 had no horizontal overflow. No console errors occurred; Next emitted CSS-preload warnings. Screenshots are saved under `/tmp/avatar-poc-*.png` locally.
+Live voice uses the local ElevenLabs endpoint when configured. Otherwise, the browser may read replies using an installed voice marked as local; remote browser voices are not selected. Missing device voices or playback failures leave the written answer available. **Read aloud** retries a completed reply. The recorded example always uses its saved MP3.
 
-After the team's API rename in PR #64, a direct live-chat probe initially reproduced the user's generic 502 in 219 ms; remote `/api/ukk` returned 404 HTML. The relay was updated to `/api/aidaddy`. The same probe then returned HTTP 200 with a nonempty SSE reply in 5,642 ms. All 17 relay tests, ESLint and the production build passed. No server configuration or Verda resources were changed.
+## Recorded evidence
+
+The example replays the public pregnancy question and Engine events from `src/data/replay.json`, with no new search or model call. Search events are adapted to playback tool labels; they are not a fresh Hermes trace. All **11 evidence entries** retain their original citation numbers, source URLs and quotes, including separate quotes from the same page. Citation markers link to their corresponding sources.
+
+`public/hud/plan.mp3` is the earlier ElevenLabs recording for that same Case. The displayed written plan is not a full transcript of the audio, and this recording does not demonstrate the later custom UKK voice. **Hear recorded plan** permits an explicit playback attempt if automatic audio is blocked. Recorded turns may appear in the visible thread, but they never enter the live server's conversation memory; the page states this when showing the example.
+
+## Validation and remaining decision
+
+As of 15 November, **49 targeted avatar tests, lint, TypeScript and the production build pass**. The build retains the unrelated Chiron Sung HK fallback-font warning. Three actual live turns verified the chosen display name **Mika** and recall of **birch** across requests. Media-only Chromium checks covered all eight stock clips without decode errors; see the asset document for measurements.
+
+The full recorded conversation completed in Chromium: 490 samples at 100 ms intervals, zero blank frames, zero API calls, actual speech followed by idle, and all eight citation markers linked to their original evidence. Sampling is not a guarantee of sub-frame smoothness. Additional browser checks passed for persistent appearance, keyboard focus restoration, reduced motion, a failed stream followed by a successful reply, its retained incomplete-response label, and the completion announcement. Earlier controller checks covered cancellation, mute and failed reset without losing the visible thread.
+
+The final production layout was inspected at 320, 390, 768, 1024, 1440 and 1639 pixels. There was no horizontal overflow. Initial mobile composers fit their tested viewports; active conversations scroll above an in-flow composer without overlap. Captures are local under `.impeccable/review/`. An independent fresh reviewer substituted for the unavailable named skill reviewer and returned **ship** after scoring all five findings resolved across two fix rounds: mobile reachability, citation mapping, face ghosting, completed-reply announcement and placeholder contrast. That verdict covers the scored fixes rather than claiming a whole-product audit. The scoped design documentation preserves the existing team's design rules.
+
+The previous generic chat error came from the team's API rename in PR #64: remote `/api/ukk` returned 404 HTML. Switching the relay to `/api/aidaddy` restored a nonempty HTTP 200 SSE response. No Verda resources or server configuration were changed for that fix.
+
+No new paid media requests were made. Custom generated appearances, purpose-made acting and lip-sync remain unimplemented. Gemini integration is still reserved for the original image/video generation jobs, pending a purchase decision and a bounded media experiment; see [AVATAR_GENERATION.md](AVATAR_GENERATION.md). The team still needs to judge whether this experience merits becoming the product's main feature.

@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 2,
+  "title": "AIDaddy — scoped design extensions",
+  "extensions": {
+    "scopes": {
+      "avatar": {
+        "route": "/avatar",
+        "name": "Avatar studio",
+        "selector": ".avatar-studio",
+        "tokenSource": {
+          "path": "DESIGN.md",
+          "format": "fenced-yaml",
+          "marker": "impeccable:scoped-design route=\"/avatar\" tokens=\"avatar-studio\"",
+          "tokenPrefix": "avatar-"
+        },
+        "sources": [
+          "src/components/avatar/avatar.css",
+          "src/components/avatar/avatar-demo.tsx",
+          "src/components/avatar/avatar-settings.tsx",
+          "src/components/avatar/avatar-stage.tsx",
+          "src/app/avatar/page.tsx"
+        ],
+        "cssSha256": "950e14abffc6a7eb2fa80d4c403e15a1bf0aa251a5419275c549cd41c5442cb0",
+        "status": "documentation complete; ship disposition for all five scored fixes after two fix rounds",
+        "media": {
+          "natural": "licensed stock stand-in",
+          "alternatives": [
+            "Ari: original illustration",
+            "Noor: original illustration"
+          ],
+          "generationIncluded": false,
+          "lipSyncIncluded": false,
+          "posterProvenance": "public/avatar/studio/poster.jpg: verified impeccable:prompt JPEG COM comment"
+        },
+        "finishReview": {
+          "reviewer": "separate fresh substitute reviewer",
+          "disposition": "ship",
+          "scope": "the five scored fixes only; not a whole-surface audit",
+          "resolvedFixes": 5,
+          "scoredFixes": 5,
+          "fixRounds": 2,
+          "finalCaptureCount": 9,
+          "responsiveEvidence": "No overlaps reported in the final 320px, 390px and 768px captures and active-conversation checks.",
+          "evidenceAuthority": "final reviewer result supplied at documentation handoff"
+        }
+      }
+    },
+    "colorMeta": {
+      "avatar-ground": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "#f3f4ee"
+      },
+      "avatar-ink": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#263d34"
+      },
+      "avatar-muted": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#637167"
+      },
+      "avatar-line": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "#dce1d7"
+      },
+      "avatar-pine": {
+        "scope": "avatar",
+        "role": "primary",
+        "displayName": "Pine",
+        "canonical": "#355b48"
+      },
+      "avatar-pine-hover": {
+        "scope": "avatar",
+        "role": "primary",
+        "displayName": "Pine Hover",
+        "canonical": "#244534"
+      },
+      "avatar-paper": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#fffef9"
+      },
+      "avatar-selection": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Selection",
+        "canonical": "#d4e0c9"
+      },
+      "avatar-scene": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Scene",
+        "canonical": "#d9ded2"
+      },
+      "avatar-control-hover": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Control Hover",
+        "canonical": "#e7ebe1"
+      },
+      "avatar-input-line": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Input Line",
+        "canonical": "#ccd6c6"
+      },
+      "avatar-input-ground": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Input Ground",
+        "canonical": "#f7f8f2"
+      },
+      "avatar-message-inset": {
+        "scope": "avatar",
+        "role": "neutral",
+        "displayName": "Message Inset",
+        "canonical": "#edf0e6"
+      }
+    },
+    "typographyMeta": {
+      "avatar-body": {
+        "scope": "avatar",
+        "displayName": "Body",
+        "purpose": "Base studio UI text."
+      },
+      "avatar-name": {
+        "scope": "avatar",
+        "displayName": "Name",
+        "purpose": "Companion name in the scene heading."
+      },
+      "avatar-welcome": {
+        "scope": "avatar",
+        "displayName": "Welcome",
+        "purpose": "Desktop empty-conversation invitation."
+      },
+      "avatar-welcome-mobile": {
+        "scope": "avatar",
+        "displayName": "Welcome Mobile",
+        "purpose": "Compact mobile invitation at 900px and below."
+      },
+      "avatar-prose": {
+        "scope": "avatar",
+        "displayName": "Prose",
+        "purpose": "Reply paragraphs and lists."
+      },
+      "avatar-panel-title": {
+        "scope": "avatar",
+        "displayName": "Panel Title",
+        "purpose": "Conversation and settings headings."
+      },
+      "avatar-field-label": {
+        "scope": "avatar",
+        "displayName": "Field Label",
+        "purpose": "Settings labels and legends."
+      }
+    },
+    "shadows": [
+      {
+        "name": "avatar-media-control",
+        "value": "0 1px 5px #182a2412",
+        "purpose": "Scene status and pause control only.",
+        "scope": "avatar"
+      },
+      {
+        "name": "avatar-selected-ring",
+        "value": "0 0 0 1px #355b48",
+        "purpose": "Selected look and focused composer.",
+        "scope": "avatar"
+      }
+    ],
+    "motion": [
+      {
+        "name": "avatar-control-transition",
+        "value": "background-color 140ms ease, color 140ms ease",
+        "purpose": "Button state changes.",
+        "scope": "avatar"
+      },
+      {
+        "name": "avatar-status-breathe",
+        "value": "1.7s ease-in-out infinite; 50% opacity .35",
+        "purpose": "Active status dots only; disabled for reduced motion.",
+        "scope": "avatar"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "avatar-phone-max",
+        "value": "540px",
+        "scope": "avatar"
+      },
+      {
+        "name": "avatar-stack-max",
+        "value": "900px",
+        "scope": "avatar"
+      },
+      {
+        "name": "avatar-compact-desktop-max",
+        "value": "1200px",
+        "scope": "avatar"
+      },
+      {
+        "name": "avatar-wide-min",
+        "value": "1500px",
+        "scope": "avatar"
+      }
+    ],
+    "accessibility": {
+      "avatar": {
+        "focus": "2px solid #355b48, 4px offset",
+        "buttonMinHeight": "44px",
+        "reducedMotion": "Static poster; CSS animations and transitions disabled.",
+        "mobileComposer": "In normal flow below a bounded scrolling thread."
+      }
+    },
+    "layout": {
+      "avatar": {
+        "maxWidth": "1600px",
+        "desktopColumns": "minmax(0, 1fr) 390px",
+        "desktopGap": "40px",
+        "desktopPanelHeight": "clamp(610px, calc(100dvh - 190px), 790px)",
+        "sceneAspectRatio": "8 / 5",
+        "mobileActiveConversationHeight": "clamp(360px, 60dvh, 560px)",
+        "mobileSceneMaxHeight": "380px",
+        "mobileSettingsMaxHeight": "760px",
+        "sceneWidth": "100%"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Avatar / Save companion",
+      "kind": "button",
+      "refersTo": "avatar-button-primary",
+      "description": "Save the selected companion settings.",
+      "html": "<button class=\"ds-avatar-save\">Save companion <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></button>",
+      "css": ".ds-avatar-save{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;display:flex;align-items:center;justify-content:center;gap:10px;min-height:44px;border:0;border-radius:7px;padding:11px 15px;background:#355b48;color:#fffef9;font-size:12px;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}.ds-avatar-save:hover{background:#244534}.ds-avatar-save:focus-visible{outline:2px solid #355b48;outline-offset:4px;}.ds-avatar-save:disabled{opacity:.42;cursor:default}@media(prefers-reduced-motion:reduce){.ds-avatar-save{transition:none}}",
+      "scope": "avatar"
+    },
+    {
+      "name": "Avatar / Personalize",
+      "kind": "button",
+      "description": "Outlined panel toggle, with the expanded state matching hover.",
+      "html": "<button class=\"ds-avatar-personalize\" aria-expanded=\"false\">Personalize</button>",
+      "css": ".ds-avatar-personalize{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;min-height:44px;padding:0 17px;border:1px solid #cdd5ca;border-radius:8px;background:transparent;font-size:14px;font-weight:500;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}.ds-avatar-personalize:hover,.ds-avatar-personalize[aria-expanded=true]{background:#e7ebe1}.ds-avatar-personalize:focus-visible{outline:2px solid #355b48;outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-avatar-personalize{transition:none}}",
+      "scope": "avatar"
+    },
+    {
+      "name": "Avatar / Name field",
+      "kind": "input",
+      "refersTo": "avatar-name-input",
+      "description": "The local companion name setting.",
+      "html": "<label class=\"ds-avatar-field\">What should I call myself?<input value=\"Alex\" maxlength=\"32\" autocomplete=\"off\"></label>",
+      "css": ".ds-avatar-field{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;display:block;font-size:12px;font-weight:550}.ds-avatar-field input{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;display:block;width:100%;min-height:44px;margin-top:8px;padding:9px 11px;border:1px solid #ccd6c6;border-radius:7px;background:#fffef9;font-size:14px;font-weight:400;caret-color:#355b48}.ds-avatar-field input:focus-visible{outline:2px solid #355b48;outline-offset:4px;}",
+      "scope": "avatar"
+    },
+    {
+      "name": "Avatar / Brand navigation",
+      "kind": "nav",
+      "description": "Home link and secondary prototype anchor from the topbar.",
+      "html": "<nav class=\"ds-avatar-nav\"><a class=\"ds-avatar-brand\" href=\"/\">AIDaddy<span aria-hidden=\"true\"></span></a><a class=\"ds-avatar-prototype\" href=\"#about-companion\">Companion prototype</a></nav>",
+      "css": ".ds-avatar-nav{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;display:flex;align-items:center;gap:32px;height:96px;border-bottom:1px solid #dce1d7}.ds-avatar-brand{display:inline-flex;align-items:baseline;gap:3px;font-size:22px;font-weight:650;letter-spacing:-.8px;text-decoration:none;color:inherit}.ds-avatar-brand span{width:6px;height:6px;background:#73917b;border-radius:50%}.ds-avatar-prototype{color:#637167;font-size:12px;text-decoration:none}.ds-avatar-nav a:focus-visible{outline:2px solid #355b48;outline-offset:4px;}",
+      "scope": "avatar"
+    },
+    {
+      "name": "Avatar / Tone choice",
+      "kind": "chip",
+      "description": "A pressed button indicates the selected response tone.",
+      "html": "<button class=\"ds-avatar-tone\" aria-pressed=\"true\">Calm</button>",
+      "css": ".ds-avatar-tone{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;min-height:44px;border:1px solid #dce1d7;border-radius:6px;background:transparent;font-size:11px;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}.ds-avatar-tone[aria-pressed=true]{background:#e9eee1;border-color:#355b48}.ds-avatar-tone:focus-visible{outline:2px solid #355b48;outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-avatar-tone{transition:none}}",
+      "scope": "avatar"
+    },
+    {
+      "name": "Avatar / User message",
+      "kind": "card",
+      "description": "Quiet tonal inset separates the user turn from assistant prose.",
+      "html": "<article class=\"ds-avatar-message\" aria-label=\"Your message\"><div>You</div><p>I have a letter I don’t understand.</p></article>",
+      "css": ".ds-avatar-message{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;margin-left:18px;border-radius:9px;padding:13px 15px;background:#edf0e6}.ds-avatar-message div{font-size:11px;font-weight:600;margin-bottom:7px}.ds-avatar-message p{margin:0;font-size:13px;line-height:1.7;overflow-wrap:anywhere}",
+      "scope": "avatar"
+    },
+    {
+      "name": "Avatar / Scene status",
+      "kind": "custom",
+      "description": "A paper status note over media; text carries the state.",
+      "html": "<div class=\"ds-avatar-status\" role=\"status\"><span aria-hidden=\"true\"></span>Here when you’re ready</div>",
+      "css": ".ds-avatar-status{font-family:var(--font-sans),sans-serif;line-height:1.55;color:#263d34;display:inline-flex;align-items:center;gap:9px;min-height:40px;padding:10px 13px;border-radius:7px;background:#fffef9;font-size:12px;line-height:1.4;box-shadow:0 1px 5px #182a2412}.ds-avatar-status span{width:6px;height:6px;background:#78937d;border-radius:50%;flex-shrink:0}",
+      "scope": "avatar"
+    }
+  ],
+  "narrative": {
+    "scopes": {
+      "avatar": {
+        "northStar": "Humanist field guide to a personal companion",
+        "overview": "Avatar studio is a humanist field guide to a personal companion: chalk-sage ground, pine ink, natural media and plain sans typography. The filmed or illustrated scene carries presence; the conversation carries useful words. Soft corners and fine rules organize the controls without competing with the person.",
+        "keyCharacteristics": [
+          "A large scene beside a narrower conversation, followed by a single-column mobile sequence.",
+          "Pine text and actions on pale sage and warm paper, with quiet tonal insets.",
+          "Natural media motion and explicit text status; the user can pause movement.",
+          "Names, focus and tone are real settings, with honest distinctions between filmed, illustrated and recorded material."
+        ],
+        "rules": [
+          {
+            "name": "The Scoped World Rule",
+            "body": "These tokens belong to `/avatar`; the existing site and reading-table tokens keep their meanings and authority.",
+            "section": "colors"
+          },
+          {
+            "name": "The In-Flow Conversation Rule",
+            "body": "Preserve the bounded message thread and its in-flow composer together; the composer must not cover messages or controls at the bottom of the panel.",
+            "section": "layout"
+          }
+        ],
+        "dos": [
+          "Do keep this world scoped to /avatar and preserve the main site and reading-table designs.",
+          "Do keep the mobile composer in normal flow beneath the bounded conversation thread.",
+          "Do keep text status, visible focus, 44px button targets and the reduced-motion poster available.",
+          "Do preserve source and license attribution and the embedded provenance when replacing or optimizing the Natural poster.",
+          "Do show Natural as a filmed stand-in, Ari and Noor as illustrations, and the recorded conversation as a saved example."
+        ],
+        "donts": [
+          "Don’t extend these colors, type roles or scene geometry to other routes.",
+          "Don’t describe the stock footage as custom generation or lip-sync.",
+          "Don’t use motion or a colored dot as the only indication of the assistant’s state.",
+          "Don’t turn the movement diagnostics into the primary conversation interface."
+        ]
+      }
+    }
+  },
+  "generatedAt": "2026-11-14T22:17:46.664555+00:00"
+}

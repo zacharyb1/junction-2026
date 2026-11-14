@@ -52,7 +52,8 @@ export interface Manifest {
   /** True when the clips are generated test cards, not a rendered person. */
   placeholder?: boolean;
   /** Provenance of the visible person; illustrated clips are locally rendered, not AI video. */
-  medium?: "illustrated" | "generated";
+  medium?: "illustrated" | "generated" | "stock";
+  attribution?: { creator: string; title: string; sourceUrl: string; license: string; licenseUrl: string; note: string };
 }
 
 /**
