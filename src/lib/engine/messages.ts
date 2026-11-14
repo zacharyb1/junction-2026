@@ -40,9 +40,15 @@ const en = {
   quoteNotFound: (title: string, host: string) => `${title}: the quoted sentence was not found on ${host}.`,
   figureNotOnPage: (title: string, host: string) => `${title}: this figure is not on ${host}, so the step is left out.`,
   factNotStated: (title: string, value: string, host: string) =>
-    `${title}: "${value}" is not stated on ${host}, so it is left out.`,
+    `${title}: "${value}" could not be matched to a sentence on the cited page (${host}), so it is left out.`,
   factElsewhere: (title: string, value: string, host: string) =>
-    `${title}: "${value}" is on ${host}, but in a sentence about something else, so it is left out.`,
+    `${title}: "${value}" is on the cited page (${host}), but not in a sentence about this step, so it is not shown with it.`,
+
+  oldSource: (title: string, host: string, year: number) =>
+    `${title}: the address of this source on ${host} carries the year ${year}. Check that it is still current.`,
+  closed: (title: string, host: string) => `${title}: listed as closed on ${host}, so it is left out.`,
+  /** In a chat line, in place of one figure, when two sources give different ones. */
+  sourcesDiffer: "sources give different figures, see",
 
   // Conflict notes. A citation number keeps the form [3] in every language: the engine renumbers it by that form.
   twoFigures: (first: string, firstRef: number, second: string, secondRef: number) =>
@@ -106,8 +112,12 @@ const fi: Messages = {
   pageNotOpened: (title, host) => `${title}: lähdesivua ei voitu avata (${host}).`,
   quoteNotFound: (title, host) => `${title}: lainattua lausetta ei löytynyt sivustolta ${host}.`,
   figureNotOnPage: (title, host) => `${title}: tätä lukua ei ole sivustolla ${host}, joten vaihe on jätetty pois.`,
-  factNotStated: (title, value, host) => `${title}: tietoa ”${value}” ei mainita sivustolla ${host}, joten se on jätetty pois.`,
-  factElsewhere: (title, value, host) =>
+  factNotStated: (title, value, host) =>
+    `${title}: tietoa ”${value}” ei voitu yhdistää yhteenkään lauseeseen lähdesivulla (${host}), joten se on jätetty pois.`,
+oldSource: (title, host, year) => `${title}: tämän lähteen osoitteessa sivustolla ${host} on vuosi ${year}. Tarkista, että tieto on yhä ajan tasalla.`,
+  closed: (title, host) => `${title}: sivuston ${host} mukaan paikka on suljettu, joten se on jätetty pois.`,
+  sourcesDiffer: "lähteissä on eri lukuja, katso",
+    factElsewhere: (title, value, host) =>
     `${title}: tieto ”${value}” on sivustolla ${host}, mutta eri asiaa koskevassa lauseessa, joten se on jätetty pois.`,
 
   twoFigures: (first, firstRef, second, secondRef) =>

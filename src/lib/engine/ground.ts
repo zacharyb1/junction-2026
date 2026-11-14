@@ -12,7 +12,8 @@ const MAX_QUOTE = 400;
 function blocks(page: string): string[][] {
   const out: string[][] = [];
   for (const block of page.split(/\n+/)) {
-    const trimmed = block.replace(/^#+\s*/, "").replace(/\s+/g, " ").trim();
+    // Heading marks, table bars and list dashes are layout, not words. The verifier ignores them too.
+    const trimmed = block.replace(/^#+\s*/, "").replace(/\|/g, " ").replace(/^\s*[-*•]\s+/, "").replace(/\s+/g, " ").trim();
     if (trimmed.length < 12) continue;
     const list = trimmed
       .split(/(?<=[.!?])\s+(?=[\p{Lu}\p{N}"'(])/u)

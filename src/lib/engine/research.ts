@@ -107,7 +107,7 @@ export class EngineError extends Error {
 
 type RawStep = { title?: string; detail?: string; due?: string; amount?: string; quote?: string; sourceUrl?: string };
 type RawOutput = { title?: string; summary?: string; steps?: RawStep[]; questions?: string[] };
-type ExaResult = { url: string; title?: string | null; publishedDate?: string | null; highlights?: string[] | null };
+type ExaResult = { url: string; title?: string | null; publishedDate?: string | null; highlights?: string[] | null; text?: string | null };
 type Grounding = { field: string; citations?: { url: string; title?: string }[]; confidence?: string };
 type ExaSearchResponse = {
   results?: ExaResult[];
@@ -149,6 +149,19 @@ const OUTPUT_SCHEMA = {
   required: ["title", "summary", "steps"],
 } as const;
 
+/** The date a page prints for itself: "Published 18/11/2025", "Julkaistu 13.5.2026". ISO form, or null. */
+function statedDate(text: string): string | null {
+  const found = text.match(/\b(?:published|updated|julkaistu|päivitetty|publicerad)\b:?\s*(\d{1,2})[./](\d{1,2})[./](\d{4})/i);
+  if (!found) return null;
+  const [, day, month, year] = found;
+  return Number(month) >= 1 && Number(month) <= 12 ? `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}` : null;
+}
+
+const properTitle = (title: string | undefined) => {
+  const text = (title ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
+  return /^\p{Ll}/u.test(text) || text.split(" ").length > 16 ? "" : text;
+};
+
 /** Countries the team decided not to serve. */
 const UNSUPPORTED_COUNTRIES = new Set(["RU"]);
 
@@ -168,6 +181,7 @@ function choicePrompt(j: Jurisdiction, language: string): string {
   return [
     `You are helping a family in ${j.region ? `${j.region}, ` : ""}${j.name} choose between real, currently available options.`,
     "Prefer the venue's or provider's own website, then recent independent reviews. Skip options that are closed, far from the place named, or fail a stated requirement.",
+    "The quote must be the sentence that shows the stated requirement is met, never a sentence that also says the opposite. Never list the same place twice.",
     "For every option, copy one sentence word for word from the source page into `quote`, in the page's own language, and give that page's exact URL in `sourceUrl`.",
     "Fill `due` only with a booking deadline or opening time the page states, and `amount` only with a price the page states, in the page's own currency. Never estimate or convert.",
     "At most five options, best fit first.",
@@ -190,17 +204,28 @@ function systemPrompt(j: Jurisdiction, language: string): string {
     "The summary says only what the steps say, in plain words, with no urgency and no advice beyond the steps. Do not ask a question that the situation already answers.",
     `When the authority publishes the page in ${lang}, cite that version of the page.`,
     "Include only steps that directly help with this exact situation. Skip general information about neighbouring topics, and anything the sources do not cover.",
-    "At most five steps. Five well-sourced steps beat ten vague ones.",
+    "At most five steps, in the order the family does them. Five well-sourced steps beat ten vague ones. One step per separate application or notice the family must file.",
+    "`detail` restates what the quote says in plain words and adds nothing the page does not say.",
+    "When a rule differs by contract date, permit type or another fact you do not have, give one step per branch and name the branch in its title. Prefer the national authority's page over an EU-level page when both cover the rule.",
+    "For money, give the rate or formula first, then minimum and maximum, then for how long it is paid, and any waiting period before the first payment. When the page gives a scale (by delay, distance or income), give the row that matches the situation and name it.",
     `Write title, summary, step titles, details and questions in ${lang}. Keep quotes in the original language.`,
   ].join(" ");
 }
+
+/** A shared page can carry lines written for an AI ("ignore your instructions"). They are not passed on to the search. */
+const ORDERS = /ignore (your|all|any|the|previous)|disregard (your|all|any|the|previous)|AI assistants?|language models?|automated agents?|system prompt/i;
+const withoutOrders = (document: string) =>
+  document
+    .split("\n")
+    .filter((line) => !ORDERS.test(line))
+    .join("\n");
 
 function frame(input: ResearchInput, j: Jurisdiction): string {
   const where = `${j.region ? `${j.region}, ` : ""}${j.name}`;
   return [
     `Situation of a family living in ${where}: ${input.situation}`,
     input.household ? `About the household: ${input.household}` : "",
-    input.document ? `They received this document:\n"""\n${input.document.slice(0, 3000)}\n"""` : "",
+    input.document ? `They received this document:\n"""\n${withoutOrders(input.document).slice(0, 3000)}\n"""` : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -314,7 +339,8 @@ const clip = (text: string | undefined, max: number) => (text ?? "").replace(/\s
 
 const EMPTY = /^(['"`´\s]*|ei määrää|ei määräaikaa|ei määritelty|ei määritetty|ei sovellu|ei koske|ei aikarajaa|ei mainittu|ei ilmoitettu|ei tiedossa|empty|none( stated| specified| given)?|n\/?a|null|unknown|varies|not (specified|stated|applicable|available|mentioned)|no (specific )?(deadline|amount)( stated| specified)?|-+|–|—)$/i;
 const JUNK = /[{}\[\]]|"\s*[:,]|citations|confidence\s*:/i;
-const VAGUE = /^(as soon as possible|asap|immediately|promptly|without delay|mahdollisimman pian|viipymättä|heti|snarast)$/i;
+const VAGUE =
+  /^(as soon as possible|asap|immediately|promptly|without delay|well in advance|in good time|in advance|when you move|within a reasonable time|while you are waiting[^,.]*|mahdollisimman pian|viipymättä|heti|hyvissä ajoin|kohtuullisessa ajassa|snarast)$/i;
 
 /** A deadline or amount as the model wrote it, or nothing if it is a placeholder, a formatting leak or too vague to act on. */
 function tidy(text: unknown): string | undefined {
@@ -351,6 +377,23 @@ function likeness(a: string, b: string): number {
 
 const sameThing = (a: string, b: string) => Math.max(overlap(a, b), overlap(b, a)) >= 0.6 || likeness(a, b) >= 0.72;
 
+/** What a step is about: word starts of its title and detail, without the verbs every title opens with. */
+const objectsOf = (c: { title: string; detail?: string }) =>
+  new Set([...stems(`${c.title} ${c.detail ?? ""}`)].filter((t) => !ACTION_STEMS.has(t)));
+/** Two candidates for one action: the same sentence quoted from two pages, or titles and details that share most of what they are about. */
+function sameAction(
+  a: { title: string; detail?: string; quote: string; url: string },
+  b: { title: string; detail?: string; quote: string; url: string },
+): boolean {
+  // One sentence quoted from two pages is one step. On the same page, two actions may share a sentence:
+  // the step loop then looks for a sentence of its own for the second.
+  if (a.url !== b.url && Math.min(overlap(a.quote, b.quote), overlap(b.quote, a.quote)) >= 0.8) return true;
+  const x = objectsOf(a);
+  const y = objectsOf(b);
+  const shared = [...x].filter((t) => y.has(t)).length;
+  return shared >= 5 && shared / Math.min(x.size, y.size) >= 0.5;
+}
+
 const stems = (text: string) => new Set(tokens(text).filter((t) => t.length >= 4).map((t) => t.slice(0, 5)));
 /** Two step titles that are mostly about the same thing, without being the same step. */
 function relatedTitles(a: string, b: string): boolean {
@@ -368,6 +411,50 @@ const ACTION_STEMS = new Set(
     " ",
   ).map((w) => w.slice(0, 5)),
 );
+
+// Whose time limit is it? "The airline must refund within seven days" binds the airline, not the family.
+const OTHERS_DUTY =
+  /\b(airlines?|carriers?|operators?|compan(y|ies)|traders?|sellers?|landlords?|lessors?|employers?|authorit(y|ies)|agenc(y|ies)|boards?|embass(y|ies)|consulates?|municipalit(y|ies)|insurers?|banks?|kela|we)\b[^.;:!?]{0,80}\b(must|shall|has to|have to|is required to|are required to|will)\b|\b(must|shall|has to|will)(?: \w+)? be (carried out|processed|paid|refunded|repaired|replaced|delivered|decided|handled|made)\b/i;
+// Only "you must …" right together counts as the family's own duty. "If you choose a refund, the airline must …" does not.
+const OWN_DUTY = /\b(you|your (application|claim|complaint|notice|request))\s+(must|have to|need to|should|shall)\b/i;
+const WAITING = /\b(not|no)\b[^.;:!?]{0,40}\b(repl\w+|respon\w+|answer\w*|decision)\b[^.;:!?]{0,30}\bwithin\b/i;
+const EXAMPLE = /^(for example|for instance|e\.g\.|esimerkiksi)\b/i;
+/** True when the sentence states someone else's duty, a waiting time or a worked example, not the family's deadline. */
+const notOurDeadline = (sentence: string) =>
+  (OTHERS_DUTY.test(sentence) && !OWN_DUTY.test(sentence)) || WAITING.test(sentence) || EXAMPLE.test(sentence.trim());
+
+// A "%" in a sentence is an amount only when the sentence is about money: "a 100% vegan restaurant" is not.
+const RATE_WORDS = /\b(price|fee|rent|increase|rate|compensation|refund|discount|tax|credit|deduct\w*|salary|wage|allowance|benefit|cost|pay\w*|interest|vuokra\w*|korotu\w*|vähenny\w*|korvau\w*|hinta\w*|vero\w*|avdrag\w*|hyra\w*)\b/i;
+
+// Signs that a place no longer exists. "Closed on Mondays" is not one of them.
+const CLOSED = /\bCLOSED:|permanently closed|closed (down|for good|its doors|permanently)|has closed|is closed due to|now closed|suljettu pysyvästi|lopettanut toimintansa/i;
+/** Names in a title: capitalised words that do not open it. "Enjoy vegan à la carte at OmNam" gives OmNam. */
+const namesIn = (title: string) => (title.match(/(?<=\S\s)\p{Lu}[\p{L}\p{N}'’&-]{2,}/gu) ?? []).filter((w) => !/^(Finland|Helsinki|Espoo|Vantaa|Tampere|Turku|Oulu|Saturday|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday)$/.test(w));
+
+/** A year in a page's address, when it is three or more years back: "…timestamp=2002", "…-2021.pdf". */
+function staleYear(url: string): number | null {
+  const now = new Date().getFullYear();
+  const years = (url.match(/(?<!\d)(19|20)\d{2}(?!\d)/g) ?? []).map(Number).filter((y) => y >= 1990 && y <= now + 1);
+  if (!years.length) return null;
+  const newest = Math.max(...years);
+  return newest <= now - 3 ? newest : null;
+}
+
+// Words that match almost any official press release.
+const CATCH_ALL = new Set(
+  "service services consumer benefit general social security customer authority change changes terms right rights rule rules under during family people person finnish finland government".split(
+    " ",
+  ).map((w) => w.slice(0, 5)),
+);
+// Municipal sites and the city each one writes for.
+const CITY_SITES: Record<string, string> = {
+  "hel.fi": "helsinki",
+  "espoo.fi": "espoo",
+  "vantaa.fi": "vantaa",
+  "tampere.fi": "tampere",
+  "turku.fi": "turku",
+  "oulu.fi": "oulu",
+};
 
 // A period taken from a quote means something only with its qualifier: "within 30 days", "two months in advance".
 const QUALIFIED = /^(within|at least|at most|up to|no later than|no earlier than|not more than|a maximum of|a minimum of|vähintään|enintään|viimeistään|högst|minst|senast)\b|in advance$/i;
@@ -581,6 +668,7 @@ export async function researchCase(
   async function searchNews(topic: string): Promise<Fresh[]> {
     if (scope !== "official" || !official.length) return [];
     stage("search", m.searchingNews);
+    const since = new Date(Date.now() - NEWS_DAYS * 86_400_000).toISOString();
     usage.searches++;
     const res = (await withRetry(() =>
       exa.search(
@@ -590,9 +678,9 @@ export async function researchCase(
           type: "auto",
           numResults: 8,
           includeDomains: official,
-          startPublishedDate: new Date(Date.now() - NEWS_DAYS * 86_400_000).toISOString(),
+          startPublishedDate: since,
           userLocation: j.code,
-          contents: { highlights: true },
+          contents: { highlights: true, text: { maxCharacters: 600 } },
         } as never,
         { timeout: 20_000 } as never,
       ),
@@ -603,9 +691,11 @@ export async function researchCase(
       .map((r) => ({
         url: r.url,
         title: clip(r.title ?? "", 200),
-        date: (r.publishedDate ?? "").slice(0, 10),
+        date: statedDate(`${(r.highlights ?? []).join(" ")} ${r.text ?? ""}`) ?? (r.publishedDate ?? "").slice(0, 10),
         text: `${r.title} ${(r.highlights ?? [])[0] ?? ""}`,
-      }));
+      }))
+      // Exa's date can be the day a page was last crawled. When the page prints its own date, that one decides.
+      .filter((n) => n.date >= since.slice(0, 10));
   }
   const asks = scope === "open" ? choiceFocuses(m.focus) : focuses(input, m.focus);
   let found = await run(asks, true);
@@ -634,12 +724,19 @@ export async function researchCase(
   // so the reader gets a sentence they can read when the authority publishes one.
   const readable = (c: Candidate) =>
     input.language.toLowerCase().startsWith("en") && (c.quote.match(ENGLISH_WORDS) ?? []).length >= 2 ? 1 : 0;
-  found.sort((a, b) => Number(b.official) - Number(a.official) || readable(b) - readable(a));
+  found.sort(
+    (a, b) =>
+      Number(b.official) - Number(a.official) ||
+      // A page whose address carries an old year (a 2002 decree, a 2021 guide) goes behind current pages.
+      Number(Boolean(staleYear(a.url))) - Number(Boolean(staleYear(b.url))) ||
+      readable(b) - readable(a),
+  );
   const merged: Candidate[] = [];
   for (const c of found) {
     const twin = merged.find(
       (m) =>
         sameThing(m.title, c.title) ||
+        sameAction(m, c) ||
         (m.url === c.url &&
           (contains(m.quote, c.quote) ||
             contains(c.quote, m.quote) ||
@@ -655,6 +752,33 @@ export async function researchCase(
 
   // Runs while the cited pages are being read, so it adds no waiting time.
   const freshPages = searchNews(merged.slice(0, 5).map((c) => c.title).join(". ")).catch(() => [] as Fresh[]);
+
+  // A choice such as a restaurant is only useful if the place still exists. One short search per option asks.
+  const closures: Promise<(string | null)[]> =
+    scope === "open"
+      ? Promise.all(
+          merged.slice(0, 6).map(async (c) => {
+            const names = namesIn(c.title);
+            if (!names.length) return null;
+            try {
+              usage.searches++;
+              const res = (await exa.search(
+                `${names.join(" ")} ${where} closed`,
+                { type: "auto", numResults: 5, contents: { highlights: true } } as never,
+                { timeout: 8_000 } as never,
+              )) as unknown as ExaSearchResponse;
+              usage.costDollars += res.costDollars?.total ?? 0;
+              const hit = (res.results ?? []).find((r) => {
+                const text = `${r.title ?? ""} ${(r.highlights ?? []).join(" ")}`;
+                return CLOSED.test(text) && names.some((name) => text.includes(name));
+              });
+              return hit ? hostOf(hit.url) : null;
+            } catch {
+              return null;
+            }
+          }),
+        )
+      : Promise.resolve([]);
 
   // Open every cited page again, live.
   const urls = [...new Set(merged.flatMap((c) => [c.url, ...c.facts.map((f) => f.url)]))];
@@ -686,7 +810,8 @@ export async function researchCase(
     evidence.push({
       n,
       url,
-      title: clip(titles.get(url), 200) || hostOf(url),
+      // Exa sometimes returns the first line of a PDF as its title. A lowercase start or a very long line is not a title.
+      title: properTitle(titles.get(url)) || hostOf(url),
       publisher: publisherOf(url),
       quote: quote.slice(0, LIMITS.quote),
       sourceType: isOfficial(url, j) ? "official" : "secondary",
@@ -710,19 +835,21 @@ export async function researchCase(
    * on that page that is about the same thing. A fact is never borrowed from a different page.
    */
   const groundFact = (fact: Fact, c: Candidate, quote: string, main: number): number | null => {
-    if (fact.url === c.url && supportFor(fact.value, quote, 0.5)) return main;
+    // A value without a figure ("when you move") has only its words, so the quote must carry all of them.
+    const bar = numbersIn(fact.value).length ? 0.5 : 1;
+    if (fact.url === c.url && supportFor(fact.value, quote, bar)) return main;
     const page = pages.get(fact.url);
     if (!page) return null;
     if (fact.url !== c.url || fact.quote !== c.quote) {
       const own = snapQuote(fact.quote, page.text);
-      if (own && supportFor(fact.value, own.quote, 0.5)) return cite(fact.url, own.quote);
+      if (own && supportFor(fact.value, own.quote, bar)) return cite(fact.url, own.quote);
     }
     const anchor = `${c.title} ${c.detail ?? ""} ${quote} ${fact.quote}`;
     const onPage = supportFor(fact.value, page.text, 0.55, anchor);
     if (!onPage) return null;
-    // An amount is listed under the sentence that states it, so it needs no link to the step.
-    // A deadline is shown on the step itself, so its sentence has to be about the same thing.
-    if (fact.kind === "amount" || sharedWords(onPage.sentence, anchor, fact.value) >= 2) return cite(fact.url, onPage.sentence);
+    // Another sentence of the page may carry the fact only when it is about the same thing as the step.
+    // Otherwise "one calendar month" of notice lands on a sentence about something else that also says one month.
+    if (numbersIn(fact.value).length && sharedWords(onPage.sentence, anchor, fact.value) >= 2) return cite(fact.url, onPage.sentence);
     elsewhere.add(fact);
     return null;
   };
@@ -732,6 +859,8 @@ export async function researchCase(
   const money: CaseInput["money"] = [];
   const dueRef = new Map<StepDraft, number>();
   const dropped: { value: string; note: string }[] = [];
+  // The note about figures that differ between steps, once it is written.
+  let figureNote = "";
   // Deadlines that are on the page, but in a sentence about something else.
   const elsewhere = new Set<Fact>();
   // Every amount confirmed for a step, wherever its sentence is, to notice two that disagree.
@@ -745,8 +874,13 @@ export async function researchCase(
   const sameFigure = (a: string, b: string) =>
     numbersIn(a).length ? sameNumbers(a, b) && unitOf(a) === unitOf(b) : key(a) === key(b);
 
-  for (const c of merged) {
+  const closedOn = await closures;
+  for (const [index, c] of merged.entries()) {
     if (steps.length >= LIMITS.steps || evidence.length >= LIMITS.evidence - 1) break;
+    if (closedOn[index] || (scope === "open" && CLOSED.test(pages.get(c.url)?.text.slice(0, 4000) ?? ""))) {
+      unverified.push(m.closed(c.title, closedOn[index] ?? hostOf(c.url)));
+      continue;
+    }
     const page: FetchedPage = pages.get(c.url) ?? null;
     if (!page) {
       unverified.push(m.pageNotOpened(c.title, hostOf(c.url)));
@@ -765,6 +899,8 @@ export async function researchCase(
     let quote = snapped.quote;
     let main = cite(c.url, quote);
     if (main === null) break;
+    const old = staleYear(c.url);
+    if (old) unverified.push(m.oldSource(c.title, hostOf(c.url), old));
 
     // Two candidates that rest on the same sentence are one step, unless the second
     // describes another action and the page has a sentence of its own for it.
@@ -797,7 +933,11 @@ export async function researchCase(
     };
     const differ = (first: string, firstRef: number, second: string, secondRef: number) => {
       // Two wordings can only disagree when both carry a number: "one week" and "viikon kuluessa" do not.
-      if (!numbersIn(first).length || !numbersIn(second).length) return;
+      if (!numbersIn(first).length || !numbersIn(second).length || firstRef === secondRef) return;
+      // "€250, €400 or €600" and "EUR 250 to EUR 600" are one rule: one side's figures are all in the other.
+      const a = new Set(numbersIn(first));
+      const b = new Set(numbersIn(second));
+      if ([...a].every((n) => b.has(n)) || [...b].every((n) => a.has(n))) return;
       if (target.conflict || sameNumbers(first, second) || !unitOf(first) || unitOf(first) !== unitOf(second)) return;
       target.conflict = m.twoFigures(first, firstRef, second, secondRef).slice(0, 400);
       addRef(firstRef);
@@ -811,6 +951,16 @@ export async function researchCase(
         missing.push(fact);
         continue;
       }
+      const sentence = evidence.find((e) => e.n === n)?.quote ?? "";
+      if (fact.kind === "deadline" && notOurDeadline(sentence)) {
+        // The time limit binds someone else, or is a waiting time or an example: it is listed under its own sentence.
+        const label = sentenceLabel(n);
+        if (money.length < LIMITS.money && !money.some((x) => x.label === label || sameFigure(x.amount, fact.value))) {
+          money.push({ label, amount: fact.value, evidence: [n] });
+        }
+        continue;
+      }
+      if (fact.kind === "deadline" && steps.some((s) => s !== target && s.due && key(s.due) === key(fact.value))) continue;
       if (fact.kind === "deadline") {
         const first = dueRef.get(target);
         if (!target.due || first === undefined) {
@@ -830,14 +980,23 @@ export async function researchCase(
         if (clash) differ(clash.value, clash.ref, fact.value, n);
         amounts.set(target, [...seen, { value: fact.value, ref: n }]);
 
-        const twin = money.find((m) => sameFigure(m.amount, fact.value));
+        // The same figure is one entitlement only when it comes from the same page or from sentences with the
+        // same figures. "50%" for a short delay and "50%" as a minimum are two rules.
+        const twin = money.find(
+          (x) =>
+            sameFigure(x.amount, fact.value) &&
+            (x.evidence.includes(n) ||
+              evidence.find((e) => e.n === x.evidence[0])?.url === fact.url ||
+              sameNumbers(evidence.find((e) => e.n === x.evidence[0])?.quote ?? "", sentence)),
+        );
         if (twin) {
           if (twin.evidence.length < 3 && !twin.evidence.includes(n)) twin.evidence.push(n);
         } else if (!clash && money.length < LIMITS.money) {
           // The amount carries the step's name only when the step's own sentence states it.
           // Stated elsewhere on the page, it is listed under the start of its own sentence,
           // so "40 working days" is never printed next to a step it does not belong to.
-          const label = n === main && !money.some((m) => m.label === target.title) ? target.title : sentenceLabel(n);
+          const own = n === main && !notOurDeadline(sentence) && !money.some((x) => x.label === target.title);
+          const label = own ? target.title : sentenceLabel(n);
           if (!money.some((m) => m.label === label)) money.push({ label, amount: fact.value, evidence: [n] });
         }
       }
@@ -848,6 +1007,16 @@ export async function researchCase(
       if (!numbersIn(fact.value).length || fact.value.length > 60) continue;
       const note = (elsewhere.has(fact) ? m.factElsewhere : m.factNotStated)(c.title, fact.value, hostOf(fact.url));
       dropped.push({ value: fact.value, note });
+      // The detail must not keep saying what was just left out ("open until 22:00").
+      const figures = [...new Set(numbersIn(fact.value))];
+      if (target.detail && figures.length) {
+        target.detail =
+          target.detail
+            .split(/(?<=[.!?])\s+/)
+            .filter((part) => figures.filter((f) => numbersIn(part).includes(f)).length * 2 < figures.length)
+            .join(" ")
+            .trim() || undefined;
+      }
     }
   }
   // What a step's own sentence states is shown even when the search model left the field empty:
@@ -855,8 +1024,16 @@ export async function researchCase(
   // The text is the verified quote's own wording, so it is grounded as it stands.
   for (const step of steps) {
     const figures = figuresIn(evidence.find((e) => e.n === step.evidence[0])?.quote ?? "").filter((f) => !contains(given, f));
+    const quote = evidence.find((e) => e.n === step.evidence[0])?.quote ?? "";
     const takes = (figure: string) => {
       if (money.length >= LIMITS.money || money.some((m) => sameFigure(m.amount, figure))) return;
+      const own = numbersIn(figure);
+      // Already inside a line that rests on the same sentence ("€250" within "€250, €400 or €600").
+      if (money.some((x) => x.evidence.includes(step.evidence[0]) && own.every((n) => numbersIn(x.amount).includes(n)))) return;
+      // One end of a range ("between 300 and 1,800 euros") is not the amount.
+      const others = numbersIn(quote).filter((n) => !own.includes(n));
+      if (own.length === 1 && others.length && /\b(between|from|zwischen|von)\b[^.]*\b(and|to|und|bis)\b|\d\s*(?:–|-|to|bis)\s*\d/i.test(quote)) return;
+      if (unitOf(figure) === "%" && !RATE_WORDS.test(quote)) return;
       if (step.due && sameNumbers(step.due, figure) && unitOf(step.due) === unitOf(figure)) return;
       const label = money.some((m) => m.label === step.title) ? sentenceLabel(step.evidence[0]) : step.title;
       if (!money.some((m) => m.label === label)) money.push({ label, amount: figure, evidence: [step.evidence[0]] });
@@ -906,6 +1083,12 @@ export async function researchCase(
       ...(step.due ? [{ value: step.due, ref: dueRef.get(step) ?? step.evidence[0] }] : []),
       ...(amounts.get(step) ?? []),
       ...money.filter((m) => m.label === step.title).map((m) => ({ value: m.amount, ref: m.evidence[0] })),
+      // A rate stated in a step's sentences counts even when no field carries it: 35 % in one quote and 40 % in another.
+      ...step.evidence.flatMap((n) =>
+        figuresIn(evidence.find((e) => e.n === n)?.quote ?? "")
+          .filter((f) => unitOf(f) === "%")
+          .map((value) => ({ value, ref: n })),
+      ),
     ].filter((f) => unitOf(f.value) && new Set(numbersIn(f.value)).size === 1);
   const differing = (
     first: { value: string; ref: number }[],
@@ -938,7 +1121,8 @@ export async function researchCase(
           return other && sameRule(other[0].ref, other[1].ref) ? other : null;
         })();
       if (!pair || steps[i].conflict?.includes(`[${pair[0].ref}]`)) continue;
-      unverified.unshift(m.differentFigures(pair[0].value, pair[0].ref, pair[1].value, pair[1].ref));
+      figureNote = m.differentFigures(pair[0].value, pair[0].ref, pair[1].value, pair[1].ref);
+      unverified.unshift(figureNote);
       break pairs;
     }
   }
@@ -951,14 +1135,24 @@ export async function researchCase(
   // and title plus first highlight share two. Place names do not count, or every local news item would match.
   // Most related first, then newest. Never a page the plan already cites.
   const places = stems(`${j.name} ${j.region ?? ""} ${where}`);
+  // The topic is what the family wrote plus the case title. Step titles bring in words such as "consumer" and
+  // "services" that match any press release, and a publisher's own name matches all of its pages.
+  const publishers = stems(evidence.map((e) => `${e.publisher ?? ""} ${hostOf(e.url).replace(/\./g, " ")}`).join(" "));
   const topic = new Set(
-    [...stems(`${head.title ?? ""} ${steps.map((s) => s.title).join(" ")}`)].filter((t) => !places.has(t) && !ACTION_STEMS.has(t)),
+    [...stems(`${input.situation} ${head.title ?? ""}`)].filter(
+      (t) => !places.has(t) && !ACTION_STEMS.has(t) && !publishers.has(t) && !CATCH_ALL.has(t) && !FILLER.has(t),
+    ),
   );
+  // A city's own site is news for that city only.
+  const elsewhereCity = (url: string) => {
+    const city = Object.entries(CITY_SITES).find(([site]) => hostOf(url) === site || hostOf(url).endsWith(`.${site}`))?.[1];
+    return Boolean(city) && !new RegExp(city as string, "i").test(`${j.region ?? ""} ${input.situation}`);
+  };
   const shared = (text: string) => [...stems(text)].filter((t) => topic.has(t)).length;
   const citedUrls = new Set(evidence.map((e) => e.url.replace(/\/$/, "")));
   // The plan never waits long for this: pointers are a bonus, and a slow search just means none are shown.
   const news = (await Promise.race([freshPages, new Promise<Fresh[]>((resolve) => setTimeout(() => resolve([]), 1200))]))
-    .filter((n) => !citedUrls.has(n.url.replace(/\/$/, "")) && shared(n.title) >= 1 && shared(n.text) >= 2)
+    .filter((n) => !citedUrls.has(n.url.replace(/\/$/, "")) && !elsewhereCity(n.url) && shared(n.title) >= 1 && shared(n.text) >= 2)
     .filter((n, i, all) => all.findIndex((o) => o.url === n.url || key(o.title) === key(n.title)) === i)
     .sort((a, b) => shared(b.text) - shared(a.text) || b.date.localeCompare(a.date))
     .slice(0, 3)
@@ -971,24 +1165,43 @@ export async function researchCase(
   for (const url of new Set(evidence.map((e) => e.url))) {
     for (const n of pageNumbers(pages.get(url)?.text ?? "")) cited.add(n);
   }
+  const saidStems = stems(given);
   // The header shows where the family lives. A place at the end of the title adds nothing,
   // and it is wrong when the situation is about somewhere else (a move to another town).
   const place = [j.region, j.name].filter(Boolean).map((p) => (p as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
   const placeless = clip(head.title, 140).replace(new RegExp(`(?:[,:]?\\s+(?:in|for|at)\\s+(?:${place})(?:,\\s*(?:${place}))?)+\\s*$`, "i"), "");
   const title = backed(placeless, cited) ?? clip(input.situation, 80);
+  // Where sources give two figures, the summary must not state one of them as the answer.
+  const disputed = [...steps.map((s) => s.conflict ?? ""), ...unverified.filter((u) => u === figureNote)].flatMap((text) =>
+    [...text.matchAll(/["”“]([^"”“]+)["”“]\s*\[\d+\]/g)].map((x) => x[1]),
+  );
+  const withoutDisputed = (text: string) =>
+    text
+      .split(/(?<=[.!?])\s+/)
+      .filter((part) => !disputed.some((d) => unitOf(d) && tokens(part).includes(unitOf(d)) && numbersIn(d).some((n) => numbersIn(part).includes(n))))
+      .join(" ");
   const caseInput: CaseInput = {
     title,
     event: key(title).split(" ").slice(0, 4).join("_").slice(0, 60) || "case",
     language: input.language,
     jurisdiction: { country: j.name, region: j.region },
-    summary: backed(clip(head.summary, 800), cited) ?? m.sourcedPlan(clip(input.situation, 200)),
+    summary: backed(withoutDisputed(clip(head.summary, 800)), cited) ?? m.sourcedPlan(clip(input.situation, 200)),
     steps,
     money,
     evidence,
     drafts: [],
     news: news.length ? news : undefined,
     unverified: dedupe(unverified, 6).map((u) => u.slice(0, 300)),
-    openQuestions: dedupe(questions.filter((q) => backed(q, cited) === q.trim()), 3).map((q) => q.slice(0, 300)),
+    openQuestions: questions
+      .filter((q) => q.trim().endsWith("?") && backed(q, cited) === q.trim())
+      // A question whose words are mostly in the family's own message has been answered already.
+      .filter((q) => {
+        const asked = [...stems(q)];
+        return asked.length > 0 && asked.filter((t) => saidStems.has(t)).length / asked.length < 0.6;
+      })
+      .filter((q, i, all) => all.findIndex((o) => sameThing(o, q) || relatedTitles(o, q)) === i)
+      .slice(0, 3)
+      .map((q) => q.slice(0, 300)),
   };
 
   stage("publish", m.building);
@@ -1013,8 +1226,9 @@ export async function researchCase(
     .map((s) => {
       const listed = money.find((m) => m.label === s.title && confirmed(m.evidence));
       const amount = listed?.amount;
-      const fact = s.due ? `: ${s.due}${amount ? ` (${amount})` : ""}` : amount ? `: ${amount}` : "";
       const refs = [...new Set([...s.evidence, ...(listed?.evidence ?? [])])];
+      if (s.conflict) return `${s.title}: ${m.sourcesDiffer} ${refs.map((n) => `[${n}]`).join("")}`;
+      const fact = s.due ? `: ${s.due}${amount ? ` (${amount})` : ""}` : amount ? `: ${amount}` : "";
       return `${s.title}${fact} ${refs.map((n) => `[${n}]`).join("")}`;
     });
 

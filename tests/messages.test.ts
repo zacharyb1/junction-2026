@@ -84,10 +84,10 @@ describe("messages", () => {
       "Apply for the grant: this figure is not on kela.fi, so the step is left out.",
     );
     expect(m.factNotStated("Apply for the grant", "170 €", "kela.fi")).toBe(
-      'Apply for the grant: "170 €" is not stated on kela.fi, so it is left out.',
+      'Apply for the grant: "170 €" could not be matched to a sentence on the cited page (kela.fi), so it is left out.',
     );
     expect(m.factElsewhere("Apply for the grant", "170 €", "kela.fi")).toBe(
-      'Apply for the grant: "170 €" is on kela.fi, but in a sentence about something else, so it is left out.',
+      'Apply for the grant: "170 €" is on the cited page (kela.fi), but not in a sentence about this step, so it is not shown with it.',
     );
     expect(m.twoFigures("35 %", 2, "40 %", 5)).toBe(
       'Two figures found: "35 %" [2] and "40 %" [5]. Check which one applies to you.',

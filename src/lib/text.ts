@@ -22,6 +22,7 @@ const NUMBER_WORDS: Record<string, string> = {
   yksi: "1", yhden: "1", kaksi: "2", kahden: "2", kahta: "2", kolme: "3", kolmen: "3", kolmea: "3",
   neljä: "4", neljän: "4", neljää: "4", viisi: "5", viiden: "5", viittä: "5", kuusi: "6", kuuden: "6",
   seitsemän: "7", kahdeksan: "8", yhdeksän: "9", kymmenen: "10",
+  zwei: "2", drei: "3", vier: "4", fünf: "5", sechs: "6", sieben: "7", acht: "8", neun: "9", zehn: "10", elf: "11", zwölf: "12",
   två: "2", tre: "3", fyra: "4", fem: "5", sex: "6", sju: "7", åtta: "8", nio: "9", tio: "10",
 };
 // \b does not treat ä, ö, å as word characters, so word boundaries are spelled out.
@@ -57,6 +58,11 @@ const CANON: Record<string, string> = {
   weeks: "week", viikko: "week", viikon: "week", viikkoa: "week", vecka: "week", veckor: "week", veckors: "week",
   months: "month", kuukausi: "month", kuukauden: "month", kuukautta: "month", månad: "month", månader: "month", månaders: "month",
   years: "year", vuosi: "year", vuoden: "year", vuotta: "year", år: "year", års: "year",
+  tag: "day", tage: "day", tagen: "day", werktage: "day", werktagen: "day", arbeitstage: "day", arbeitstagen: "day",
+  woche: "week", wochen: "week",
+  monat: "month", monate: "month", monaten: "month", lebensmonat: "month", lebensmonate: "month", lebensmonaten: "month",
+  jahr: "year", jahre: "year", jahren: "year",
+  innerhalb: "within", binnen: "within", spätestens: "latest", prozent: "%",
   kuluessa: "within", inom: "within",
   ennen: "before", innan: "before", före: "before",
   jälkeen: "after", efter: "after",
@@ -110,13 +116,13 @@ export function includesWhole(hay: string, needle: string): boolean {
 }
 
 const PERIOD_WORDS =
-  "working days?|days?|weeks?|months?|years?|arkipäivää|päivää|päivän|viikkoa|viikon|kuukautta|kuukauden|vuotta|vuoden|dagar|veckor|månader|år";
-const MONEY_WORDS = "€|euros?|euroa|eur|%|per ?cent|prosenttia|procent|kronor|£|pounds?|\\$|dollars?|usd";
+  "working days?|business days?|banking days?|calendar days?|calendar months?|days?|weeks?|months?|years?|Werktagen?|Arbeitstagen?|Tagen?|Wochen?|Lebensmonaten?|Monaten?|Jahren?|arkipäivää|päivää|päivän|viikkoa|viikon|kuukautta|kuukauden|vuotta|vuoden|dagar|veckor|månader|år";
+const MONEY_WORDS = "€|euros?|euroa|eur|%|Prozent|per ?cent|prosenttia|procent|kronor|£|pounds?|\\$|dollars?|usd";
 const FIGURE_NUMBER = `(?:\\d{1,3}(?:[ \u00a0\u202f.,]\\d{3})+(?:[.,]\\d+)?|\\d+(?:[.,]\\d+)?|${Object.keys(NUMBER_WORDS).join("|")})`;
 const FIGURE_LEAD =
-  "(?:within|at least|at most|up to|no later than|no earlier than|not more than|a maximum of|a minimum of|vähintään|enintään|viimeistään|högst|minst|senast)";
+  "(?:within|at least|at most|up to|no later than|no earlier than|not more than|a maximum of|a minimum of|vähintään|enintään|viimeistään|högst|minst|senast|innerhalb von|innerhalb|spätestens|mindestens|höchstens|bis zu)";
 const FIGURE = new RegExp(
-  `(?<![\\p{L}\\p{N}])(?:${FIGURE_LEAD}\\s+)?(?:(?:[€£$]|EUR|USD|GBP)\\s?${FIGURE_NUMBER}|${FIGURE_NUMBER}(?:\\s?\\(\\d+\\))?\\s?(?:${PERIOD_WORDS}|${MONEY_WORDS}))(?:\\s+in advance)?(?![\\p{L}\\p{N}])`,
+  `(?<![\\p{L}\\p{N}])(?:${FIGURE_LEAD}\\s+)?(?:(?:[€£$]|EUR|USD|GBP)\\s?${FIGURE_NUMBER}|${FIGURE_NUMBER}(?:\\s?\\(\\d+\\))?\\s?(?:${PERIOD_WORDS}|${MONEY_WORDS}))(?:\\s+(?:in advance|kuluessa|sisällä))?(?![\\p{L}\\p{N}])`,
   "giu",
 );
 
