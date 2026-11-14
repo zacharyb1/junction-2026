@@ -14,7 +14,7 @@ This is an operational reference for the current implementation, not a roadmap o
 
 The bot configuration still targets a local Engine. Earlier Telegram tests used localhost links; production bot integration and reminder delivery are unverified. Detailed evidence is in [HERMES_HANDOVER.md](HERMES_HANDOVER.md).
 
-The web app and Engine can also run together in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac setup, persistent Case storage and connecting a native Hermes process. The Compose setup starts only the web service; it does not start Telegram or move existing runtime state.
+The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac/Linux setup and separate persistent volumes for Cases, Hermes state and Ollama models. The default Compose command starts only the web service; `--profile bot` explicitly starts Hermes and the Gemma gate too. Starting containers does not move existing runtime state. Exa and NVIDIA remain external API services.
 
 ## Deploying the web app
 
@@ -50,7 +50,7 @@ Deploying new code does not move local Cases to Blob or rewrite URLs in existing
 
 Installing or editing the repository does not require starting the shared bot. Web-only development uses `pnpm dev` and `/try` without Hermes. To exercise Telegram independently, use a different bot token and a fresh private home.
 
-For a bot host, the tested installer needs macOS/Linux, Git and curl; a local Engine also needs Node 22+ with npx, and the gate needs Podman/Docker or an existing local Ollama. Fedora was tested; macOS was not. Windows-native operation is not established by this handover.
+The [full-container setup](CONTAINERS.md#running-the-whole-project) needs Docker and Compose on the host; it packages the language runtimes and Hermes. The native instructions below are a separate option. For native installation, the tested installer needs macOS/Linux, Git and curl; a local Engine also needs Node 22+ with npx, and the gate needs Podman/Docker or an existing local Ollama. Fedora was tested; native macOS installation was not. Windows-native operation is not established by this handover.
 
 ```bash
 git clone https://github.com/zacharyb1/junction-2026.git
@@ -64,7 +64,7 @@ The installer is pinned and uses `.hermes-local/`; it does not depend on a teamm
 
 1. Create a different bot in BotFather and a separate test group. Use a **fresh** `.hermes-local/home`; cloning the source gives this, copying the live home does not.
 2. Populate `.hermes-local/home/.env` from [hermes/env.example](../hermes/env.example) in your editor. Set your own `TELEGRAM_BOT_TOKEN`, numeric `TELEGRAM_ALLOWED_USERS`, provider key and Exa key. Set `CASEFILE_URL` to the chosen Engine's **full `/api/mcp` URL** and `CASEFILE_SECRET` to that Engine's secret. Keep the test token local; do not replace the shared keys repo's `bot.env`.
-3. For a local Engine, also fill the root `.env.local` from `.env.example`, omit Blob for isolated data, and make the two `CASEFILE_SECRET` values match. The default Engine port is 3000. `start.sh` starts the local Engine itself when the MCP URL is localhost; do not also run `pnpm dev` on that port. For an Engine already running in Docker, use the [foreground gateway procedure](CONTAINERS.md#connecting-hermes) instead of `start.sh`. For a remote preview, complete its deployment/auth checks first.
+3. For a local Engine, also fill the root `.env.local` from `.env.example`, omit Blob for isolated data, and make the two `CASEFILE_SECRET` values match. The default Engine port is 3000. `start.sh` starts the local Engine itself when the MCP URL is localhost; do not also run `pnpm dev` on that port. For an Engine already running in Docker, use the [foreground gateway procedure](CONTAINERS.md#native-hermes-option) instead of `start.sh`. For a remote preview, complete its deployment/auth checks first.
 4. Configure the runtime and install the gate, if used:
 
    ```bash
@@ -83,11 +83,11 @@ The bot host must stay awake and online. `start.sh` backgrounds processes; this 
 
 **One active gateway per Telegram token**, whether Hermes or another runtime. A second poller causes conflicts; branches, profiles and laptops do not provide independent bot identities. A different token plus fresh runtime state is the independent-development boundary.
 
-`start.sh` checks only PID files in its own `.hermes-local/run`. There is **no cross-machine lock, lease, automatic failover or scheduler deduplication across hosts**. A missing local PID file does not prove the shared token is unused elsewhere. There is no automatic duplicate prevention to rely on in the current implementation.
+`start.sh` checks only PID files in its own `.hermes-local/run`. The container setup requires explicit bot startup and checks which token owns its saved home, but those checks cover only that storage. There is **no cross-machine lock, lease, automatic failover or scheduler deduplication across hosts**. A missing local PID file or fresh container does not prove the shared token is unused elsewhere.
 
 For transferring the shared bot:
 
-1. Establish which host currently runs that token. Stop its gateway and scheduler before starting a replacement. `bash hermes/stop.sh` handles the processes tracked by that checkout and snapshots local Cases; separately started gateways/schedulers or service-manager restarts must also be accounted for. Confirm the old host will remain stopped.
+1. Establish which host currently runs that token. Stop its gateway and scheduler before starting a replacement. For the native setup, `bash hermes/stop.sh` handles the processes tracked by that checkout and snapshots local Cases. For Compose, `docker compose --env-file .env.local --profile bot stop hermes` stops the bot container. Separately started gateways/schedulers or service-manager restarts must also be accounted for. Confirm the old host will remain stopped.
 2. Retain a private backup of the old Hermes home and local Case data. A source clone carries neither. Decide explicitly which memories, conversations and pending jobs must continue; a fresh home starts without them.
 3. Install Hermes on the new host. Restore/reconcile any retained state while both gateways are stopped, using the runtime's supported state handling. Reapply configuration for the new paths, Engine URL, admin IDs and delivery group. The project does **not** provide an automated or validated machine-to-machine state migration; Case backups alone do not migrate Hermes.
 4. Check that each pending reminder has one active owner and its Case URL is still reachable. Then start the replacement and check a normal reply and Case link. Polling conflicts are a reason to stop the replacement and locate the other poller, not a successful handover.
@@ -112,6 +112,7 @@ Stop the bot before switching its endpoint, then restart on the chosen host. Thi
 | `.data/cases` | Local Engine Case JSON | Absent; old local links need the original data and origin. |
 | `.hermes-local/case-backups` | Exact Case snapshots for preservation/recovery | Absent; does not include conversations or cron jobs. |
 | `.hermes-local/home/state.db`, memory files and `cron/` | Conversations, memory and scheduled-job state | Absent; Git and Vercel do not synchronize them. |
+| Compose `case-data`, `hermes-home`, `ollama-data` volumes | Container Cases, private bot state/reminders and downloaded models | Created for that Compose project; no automatic import from native state. Container replacement retains them; `down -v` deletes them. |
 | Private Blob store | Cases for deployments using that store's token | Remains remote; reusing the token reuses the same data. |
 
 A Git pull changes source, not running processes. The local startup script reuses an existing `.next/BUILD_ID`; it does not automatically rebuild after source updates. For a managed local Engine update, stop the runtime, retain its data, run the repository's checks/build, then start again. For a deployed Engine, the web deployment is independent of the persistent bot host. Runtime prompt/config updates still need their own application/restart; see [the runbook](../hermes/README.md).

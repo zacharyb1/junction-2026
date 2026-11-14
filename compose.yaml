@@ -1,15 +1,21 @@
-# Web only: this never starts a Telegram poller or copies a Hermes home.
+# Default startup runs only web. --profile bot explicitly starts Telegram + its gate.
 services:
   web:
     build:
       context: .
       args:
-        PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:3000}
+        PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:${KAVERI_HTTP_PORT:-3000}}
         NEXT_PUBLIC_BOT_USERNAME: ${NEXT_PUBLIC_BOT_USERNAME:-}
         NEXT_PUBLIC_SAMPLE_CASE_ID: ${NEXT_PUBLIC_SAMPLE_CASE_ID:-}
         NEXT_PUBLIC_REPO_URL: ${NEXT_PUBLIC_REPO_URL:-}
     env_file:
       - .env.local
+    environment:
+      # The bot reaches web through the Compose network; people need a browser URL.
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:${KAVERI_HTTP_PORT:-3000}}
+      # Use the same values for both services; commands supply --env-file .env.local.
+      CASEFILE_SECRET: ${CASEFILE_SECRET:-}
+      EXA_API_KEY: ${EXA_API_KEY:-}
     ports:
       - "127.0.0.1:${KAVERI_HTTP_PORT:-3000}:3000"
     volumes:
@@ -17,5 +23,60 @@ services:
     init: true
     stop_grace_period: 30s
 
+  ollama:
+    image: docker.io/ollama/ollama:0.40.16
+    profiles: [bot]
+    volumes:
+      - ollama-data:/root/.ollama
+    # Internal only. Mac Docker uses CPU; no host GPU/socket/port is required.
+    healthcheck:
+      test: [CMD, ollama, list]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  gate-init:
+    image: docker.io/ollama/ollama:0.40.16
+    profiles: [bot]
+    entrypoint: [/bin/sh]
+    command: [/kaveri/init.sh]
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      KAVERI_GATE_MODEL: gemma3:1b
+    volumes:
+      - ./containers/gate/init.sh:/kaveri/init.sh:ro
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
+  hermes:
+    profiles: [bot]
+    build:
+      context: .
+      dockerfile: containers/hermes/Dockerfile
+    env_file:
+      - path: .env.bot
+        required: false
+    environment:
+      CASEFILE_URL: http://web:3000/api/mcp
+      CASEFILE_SECRET: ${CASEFILE_SECRET:-}
+      EXA_API_KEY: ${EXA_API_KEY:-}
+      KAVERI_GATE_URL: http://ollama:11434
+      KAVERI_GATE_MODEL: gemma3:1b
+    volumes:
+      - hermes-home:/opt/data
+    depends_on:
+      web:
+        condition: service_healthy
+      gate-init:
+        condition: service_completed_successfully
+    init: true
+    # Allow the pinned runtime's reminder drain and cleanup budget before forced exit.
+    stop_grace_period: 90s
+
 volumes:
   case-data:
+  hermes-home:
+  ollama-data:

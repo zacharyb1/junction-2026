@@ -103,7 +103,7 @@ See [Hermes handover](docs/HERMES_HANDOVER.md) for timings, field-reading limita
 
 ## Run the web app
 
-On a Mac, the [Docker setup](docs/CONTAINERS.md) builds and runs the web app and Engine without installing Node or pnpm on the host. It starts no Telegram bot. The native setup below provides live reload while editing code; the container setup requires a rebuild after code changes.
+On a Mac, the [Docker setup](docs/CONTAINERS.md) can run the whole project without installing Node, Python, pnpm or Hermes on the host. Its default command starts the web app and Engine; the explicit `bot` profile adds Hermes and the local Gemma gate. The native web setup below provides live reload while editing code; container source changes require a rebuild.
 
 Use Node 22+ and the pnpm version in `package.json`. From the repository root:
 
@@ -119,14 +119,14 @@ The team's secrets live in the separate private `kapuchai/junction-2026-keys` re
 
 ## Deployment and Telegram operation
 
-There are **two separate running parts**: the Next.js app on Vercel or in a container, and Hermes on an awake laptop/server. Orca and Claude Code are development tools; neither is needed to keep the product running. Deploying the web app does not start a Telegram bot.
+The web app/Engine, Hermes and the local model are separate processes. [Docker Compose](docs/CONTAINERS.md) can run all of them on one Mac or Linux server, with persistent storage for Cases, bot state and models. The default web startup starts no Telegram bot; `--profile bot` starts the whole stack. Vercel plus a separate bot host and the native installation remain options. Orca and Claude Code are development tools; neither is needed to keep the product running.
 
 [Deployment and runtime state](docs/DEPLOYMENT.md) describes the existing Vercel connection, required environment variables and Blob storage, plus the two supported operational choices for Telegram:
 
 - **Independent development:** use `/try` with no Hermes process, or a fresh Hermes home with a separate BotFather token and test group.
 - **The shared bot:** one active gateway for its token. A transfer requires the previous gateway/scheduler to be stopped and its private state handled before the replacement starts.
 
-The current scripts have **no cross-machine lock**. Separate branches, laptops or Hermes profiles do not make a shared token safe to run twice. The shared secrets helper can replace a local test token; copying a live home also copies reminder state. These limits and the exact setup commands are documented in the deployment guide.
+The current scripts and containers have **no cross-machine lock**. Separate branches, laptops or Compose/Hermes profiles do not make a shared token safe to run twice. The shared secrets helper can replace a local test token; copying a live home also copies reminder state. The [container guide](docs/CONTAINERS.md) explains the two env files, explicit bot startup and persistent volumes. The deployment guide records shared-token transfer requirements.
 
 The tested bot configuration uses localhost Case links, which do not open on teammates' phones. Production bot integration has not been verified. Changing the Engine URL does not move existing Cases, memories or reminders.
 
@@ -161,7 +161,7 @@ This handover records implemented behavior, tests, limitations and earlier decis
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Changing the Engine, Case schema, transport or bot integration. |
 | [docs/HERMES_HANDOVER.md](docs/HERMES_HANDOVER.md) | Reading bot evidence, repairs and limitations. |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deploying the app, setting up an independent bot or transferring the shared runtime. |
-| [docs/CONTAINERS.md](docs/CONTAINERS.md) | Running the web app in Docker on a Mac or Linux host, retaining its data, or connecting native Hermes. |
+| [docs/CONTAINERS.md](docs/CONTAINERS.md) | Running the whole project or only the website in Docker, retaining state and controlling bot startup. |
 | [hermes/README.md](hermes/README.md), [CHECKS.md](hermes/CHECKS.md) | Installing/operating Hermes or checking a configuration assumption. |
 | [docs/TECH_CHALLENGES.md](docs/TECH_CHALLENGES.md) | Choosing sponsor work or preparing its submission note. |
 | [docs/PLAN.md](docs/PLAN.md) | Reading the historical product design and proposed demo; its milestones are not current assignments. |
