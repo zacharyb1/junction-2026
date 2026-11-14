@@ -1,30 +1,19 @@
-import { ArrowRight, CodeXml } from "lucide-react";
+import { Arrow } from "@/components/landing/glyphs";
 import { TryLink } from "@/components/landing/try-link";
+import { InkReveal } from "@/components/landing/reading-motion";
+import { ReadingPlate } from "@/components/landing/reading-plates";
 
-const LINK = "inline-flex items-center gap-1.5 font-medium text-foreground underline-offset-4 hover:underline";
-
-/** The source link shows only when a repository URL is configured. */
 export function SiteFooter({ repoUrl }: { repoUrl: string | null }) {
   return (
-    <footer className="border-t">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 py-8 text-sm text-muted-foreground sm:px-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="l-footer">
+      <div className="l-wrap">
+        <p className="l-footer-title">A next step you can <span className="l-footer-mark">check.<InkReveal className="l-footer-ink"><ReadingPlate name="next-underline" className="reading-ink-inner" /></InkReveal></span></p>
+        <TryLink className="l-action l-action--primary">Try it in the browser <Arrow /></TryLink>
+        <div className="l-footer-row">
           <p>Built at Junction 2026 for the Exa challenge.</p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <TryLink className={LINK}>
-              Try it in the browser <ArrowRight className="size-4" />
-            </TryLink>
-            {repoUrl && (
-              <a href={repoUrl} target="_blank" rel="noreferrer" className={LINK}>
-                <CodeXml className="size-4" /> Source code
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            )}
-          </div>
+          {repoUrl && <a href={repoUrl} target="_blank" rel="noreferrer" className="l-link">Source code <Arrow dir="up-right" /><span className="sr-only"> (opens in a new tab)</span></a>}
         </div>
-        <p className="text-xs">
-          Kaveri is an independent hackathon project. It is not affiliated with Kela, Vero or Telegram.
-        </p>
+        <small>Kaveri is Finnish for “buddy”. Kaveri is an independent hackathon project. It is not affiliated with Kela, Vero or Telegram.</small>
       </div>
     </footer>
   );

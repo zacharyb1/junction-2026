@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Worktrees of background agents hold their own copy of the project.
     ".claude/worktrees/**",
+    // Generated design review snapshots include compiled third-party runtime code.
+    ".impeccable/**",
   ]),
 ]);
 

@@ -1,46 +1,42 @@
-import { ArrowRight, ConciergeBell, FileCheck } from "lucide-react";
-import { LinkButton, linkButtonClasses } from "@/components/landing/link-button";
+import Link from "next/link";
+import { CalendarDays, MapPin, ArrowRight } from "lucide-react";
+import { ReadingPlate } from "@/components/landing/reading-plates";
+import { InkReveal, ReadingMotion } from "@/components/landing/reading-motion";
+import { planLines } from "@/components/landing/sample";
 import { TryLink } from "@/components/landing/try-link";
 
-/** Name, promise and the two ways in. The sample case button hides when no sample case is configured. */
+const INK = ["wordmark-ink", "headline-highlight", "intro-ink", "sample-circle", "case-underline", "plan-highlight", "proof-bracket", "bracket-underline", "plan-arrow", "publisher-highlight", "source-highlight", "source-arrow", "divider"] as const;
+
+/** Source-first reading is real text. The marks never carry information alone. */
 export function Hero({ sampleCaseHref }: { sampleCaseHref: string | null }) {
+  const line = planLines.find(item => item.source.n === 5)!;
   return (
-    <section aria-labelledby="hero-title" className="flex flex-col gap-6">
-      <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <ConciergeBell className="size-4" />
-        </span>
-        <span className="text-lg font-semibold tracking-tight">Kaveri</span>
-        <span className="text-sm text-muted-foreground">Finnish for “buddy”</span>
-      </p>
-
-      <h1 id="hero-title" className="text-4xl leading-[1.1] font-semibold tracking-tight text-balance sm:text-5xl">
-        The butler that lives in your family group chat.
-      </h1>
-
-      <p className="max-w-xl text-lg text-pretty text-muted-foreground">
-        It reads along and <strong className="font-medium text-foreground">says nothing</strong>, until someone
-        mentions a life event. Then it researches the live web with Exa and posts a short plan: what to do, by
-        when, and what you are entitled to. Every line carries{" "}
-        <strong className="font-medium text-foreground">a source you can check</strong>.
-      </p>
-
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <TryLink className={linkButtonClasses({ size: "cta" })}>
-          Try it in the browser <ArrowRight />
-        </TryLink>
-        {sampleCaseHref && (
-          <LinkButton href={sampleCaseHref} variant="outline" size="cta">
-            <FileCheck /> See a sample case file
-          </LinkButton>
-        )}
-      </div>
-
-      <p className="max-w-xl text-sm text-pretty text-muted-foreground">
-        Built first for international families in Finland, who deal with Kela, Vero and landlords in a language
-        they do not read. Twelve countries have a checked list of official sites. Elsewhere it searches the open web
-        and labels every source.
-      </p>
+    <section className="reading-hero" aria-labelledby="hero-title">
+      <ReadingMotion>
+        {INK.map(name => <ReadingPlate key={name} name={name} />)}
+        <h1 id="hero-title" className="r-headline">Your family’s next<br />step, sourced.</h1>
+        <p className="r-intro">The butler in your family group chat.</p>
+        <p className="r-sample-label">Sample case</p>
+        <h2 className="r-case-title">Expecting a baby</h2>
+        <MapPin className="r-location-icon" aria-hidden="true" />
+        <p className="r-location">Espoo, Finland</p>
+        <h3 className="r-plan">{line.what}</h3>
+        <span className="r-task-notation" aria-label="Source 5">5</span>
+        <CalendarDays className="r-calendar" aria-hidden="true" />
+        <p className="r-deadline">{line.when}</p>
+        <span className="r-plan-label" aria-hidden="true">plan</span>
+        <span className="r-bracket-label" aria-hidden="true">supported<br />by</span>
+        <p className="r-publisher">5 · {line.source.publisher}</p>
+        <blockquote className="r-source" cite={line.source.href}>“{line.source.quote}”</blockquote>
+        <span className="r-source-label" aria-hidden="true">source</span>
+        <span className="r-source-rule" aria-hidden="true" />
+        <a className="r-source-link" href={line.source.href} target="_blank" rel="noreferrer">Read the source <ArrowRight aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
+        <div className="r-try"><TryLink className="reading-action">Try it in the browser <ArrowRight aria-hidden="true" /></TryLink></div>
+        <div className="r-sample-link">{sampleCaseHref ? <Link className="reading-action reading-action--secondary" href={sampleCaseHref}>View sample case</Link> : <a className="reading-action reading-action--secondary" href="#sample-plan">View sample plan</a>}</div>
+        <h2 id="silent-title" className="r-next-title">Silent until it matters.</h2>
+        <InkReveal className="r-next-underline"><ReadingPlate name="next-underline" className="reading-ink-inner" /></InkReveal>
+        <p className="r-next-intro">A life event. Live research. A sourced plan.</p>
+      </ReadingMotion>
     </section>
   );
 }

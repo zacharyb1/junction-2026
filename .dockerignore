@@ -11,6 +11,10 @@
 !src/**
 !public/
 !public/**
+# The landing imports these local images into Next's static asset bundle.
+!assets/
+!assets/plates/
+!assets/plates/*.png
 # Keep future env/key files out even if added under an allowed source directory.
 **/.env*
 **/*.pem

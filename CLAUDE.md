@@ -11,6 +11,8 @@ The team uses Claude Code with its own workflows and tools. This repository does
 - [docs/HERMES_HANDOVER.md](docs/HERMES_HANDOVER.md), [hermes/README.md](hermes/README.md), [hermes/CHECKS.md](hermes/CHECKS.md): measured bot behavior, setup reference and unverified assumptions.
 - [eval/README.md](eval/README.md): live scorecards, cost and result-file behavior. [docs/TECH_CHALLENGES.md](docs/TECH_CHALLENGES.md) records demonstrated versus proposed sponsor roles; [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) records submission requirements.
 
+- Design system: DESIGN.md (product context: PRODUCT.md).
+
 ## Project invariants and operational limits
 
 - Research and verification live in the shared Engine. Conversation, silence, approvals, drafts and reminders live in the bot runtime.

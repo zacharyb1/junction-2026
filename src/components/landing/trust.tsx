@@ -1,137 +1,138 @@
-import { BadgeCheck, CircleAlert, Hand, Scale, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { Attention, Check, Cross } from "@/components/landing/glyphs";
+import { approvalStep, firstGap } from "@/components/landing/sample";
 import { Section } from "@/components/landing/section";
-import { Badge } from "@/components/ui/badge";
 import { labels } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 /** The marks below use the case page's own English labels, so the two pages cannot drift apart. */
 const t = labels("en");
 
-/** Same accent tints as the case page. The extra classes let a long badge wrap on a narrow phone. */
-const BADGE = "h-auto min-h-5 max-w-full shrink whitespace-normal";
-const GOOD = `${BADGE} bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200`;
-const WARN = `${BADGE} bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200`;
-const WARN_ICON = "mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400";
+const MARK = {
+  /** The quote was found. */
+  go: { className: "l-lamp--go", Glyph: Check },
+  /** The quote was not found. */
+  stop: { className: "l-lamp--stop", Glyph: Cross },
+  /** Something the reader has to look at or decide. */
+  attention: { className: "", Glyph: Attention },
+} as const;
 
-function TrustCard({
-  icon: Icon,
-  title,
-  text,
-  children,
-}: {
-  icon: LucideIcon;
-  title: string;
-  text: string;
-  /** A small specimen of what this looks like in a case file. */
-  children: ReactNode;
-}) {
+/** Keeps a figure and its unit on one line. The words are unchanged. */
+const NBSP = "\u00a0";
+
+/** A status line: a verification glyph, then the words. Colour is never the only signal. */
+function Status({ tone, strong = false, children }: { tone: keyof typeof MARK; strong?: boolean; children: ReactNode }) {
+  const { className, Glyph } = MARK[tone];
   return (
-    <li className="flex flex-col gap-3 rounded-xl border bg-card p-4 sm:p-5">
-      <div className="flex items-center gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Icon className="size-4" />
-        </span>
-        <h3 className="font-medium">{title}</h3>
+    <span className={cn("l-status", strong && "l-status--strong")}>
+      <span className={cn("l-lamp", className)}>
+        <Glyph />
+      </span>
+      <span>{children}</span>
+    </span>
+  );
+}
+
+/** One promise, with a specimen of what it looks like in a case file. */
+function Claim({ title, text, children }: { title: string; text: string; children: ReactNode }) {
+  return (
+    <li className="l-claim">
+      <div className="l-claim-text">
+        <h3>{title}</h3>
+        <p>{text}</p>
       </div>
-      <p className="text-sm text-muted-foreground">{text}</p>
-      {/* flex-1 lets the specimen fill the card, so two cards in a row end on the same line. */}
-      <div className="flex-1 rounded-lg border border-dashed p-3 text-sm">{children}</div>
+      <div className="l-specimen">{children}</div>
     </li>
   );
 }
 
-/** One verification mark and what it means for the reader. */
-function Mark({ tone, icon: Icon, label, children }: { tone: string; icon: LucideIcon; label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col items-start gap-1">
-      <dt className="max-w-full">
-        <Badge className={tone}>
-          <Icon /> {label}
-        </Badge>
-      </dt>
-      <dd>{children}</dd>
-    </div>
-  );
-}
-
 /**
- * The specimens quote src/data/sample-case.json word for word: source 4 with its prior belief,
- * the first unverified item and the step that waits for approval.
+ * Two specimens are read from src/data/sample-case.json (see sample.ts): the first unverified item and
+ * the step that waits for approval. The "Two figures found" specimen is not in the sample case. It shows
+ * the wording the case page uses, with made-up figures. Keep the section hint true when you edit.
  */
 export function Trust() {
   return (
     <Section
       id="trust"
       title="Why you can trust it"
-      hint="A language model can sound sure and still be wrong. So Kaveri shows where every line comes from, and says what it could not confirm. The examples below are from our sample case."
+      hint="A language model can sound sure and still be wrong. So Kaveri shows where every line comes from, and says what it could not confirm. The sample case and an explicitly labelled illustration show how this works."
     >
-      <ul className="grid gap-3 md:grid-cols-2">
-        <TrustCard
-          icon={BadgeCheck}
+      <ul>
+        <Claim
           title="Every quote is checked"
           text="The assistant does not grade its own work. Our server reads each cited page again, with its own request and through Exa, and looks for the quoted sentence. The result sits next to the quote."
         >
-          <dl className="flex flex-col gap-3">
-            <Mark tone={GOOD} icon={BadgeCheck} label={t.foundLive}>
-              Our own request to the page found the sentence.
-            </Mark>
-            <Mark tone={GOOD} icon={BadgeCheck} label={t.foundExa}>
-              Our own request could not confirm it, for example on a PDF. Exa&apos;s reading of the page has the
-              sentence.
-            </Mark>
-            <Mark tone={WARN} icon={CircleAlert} label={t.notFound}>
-              The line is taken out of the plan and listed as unverified.
-            </Mark>
+          <dl className="l-legend">
+            <div>
+              <dt>
+                <Status tone="go" strong>
+                  {t.foundLive}
+                </Status>
+              </dt>
+              <dd>Our own request to the page found the sentence.</dd>
+            </div>
+            <div>
+              <dt>
+                <Status tone="go" strong>
+                  {t.foundExa}
+                </Status>
+              </dt>
+              <dd>
+                Our own request could not confirm it, for example on a PDF. Exa&apos;s reading of the page has the
+                sentence.
+              </dd>
+            </div>
+            <div>
+              <dt>
+                <Status tone="stop" strong>
+                  {t.notFound}
+                </Status>
+              </dt>
+              <dd>The line is taken out of the plan and listed as unverified.</dd>
+            </div>
           </dl>
-        </TrustCard>
+        </Claim>
 
-        <TrustCard
-          icon={Scale}
+        <Claim
           title="When sources disagree"
           text="Two pages can give different figures for the same step, for example last year's rate and this year's. The case file shows both with their sources. It does not pick one for you in silence."
         >
-          <dl className="flex flex-col gap-2">
+          <p className="l-illustrative">Illustrative example</p>
+          <dl className="l-fields">
             <div>
-              <dt className="text-xs font-medium text-muted-foreground">Step</dt>
+              <dt>Step</dt>
               <dd>Claim the tax credit for household expenses</dd>
             </div>
             <div>
-              <dt className="text-xs font-medium text-muted-foreground">In the case file</dt>
-              <dd className="flex gap-2">
-                <Scale className={WARN_ICON} />
-                <span>Two figures found: “35 %” [2] and “40 %” [5]. Check which one applies to you.</span>
+              <dt>In the case file</dt>
+              <dd>
+                <Status tone="attention">
+                  Two figures found: “35{NBSP}%” [2] and “40{NBSP}%” [5]. Check which one applies to you.
+                </Status>
               </dd>
             </div>
           </dl>
-        </TrustCard>
+        </Claim>
 
-        <TrustCard
-          icon={CircleAlert}
+        <Claim
           title="Gaps are listed, not hidden"
           text="No source, no number. What the assistant could not confirm goes on a list in the case file, next to the questions that are still open."
         >
-          <p className="flex gap-2">
-            <CircleAlert className={WARN_ICON} />
-            <span>
-              The amount of the cash benefit for this year. The Kela page says the value increased but I did not
-              capture the figure, so I am not stating one.
-            </span>
-          </p>
-        </TrustCard>
+          <Status tone="attention">{firstGap}</Status>
+        </Claim>
 
-        <TrustCard
-          icon={Hand}
+        <Claim
           title="Nothing is sent without you"
           text="Kaveri researches and prepares. It never sends, files, books or pays on its own. A step that needs your decision is marked and waits for you."
         >
-          <div className="flex gap-2">
-            <Hand className={WARN_ICON} />
-            <div className="flex min-w-0 flex-col items-start gap-2">
-              <p className="font-medium">Tell both employers about parental leave</p>
-              <Badge className={WARN}>{t.approveInChat}</Badge>
-            </div>
-          </div>
-        </TrustCard>
+          <Status tone="attention" strong>
+            {approvalStep}
+          </Status>
+          <p className="l-decision-note">
+            <span className="l-chip">Needs your decision</span>
+          </p>
+        </Claim>
       </ul>
     </Section>
   );
