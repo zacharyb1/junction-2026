@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { ChatScreen } from "@/components/chat-screen";
-import { SiteShell } from "@/components/site/site-shell";
 
 const title = "Chat with UKK";
-const description = "Talk to UKK, the butler of AIDaddy: life in Finland, official letters, and finding anything to buy, with sources.";
+const description = "Talk to UKK, the family butler of AIDaddy: gifts, medicines, moves and official letters, with sources.";
 
 export const metadata: Metadata = {
   title,
@@ -12,14 +11,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-/** The full-screen chat with UKK, laid out like a chat app, so it works as an app on a phone as well as on a laptop. */
+/**
+ * The full-screen chat with UKK in its own family look, so it works as an app on a phone as well as on a laptop.
+ * It has no site header or footer and does not use the site's dark frame.
+ */
 export default async function AssistantPage({ searchParams }: PageProps<"/assistant">) {
   const params = await searchParams;
   const code = typeof params.code === "string" ? params.code.trim() : "";
-  // bare: no site header or footer, the chat fills the screen.
-  return (
-    <SiteShell bare>
-      <ChatScreen code={code} />
-    </SiteShell>
-  );
+  return <ChatScreen code={code} />;
 }
