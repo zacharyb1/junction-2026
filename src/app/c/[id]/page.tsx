@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ActionLog } from "@/components/action-log";
 import { CopyButton } from "@/components/copy-button";
 import { DeadlineDate } from "@/components/deadline-date";
 import { ListenButton } from "@/components/listen-button";
@@ -414,6 +415,25 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
           </ul>
         </Section>
       )}
+
+      {c.actions?.length ? (
+        <Section title={t.actions}>
+          <p className="text-sm text-muted-foreground">{t.actionsHint}</p>
+          <ActionLog
+            caseId={c.id}
+            actions={c.actions}
+            t={{
+              actionKind: t.actionKind,
+              actionTrigger: t.actionTrigger,
+              approve: t.approve,
+              approved: t.approved,
+              approvedNote: t.approvedNote,
+              approvedLetter: t.approvedLetter,
+              approveFailed: t.approveFailed,
+            }}
+          />
+        </Section>
+      ) : null}
 
       {c.trail && (
         <Section title={t.researched}>
