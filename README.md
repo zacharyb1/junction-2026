@@ -8,19 +8,21 @@ Built for international families in Finland at Junction 2026, Espoo, 13–15 Nov
 
 This is the **Saturday 14 November morning handover**, on the Hermes bot branch. It describes work available for review, not a claim that every feature is deployed. Check current branches and PRs before integrating.
 
-| Workstream | Where we left off | Next owner/action |
-|---|---|---|
-| Shared Engine and web app | `main` contains research, verification, case pages, browser demo and the optional Oxylabs reader. | Zachary owns Engine and production integration. |
-| Hermes bot | [Draft PR #6](https://github.com/zacharyb1/junction-2026/pull/6): local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows worked against a local Engine. | Vlad; evidence and outstanding checks in [Hermes handover](docs/HERMES_HANDOVER.md). |
-| Verifier review | [Draft PR #7](https://github.com/zacharyb1/junction-2026/pull/7): require an individual page reading to verify a quote; withhold unsupported money items. Separate from #6. | Zachary reviews the trade-off and persistence impact before merging. |
-| Alternate bot | Milan's `scaffold/milestone-1-2` is a separate Hono/Mastra track; this handover does not certify it. | Team compares concrete scenarios at the planned Saturday 10:30 bake-off. |
-| Landing design | Separate `vlad/landing-redesign` workstream. | Coordinate with its owner; no design changes are part of this handover. |
+| Workstream | State at handover |
+|---|---|
+| Shared Engine and web app | `main` contains research, verification, case pages, browser demo and the optional Oxylabs reader. |
+| Hermes bot | [Draft PR #6](https://github.com/zacharyb1/junction-2026/pull/6): local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows passed against a local Engine. Detailed evidence is in [Hermes handover](docs/HERMES_HANDOVER.md). |
+| Verifier review | [Draft PR #7](https://github.com/zacharyb1/junction-2026/pull/7): independent-reading verification and withholding unsupported money items. Separate from #6 and not merged. |
+| Alternate bot | `scaffold/milestone-1-2` is the separate Hono/Mastra track; this handover does not certify it. |
+| Landing design | Separate `vlad/landing-redesign` branch; outside this handover's changes. |
 
-No PR was merged by this continuation. Merging `main` deploys to production. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`. Their owners can close the redundant drafts after checking.
+No PR was merged by this continuation. The existing Vercel project deploys `main`. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`.
+
+**Runtime snapshot, Saturday morning:** the local Engine process is running and five Case files are present. No running Hermes gateway was found during the latest process check. Its configuration still targets the local Engine; the gate plugin is installed. The successful Telegram tests below are earlier evidence, not a claim that the bot is online now. No service was started or stopped during this documentation pass.
 
 ## Goal and core concepts
 
-The demo should complete a few chosen scenarios reliably: notice the event, acknowledge it, return a sourced plan, open its case file, and carry out an approved follow-up such as saving a draft. The team will choose those scenarios together. Unscripted messages should produce useful sourced research, a clear limitation, or group silence. We are not trying to cover every possible family situation before submission.
+The demo should complete a few chosen scenarios reliably: notice the event, acknowledge it, return a sourced plan, open its case file, and carry out an approved follow-up such as saving a draft. A final scenario set is not recorded in this handover. Unscripted messages should produce useful sourced research, a clear limitation, or group silence. We are not trying to cover every possible family situation before submission.
 
 | Concept | Meaning |
 |---|---|
@@ -113,11 +115,18 @@ Set `EXA_API_KEY`, `CASEFILE_SECRET` and `DEMO_ACCESS_CODE` in `.env.local`; ope
 
 The team's secrets live in the separate private `kapuchai/junction-2026-keys` repository, in `app.env` and `bot.env`. Get access through the team. Never paste values into chat or commit them here.
 
-## Run the bot
+## Deployment and Telegram operation
 
-Follow the [Hermes handover's fresh-clone steps](docs/HERMES_HANDOVER.md#run-from-a-fresh-clone), then the [runbook](hermes/README.md#quick-start-the-repo-local-install). They cover the pinned install, secrets, configuration, gate, group setup and expected checks. Coordinate with the current operator before starting the shared token.
+There are **two separate running parts**: the Next.js app on Vercel, and Hermes on an awake laptop/server. Orca and Claude Code are development tools; neither is needed to keep the product running. Deploying the web app does not start a Telegram bot.
 
-The tested bot uses a **local Engine**. Its localhost links do not open on teammates' phones. Production integration needs the deployed URL, matching secret and an end-to-end check with Zachary; public web pages being reachable does not establish that integration.
+[Deployment and runtime state](docs/DEPLOYMENT.md) describes the existing Vercel connection, required environment variables and Blob storage, plus the two supported operational choices for Telegram:
+
+- **Independent development:** use `/try` with no Hermes process, or a fresh Hermes home with a separate BotFather token and test group.
+- **The shared bot:** one active gateway for its token. A transfer requires the previous gateway/scheduler to be stopped and its private state handled before the replacement starts.
+
+The current scripts have **no cross-machine lock**. Separate branches, laptops or Hermes profiles do not make a shared token safe to run twice. The shared secrets helper can replace a local test token; copying a live home also copies reminder state. These limits and the exact setup commands are documented in the deployment guide.
+
+The tested bot configuration uses localhost Case links, which do not open on teammates' phones. Production bot integration has not been verified. Changing the Engine URL does not move existing Cases, memories or reminders.
 
 ## Validate a change
 
@@ -133,32 +142,24 @@ pnpm build
 
 Use an isolated checkout/copy for builds while the shared demo Engine is running; builds and type generation write `.next`. Live scorecards incur API usage and write result files: follow [eval/README.md](eval/README.md), explicitly use `--concurrency 2`, and use `--no-scorecard` for experiments that should not replace the published scorecard. Bot rehearsals are described in the runbook and do not prove Telegram delivery.
 
-## Next work for the team
+## Claude Code and existing workflows
 
-1. **Choose and rehearse the demo scenarios.** Compare the two bot tracks, inspect the plan wording and verify fresh case links from another device. Include a due reminder only if it is in the chosen demo.
-2. **Review integration.** Zachary reviews #7's verification/persistence trade-off and #6's runtime handover, then coordinates production credentials and deployment. Keep the two reviews separate.
-3. **Finish the submission evidence.** Refresh pitch numbers from the chosen build, record the ≤2-minute video and backup demo, confirm challenge selections and organizer source access. The existing pitch/voiceover contains earlier measurements.
-4. **Take optional work only after the core path is ready.** Decide whether to prove Oxylabs, add voice, or build the change watch. The watch still needs an alert rule, chat ownership and a controllable demo page before Context.dev/Aiven become demonstrable roles.
+[CLAUDE.md](CLAUDE.md) contains project context, invariants and document pointers for Claude Code. It does not require Orca, a particular agent setup, or this machine's global skills, plugins or MCP servers. The repository's `.claude/commands/` and coding skills are optional helpers; teammates can keep their own workflows and tools.
 
-Planned milestones, all Helsinki time: bot choice Saturday 10:30; feature freeze Saturday 20:00; final submission Sunday 15 November 10:00; peer review Sunday 10:30–13:00. [Submission checklist](docs/SUBMISSION_CHECKLIST.md) carries the final requirements.
+The `hermes/skills/butler/` files are different: they are product instructions loaded by the running bot. They are not instructions to install skills into a teammate's Claude Code environment.
 
-For later architecture work, the first candidate is to give bot configuration one executable source: `configure.sh`, the YAML snippet and manual setup currently overlap. A shared policy for projecting stored Cases into Plans is a separate candidate after #7. These are recommendations, not approved implementation changes.
-
-## Working with coding agents
-
-Start an agent at the repository root and have it read [AGENTS.md](AGENTS.md). Give it the intended outcome, branch and relevant workstream. That file routes it to the contracts, decision history, task-specific checks and runtime precautions. [CLAUDE.md](CLAUDE.md) points to the same rules and adds Claude-specific helpers; there is no second copy of the project policy.
-
-Use a separate branch/worktree per workstream, agree who owns any shared running service, and hand back the commit, checks, evidence and unresolved limitations. Agent or CLI output is not itself evidence that a message reached Telegram or a change reached production.
+This handover records implemented behavior, tests, limitations and earlier decisions. Historical plans remain available for context; they are not a task allocation or a current roadmap.
 
 | Document | Read it when… |
 |---|---|
 | [GLOSSARY.md](GLOSSARY.md) | Naming concepts or describing product behavior. |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Understanding why a choice was made or proposing to change it. |
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Changing the Engine, Case schema, transport or bot integration. |
-| [docs/HERMES_HANDOVER.md](docs/HERMES_HANDOVER.md) | Picking up the bot: current evidence, repairs, limitations and next checks. |
+| [docs/HERMES_HANDOVER.md](docs/HERMES_HANDOVER.md) | Reading bot evidence, repairs and limitations. |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deploying the app, setting up an independent bot or transferring the shared runtime. |
 | [hermes/README.md](hermes/README.md), [CHECKS.md](hermes/CHECKS.md) | Installing/operating Hermes or checking a configuration assumption. |
 | [docs/TECH_CHALLENGES.md](docs/TECH_CHALLENGES.md) | Choosing sponsor work or preparing its submission note. |
-| [docs/PLAN.md](docs/PLAN.md) | Reading the original product design, proposed demo and milestone rationale; dated status is historical. |
+| [docs/PLAN.md](docs/PLAN.md) | Reading the historical product design and proposed demo; its milestones are not current assignments. |
 | [eval/README.md](eval/README.md), [eval/results/](eval/results/) | Running or interpreting measurements. |
 | [docs/PITCH.md](docs/PITCH.md), [docs/pitch/](docs/pitch/) | Preparing the story, script and voiceover; refresh dated claims before recording. |
 | [docs/RESEARCH.md](docs/RESEARCH.md), [docs/research/](docs/research/) | Finding prior research and historical plans. |

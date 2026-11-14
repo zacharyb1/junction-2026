@@ -6,18 +6,18 @@ Snapshot: Saturday 14 November 2026, on `vlad/hermes-bot` (draft [PR #6](https:/
 
 ## What we are pursuing
 
-| Challenge | Role and current evidence | What remains before claiming it |
+| Challenge | Role and current evidence | Current limit or dependency |
 |---|---|---|
-| **Exa — The Internet Butler** (main) | The shared Engine uses Exa structured search and page contents to produce a sourced Plan and Case file. Local Telegram research, browser research and engine scorecards have run. | Choose and rehearse the demo scenarios; connect the bot to the deployed Engine and confirm its Case links work on another device. Keep a live-query path for judges. Zachary owns the Engine; Vlad and Milan own the bot tracks. |
-| **NVIDIA — Best Use of Nemotron** | Hermes uses `nvidia/nemotron-3.5-super-vl-120b-a12b` for the conversation, tool calls, drafts and native letter-photo reading. Local group and DM flows are recorded. | If Hermes is selected, show that role in the demo and add the required model/use/improvement explanation to the submission form. The bot bake-off remains a team decision. |
-| **Gemma** | The local Hermes gate uses `gemma3:1b` through Ollama, after rules and wake patterns. The labelled-set evaluation and selected Telegram messages have evidence. | Show the gate in the chosen demo and report measured misses and false wakes. A Gemma-only trigger outside the 180-second open window remains unmeasured live; this is an evidence gap, not a new broad testing obligation. |
-| **Oxylabs Web API** | A third page reader is implemented in the verifier and recheck. Its response handling was tested with a local stand-in; no real API call is recorded. | The team decides whether to obtain/use the account. Then record a successful live read, its source URL and the reader label in the Case file. Do not claim live use from implementation alone. |
-| **ElevenLabs** | Pitch voiceover files have been rendered and transcribed back to text. Bot voice input/output has no live test evidence. | Listen to the audio, refresh any stale narration numbers and include the audio in the final video. Confirm that this use meets the selected challenge's brief; claim bot voice only if it is implemented and demonstrated. |
-| **Gemini API** | No demonstrated role on the Hermes track. The earlier letter-reader fallback was not used: Nemotron read the test photo. No comparative Gemini test was run. | Keep this selection only if the final bot track demonstrates a meaningful Gemini role. Check Milan's implementation before deciding; the platform selection has not been rechecked. |
-| **Context.dev** | Proposed extra verifier reader and monitors for cited pages. No implementation or live test is present on this branch. | Deferred until the core demo works. Agree the alert rule and a controllable page for the demo before building the monitor/webhook path. A second submission under its main challenge is conditional on a working production change watch. |
-| **Aiven** | Proposed Postgres index from cited pages to affected Cases; Cases would remain in Blob. No integration is present on this branch. | Confirm the proposal with Zachary and justify it through a working change-watch flow. No database migration is currently required to run Kaveri. |
+| **Exa — The Internet Butler** (main) | The shared Engine uses Exa structured search and page contents to produce a sourced Plan and Case file. Local Telegram research, browser research and engine scorecards have run. | The recorded bot runs use a local Engine and localhost Case links. Production bot integration and the final demo scenarios are not established by these tests. |
+| **NVIDIA — Best Use of Nemotron** | Hermes uses `nvidia/nemotron-3.5-super-vl-120b-a12b` for the conversation, tool calls, drafts and native letter-photo reading. Local group and DM flows are recorded. | The saved brief requires a model/use/improvement explanation in the submission form. The final bot track is not selected in this record. |
+| **Gemma** | The local Hermes gate uses `gemma3:1b` through Ollama, after rules and wake patterns. The labelled-set evaluation and selected Telegram messages have evidence. | Misses and false wakes are measured below. A Gemma-only trigger outside the 180-second open window remains unmeasured live; the broad live silence run was cancelled. |
+| **Oxylabs Web API** | A third page reader is implemented in the verifier and recheck. Its response handling was tested with a local stand-in; no real API call is recorded. | The account requirement is unresolved. The saved brief requires a live API call and source URLs; the implementation alone does not establish that use. |
+| **ElevenLabs** | Pitch voiceover files have been rendered and transcribed back to text. Bot voice input/output has no live test evidence. | The audio contains earlier scorecard figures. Its inclusion in the final video and eligibility as the selected challenge use are not confirmed; bot voice is not demonstrated. |
+| **Gemini API** | No demonstrated role on the Hermes track. The earlier letter-reader fallback was not used: Nemotron read the test photo. No comparative Gemini test was run. | Another bot track may use Gemini, but this document does not establish that role. The platform selection has not been rechecked. |
+| **Context.dev** | Proposed extra verifier reader and monitors for cited pages. No implementation or live test is present on this branch. | The alert rule, chat ownership and controllable demo page are unresolved. A second submission under its main challenge remains conditional on a working production change watch. |
+| **Aiven** | Proposed Postgres index from cited pages to affected Cases; Cases would remain in Blob. No integration is present on this branch. | This is an unconfirmed proposal associated with the change watch. No database migration is currently required to run Kaveri. |
 
-Hostinger's scam-check idea is an exploratory revisit scheduled for Saturday 14:00 only if the core is green; it is not part of the implemented demo. Beyond the Clinic, Meta glasses, MariaDB's main challenge and Cloudinary remain parked. See the original rationale in the [Friday plan](research/tech-challenges-2026-11-13.md).
+Hostinger's scam-check idea is exploratory and is not part of the implemented demo. Beyond the Clinic, Meta glasses, MariaDB's main challenge and Cloudinary remain parked. See the original rationale in the [Friday plan](research/tech-challenges-2026-11-13.md).
 
 ## Evidence we can use
 
@@ -31,13 +31,13 @@ Hostinger's scam-check idea is an exploratory revisit scheduled for Saturday 14:
 
 **ElevenLabs.** [Pitch instructions](PITCH.md#voiceover-files), [audio files](pitch/voiceover/) and [voiceover text](pitch/voiceover.json) are present. Audio generation is evidence of video preparation, not a tested voice feature in the bot. The existing numbers line describes an older engine run and needs review before recording the final video.
 
-## Decisions still with the team
+## Unresolved state
 
-1. Choose the bot track and concrete scenarios at the Saturday 10:30 bake-off. Tonight's scope is selected scenarios and polite handling of other messages; the broad live silence run was cancelled.
-2. Agree the production Engine URL and matching secret, then verify the full demo path from Telegram on another device. Current local Case links use localhost.
-3. Decide whether Oxylabs is worth the account requirement and collect a real API result if retained.
-4. Settle the change-watch alert rule, Case/chat scope and demo page before pursuing Context.dev, Aiven or a second submission. Existing `case_recheck` and a watch template do not demonstrate that integration; no live daily watch was enabled.
-5. Reconcile the platform's actual challenge selections with the final demo. The prior supervisor recorded renaming the draft to Kaveri; this document does not verify the platform state.
+- The final bot track and concrete demo scenarios are not selected in this record. The recorded scope is selected scenarios and polite handling of other messages; the broad live silence run was cancelled.
+- Production Engine credentials and the full Telegram-to-public-Case flow have not been validated here. Current local Case links use localhost.
+- Oxylabs has an account requirement and no recorded real API result.
+- The change-watch alert rule, Case/chat scope and demo page are unsettled. Existing `case_recheck` and a watch template do not demonstrate the proposed Context.dev/Aiven integration; no live daily watch is enabled.
+- The platform's challenge selections have not been rechecked. The prior supervisor recorded renaming the draft to Kaveri; this document does not verify that platform state.
 
 ## Submission and claim rules
 

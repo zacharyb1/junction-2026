@@ -1,10 +1,11 @@
 ---
-description: Validate task changes, commit, push a branch, and report its draft PR
+description: Check and publish the current change using the team's chosen Git workflow
 ---
-1. Read `AGENTS.md`, inspect the branch and diff, and identify this task's files. Work on a feature branch unless the user has explicitly authorized production integration; pushing `main` deploys.
-2. Run the required checks from `.github/workflows/ci.yml`, following the isolated-build and documentation-only rules in `AGENTS.md`. Resolve failures caused by this change and report unrelated blockers.
-3. Stage only this task's files, inspect the staged diff, and commit with a concise imperative message. Keep secrets, private runtime data and unrelated edits out.
-4. Push the feature branch. Update its existing PR, or create a draft with a description of the resulting behavior, evidence and material risks. Do not create a duplicate PR.
-5. Report the commit, PR, checks and outstanding limitations. Include a Vercel preview only if it actually exists and say if access is restricted. A passing CI run is not evidence of a working preview or production deployment.
+This is an optional helper. Read `CLAUDE.md` and follow the user's current scope and Git/review workflow.
+
+1. Inspect the branch and diff; identify the task's files and any unrelated edits. The existing Vercel integration deploys `main`, so distinguish source publication from production deployment.
+2. Run the applicable repository checks from `.github/workflows/ci.yml`. Documentation-only changes need link/reference and diff checks; state when unchanged-code validation is reused. A build writes `.next` and can disrupt a server using that directory.
+3. If publication is requested, stage the task's files and inspect the staged diff before committing/pushing. Keep private state and credentials out. Use the team's existing PR/review process rather than creating a duplicate or assuming a required draft state.
+4. Report the commit/PR, checks and limitations. Include a deployment URL only if it exists; CI success alone does not establish a working preview or production release.
 
 $ARGUMENTS

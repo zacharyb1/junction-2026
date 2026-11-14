@@ -11,6 +11,8 @@ From an empty laptop to "the bot answers in the family group". Follow the steps 
 
 ## Quick start: the repo-local install
 
+**Before launching:** choose an [independent test bot or a shared-bot takeover](../docs/DEPLOYMENT.md#hermes-and-telegram). A clone is not a second instance of the shared token. The helper below copies shared credentials; it is not the independent-test-token setup. There is no cross-machine lock. The runtime does not need Orca or an open Claude Code session.
+
 This is the path that was actually run (Fedora, Fri night 13 Nov). It installs nothing outside this repository folder: no `hermes` on your PATH, no line in your shell profile, no sudo. The long runbook below explains each setting and still applies; where it says `hermes ...`, run `hermes/bin/hermes ...`, or put the wrapper on your PATH for one terminal with `export PATH="$PWD/hermes/bin:$PATH"`.
 
 Needs: macOS or Linux, git, curl, Node 22 or newer with npx (only for a local engine), podman or docker (only for the gate).
@@ -21,16 +23,18 @@ bash hermes/setup-local.sh
 
 # 2. Secrets. Clone the team's private keys repo next to this checkout once, then:
 git clone https://github.com/kapuchai/junction-2026-keys.git ../junction-2026-keys
-bash hermes/secrets.sh --production     # production engine (needs CASEFILE_SECRET in the keys repo)
-bash hermes/secrets.sh --local-engine   # or: engine on this machine, case links open only here
+# Choose one Engine; do not run both alternatives:
+bash hermes/secrets.sh --production     # deployed Engine, matching URL/secret must exist in the keys repo
+# bash hermes/secrets.sh --local-engine # alternative: local Engine, links open only here
 
 # 3. Model, Part 1 of the config, persona and skills
 bash hermes/configure.sh
 
-# 4. Start and stop: engine (if local), gate model (if installed), gateway. Logs in .hermes-local/run/
+# 4. Only after shared-token handover (or with your independent token): start/stop. Logs in .hermes-local/run/
 bash hermes/start.sh
-bash hermes/stop.sh
 ```
+
+Stop that managed runtime with `bash hermes/stop.sh` (see the deployment guide before stopping a shared local gate).
 
 Then follow the runbook from step 10 (direct message test). After `/sethome` in the family group, step 12 is one command: `bash hermes/configure.sh --group <CHAT_ID>`, then stop and start.
 

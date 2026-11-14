@@ -1,18 +1,24 @@
 # Hermes bot track handover
 
-Snapshot: Saturday 14 November, including the Telegram tests through 02:42 Helsinki and the subsequent local recovery checks below. Draft PR: https://github.com/zacharyb1/junction-2026/pull/6.
+Snapshot: Saturday 14 November, including the Telegram tests through 02:42 Helsinki, the subsequent local recovery checks, and the morning process check below. Draft PR: https://github.com/zacharyb1/junction-2026/pull/6.
 
-Vlad narrowed tonight's scope to repeatable selected scenarios and polite handling of other messages. The broad 20-message silence run and repeated pregnancy triggers are no longer required tonight. The team will choose concrete demo scenarios later; CLI rehearsals remain distinct from Telegram delivery checks.
+The recorded scope is repeatable selected scenarios and polite handling of other messages. The broad 20-message silence run and repeated pregnancy triggers were cancelled. Final demo scenarios are not recorded in this snapshot; CLI rehearsals remain distinct from Telegram delivery checks.
+
+## Current runtime state
+
+A read-only process check on Vlad's machine on Saturday 14 November morning found the recorded Engine process still running, but no Hermes gateway process. The recorded gateway PID was absent, and no process matched the gateway command or this installation's Hermes runtime path. The configured bot endpoint still points at the local Engine. The gate plugin is installed; whether its model process is running was not established by this check. Five local Case JSON files are present.
+
+No new Telegram delivery was attempted and no service was changed during that check. The successful Telegram runs below are historical evidence, not a claim that the bot is currently connected. This local process check does not establish whether another machine is polling the shared token.
 
 ## State and evidence
 
-| Milestone | State | Evidence and remaining check |
+| Component | State | Evidence and limits |
 |---|---|---|
-| 1. Pinned, removable Hermes | Done | v0.23.1, commit `3b421578588243f920886e6fe79a6faa87ea026e`. Prior session's one-shot answer took 4 s. Runtime and home are inside `.hermes-local/`. |
-| 2. Telegram DM returns a plan | Done against the local engine | At 02:42, Helsinki-to-Tampere move: `research_case` returned four plan lines and 5/5 verified quotes. All four lines, counts and URL match the DM reply. Case page and API returned HTTP 200. The approved draft was saved with `case_update` and is present in the stored case. |
-| 3. Family group with silence | Observed on the selected live messages | Group research, approval buttons and intentional silence observed. The gate stopped 6 of 7 small-talk messages locally; the false wake reached the cloud model, which stayed silent. This is a small sample, not a general reliability claim. |
-| 4. Local gate | Done for the labelled-set check | `eval/results/gate-gemma3-1b.json`: 60 messages, 20 triggers, 40 small talk; 0 missed triggers, 4 false wakes, 0 gate errors. The live gateway also logged `pre_gateway_dispatch skip: reason=kaveri-gate:gemma:small_talk`. |
-| 5. Handover | Published in draft PR | This document and PR #6; update as repairs and selected scenario checks finish. |
+| Pinned, removable Hermes | Done | v0.23.1, commit `3b421578588243f920886e6fe79a6faa87ea026e`. Prior session's one-shot answer took 4 s. Runtime and home are inside `.hermes-local/`. |
+| Telegram DM returns a plan | Done against the local engine | At 02:42, Helsinki-to-Tampere move: `research_case` returned four plan lines and 5/5 verified quotes. All four lines, counts and URL match the DM reply. Case page and API returned HTTP 200. The approved draft was saved with `case_update` and is present in the stored case. |
+| Family group with silence | Observed on the selected live messages | Group research, approval buttons and intentional silence observed. The gate stopped 6 of 7 small-talk messages locally; the false wake reached the cloud model, which stayed silent. This is a small sample, not a general reliability claim. |
+| Local gate | Done for the labelled-set check | `eval/results/gate-gemma3-1b.json`: 60 messages, 20 triggers, 40 small talk; 0 missed triggers, 4 false wakes, 0 gate errors. The live gateway also logged `pre_gateway_dispatch skip: reason=kaveri-gate:gemma:small_talk`. |
+| Handover | Published in draft PR | This document and PR #6 contain the measured state at this snapshot. |
 
 Before this track, the runbook was documentation-only. Now the local runtime, tool calls, group flow, local gate and a letter photo have live evidence. `hermes/CHECKS.md` records the boundaries. The 12 scenario rehearsals are direct CLI chats; they do not test Telegram delivery or group silence.
 
@@ -38,35 +44,19 @@ Keep `.data/cases` when moving or rebuilding a local engine. Its location is rel
 
 ## Run from a fresh clone
 
-Needs git, curl, macOS or Linux, Node 22+ with npx for a local engine, and podman or docker for the gate. Fedora was tested; macOS was not. Only one machine may poll the shared Telegram token.
+The portable setup and deployment instructions are in [Deployment and operation](DEPLOYMENT.md#hermes-and-telegram), with detailed configuration in the [repo-local runbook](../hermes/README.md#quick-start-the-repo-local-install). Neither the project nor its running bot requires Orca or a Claude Code session. Teammates can use their own terminals, editors and deployment workflow.
 
-```bash
-git clone --branch vlad/hermes-bot https://github.com/zacharyb1/junction-2026.git
-cd junction-2026
-bash hermes/setup-local.sh
-git clone https://github.com/kapuchai/junction-2026-keys.git ../junction-2026-keys
-bash hermes/secrets.sh --local-engine
-bash hermes/configure.sh
-bash hermes/install-gate.sh
-bash hermes/start.sh
-```
+Install and configure first; start a gateway only with its own development token or after the existing shared-token instance has stopped. The [morning process check](#current-runtime-state) found the Engine process running and no Hermes gateway on Vlad's machine. The bot configuration still uses a localhost Engine URL, so those Case links cannot open on another device. This document is a snapshot, not a live process monitor.
 
-The secrets script may ask the human for missing values with hidden input. Never paste keys into chat. It can write missing values to the private keys repo through that repo's `put` command.
+There is no cross-machine lock or automatic runtime takeover. The start script checks this installation's PID files; it cannot detect a teammate polling the same token elsewhere. Independent Telegram development needs a separate bot token and isolated Hermes state. Moving the shared bot requires stopping the former instance before starting its replacement. The deployment guide describes both arrangements.
 
-In Telegram, use the existing bot; for a new bot follow BotFather setup in the runbook, including disabling group privacy and removing/re-adding it. Send `/sethome` as an allowed admin in the family group, then run:
+Reminders, conversation state and memory are local to the Hermes home; a fresh clone does not inherit them. The repaired rent-letter reminder remains in the original runtime's local scheduler. Copying scheduled jobs into another active runtime can duplicate delivery, even when the Telegram polling conflict is avoided. Case storage and backups also need separate treatment when moving the runtime; git carries neither private state nor local Cases.
 
-```bash
-KAVERI_CHAT_ID='replace-with-the-numeric-chat-id'
-bash hermes/configure.sh --group "$KAVERI_CHAT_ID"
-bash hermes/stop.sh
-bash hermes/start.sh
-```
+The repo-local prerequisites are git, curl, macOS or Linux, Node 22+ with npx for a local Engine, and Podman or Docker for the gate. Fedora was tested; macOS was not. The secret helper may offer to save missing values through the private keys repo's `put` command, which commits and pushes there. Private values belong in local files or the team's secret store, not chat.
 
-Send `/new --yes` in the chat to load changed prompts. Stop all locally managed services with `bash hermes/stop.sh`. At this snapshot the gateway, root engine and gate are left running on Vlad's machine. Coordinate a stop before another teammate starts the shared bot.
+Logs are in `.hermes-local/run/` and `.hermes-local/home/logs/`; the transcript database is `.hermes-local/home/state.db`. These may contain family messages and are not committed. `bash hermes/secrets.sh --status` reports which secret names are set without printing their values. Changed prompts load in a new chat conversation via `/new --yes`.
 
-Logs: `.hermes-local/run/`, `.hermes-local/home/logs/`; transcript database: `.hermes-local/home/state.db`. Logs and transcripts may contain family messages; do not commit them. Check installed version with `hermes/bin/hermes --version` and secret presence with `bash hermes/secrets.sh --status`.
-
-To use production, obtain matching production credentials from Zachary, stop the bot, run `bash hermes/secrets.sh --production`, then start it. Tonight's local case links point at localhost and cannot be opened on a teammate's phone. Do not claim production bot integration is tested.
+Production bot integration has not been tested in this snapshot. A deployed Engine URL and matching credentials are required; switching the endpoint alone does not transfer existing local Cases or scheduled reminders.
 
 ## Secret names and locations
 
@@ -77,34 +67,23 @@ Private keys repo: `bot.env` and `app.env`. Local copies: `.hermes-local/home/.e
 - Access settings: `TELEGRAM_ALLOW_ALL_USERS`, `TELEGRAM_HOME_CHANNEL`.
 - Optional voice: `ELEVENLABS_API_KEY`.
 
-## Blockers and review work
+## Integration state and limits
 
-- Telegram: the fresh DM plan, case link and saved draft passed. Confirm the team's chosen group scenario during its next rehearsal; no broad live-message run is required tonight. CLI rehearsals do not establish Telegram delivery.
-- Zachary: deployed engine URL and matching secret; validate production case links and review grounding fixes.
-- Separate reviewer branch `review-grounding`: local refs show `340ae31` (verify independent readings), `3125e57` (withhold unsupported amounts), `b35abc9` (live scorecard comparison). These are not applied to this bot branch. Original reviewer edits were removed from this checkout; do not resurrect the obsolete patch. Read that branch's `docs/research/VERIFIER_COMPARISON.md` and draft PR #7 before integrating.
-- The chat-scoped watch template from `cd8c82a` on `review-watch-template` is now adopted in the reminder skill and runbook. Watch jobs must restrict cases to the matching chat label and delivery destination. No live daily watch was enabled or tested tonight.
+- The fresh Telegram DM plan, Case link and saved draft passed against the local Engine. CLI rehearsals do not establish Telegram delivery, and no production bot integration is recorded.
+- Separate reviewer branch `review-grounding` contains `340ae31` (verify independent readings), `3125e57` (withhold unsupported amounts) and `b35abc9` (live scorecard comparison). These are not applied to this bot branch. The original overlapping reviewer edits were removed from this checkout; the comparison is in that branch's `docs/research/VERIFIER_COMPARISON.md` and draft PR #7.
+- The chat-scoped watch template from `cd8c82a` on `review-watch-template` is adopted in the reminder skill and runbook. Watch jobs require matching chat labels and delivery destinations. No live daily watch was enabled or tested.
+- The rent-letter Case and stored deadline are repaired. Four older Cases had only summary records left and were not recovered; their old links remain unusable.
+- Context.dev as an extra page reader and its monitor/webhook path are proposals, with no implementation on this branch. Aiven's cited-page-to-Case index and ElevenLabs bot voice are also absent.
+- Milan's `scaffold/milestone-1-2` is a separate bot track. A Friday comparison differed from main by 168 files; this handover does not establish its compatibility or runtime behavior. No PR was merged by this continuation.
 
-## Decisions for the team
+## Unresolved choices at this snapshot
 
-- Change-alert rule and a controllable demo page for the change watch.
-- Submission challenge selection: retain Nemotron's demonstrated letter-reading role. Claim Gemini only if another demonstrated role is added (including on Milan's track); the current platform selection has not been rechecked.
-- Keep or drop Oxylabs given the credit-card requirement.
-- Confirm the second submission under Context.dev's main challenge.
-- Revisit Hostinger Saturday 14:00 only if the core is green.
-- Bot bake-off Saturday 10:30: agree the concrete scenario and repeatability check with the team. Pregnancy was the original proposed script, not a required extra test tonight.
-- Product name: the repo says Kaveri. The prior supervisor recorded renaming the platform draft to Kaveri; current platform state has not been rechecked.
-- Confirm open DMs, shared profile memory, slash-command restrictions and media bypass of the gate, as recorded in `docs/DECISIONS.md`.
-
-## Next steps
-
-1. Rehearse the team's chosen scenarios and confirm Telegram delivery, including a due reminder when that feature is selected. The rent-letter case and stored deadline are repaired; four unrecoverable old cases require fresh research.
-2. Zachary reviews the independent-reading verification and unsupported-amount fixes before making grounding claims.
-3. Deferred to the team after the core scenario works: Context.dev as an extra verifier page reader with `maxAgeMs: 0` (documented default cache is three days).
-4. Deferred: monitors on cited pages. The engine receives and checks the webhook, then forwards to Hermes' inbound webhook. Settle the alert rule and chat scope first.
-5. Deferred: Aiven index mapping cited pages to cases.
-6. Deferred: ElevenLabs voice.
-
-Before merging anything, compare Milan's `scaffold/milestone-1-2` with main: it differed by 168 files Friday night. Do not merge another track blindly. No PR was merged by this continuation.
+- The final bot track and concrete demo scenarios are not selected in this record. Pregnancy was an earlier proposed script, not an outstanding test requirement.
+- The change-watch alert rule, chat ownership policy and controllable demo page are not settled. The second Context.dev submission remains conditional on a working production watch.
+- Oxylabs has an account/credit-card dependency and no recorded real API use. The Hostinger scam-check idea remains exploratory.
+- Nemotron has the demonstrated letter-reading role. Gemini has no demonstrated Hermes role; another bot track's use and the platform's challenge selections have not been checked here.
+- The repository name is Kaveri. The prior supervisor recorded renaming the platform draft to Kaveri; current platform state has not been rechecked.
+- Open DMs, shared profile memory, slash-command restrictions and media bypass are documented in `docs/DECISIONS.md`, including entries still marked for team confirmation.
 
 ## Merge risk
 
@@ -118,6 +97,6 @@ DM check at 02:42: acknowledgement 12.4 s, plan 32.1 s, draft completion 49.2 s 
 
 Isolated CLI profile, updated persona/skills, no Telegram delivery: missing-case reminder stopped after `case_get` in 7.8 s with no cron job. A stale washing-machine follow-up fetched the missing case then researched a new one in 30.5 s; two fresh repetitions took 31.6 s and 28.2 s. All three research outcomes returned matching case API JSON and HTTP 200 pages (6/6, 7/7 and 9/9 checked quotes respectively). Exa reported $0.063 total. Evidence: `eval/results/rehearse-hardening-20261114T*.json`. These establish the selected path and link validity, not Telegram delivery or fixed wording: one run added an extra summary after its plan.
 
-Runtime application: the Telegram gateway was restarted gracefully with the updated persona; the engine and local gate stayed running. Startup archived all five current cases; all five remained readable through the case API. New conversations load the updated instructions; use `/new --yes` before a future rehearsal to avoid an old conversation prompt.
+Historical runtime application during the repair: the Telegram gateway was restarted gracefully with the updated persona; the Engine and local gate stayed running at that time. Startup archived all five Cases; all five remained readable through the Case API. The later morning process check found no gateway, as recorded above. New conversations load the updated instructions; use `/new --yes` before a future rehearsal to avoid an old conversation prompt.
 
 Reminder success/duplicate checks in the isolated profile: explicit approver fixture created one job in 38.0 s; repetition in 15.8 s listed the same job without creating another. The test job was removed, none ran, and the real reminder was unchanged. An initial unnamed fixture waited for a first name without scheduling. The ID-only fixture checks scheduling/deduplication, not reminder URL content or delivery; the real reminder retains its full working case URL.

@@ -1,8 +1,8 @@
-# Implementation plan: Kaveri, the family butler (Exa challenge)
+# Historical implementation plan: Kaveri (13–14 November)
 
 Working name: **Kaveri** (Finnish for "buddy").
 
-**Reading this plan on Saturday:** this document retains the original design and dated measurements. The current team entry point is [README.md](../README.md); the bot's measured state is [HERMES_HANDOVER.md](HERMES_HANDOVER.md), and sponsor scope is [TECH_CHALLENGES.md](TECH_CHALLENGES.md). Historical timing and scorecard rows below are not a fresh production check.
+**Historical reference, not a current roadmap or task allocation:** this document retains the original design, proposed milestones and dated measurements. The current team entry point is [README.md](../README.md); the bot's measured state is [HERMES_HANDOVER.md](HERMES_HANDOVER.md), and sponsor scope is [TECH_CHALLENGES.md](TECH_CHALLENGES.md). Historical timing and scorecard rows below are not a fresh production check.
 
 All times Helsinki. Final submission **Sun 15 Nov 10:00**. Feature freeze **Sat 20:00**.
 English is the main language for the product, the code and the docs. Finnish is available as an answer language.
@@ -181,14 +181,14 @@ If Telegram or the laptop fails, the same story runs from `/try` on a phone. Rec
 | M5 | Sat 20:00 to 01:00 | Story | Zachary | 2:00 video, deck PDF, README, backup video. Run `/pitch`. |
 | M6 | Sun 07:30 to 09:15 | Submit | Zachary | `/submit-check` green. Organizers can read the repo. FINAL by 09:15. |
 
-## 9. Current integration work
+## 9. Later implementation state
 
-See [README.md](../README.md#next-work-for-the-team) for priorities and owners, and [HERMES_HANDOVER.md](HERMES_HANDOVER.md) for the remaining bot checks.
+See [README.md](../README.md#start-here) and [HERMES_HANDOVER.md](HERMES_HANDOVER.md) for the recorded state, and [DEPLOYMENT.md](DEPLOYMENT.md) for deployment and runtime boundaries. The milestones above are historical proposals.
 
 - The bot token and model key are configured for the tested local runtime. Team secrets are in the separate private keys repo; `.env.bot` was the old handoff convention.
 - Production integration needs the deployed Engine URL, matching `CASEFILE_SECRET` and a live check with Zachary. The earlier report of a missing production Exa key is historical and has not been revalidated here.
 - PR #1 is merged; #4 and #5 are closed, and the current main baseline contains the Oxylabs and review work. The earlier instruction to merge them in order is obsolete. Draft #6 (Hermes) and #7 (verifier) remain separate review work; neither was merged by this continuation.
-- The team still chooses the bot track and concrete demo scenarios. Read the resulting cases for relevance and wording before pitching; quote counts alone do not establish either.
+- The final bot track and concrete demo scenarios are not selected in this record. Quote counts alone do not establish the relevance or wording quality of a Case.
 - Removing the unused scaffold chat remains optional cleanup. It is not a blocker for the chosen demo path.
 
 Work happens on branches; merging to `main` deploys production. A preview may require deployment access even when GitHub CI passes.
