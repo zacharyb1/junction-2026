@@ -68,7 +68,12 @@ describe("POST /api/ukk", () => {
     expect((init!.headers as Record<string, string>).authorization).toBe(`Bearer ${KEY}`);
     const body = JSON.parse(String(init!.body));
     expect(body.stream).toBe(true);
-    expect(body.messages).toEqual([{ role: "user", content: "I just moved to Espoo" }]);
+    // Hermes only reports "api_server", so the route tells UKK where he is: the web page, no reminders.
+    expect(body.messages).toHaveLength(2);
+    expect(body.messages[0].role).toBe("system");
+    expect(body.messages[0].content).toMatch(/web page/i);
+    expect(body.messages[0].content).toMatch(/reminders/i);
+    expect(body.messages[1]).toEqual({ role: "user", content: "I just moved to Espoo" });
     expect(await res.text()).toContain("A matter of state.");
   });
 

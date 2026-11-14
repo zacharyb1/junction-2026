@@ -8,6 +8,15 @@ export const maxDuration = 300;
 
 const Input = z.object({ message: z.string().trim().min(1).max(1500) });
 
+/**
+ * Hermes reports this channel only as "api_server", so UKK cannot tell it is the web page. This line
+ * tells him, so the web rules in hermes/SOUL.md and the skills apply: no reminders, no memory.
+ */
+const WEB_CONTEXT =
+  "This conversation is on the UKK web page (/ukk), not Telegram. Every message is addressed to you. " +
+  "You have no memory and no reminders here: ask for the city when you need it, never offer to set reminders, " +
+  "and say reminders work when UKK is added to a Telegram group.";
+
 const json = (body: unknown, status: number) => Response.json(body, { status });
 
 /**
@@ -35,7 +44,10 @@ export async function POST(req: Request) {
     upstream = await fetch(`${process.env.UKK_API_URL}/v1/chat/completions`, {
       method: "POST",
       headers,
-      body: JSON.stringify({ model: "ukk", stream: true, messages: [{ role: "user", content: parsed.data.message }] }),
+      body: JSON.stringify({ model: "ukk", stream: true, messages: [
+          { role: "system", content: WEB_CONTEXT },
+          { role: "user", content: parsed.data.message },
+        ] }),
       signal: AbortSignal.timeout(280_000),
     });
   } catch (error) {
