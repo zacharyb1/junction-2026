@@ -2,6 +2,8 @@
 
 import { CircleAlert, Loader2, Search } from "lucide-react";
 import { useRef, useState } from "react";
+import { EarlierCases } from "@/components/earlier-cases";
+import { EXAMPLES } from "@/lib/examples";
 import { advance, Elapsed, NO_PROGRESS, type Progress, Timeline } from "@/components/try-progress";
 import { TryResult } from "@/components/try-result";
 import { Button } from "@/components/ui/button";
@@ -34,14 +36,6 @@ const LANGUAGES = [
   ["fr", "Français"],
 ] as const;
 
-const EXAMPLES = [
-  { label: "Expecting a baby", text: "I just found out I am pregnant. We both work full time. What do we need to do and when?" },
-  { label: "Rent increase", text: "Our landlord wants to raise the rent by 15 percent from next month. Is that allowed and what can we do?" },
-  { label: "Flight cancelled", text: "Our flight tomorrow morning was just cancelled. We are a family of three. What are we entitled to?" },
-  { label: "Lost my job", text: "I was laid off today after three years at the company. What do I have to do this week and what support can I get?" },
-  { label: "Moving home", text: "We are moving to another city next month. Who do we have to notify and by when?" },
-];
-
 const field = "h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 export function TryForm({ code: initialCode }: { code: string }) {
@@ -58,6 +52,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
   const [error, setError] = useState<string | null>(null);
   // A code from the link that the server refused: show the field so it can be corrected.
   const [rejected, setRejected] = useState(false);
+  // Live research failed for a reason the visitor cannot fix: offer the cases researched earlier.
+  const [liveDown, setLiveDown] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
   async function run(event: React.FormEvent) {
@@ -67,6 +63,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
     setProgress(NO_PROGRESS);
     setResult(null);
     setError(null);
+    setLiveDown(false);
     try {
       const res = await fetch("/api/research", {
         method: "POST",
@@ -80,6 +77,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
         }),
       });
       if (res.status === 401) setRejected(true);
+      // A server fault or a busy demo. A wrong code or a refused request is the visitor's to fix.
+      if (res.status >= 500 || res.status === 429 || (res.ok && !res.body)) setLiveDown(true);
       if (!res.ok || !res.body) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(
@@ -110,18 +109,26 @@ export function TryForm({ code: initialCode }: { code: string }) {
             setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
           } else if (name === "error") {
             finished = true;
-            setError((payload as { error: string }).error);
+            const message = (payload as { error: string }).error;
+            setError(message);
+            // The engine's two refusals are answers, not outages.
+            if (!/^(I could not find anything to research|Unknown country|This country is not supported)/.test(message)) setLiveDown(true);
           } else {
             // Every other event is one of the engine's, named after its type.
             setProgress((p) => advance(p, payload as EngineEvent));
           }
         }
       }
-      if (!finished) setError("The connection closed before the research finished. Please try again.");
+      if (!finished) {
+        setError("The connection closed before the research finished. Please try again.");
+        setLiveDown(true);
+      }
       // A wrong code was corrected by hand: the field has done its job.
       else setRejected(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
+      // The request never reached the server.
+      if (e instanceof TypeError) setLiveDown(true);
     } finally {
       setBusy(false);
     }
@@ -156,6 +163,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
               </button>
             ))}
           </div>
+          <EarlierCases situation={situation} failed={false} />
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -247,6 +255,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
                 <CircleAlert className="mt-0.5 size-4 shrink-0" /> {error}
               </p>
             )}
+            {error && liveDown && <EarlierCases situation={situation} failed />}
           </CardContent>
         </Card>
       )}

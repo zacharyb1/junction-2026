@@ -1,3 +1,5 @@
+import examples from "@/data/example-cases.json";
+
 /**
  * Everything the landing page takes from the environment, in one place.
  *
@@ -17,7 +19,8 @@ export type LandingConfig = {
 export function landingConfig(): LandingConfig {
   return {
     botUsername: telegramUsername(process.env.NEXT_PUBLIC_BOT_USERNAME),
-    sampleCaseHref: caseHref(process.env.NEXT_PUBLIC_SAMPLE_CASE_ID),
+    // Without a chosen sample, the first case the engine researched for the demo's examples stands in.
+    sampleCaseHref: caseHref(process.env.NEXT_PUBLIC_SAMPLE_CASE_ID) ?? caseHref(examples.cases[0]?.id),
     repoUrl: httpUrl(process.env.NEXT_PUBLIC_REPO_URL),
   };
 }
