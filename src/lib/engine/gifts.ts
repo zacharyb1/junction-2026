@@ -73,8 +73,8 @@ export type GiftResult = {
   ms: number;
 };
 
-/** Enough checked products to offer a real choice. Below it the search tries again. */
-export const ENOUGH_IDEAS = 3;
+/** Enough checked products to offer a real choice (UKK posts up to 6). Below it the search tries again. */
+export const ENOUGH_IDEAS = 5;
 export const MAX_ATTEMPTS = 3;
 
 // ---- Delivery dates ----------------------------------------------------------
@@ -129,10 +129,32 @@ export function priceValue(price: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
+// Words of a line about what delivery or pickup costs, in English, Finnish, Swedish and German.
+const SHIPPING = /deliver|shipping|postage|pickup|pick-up|toimitus|nouto|postikulu|frakt|leverans|versand|lieferung/i;
+
+// Path parts of pages that list or write about many products: a guide, a blog, a category, a search.
+const NOT_ONE_PRODUCT = /\/(blogs?|news|articles?|guides?|gift-guides?|collections?|categor(y|ies)|catalogue|catalog|sets|select|shopping|search|tag|tags|c|kategoria|tuoteryhma)(\/|$)/i;
+
 /**
- * Keeps a proposed product only when its own page backs the price: the price's figures are on the page, and the
- * quoted sentence is the page's own. A product over the budget is not kept. The delivery sentence is kept only when
- * it is on the page too.
+ * True when a URL can be the page of one product, so the person lands on the thing itself, not on a gift guide or a
+ * shop's category page where the price we checked belongs to just one of many items.
+ */
+export function productPage(url: string): boolean {
+  let path: string;
+  try {
+    path = new URL(url).pathname.replace(/\/+$/, "");
+  } catch {
+    return false;
+  }
+  // A shop's front page or a language root ("/en") is not a product.
+  if (path.split("/").filter(Boolean).length === 0 || /^\/[a-z]{2}(-[a-z]{2})?$/i.test(path)) return false;
+  return !NOT_ONE_PRODUCT.test(path);
+}
+
+/**
+ * Keeps a proposed product only when its URL is one product's page and that page backs the price: the price's
+ * figures are on the page, and the quoted sentence is the page's own. A product over the budget is not kept. The
+ * delivery sentence is kept only when it is on the page too.
  */
 export function groundIdea(
   idea: ProposedIdea,
@@ -142,7 +164,7 @@ export function groundIdea(
   budget?: number,
 ): GiftIdea | null {
   const { name, price, priceQuote, url } = idea;
-  if (!name || !price || !priceQuote || !url || !page) return null;
+  if (!name || !price || !priceQuote || !url || !page || !productPage(url)) return null;
   const value = priceValue(price);
   if (value === null || (budget !== undefined && value > budget)) return null;
   const figures = numbersIn(price);
@@ -150,9 +172,12 @@ export function groundIdea(
   if (!figures.length || !figures.every((f) => onPage.has(f))) return null;
   const quote = snapQuote(priceQuote, page);
   if (!quote || !figures.every((f) => numbersIn(quote.quote).includes(f))) return null;
+  // "Pickup 4,90 €" is on the page too, but it is what delivery costs, not what the product costs.
+  if (SHIPPING.test(quote.quote)) return null;
+  const delivery = idea.delivery ? snapQuote(idea.delivery, page) : null;
+  if (delivery && SHIPPING.test(delivery.quote) && figures.every((f) => numbersIn(delivery.quote).includes(f))) return null;
 
   const out: GiftIdea = { name, why: idea.why ?? "", price, priceQuote: quote.quote, url, shop: shopOf(url) };
-  const delivery = idea.delivery ? snapQuote(idea.delivery, page) : null;
   if (delivery) {
     out.delivery = delivery.quote;
     const span = deliveryDays(delivery.quote);
@@ -333,9 +358,9 @@ export async function findGifts(raw: GiftInput, today = new Date().toISOString()
     const skip = seen.size ? `\nDo not return these pages again:\n${[...seen].slice(0, 20).join("\n")}` : "";
     const res = (await exa.search(query, {
       type: "auto",
-      objective: `${goal}${budget}\nRank pages where one product can be bought, with its price on the page, first. Exclude blog posts, listicles and marketplaces of used goods.${skip}`.slice(0, 4000),
+      objective: `${goal}${budget}\nReturn product pages: one product per page, with its price and a way to buy it. Exclude gift guides, blog posts, listicles, category and search pages, and marketplaces of used goods.${skip}`.slice(0, 4000),
       systemPrompt:
-        "Return only products whose own page appears in the search results. Copy the price and the price sentence word for word from that page; never estimate, convert or invent a price. Copy the delivery sentence only when the same page states a delivery time.",
+        "Return only products whose own product page appears in the search results; each url is the page of that one product, never a list, guide or category page. Copy the price and the price sentence word for word from that page; never estimate, convert or invent a price. Copy the delivery sentence only when the same page states a delivery time.",
       outputSchema: OUTPUT_SCHEMA,
       contents: { text: true },
       userLocation: j.code,
@@ -375,7 +400,8 @@ export async function findGifts(raw: GiftInput, today = new Date().toISOString()
   ideas.sort((a, b) => Number(Boolean(a.late)) - Number(Boolean(b.late)));
   return {
     recipient: input.recipient,
-    ideas,
+    // More than 8 is more than anyone reads in a chat.
+    ideas: ideas.slice(0, 8),
     dropped,
     attempts,
     costDollars: Math.round(cost * 1000) / 1000,
