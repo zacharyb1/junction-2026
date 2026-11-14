@@ -26,7 +26,7 @@ Issue #39. One of AIDaddy's three specialist desks. It takes two kinds of matter
 - The chat ID is the exact Telegram numeric ID from trusted session context. Read and write only the line with this chat's ID.
 - Keep: start, destination, dates, how many travel, the stage, the case ID. Never keep: passport or booking numbers, card details, names of other people, where the home stands empty.
 - The travel desk does not read the legal or finance desk's line. If a matter needs another desk, say "Passing this to the legal desk" and let that skill start fresh from the message.
-- Trip over or "forget everything": remove the line.
+- Trip over or "forget everything": remove the line. After a successful removal, reply only: "This chat’s travel desk entry is removed." A failed removal is reported as a failure. Memory-tool results are internal state: never quote the remaining memory or entries for another desk or chat.
 
 ## Rules
 
