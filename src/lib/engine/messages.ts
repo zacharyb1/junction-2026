@@ -18,6 +18,8 @@ const en = {
     exceptions: "exceptions and missed deadlines",
     options: "options that fit",
     details: "practical details",
+    rule: "what the law or customs rule says",
+    conditions: "limits, permits and penalties",
   },
 
   // Research trail.
@@ -88,6 +90,8 @@ const fi: Messages = {
     exceptions: "poikkeukset ja määräajasta myöhästyminen",
     options: "sopivat vaihtoehdot",
     details: "käytännön tiedot",
+    rule: "mitä laki tai tullisääntö sanoo",
+    conditions: "rajat, luvat ja seuraamukset",
   },
 
   pinnedOpen: (j) =>

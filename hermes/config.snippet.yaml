@@ -127,6 +127,8 @@ telegram:
   #B   - "\\b((flight|train|ferry)\\b.{0,40}\\b(cancel\\w*|delay\\w*)|(cancel\\w*|delay\\w*)\\b.{0,40}\\b(flight|train|ferry)|missed (the |our |my )?(flight|connection)|lost (luggage|baggage|passport)|warranty|stopped working|broke down|subscription|price (increase|rise|hike)|rais\\w+ (the|their) prices?|anniversary|wedding|birthday (party|dinner)|book(ing)? a (table|restaurant|venue))\\b"
   #B   # Birthdays of close people (issue #23), English and Finnish
   #B   - "(?<!\\w)(birthdays?|bday|syntymäpäiv\\w*|synttär\\w*|synttäre\\w*|merkkipäiv\\w*)(?!\\w)"
+  #B   # Is it allowed? Customs and legal questions (issue #29)
+  #B   - "(?<!\\w)(customs|duty[- ]free|is it (legal|illegal|allowed)|can (i|we) (bring|take|carry|import)|tulli\\w*|saa(ko|nko) (tuoda|viedä)|onko (laillista|sallittua))(?!\\w)"
   #B   # Finnish: family and home, work and letters, travel and consumer
   #B   - "(?<!\\w)(raskaa\\w*|raskau\\w*|odota(n|mme)\\s+vauvaa|laskettu\\s+aika|synnyt\\w*|vastasyntyn\\w*|äitiys\\w*|isyys\\w*|vanhempainvapaa\\w*|neuvola\\w*|päiväkot\\w*|lapsi\\s+on\\s+(sairas|kipeä)|kuume\\w*|muutto\\w*|muutamme|muutetaan|muutimme|uusi\\s+asunto|vuokranantaj\\w*|vuokrankorotu\\w*|vuokra\\w*\\s+nous\\w*|vuokrasopimu\\w*)"
   #B   - "(?<!\\w)(irtisano\\w*|lomaut\\w*|sain\\s+potkut|työttöm\\w*|uusi\\s+työ\\w*|työtarjou\\w*|\\w*sak(ko|on|ot)\\w*|pysäköintivirhemaksu\\w*|oleskelulup\\w*|viisumi\\w*|migri\\w*|kansalaisuu\\w*|verokort\\w*|veroilmoitu\\w*|veropäätö\\w*|verotoimisto\\w*|veronpalautu\\w*|jäännösver\\w*|mätky\\w*|kirje\\w*|lasku(n|t|ja)?\\b|perintä\\w*)"

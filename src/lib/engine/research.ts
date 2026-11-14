@@ -236,6 +236,18 @@ type Focus = { name: string; ask: string; keywords: string; lead?: boolean };
 const CHOICE = /\b(restaurants?|dinner|lunch|brunch|caf[eé]s?|bars?|anniversary|birthday|party|gifts?|presents?|hotels?|trip|holiday|vacation|weekend|date night|things to do|activit(y|ies)|concerts?|babysitters?|plumbers?|electricians?|movers?|moving compan(y|ies)|cleaners?|gyms?|recipes?)\b/i;
 const RULES =
   /\b(benefits?|allowances?|permits?|visas?|tax(es)?|fines?|landlords?|rent|leases?|contracts?|compensation|refunds?|deadlines?|laws?|legal|rights?|cancel\w*|delayed|pregnan\w*|unemploy\w*|laid off|warranty|insurance|letters?|passports?|stolen|theft|lost|police|embassy|consulate|emergency|accident|hospital|sick|illness|died|death|divorce|marri(ed|age)|baby|daycare|schools?|moving|relocat\w*|residen\w*|citizen\w*|parking|invoices?|debts?|eviction|employers?|boss|salary|wages?|entitled|membership|customs|broke\w*|damaged?|complain\w*|refus\w*|charged|allowed)\b/i;
+/**
+ * "Can I bring snus into Finland?", "Is codeine legal in the UAE?" (issue #29): the answer is a verdict and the
+ * sentence that settles it, not a to-do list. Same engine, pinned to the destination's official sites.
+ */
+const LEGALITY =
+  /\b(can (i|we|you) (bring|take|carry|import|export|send|fly|use|drive|buy|own)|is it (legal|illegal|allowed|permitted)|allowed to (bring|take|carry|import|use|fly)|(legal|illegal|banned|prohibited|forbidden|allowed) (in|into|to bring)|customs|duty[- ]free|import (limits?|rules?|allowance)|declare at|smuggl\w*|saa(ko|nko) (tuoda|viedä|ottaa)|onko (laillista|sallittua|kiellettyä)|tullis\w*|tulli\w*)\b/i;
+
+/** A question whether something is allowed at a destination: answered with a verdict and its sentence. */
+export function isRuleCheck(input: Pick<ResearchInput, "situation" | "document">): boolean {
+  return !input.document && LEGALITY.test(input.situation);
+}
+
 const ASKS_FOR_OPTIONS = /\b(find|recommend\w*|suggest\w*|book|looking for|where (can|to|should)|best|ideas?|near(by)?|options?)\b/i;
 
 /** Rules and benefits live on official sites. Choices such as restaurants or gifts live on the open web. */
@@ -247,6 +259,22 @@ function resolveScope(input: ResearchInput): "official" | "open" {
   // "Find a vegan restaurant" is a choice even with a rule word nearby. "The gym will not let me cancel" is a rule.
   if (ASKS_FOR_OPTIONS.test(text)) return "open";
   return RULES.test(text) ? "official" : "open";
+}
+
+function ruleFocuses(names: Messages["focus"]): Focus[] {
+  return [
+    {
+      name: names.rule,
+      lead: true,
+      keywords: "customs, import limits, allowed, prohibited, restricted, permit, declaration",
+      ask: "Is this allowed? Find the sentence on the authority's own page that allows it, bans it, or sets the limit (a quantity, an age, a permit, a declaration). One step per rule, and the quote must be that sentence.",
+    },
+    {
+      name: names.conditions,
+      keywords: "maximum quantity, permit, prescription, declare, penalty, confiscation",
+      ask: "Under which conditions: the maximum quantity, documents or permits needed, whether it must be declared at the border, and what happens to someone who breaks the rule?",
+    },
+  ];
 }
 
 function choiceFocuses(names: Messages["focus"]): Focus[] {
@@ -554,7 +582,13 @@ export async function researchCase(
   const official = scope === "official" ? j.officialDomains : [];
   const context = frame(input, j);
   const where = `${j.region ? `${j.region}, ` : ""}${j.name}`;
-  const system = scope === "open" ? choicePrompt(j, input.language) : systemPrompt(j, input.language);
+  const ruleCheck = scope === "official" && isRuleCheck(input);
+  const system =
+    scope === "open"
+      ? choicePrompt(j, input.language)
+      : ruleCheck
+        ? `${systemPrompt(j, input.language)} This is a question whether something is allowed in ${j.name}. Make the first step the verdict: title it "Allowed", "Not allowed" or "Allowed with limits", followed by what. Its quote must be the sentence that allows, bans or limits it. If no page states it, say so in the summary and do not guess.`
+        : systemPrompt(j, input.language);
   const titles = new Map<string, string>();
   const trailEvents: { ms: number; detail: string }[] = [];
   const stage = (name: Extract<EngineEvent, { type: "stage" }>["name"], detail: string) => {
@@ -697,7 +731,7 @@ export async function researchCase(
       // Exa's date can be the day a page was last crawled. When the page prints its own date, that one decides.
       .filter((n) => n.date >= since.slice(0, 10));
   }
-  const asks = scope === "open" ? choiceFocuses(m.focus) : focuses(input, m.focus);
+  const asks = scope === "open" ? choiceFocuses(m.focus) : ruleCheck ? ruleFocuses(m.focus) : focuses(input, m.focus);
   let found = await run(asks, true);
   // Too little from official sites: widen to the open web once.
   if (found.length < 3 && official.length) found = [...found, ...(await run(asks.slice(0, 2), false))];
