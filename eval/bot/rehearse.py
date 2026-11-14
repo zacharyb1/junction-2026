@@ -15,8 +15,9 @@ bot always answers and the silence rule and the gate are not exercised. A questi
 with buttons cannot be answered here, so the household is seeded into memory by default.
 
 Runs use a Hermes profile of their own ("rehearse", inside .hermes-local/home/profiles/) whose
-memory is reset before every run, so runs share nothing with each other or with the live bot.
-It may run while the bot is running. The profile holds no Telegram token.
+MEMORY.md and USER.md are reset before every run. Its env file excludes Telegram settings,
+but runs still share the configured Engine and provider credits. Hermes CLI calls may auto-start
+a gateway; follow docs/DEPLOYMENT.md before running alongside a live bot.
 Results: eval/results/rehearse-<time>.json. Needs: hermes/setup-local.sh, secrets and configure done,
 and the engine reachable (bash hermes/start.sh starts a local one).
 """
@@ -103,6 +104,8 @@ def prepare_profile() -> None:
 def run_once(message: str, memory: str, timeout: int) -> dict:
     (PROFILE_HOME / "memories").mkdir(parents=True, exist_ok=True)
     (PROFILE_HOME / "memories" / "MEMORY.md").write_text((memory + "\n") if memory else "", encoding="utf-8")
+    # --clone includes USER.md too; neither live facts nor a prior run may seed this run.
+    (PROFILE_HOME / "memories" / "USER.md").write_text("", encoding="utf-8")
 
     started = time.monotonic()
     output, error = "", ""

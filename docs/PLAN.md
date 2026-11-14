@@ -187,7 +187,7 @@ See [README.md](../README.md#start-here) and [HERMES_HANDOVER.md](HERMES_HANDOVE
 
 - The bot token and model key are configured for the tested local runtime. Team secrets are in the separate private keys repo; `.env.bot` was the old handoff convention.
 - Production integration needs the deployed Engine URL, matching `CASEFILE_SECRET` and a live check with Zachary. The earlier report of a missing production Exa key is historical and has not been revalidated here.
-- PR #1 is merged; #4 and #5 are closed, and the current main baseline contains the Oxylabs and review work. The earlier instruction to merge them in order is obsolete. Draft #6 (Hermes) and #7 (verifier) remain separate review work; neither was merged by this continuation.
+- PR #1 is merged; #4 and #5 are closed, and the current main baseline contains the Oxylabs and review work. The earlier instruction to merge them in order is obsolete. PR #6 (Hermes) and #7 (verifier) are separate changes; their links show current integration status.
 - The final bot track and concrete demo scenarios are not selected in this record. Quote counts alone do not establish the relevance or wording quality of a Case.
 - Removing the unused scaffold chat remains optional cleanup. It is not a blocker for the chosen demo path.
 

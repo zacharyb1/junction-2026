@@ -11,12 +11,12 @@ This is the **Saturday 14 November morning handover**, on the Hermes bot branch.
 | Workstream | State at handover |
 |---|---|
 | Shared Engine and web app | `main` contains research, verification, case pages, browser demo and the optional Oxylabs reader. |
-| Hermes bot | [Draft PR #6](https://github.com/zacharyb1/junction-2026/pull/6): local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows passed against a local Engine. Detailed evidence is in [Hermes handover](docs/HERMES_HANDOVER.md). |
+| Hermes bot | [PR #6](https://github.com/zacharyb1/junction-2026/pull/6): local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows passed against a local Engine. Detailed evidence is in [Hermes handover](docs/HERMES_HANDOVER.md). |
 | Verifier review | [Draft PR #7](https://github.com/zacharyb1/junction-2026/pull/7): independent-reading verification and withholding unsupported money items. Separate from #6 and not merged. |
 | Alternate bot | `scaffold/milestone-1-2` is the separate Hono/Mastra track; this handover does not certify it. |
 | Landing design | Separate `vlad/landing-redesign` branch; outside this handover's changes. |
 
-No PR was merged by this continuation. The existing Vercel project deploys `main`. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`.
+This snapshot was prepared while PRs #6 and #7 were drafts; their links show the current merge status. The existing Vercel project deploys `main`. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`.
 
 **Runtime snapshot, Saturday morning:** the local Engine process is running and five Case files are present. No running Hermes gateway was found during the latest process check. Its configuration still targets the local Engine; the gate plugin is installed. The successful Telegram tests below are earlier evidence, not a claim that the bot is online now. No service was started or stopped during this documentation pass.
 
@@ -135,6 +135,8 @@ The required branch checks are in [CI](.github/workflows/ci.yml):
 ```bash
 node --test hermes/preserve-cases.test.mjs
 python3 -m unittest discover -s eval/bot -p 'test_*.py'
+python3 -m unittest discover -s eval/gate -p 'test_*.py'
+python3 -m unittest discover -s hermes -p 'test_*.py'
 pnpm lint
 pnpm typecheck
 pnpm build

@@ -24,7 +24,7 @@ The existing Git-connected Vercel project is the normal shared deployment. A tea
 4. Deploy the intended revision through the team's usual Vercel/Git workflow. On the existing integration, production-branch pushes deploy production and other branches create previews. Environment changes require a new deployment. [Vercel Git deployments](https://vercel.com/docs/git) and [environment guidance](https://vercel.com/docs/deployments/environments) describe those behaviors.
 5. Open `/try?code=<the environment's demo code>`, run one test situation, and open its returned `/c/<id>` page from another device. Confirm the stored Case is readable at `/api/cases/<id>`. An authenticated bot/MCP call needs a separate check; a public landing page or passing CI does not establish that path.
 
-For a separate deployment, import the repository into a new Vercel project with the same root/framework settings and configure its own values. As of this handover, the Hermes scripts/docs are on `vlad/hermes-bot` in draft #6; the independent verifier changes are on `review-grounding` in draft #7. Deploying a branch includes only that branch's code.
+For a separate deployment, import the repository into a new Vercel project with the same root/framework settings and configure its own values. As of this handover, the Hermes scripts/docs are on `vlad/hermes-bot` in PR #6; the independent verifier changes are on `review-grounding` in draft #7. Deploying a branch includes only that branch's code.
 
 | Variable | Required role |
 |---|---|

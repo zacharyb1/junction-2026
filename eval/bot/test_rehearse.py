@@ -1,4 +1,4 @@
-"""Catch case URLs that look valid in a reply but no longer open."""
+"""Check rehearsal isolation and case URLs that look valid but no longer open."""
 import importlib.util
 import json
 import sqlite3
@@ -57,6 +57,42 @@ class CaseLinkTest(unittest.TestCase):
 
     def test_broken_case_page_fails_even_if_api_works(self):
         self.assertIn('404', self.run_reply(page_status=404)['error'])
+
+
+class MemoryIsolationTest(unittest.TestCase):
+    def test_inherited_and_prior_run_user_memory_are_cleared_before_invocation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            live_home = Path(tmp) / 'live'
+            profile = live_home / 'profiles' / 'rehearse'
+            inherited = {'MEMORY.md': 'Live household facts\n', 'USER.md': 'Live user facts\n'}
+            for home in (live_home, profile):
+                (home / 'memories').mkdir(parents=True)
+                for name, content in inherited.items():
+                    (home / 'memories' / name).write_text(content, encoding='utf-8')
+            db = sqlite3.connect(profile / 'state.db')
+            db.execute('create table messages (session_id text, role text, content text, tool_name text)')
+            db.close()
+            seen = []
+
+            def invoke(*args, **kwargs):
+                seen.append({name: (profile / 'memories' / name).read_text(encoding='utf-8')
+                             for name in inherited})
+                # Simulate facts saved by a model turn; the next invocation must not inherit them.
+                for name in inherited:
+                    (profile / 'memories' / name).write_text('Previous rehearsal facts\n', encoding='utf-8')
+                return SimpleNamespace(stdout='Session: test\n', stderr='', returncode=0)
+
+            with patch.object(rehearse, 'HOME', live_home), patch.object(rehearse, 'PROFILE_HOME', profile), \
+                    patch.object(rehearse.subprocess, 'run', side_effect=invoke) as run:
+                self.assertEqual(rehearse.run_once('first fixture', 'Selected rehearsal seed', 10)['error'], '')
+                self.assertEqual(rehearse.run_once('second fixture', '', 10)['error'], '')
+            self.assertEqual(run.call_count, 2)
+            self.assertEqual(seen, [
+                {'MEMORY.md': 'Selected rehearsal seed\n', 'USER.md': ''},
+                {'MEMORY.md': '', 'USER.md': ''},
+            ])
+            for name, content in inherited.items():
+                self.assertEqual((live_home / 'memories' / name).read_text(encoding='utf-8'), content)
 
 
 if __name__ == '__main__':

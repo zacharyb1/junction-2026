@@ -1,6 +1,6 @@
 # Hermes bot track handover
 
-Snapshot: Saturday 14 November, including the Telegram tests through 02:42 Helsinki, the subsequent local recovery checks, and the morning process check below. Draft PR: https://github.com/zacharyb1/junction-2026/pull/6.
+Snapshot: Saturday 14 November, including the Telegram tests through 02:42 Helsinki, the subsequent local recovery checks, and the morning process check below. Implementation PR: https://github.com/zacharyb1/junction-2026/pull/6.
 
 The recorded scope is repeatable selected scenarios and polite handling of other messages. The broad 20-message silence run and repeated pregnancy triggers were cancelled. Final demo scenarios are not recorded in this snapshot; CLI rehearsals remain distinct from Telegram delivery checks.
 
@@ -74,7 +74,7 @@ Private keys repo: `bot.env` and `app.env`. Local copies: `.hermes-local/home/.e
 - The chat-scoped watch template from `cd8c82a` on `review-watch-template` is adopted in the reminder skill and runbook. Watch jobs require matching chat labels and delivery destinations. No live daily watch was enabled or tested.
 - The rent-letter Case and stored deadline are repaired. Four older Cases had only summary records left and were not recovered; their old links remain unusable.
 - Context.dev as an extra page reader and its monitor/webhook path are proposals, with no implementation on this branch. Aiven's cited-page-to-Case index and ElevenLabs bot voice are also absent.
-- Milan's `scaffold/milestone-1-2` is a separate bot track. A Friday comparison differed from main by 168 files; this handover does not establish its compatibility or runtime behavior. No PR was merged by this continuation.
+- Milan's `scaffold/milestone-1-2` is a separate bot track. A Friday comparison differed from main by 168 files; this handover does not establish its compatibility or runtime behavior. This snapshot was prepared before integration; the PR links show current merge status.
 
 ## Unresolved choices at this snapshot
 
@@ -100,3 +100,10 @@ Isolated CLI profile, updated persona/skills, no Telegram delivery: missing-case
 Historical runtime application during the repair: the Telegram gateway was restarted gracefully with the updated persona; the Engine and local gate stayed running at that time. Startup archived all five Cases; all five remained readable through the Case API. The later morning process check found no gateway, as recorded above. New conversations load the updated instructions; use `/new --yes` before a future rehearsal to avoid an old conversation prompt.
 
 Reminder success/duplicate checks in the isolated profile: explicit approver fixture created one job in 38.0 s; repetition in 15.8 s listed the same job without creating another. The test job was removed, none ran, and the real reminder was unchanged. An initial unnamed fixture waited for a first name without scheduling. The ID-only fixture checks scheduling/deduplication, not reminder URL content or delivery; the real reminder retains its full working case URL.
+
+
+## Pre-merge source review, 14 November
+
+The final review corrected four instruction/setup paths: direct messages now receive a short reply when research refuses the input; the gate honors Hermes' trusted bot-mention flag; configuration requires valid numeric admin IDs before writing settings; and rehearsals clear both `MEMORY.md` and `USER.md` before each run. Generated Python bytecode was removed from tracking.
+
+Offline checks passed: eight Case-preservation tests, five rehearsal tests, seven gate-hook tests and four admin-configuration tests. The new suites are in CI. These source changes have not had a new Telegram delivery test; the installed gate plugin was not refreshed and no service was restarted by the review. Earlier live measurements above retain their original scope.

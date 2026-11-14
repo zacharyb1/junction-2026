@@ -15,6 +15,19 @@ SKILLS_DIR="$ROOT/hermes/skills"
 MODEL="${KAVERI_MODEL:-nvidia/nemotron-3.5-super-vl-120b-a12b}"
 PROVIDER="${KAVERI_PROVIDER:-nvidia}"
 
+# Admins are required even when everyone may chat with the bot. Validate before
+# any config command so an incomplete setup cannot leave slash commands open.
+BOT_ENV="${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home/.env"
+OWNER=""
+if [ -f "$BOT_ENV" ]; then
+  OWNER="$(sed -n 's/^TELEGRAM_ALLOWED_USERS=//p' "$BOT_ENV" | tail -n 1)"
+fi
+if [[ ! "$OWNER" =~ ^[[:space:]]*[1-9][0-9]*([[:space:]]*,[[:space:]]*[1-9][0-9]*)*[[:space:]]*$ ]]; then
+  echo "ERROR: TELEGRAM_ALLOWED_USERS must contain comma-separated positive numeric Telegram user IDs. Admins are required even when TELEGRAM_ALLOW_ALL_USERS is enabled; no configuration was changed." >&2
+  exit 1
+fi
+OWNER="$(printf '%s' "$OWNER" | tr -d '[:space:]')"
+
 set_key() { "$H" config set "$1" "$2" >/dev/null && echo "  set $1"; }
 
 case "${1:-}" in
@@ -78,17 +91,12 @@ set_key cron.wrap_response false
 
 # Slash commands (/sethome, /new, /model ...) only for the owner. Without this every user the bot
 # answers can run them, which matters once TELEGRAM_ALLOW_ALL_USERS is on (CHECKS.md, U10).
-OWNER="$(sed -n 's/^TELEGRAM_ALLOWED_USERS=//p' "${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home/.env" 2>/dev/null | tail -n 1 | tr -d '[:space:]')"
-if [ -n "$OWNER" ]; then
-  echo "Slash commands: admin only"
-  ADMINS="[\"$(printf '%s' "$OWNER" | sed 's/,/","/g')\"]"
-  set_key platforms.telegram.extra.allow_admin_from "$ADMINS"
-  set_key platforms.telegram.extra.group_allow_admin_from "$ADMINS"
-  set_key platforms.telegram.extra.user_allowed_commands '["start", "new"]'
-  set_key platforms.telegram.extra.group_user_allowed_commands '["start", "new"]'
-else
-  echo "Slash commands: open to every user (no TELEGRAM_ALLOWED_USERS to name as admin)"
-fi
+echo "Slash commands: admin only"
+ADMINS="[\"$(printf '%s' "$OWNER" | sed 's/,/","/g')\"]"
+set_key platforms.telegram.extra.allow_admin_from "$ADMINS"
+set_key platforms.telegram.extra.group_allow_admin_from "$ADMINS"
+set_key platforms.telegram.extra.user_allowed_commands '["start", "new"]'
+set_key platforms.telegram.extra.group_user_allowed_commands '["start", "new"]'
 
 echo "Persona"
 PATH="$ROOT/hermes/bin:$PATH" bash "$ROOT/hermes/install.sh" --home "${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home" | sed -n '1,6p'

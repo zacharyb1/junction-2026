@@ -1,6 +1,6 @@
 # Challenge status and evidence
 
-Snapshot: Saturday 14 November 2026, on `vlad/hermes-bot` (draft [PR #6](https://github.com/zacharyb1/junction-2026/pull/6)). This describes the code and recorded tests on this branch. It does not certify production integration, Milan's bot track, or the current selections on the Junction Platform.
+Snapshot: Saturday 14 November 2026, on `vlad/hermes-bot` ([PR #6](https://github.com/zacharyb1/junction-2026/pull/6)). This describes the code and recorded tests on this branch. It does not certify production integration, Milan's bot track, or the current selections on the Junction Platform.
 
 **Exa remains the main challenge.** Tech challenges support the same product only when their technology has a demonstrated role. The [decision log](DECISIONS.md) records the choices and proposals; the [Friday plan](research/tech-challenges-2026-11-13.md) preserves the original research, prizes and rationale. This status update reconciles that plan with the implementation; it does not settle the team's outstanding choices.
 

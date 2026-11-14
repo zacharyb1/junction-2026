@@ -72,7 +72,9 @@ async def _on_message(event, gateway=None, session_store=None, **kwargs):
             text,
             _patterns(),
             has_media=bool(getattr(event, "media_urls", None)),
-            addressed=bool(getattr(event, "reply_to_is_own_message", False)),
+            # Telegram resolves actual bot mentions into this trusted event flag.
+            addressed=(getattr(event, "reply_expected", None) is True
+                       or bool(getattr(event, "reply_to_is_own_message", False))),
         )
     if decision.wake and decision.label != "open_window" and open_seconds > 0:
         _OPEN_UNTIL[chat] = now + open_seconds

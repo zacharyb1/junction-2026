@@ -59,7 +59,7 @@ status() {
   echo "Hermes home:  $BOT_ENV"
   for name in $BOT_REQUIRED; do
     if has "$BOT_ENV" "$name"; then echo "  [set]     $name"
-    elif [ "$name" = TELEGRAM_ALLOWED_USERS ] && has "$BOT_ENV" TELEGRAM_ALLOW_ALL_USERS; then echo "  [optional] $name (the bot is open to everyone)"
+    elif [ "$name" = TELEGRAM_ALLOWED_USERS ]; then echo "  [missing] $name (required for admin commands, even when the bot is open to everyone)"
     else echo "  [missing] $name"; fi
   done
   for name in TELEGRAM_ALLOW_ALL_USERS ELEVENLABS_API_KEY; do
