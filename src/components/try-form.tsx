@@ -111,8 +111,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
             finished = true;
             const message = (payload as { error: string }).error;
             setError(message);
-            // The engine's two refusals are answers, not outages.
-            if (!/^(I could not find anything to research|Unknown country|This country is not supported)/.test(message)) setLiveDown(true);
+            // The engine's refusals, in English or Finnish, are answers, not outages.
+            if (!/^(I could not find anything to research|Unknown country|This country is not supported|En löytänyt viestistä|Maata |Tämä maa ei ole mukana)/.test(message)) setLiveDown(true);
           } else {
             // Every other event is one of the engine's, named after its type.
             setProgress((p) => advance(p, payload as EngineEvent));

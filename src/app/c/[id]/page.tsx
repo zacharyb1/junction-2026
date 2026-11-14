@@ -153,7 +153,7 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
           {step.owner && <Badge variant="outline">{step.owner}</Badge>}
           {step.confidence && step.confidence !== "high" && (
             <Badge variant="outline">
-              {t.exaConfidence}: {step.confidence}
+              {t.exaConfidence}: {t.confidence[step.confidence]}
             </Badge>
           )}
           {step.status === "needs_approval" && (
@@ -269,7 +269,7 @@ function Header({ c, t }: { c: Case; t: Labels }) {
     <header className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <Badge variant="secondary">
-          <MapPin /> {[c.jurisdiction.region, c.jurisdiction.country].filter(Boolean).join(", ")}
+          <MapPin /> {[c.jurisdiction.region, t.country(c.jurisdiction.country)].filter(Boolean).join(", ")}
         </Badge>
         <span className="text-muted-foreground">
           {t.updated} {when(c.updatedAt, t)}
@@ -344,7 +344,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
               <CardHeader className="flex flex-row items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-base">{d.title}</CardTitle>
-                  <CardDescription className="capitalize">{d.kind}</CardDescription>
+                  <CardDescription className="capitalize">{t.draftKind[d.kind]}</CardDescription>
                 </div>
                 <CopyButton text={d.body} label={t.copy} copiedLabel={t.copied} />
               </CardHeader>

@@ -7,8 +7,23 @@
 const listOf = (locale: string, numbers: number[]) =>
   new Intl.ListFormat(locale, { type: "conjunction" }).format(numbers.map(String));
 
+/** The Finnish name of a country stored under its English name. A name Intl does not know stays as written. */
+function finnishCountry(name: string): string {
+  const english = new Intl.DisplayNames(["en"], { type: "region" });
+  const finnish = new Intl.DisplayNames(["fi"], { type: "region", fallback: "none" });
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (const a of letters) {
+    for (const b of letters) {
+      if (english.of(a + b) === name) return finnish.of(a + b) ?? name;
+    }
+  }
+  return name;
+}
+
 const en = {
   locale: "en-GB",
+  /** The country in the header, stored in English. */
+  country: (name: string) => name,
   updated: "Updated",
   quotesVerified: "quotes verified",
   deadline: "deadline",
@@ -29,9 +44,11 @@ const en = {
   done: "Done",
   approveInChat: "Approve in the chat",
   exaConfidence: "Exa confidence",
+  confidence: { low: "low", medium: "medium", high: "high" },
   money: "Money and entitlements",
   drafts: "Drafts ready for you",
   draftsHint: "Nothing is sent without your approval.",
+  draftKind: { email: "email", letter: "letter", checklist: "checklist" },
   copy: "Copy",
   copied: "Copied",
   gaps: "What I could not confirm",
@@ -93,6 +110,7 @@ export type Labels = typeof en;
 
 const fi: Labels = {
   locale: "fi-FI",
+  country: finnishCountry,
   updated: "Päivitetty",
   quotesVerified: "lainausta vahvistettu",
   deadline: "määräaika",
@@ -113,9 +131,11 @@ const fi: Labels = {
   done: "Valmis",
   approveInChat: "Hyväksy keskustelussa",
   exaConfidence: "Exan varmuus",
+  confidence: { low: "pieni", medium: "kohtalainen", high: "suuri" },
   money: "Raha ja etuudet",
   drafts: "Valmiit luonnokset",
   draftsHint: "Mitään ei lähetetä ilman hyväksyntääsi.",
+  draftKind: { email: "sähköposti", letter: "kirje", checklist: "tarkistuslista" },
   copy: "Kopioi",
   copied: "Kopioitu",
   gaps: "Mitä en voinut vahvistaa",

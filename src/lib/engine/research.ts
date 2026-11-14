@@ -13,6 +13,7 @@ import {
   unbackedNumbers,
 } from "@/lib/engine/ground";
 import { hostOf, isOfficial, type Jurisdiction, publisherOf, resolveJurisdiction } from "@/lib/engine/jurisdiction";
+import { type Messages, messages } from "@/lib/engine/messages";
 import { figuresIn, numbersIn, tokens } from "@/lib/text";
 import { type FetchedPage, fetchPages, judge, type PageReader, readerCounts } from "@/lib/verify";
 
@@ -148,9 +149,6 @@ const OUTPUT_SCHEMA = {
   required: ["title", "summary", "steps"],
 } as const;
 
-const NOTHING_MESSAGE =
-  "I could not find anything to research in that message. Describe what happened in a sentence or two, for example: “Our landlord wants to raise the rent by 15 percent from next month.”";
-
 /** Countries the team decided not to serve. */
 const UNSUPPORTED_COUNTRIES = new Set(["RU"]);
 
@@ -226,27 +224,27 @@ function resolveScope(input: ResearchInput): "official" | "open" {
   return RULES.test(text) ? "official" : "open";
 }
 
-function choiceFocuses(): Focus[] {
+function choiceFocuses(names: Messages["focus"]): Focus[] {
   return [
     {
-      name: "options that fit",
+      name: names.options,
       lead: true,
       keywords: "best options that match every requirement",
       ask: "Which specific places, providers or options fit this request best? One option per step. Every requirement in the request must be met by the option, and the quote must show that it is.",
     },
     {
-      name: "practical details",
+      name: names.details,
       keywords: "opening hours, booking, prices, address",
       ask: "For options that fit the request: opening hours on the requested day, how to book, price level and address. One option per step.",
     },
   ];
 }
 
-function focuses(input: ResearchInput): Focus[] {
+function focuses(input: ResearchInput, names: Messages["focus"]): Focus[] {
   const doc = Boolean(input.document);
   const list: Focus[] = [
     {
-      name: "actions and deadlines",
+      name: names.actions,
       lead: true,
       keywords: doc ? "rules, tenant or consumer rights, how to object, deadlines" : "what to do, applications, notifications, deadlines",
       ask: doc
@@ -254,21 +252,21 @@ function focuses(input: ResearchInput): Focus[] {
         : "What must they do, in what order, and by when? Cover applications, notifications to employers or authorities, appointments and deadlines.",
     },
     {
-      name: "money and entitlements",
+      name: names.money,
       keywords: "amounts, benefits, compensation, entitlements, conditions",
       ask: doc
         ? "Which limits, compensation, fees or rights apply to this situation? List only items with a stated amount, percentage, cap or number of days."
         : "Which benefits, compensation, paid leave or other entitlements can they get? List only items with a stated amount, rate, percentage or number of days, and the conditions.",
     },
     {
-      name: "how and where to apply",
+      name: names.apply,
       keywords: "how to apply, which authority, forms, required documents",
       ask: "For each application or notification: which authority, online service or form is used, and which documents or certificates are needed?",
     },
   ];
   if (input.depth === "deep") {
     list.push({
-      name: "exceptions and missed deadlines",
+      name: names.exceptions,
       keywords: "exceptions, recently moved, non-citizens, missed deadline",
       ask: "Which exceptions apply to people who recently moved to the country or are not citizens, and what happens if a deadline is missed?",
     });
@@ -314,7 +312,7 @@ const key = (text: string) =>
 
 const clip = (text: string | undefined, max: number) => (text ?? "").replace(/\s+/g, " ").trim().slice(0, max);
 
-const EMPTY = /^(['"`´\s]*|ei määrää|ei määräaikaa|ei mainittu|ei ilmoitettu|ei tiedossa|empty|none( stated| specified| given)?|n\/?a|null|unknown|varies|not (specified|stated|applicable|available|mentioned)|no (specific )?(deadline|amount)( stated| specified)?|-+|–|—)$/i;
+const EMPTY = /^(['"`´\s]*|ei määrää|ei määräaikaa|ei määritelty|ei määritetty|ei sovellu|ei koske|ei aikarajaa|ei mainittu|ei ilmoitettu|ei tiedossa|empty|none( stated| specified| given)?|n\/?a|null|unknown|varies|not (specified|stated|applicable|available|mentioned)|no (specific )?(deadline|amount)( stated| specified)?|-+|–|—)$/i;
 const JUNK = /[{}\[\]]|"\s*[:,]|citations|confidence\s*:/i;
 const VAGUE = /^(as soon as possible|asap|immediately|promptly|without delay|mahdollisimman pian|viipymättä|heti|snarast)$/i;
 
@@ -454,13 +452,15 @@ export async function researchCase(
   const started = Date.now();
   const since = () => Date.now() - started;
   const input = ResearchInput.parse(raw);
+  // Everything the engine writes itself, in the language of the case.
+  const m = messages(input.language);
   if (!process.env.EXA_API_KEY) throw new EngineError("EXA_API_KEY is not configured on the server.", 500);
 
   const j = resolveJurisdiction(input.country, input.region);
   if (!j.code) {
-    throw new EngineError(`Unknown country "${input.country}". Use an English country name or a two-letter code.`, 400);
+    throw new EngineError(m.unknownCountry(input.country), 400);
   }
-  if (UNSUPPORTED_COUNTRIES.has(j.code)) throw new EngineError("This country is not supported.", 400);
+  if (UNSUPPORTED_COUNTRIES.has(j.code)) throw new EngineError(m.unsupportedCountry, 400);
   const exa = new Exa(process.env.EXA_API_KEY);
   const usage = { searches: 0, contents: 0, costDollars: 0 };
   const scope = resolveScope(input);
@@ -475,21 +475,14 @@ export async function researchCase(
     emit({ type: "stage", name, detail, ms: since() });
   };
 
-  stage(
-    "plan",
-    scope === "open"
-      ? `Pinned to ${where}. This is a choice, not a rule, so searching the open web and labelling each source.`
-      : official.length
-        ? `Pinned to ${j.name}. Searching ${official.length} official sites first.`
-        : `Pinned to ${j.name}. No official site list for this country yet, so searching the open web and labelling each source.`,
-  );
+  stage("plan", scope === "open" ? m.pinnedOpen(j) : official.length ? m.pinnedOfficial(j, official.length) : m.pinnedNoList(j));
 
   let head: RawOutput = {};
   const questions: string[] = [];
   const given = `${input.situation}\n${input.document ?? ""}\n${input.household ?? ""}`;
 
   async function search(focus: Focus, restrict: boolean): Promise<Candidate[]> {
-    stage("search", `Exa search on ${restrict && official.length ? "official sites" : "the open web"}: ${focus.name}`);
+    stage("search", m.searching(Boolean(restrict && official.length), focus.name));
     usage.searches++;
     const began = Date.now();
     const report = (status: "running" | "done" | "failed", steps = 0, pages = 0) =>
@@ -575,7 +568,7 @@ export async function researchCase(
     const failures = settled.filter((r): r is PromiseRejectedResult => r.status === "rejected");
     if (failures.length) {
       lastError = failures[0].reason;
-      stage("search", `${failures.length} of ${list.length} searches failed and were skipped`);
+      stage("search", m.searchesSkipped(failures.length, list.length));
     }
     // Results keep the order of `list`, so the lead focus comes first.
     return settled.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
@@ -587,7 +580,7 @@ export async function researchCase(
   type Fresh = { url: string; title: string; date: string; text: string };
   async function searchNews(topic: string): Promise<Fresh[]> {
     if (scope !== "official" || !official.length) return [];
-    stage("search", "Exa search on official sites: pages published in the last four months");
+    stage("search", m.searchingNews);
     usage.searches++;
     const res = (await withRetry(() =>
       exa.search(
@@ -614,23 +607,23 @@ export async function researchCase(
         text: `${r.title} ${(r.highlights ?? [])[0] ?? ""}`,
       }));
   }
-  const asks = scope === "open" ? choiceFocuses() : focuses(input);
+  const asks = scope === "open" ? choiceFocuses(m.focus) : focuses(input, m.focus);
   let found = await run(asks, true);
   // Too little from official sites: widen to the open web once.
   if (found.length < 3 && official.length) found = [...found, ...(await run(asks.slice(0, 2), false))];
   if (!found.length) {
     if (lastError) {
-      throw new EngineError(`Exa search failed: ${lastError instanceof Error ? lastError.message : String(lastError)}`, 502);
+      throw new EngineError(m.searchFailed(lastError instanceof Error ? lastError.message : String(lastError)), 502);
     }
     // Nothing to research, or nothing found. Not a server fault, so the caller gets a message it can show.
-    throw new EngineError(NOTHING_MESSAGE, 422);
+    throw new EngineError(m.nothingToResearch, 422);
   }
   // Small talk or gibberish still returns pages, and a plan built from them would be an invented situation.
   // If no word of the message comes back in anything the search wrote or quoted, there was nothing to research.
   if (!input.document) {
     const written = found.map((c) => `${c.title} ${c.detail ?? ""} ${c.quote}`).join(" ");
     if (!echoes(input.situation, `${head.title ?? ""} ${head.summary ?? ""} ${written}`)) {
-      throw new EngineError(NOTHING_MESSAGE, 422);
+      throw new EngineError(m.nothingToResearch, 422);
     }
   }
   const searchMs = since();
@@ -665,19 +658,19 @@ export async function researchCase(
 
   // Open every cited page again, live.
   const urls = [...new Set(merged.flatMap((c) => [c.url, ...c.facts.map((f) => f.url)]))];
-  stage("read", `Opening ${urls.length} cited pages: our own live request plus Exa Contents`);
+  stage("read", m.opening(urls.length));
   // Fast mode spends an Oxylabs read only on pages nothing else could open. Deep mode reads every blocked page live.
   const pages = await fetchPages(urls, { oxylabs: input.depth === "deep" ? "blocked" : "unread" }, (url, via) =>
     emit({ type: "page", url, title: titles.get(url) ?? hostOf(url), official: isOfficial(url, j), via, ms: since() }),
   );
   const readers = readerCounts(pages);
-  if (readers.oxylabs) stage("read", `Read ${readers.oxylabs} blocked pages live through the Oxylabs Web API`);
+  if (readers.oxylabs) stage("read", m.readBlocked(readers.oxylabs));
   for (const url of urls) emit({ type: "source", url, title: titles.get(url) ?? hostOf(url), official: isOfficial(url, j) });
 
   usage.contents += [...pages.values()].filter((p) => p?.exa).length;
   const readMs = since() - searchMs;
 
-  stage("verify", "Checking every quote, amount and deadline against the page text");
+  stage("verify", m.checking);
   const evidence: EvidenceInput[] = [];
   const unverified: string[] = [];
   /** Returns the citation number, or null when the case already holds as many sources as it may. */
@@ -756,17 +749,17 @@ export async function researchCase(
     if (steps.length >= LIMITS.steps || evidence.length >= LIMITS.evidence - 1) break;
     const page: FetchedPage = pages.get(c.url) ?? null;
     if (!page) {
-      unverified.push(`${c.title}: the cited page could not be opened (${hostOf(c.url)}).`);
+      unverified.push(m.pageNotOpened(c.title, hostOf(c.url)));
       continue;
     }
     const snapped = snapQuote(c.quote, page.text);
     if (!snapped) {
-      unverified.push(`${c.title}: the quoted sentence was not found on ${hostOf(c.url)}.`);
+      unverified.push(m.quoteNotFound(c.title, hostOf(c.url)));
       continue;
     }
     const onPage = pageNumbers(page.text);
     if (unbackedNumbers(c.title, onPage, known).length) {
-      unverified.push(`${c.title}: this figure is not on ${hostOf(c.url)}, so the step is left out.`);
+      unverified.push(m.figureNotOnPage(c.title, hostOf(c.url)));
       continue;
     }
     let quote = snapped.quote;
@@ -806,7 +799,7 @@ export async function researchCase(
       // Two wordings can only disagree when both carry a number: "one week" and "viikon kuluessa" do not.
       if (!numbersIn(first).length || !numbersIn(second).length) return;
       if (target.conflict || sameNumbers(first, second) || !unitOf(first) || unitOf(first) !== unitOf(second)) return;
-      target.conflict = `Two figures found: "${first}" [${firstRef}] and "${second}" [${secondRef}]. Check which one applies to you.`.slice(0, 400);
+      target.conflict = m.twoFigures(first, firstRef, second, secondRef).slice(0, 400);
       addRef(firstRef);
       addRef(secondRef);
     };
@@ -853,10 +846,8 @@ export async function researchCase(
     for (const fact of missing) {
       // A long value is a sentence, not a figure. Reporting it as missing would only confuse.
       if (!numbersIn(fact.value).length || fact.value.length > 60) continue;
-      const why = elsewhere.has(fact)
-        ? `is on ${hostOf(fact.url)}, but in a sentence about something else, so it is left out`
-        : `is not stated on ${hostOf(fact.url)}, so it is left out`;
-      dropped.push({ value: fact.value, note: `${c.title}: "${fact.value}" ${why}.` });
+      const note = (elsewhere.has(fact) ? m.factElsewhere : m.factNotStated)(c.title, fact.value, hostOf(fact.url));
+      dropped.push({ value: fact.value, note });
     }
   }
   // What a step's own sentence states is shown even when the search model left the field empty:
@@ -947,15 +938,13 @@ export async function researchCase(
           return other && sameRule(other[0].ref, other[1].ref) ? other : null;
         })();
       if (!pair || steps[i].conflict?.includes(`[${pair[0].ref}]`)) continue;
-      unverified.unshift(
-        `Different figures appear: "${pair[0].value}" [${pair[0].ref}] and "${pair[1].value}" [${pair[1].ref}]. They may apply to different years or cases, so read both quotes.`,
-      );
+      unverified.unshift(m.differentFigures(pair[0].value, pair[0].ref, pair[1].value, pair[1].ref));
       break pairs;
     }
   }
 
   if (!steps.length) {
-    throw new EngineError("Sources were found, but no claim could be confirmed on the cited pages.", 502);
+    throw new EngineError(m.nothingConfirmed, 502);
   }
 
   // A recent page is kept only when it is about this case: its title shares a word start with the step titles,
@@ -974,7 +963,7 @@ export async function researchCase(
     .sort((a, b) => shared(b.text) - shared(a.text) || b.date.localeCompare(a.date))
     .slice(0, 3)
     .map((n) => ({ url: n.url, title: n.title, date: n.date, publisher: publisherOf(n.url) }));
-  if (news.length) stage("verify", `Found ${news.length} recent official pages on this topic`);
+  if (news.length) stage("verify", m.foundNews(news.length));
   const verifyMs = since() - searchMs - readMs;
 
   // Title, summary and questions are the model's own prose. Any figure in them must be on a page we cite.
@@ -992,7 +981,7 @@ export async function researchCase(
     event: key(title).split(" ").slice(0, 4).join("_").slice(0, 60) || "case",
     language: input.language,
     jurisdiction: { country: j.name, region: j.region },
-    summary: backed(clip(head.summary, 800), cited) ?? `Sourced plan for: ${clip(input.situation, 200)}`,
+    summary: backed(clip(head.summary, 800), cited) ?? m.sourcedPlan(clip(input.situation, 200)),
     steps,
     money,
     evidence,
@@ -1002,7 +991,7 @@ export async function researchCase(
     openQuestions: dedupe(questions.filter((q) => backed(q, cited) === q.trim()), 3).map((q) => q.slice(0, 300)),
   };
 
-  stage("publish", "Building the case file");
+  stage("publish", m.building);
   const published = await publishCase(caseInput, origin, pages, {
     ms: since(),
     searches: usage.searches,
