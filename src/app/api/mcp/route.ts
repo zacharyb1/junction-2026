@@ -43,24 +43,24 @@ function handlerFor(origin: string) {
     );
 
     server.registerTool(
-      "find_gifts",
+      "find_products",
       {
-        title: "Find gifts with prices",
+        title: "Find products with prices",
         description:
-          "Find products to buy online as a gift, with prices checked on each shop's own page. " +
-          "Pass `prompt` with what to look for in plain words (\"gift for Sem who likes cars, under 50 euros\"), " +
-          "or `recipient` with `clues` (one fact each). Add `occasion` (YYYY-MM-DD) to have late deliveries marked, " +
-          "and `budget` to drop anything dearer. Returns products with name, price, the price line quoted from the " +
+          "Find products to buy online, gifts included, with prices checked on each shop's own product page. " +
+          "Pass `prompt` with what to look for in plain words (\"electric kettle under 40 euros\", \"gift for Sem who likes cars\"), " +
+          "or `recipient` with `clues` (one fact each) for a gift. Add `occasion` (YYYY-MM-DD) to have late deliveries marked, " +
+          "and `budget` to drop anything dearer. Returns up to 8 products with name, price, the price line quoted from the " +
           "page, delivery, arrival date when the page states days, and the shop URL. Typically 3 to 15 seconds. " +
-          "Use this for any request to find, choose or buy a gift or a product.",
+          "Use this for any request to find, compare, choose or buy a product or a gift.",
         inputSchema: GiftInput,
       },
       async (input) => {
         try {
           return text(await findGifts(input));
         } catch (error) {
-          const message = error instanceof Error ? error.message : "gift search failed";
-          return { ...text(`find_gifts failed: ${message}. Tell the user you could not find products right now.`), isError: true };
+          const message = error instanceof Error ? error.message : "product search failed";
+          return { ...text(`find_products failed: ${message}. Tell the user you could not find products right now.`), isError: true };
         }
       },
     );
