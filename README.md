@@ -186,6 +186,7 @@ This handover records implemented behavior, tests, limitations and earlier decis
 | [docs/PLAN.md](docs/PLAN.md) | Reading the historical product design and proposed demo; its milestones are not current assignments. |
 | [eval/README.md](eval/README.md), [eval/results/](eval/results/) | Running or interpreting measurements. |
 | [docs/PITCH.md](docs/PITCH.md), [docs/pitch/](docs/pitch/) | Preparing the story, script and voiceover; refresh dated claims before recording. |
+| [docs/CHALLENGES_TO_SELECT.md](docs/CHALLENGES_TO_SELECT.md), [docs/VERDA.md](docs/VERDA.md) | Filling in the submission form: which challenges to select, the note to paste for each, and the process summary the Verda challenge asks for. |
 | [docs/DEMO_PLAN.md](docs/DEMO_PLAN.md), [docs/BOT_PLAN.md](docs/BOT_PLAN.md) | Proposals of Saturday 09:05: the run of show on the new front page, and the order of bot work before the freeze. |
 | [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The dark front page on `/`: what each section shows and which data file it reads. The reading-table page is at `/reading`. |
 | [docs/RESEARCH.md](docs/RESEARCH.md), [docs/research/](docs/research/) | Finding prior research and historical plans. |

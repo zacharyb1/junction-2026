@@ -11,7 +11,7 @@ Review [the event rules](PLAYBOOK.md#rules-that-disqualify) before submission: p
 - [ ] Challenge(s) selected (you may submit to multiple challenges)
 - [ ] Technologies used
 - [ ] **Video pitch ≤ 2:00** uploaded (YouTube/Vimeo, viewable by everyone, not private). Check length to the second.
-- [ ] Demo link (deployed Vercel URL, works from a fresh browser with no login, or with a prefilled demo account)
+- [ ] Demo link (<https://86.38.238.136.sslip.io>, works from a fresh browser with no login)
 - [ ] Source code link (GitHub repo, MIT license file present). The repo is private while we build: make it public, or add the organizers as collaborators, before setting the submission to FINAL.
 - [ ] Source code publicity answered
 - [ ] "Do you want to be credited?" answered
@@ -34,6 +34,8 @@ Review [the event rules](PLAYBOOK.md#rules-that-disqualify) before submission: p
 - [ ] Each member reviews their assigned projects on the platform (mandatory)
 
 ## Tech challenges (see `docs/TECH_CHALLENGES.md`)
+- [ ] **Go through [CHALLENGES_TO_SELECT.md](CHALLENGES_TO_SELECT.md)**: which challenges to tick on the platform, with a note to paste for each
+- [ ] Verda: post the link to [VERDA.md](VERDA.md) in Verda's Discord channel (their brief requires it)
 - [ ] Reconcile platform selections with [the current challenge matrix](TECH_CHALLENGES.md); keep only technologies demonstrated by the chosen bot track and final demo
 - [ ] Nemotron: include the required text explanation of its actual role and evaluation in the submission form
 - [ ] One short note per challenge: which endpoints or models, what they do in the demo, why; refresh pitch/voiceover measurements from the chosen build
