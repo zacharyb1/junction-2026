@@ -62,7 +62,7 @@ healthy() {
   port=$(sed -n 's/^KAVERI_HTTP_PORT=//p' .env.local | tail -n1)
   port=${port:-3000}
   deadline=$((SECONDS + HEALTH_TIMEOUT))
-  until curl -fsS -m 5 "http://127.0.0.1:$port/api/health" 2>/dev/null | grep -q "\"commit\":\"$want\""; do
+  until curl -fsS -m 5 "http://127.0.0.1:$port/api/health" 2>/dev/null | grep "\"commit\":\"$want\"" >/dev/null; do
     if ((SECONDS > deadline)); then
       log "web did not report commit $want within ${HEALTH_TIMEOUT}s"
       return 1
@@ -73,7 +73,7 @@ healthy() {
   local bot started
   bot=$(compose ps -q hermes)
   started=$(docker inspect -f '{{.State.StartedAt}}' "$bot")
-  until docker logs --since "$started" "$bot" 2>&1 | grep -q "Connected to Telegram"; do
+  until docker logs --since "$started" "$bot" 2>&1 | grep "Connected to Telegram" >/dev/null; do
     if ((SECONDS > deadline)); then
       log "the bot did not connect to Telegram within ${HEALTH_TIMEOUT}s"
       return 1

@@ -74,7 +74,12 @@ export function UkkChat({ code }: { code: string }) {
         dropEmptyReply();
         return;
       }
-      await readCompletionStream(res.body, append);
+      const received = await readCompletionStream(res.body, append);
+      if (received === 0) {
+        // A finished reply with no text (an error inside the run, or a silent turn) must not leave the spinner.
+        setError("UKK did not answer this time. Please send your message again.");
+        dropEmptyReply();
+      }
     } catch {
       setError("The connection dropped. Please send your message again.");
       dropEmptyReply();

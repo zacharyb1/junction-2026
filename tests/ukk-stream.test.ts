@@ -34,6 +34,16 @@ describe("readCompletionStream", () => {
     expect(text.join("")).toBe("hi");
   });
 
+  it("returns how much reply text arrived, so an empty reply can be shown as an error", async () => {
+    expect(await readCompletionStream(stream(chunk("hi"), "data: [DONE]\n\n"), () => {})).toBe(2);
+    expect(await readCompletionStream(stream("data: [DONE]\n\n"), () => {})).toBe(0);
+  });
+
+  it("rejects an error event from the backend", async () => {
+    const error = `data: ${JSON.stringify({ error: { message: "provider failed" } })}\n\n`;
+    await expect(readCompletionStream(stream(error, "data: [DONE]\n\n"), () => {})).rejects.toThrow("UKK could not answer");
+  });
+
   it("rejects a stream that closes before [DONE]", async () => {
     await expect(readCompletionStream(stream(chunk("half")), () => {})).rejects.toThrow("stream ended early");
   });
