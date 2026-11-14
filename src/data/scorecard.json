@@ -1,16 +1,16 @@
 {
-  "label": "Run 9: with refusal checks",
-  "ranAt": "2026-11-14T04:32:57.532Z",
+  "label": "Run 10: independent readings and verified amounts",
+  "ranAt": "2026-11-14T04:38:55.499Z",
   "base": "http://localhost:3100",
   "depth": "fast",
   "totals": {
     "scenarios": 19,
-    "passed": 18,
-    "verifiedQuotes": 127,
-    "totalQuotes": 127,
+    "passed": 19,
+    "verifiedQuotes": 129,
+    "totalQuotes": 129,
     "unsourcedClaims": 0,
-    "medianMs": 7051,
-    "p90Ms": 9009
+    "medianMs": 5901,
+    "p90Ms": 9241
   },
   "refusals": {
     "passed": 6,
@@ -26,8 +26,8 @@
       "verified": 12,
       "evidence": 12,
       "official": 12,
-      "ms": 9009,
-      "url": "https://junction-2026.vercel.app/c/Ib4RjVchUAO4S9cx",
+      "ms": 6603,
+      "url": "https://junction-2026.vercel.app/c/FRFJHh-nM6Wzj1Rh",
       "error": null
     },
     {
@@ -36,11 +36,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 6,
-      "evidence": 6,
-      "official": 6,
-      "ms": 8242,
-      "url": "https://junction-2026.vercel.app/c/IAave3ZZm3fdi8m3",
+      "verified": 7,
+      "evidence": 7,
+      "official": 7,
+      "ms": 6554,
+      "url": "https://junction-2026.vercel.app/c/XXdxbAJI52dkSEGk",
       "error": null
     },
     {
@@ -49,11 +49,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 6,
-      "evidence": 6,
-      "official": 6,
-      "ms": 7073,
-      "url": "https://junction-2026.vercel.app/c/CyU4ClPBrDG_hXEi",
+      "verified": 7,
+      "evidence": 7,
+      "official": 7,
+      "ms": 5855,
+      "url": "https://junction-2026.vercel.app/c/o9tW4FZ1-Mmwtzfs",
       "error": null
     },
     {
@@ -62,11 +62,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 4,
-      "evidence": 4,
-      "official": 4,
-      "ms": 6352,
-      "url": "https://junction-2026.vercel.app/c/zQwOar1KUAgilUwZ",
+      "verified": 6,
+      "evidence": 6,
+      "official": 6,
+      "ms": 7122,
+      "url": "https://junction-2026.vercel.app/c/ezoklHJRWVl_D9x3",
       "error": null
     },
     {
@@ -75,11 +75,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 4,
-      "evidence": 4,
-      "official": 4,
-      "ms": 8163,
-      "url": "https://junction-2026.vercel.app/c/iDa9NWP2fTv7gGum",
+      "verified": 6,
+      "evidence": 6,
+      "official": 6,
+      "ms": 5293,
+      "url": "https://junction-2026.vercel.app/c/1kyRmsItu6cLCy8f",
       "error": null
     },
     {
@@ -88,11 +88,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 3,
-      "evidence": 3,
-      "official": 3,
-      "ms": 6750,
-      "url": "https://junction-2026.vercel.app/c/kkYDPwP-UR4rZ3rH",
+      "verified": 4,
+      "evidence": 4,
+      "official": 4,
+      "ms": 5446,
+      "url": "https://junction-2026.vercel.app/c/dKtlTYVgrv9tJhMx",
       "error": null
     },
     {
@@ -101,11 +101,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 9,
-      "evidence": 9,
-      "official": 9,
-      "ms": 7051,
-      "url": "https://junction-2026.vercel.app/c/xNViEJUiRyMQLjtx",
+      "verified": 5,
+      "evidence": 5,
+      "official": 5,
+      "ms": 5729,
+      "url": "https://junction-2026.vercel.app/c/o2KAT4fyumUnOBp2",
       "error": null
     },
     {
@@ -114,11 +114,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 10,
-      "evidence": 10,
-      "official": 10,
-      "ms": 8905,
-      "url": "https://junction-2026.vercel.app/c/oc2BUahpdHv3QfeO",
+      "verified": 9,
+      "evidence": 9,
+      "official": 9,
+      "ms": 9241,
+      "url": "https://junction-2026.vercel.app/c/Vs87N88OVwPmIuTO",
       "error": null
     },
     {
@@ -127,11 +127,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 2,
-      "evidence": 2,
-      "official": 2,
-      "ms": 6044,
-      "url": "https://junction-2026.vercel.app/c/BmhfUVYf3At9vtsk",
+      "verified": 3,
+      "evidence": 3,
+      "official": 3,
+      "ms": 6118,
+      "url": "https://junction-2026.vercel.app/c/9MUckw-2k0BLOPIQ",
       "error": null
     },
     {
@@ -140,11 +140,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 9,
-      "evidence": 9,
-      "official": 9,
-      "ms": 7215,
-      "url": "https://junction-2026.vercel.app/c/39ICq63ypJztjgDb",
+      "verified": 11,
+      "evidence": 11,
+      "official": 11,
+      "ms": 6802,
+      "url": "https://junction-2026.vercel.app/c/KcvLAmv8HZm4UD8-",
       "error": null
     },
     {
@@ -156,8 +156,8 @@
       "verified": 9,
       "evidence": 9,
       "official": 9,
-      "ms": 6342,
-      "url": "https://junction-2026.vercel.app/c/NTyTaRwjqUUpeRid",
+      "ms": 5901,
+      "url": "https://junction-2026.vercel.app/c/VnQomIXra9nuT1jr",
       "error": null
     },
     {
@@ -169,8 +169,8 @@
       "verified": 5,
       "evidence": 5,
       "official": 0,
-      "ms": 4122,
-      "url": "https://junction-2026.vercel.app/c/HW2Z6aCIMer5Xu9d",
+      "ms": 4469,
+      "url": "https://junction-2026.vercel.app/c/QfDLd9TAE-0lGZHT",
       "error": null
     },
     {
@@ -179,11 +179,11 @@
       "group": "everyday",
       "country": "FI",
       "pass": true,
-      "verified": 7,
-      "evidence": 7,
-      "official": 7,
-      "ms": 8736,
-      "url": "https://junction-2026.vercel.app/c/cWL7Bl7AkkSaf8ZT",
+      "verified": 4,
+      "evidence": 4,
+      "official": 4,
+      "ms": 5592,
+      "url": "https://junction-2026.vercel.app/c/ZsIdtEGwfngDsT9G",
       "error": null
     },
     {
@@ -192,11 +192,11 @@
       "group": "everyday",
       "country": "FI",
       "pass": true,
-      "verified": 6,
-      "evidence": 6,
-      "official": 6,
-      "ms": 6808,
-      "url": "https://junction-2026.vercel.app/c/8CHePamDXPScS4JM",
+      "verified": 5,
+      "evidence": 5,
+      "official": 5,
+      "ms": 5363,
+      "url": "https://junction-2026.vercel.app/c/Jg8EtzbKo84XFeEi",
       "error": null
     },
     {
@@ -205,11 +205,11 @@
       "group": "judge",
       "country": "US",
       "pass": true,
-      "verified": 9,
-      "evidence": 9,
-      "official": 9,
-      "ms": 7390,
-      "url": "https://junction-2026.vercel.app/c/SCphQkzoRjr_xoGB",
+      "verified": 7,
+      "evidence": 7,
+      "official": 7,
+      "ms": 8511,
+      "url": "https://junction-2026.vercel.app/c/YY_nPt0GBPpO6c_v",
       "error": null
     },
     {
@@ -221,8 +221,8 @@
       "verified": 6,
       "evidence": 6,
       "official": 6,
-      "ms": 5668,
-      "url": "https://junction-2026.vercel.app/c/qMevNgUNazzZUH7E",
+      "ms": 5728,
+      "url": "https://junction-2026.vercel.app/c/dwkN17PnrGV79JBX",
       "error": null
     },
     {
@@ -234,8 +234,8 @@
       "verified": 7,
       "evidence": 7,
       "official": 7,
-      "ms": 10491,
-      "url": "https://junction-2026.vercel.app/c/Rv4NUq9U-ioaVGRg",
+      "ms": 6213,
+      "url": "https://junction-2026.vercel.app/c/PRKTNumGMyz-IGt9",
       "error": null
     },
     {
@@ -243,12 +243,12 @@
       "title": "Lost passport while abroad",
       "group": "judge",
       "country": "NL",
-      "pass": false,
-      "verified": 7,
-      "evidence": 7,
-      "official": 7,
-      "ms": 6741,
-      "url": "https://junction-2026.vercel.app/c/FGUjsYurmDRJF5uB",
+      "pass": true,
+      "verified": 8,
+      "evidence": 8,
+      "official": 8,
+      "ms": 5329,
+      "url": "https://junction-2026.vercel.app/c/HTJ3uTKcrH4VIyqs",
       "error": null
     },
     {
@@ -257,11 +257,11 @@
       "group": "safety",
       "country": "FI",
       "pass": true,
-      "verified": 6,
-      "evidence": 6,
-      "official": 6,
-      "ms": 7001,
-      "url": "https://junction-2026.vercel.app/c/adR_MjYucXaTtihC",
+      "verified": 8,
+      "evidence": 8,
+      "official": 8,
+      "ms": 10721,
+      "url": "https://junction-2026.vercel.app/c/gaPOzZs-9jvbJrc5",
       "error": null
     }
   ]

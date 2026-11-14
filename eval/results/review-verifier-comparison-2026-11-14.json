@@ -1,0 +1,370 @@
+{
+  "baseCommit": "ef53df2939cb7805f05d3ff3a43e27eed2c8ec9f",
+  "enginePatchCommit": "3125e57",
+  "configuration": {
+    "base": "http://127.0.0.1:3230",
+    "concurrency": 2,
+    "depth": "fast",
+    "scoredScenarios": 19,
+    "manualScenarios": 2,
+    "readersConfigured": [
+      "direct",
+      "exa"
+    ],
+    "oxylabsKeyAvailable": false,
+    "storage": "local",
+    "moneyFilter": "enabled in both runs"
+  },
+  "runs": {
+    "main": {
+      "label": "review main verifier ef53df2",
+      "ranAt": "2026-11-13T23:42:11.218Z",
+      "durationMs": 68920,
+      "totals": {
+        "scenarios": 19,
+        "passed": 18,
+        "verifiedQuotes": 128,
+        "totalQuotes": 128,
+        "unsourcedClaims": 0,
+        "medianMs": 6469,
+        "p90Ms": 8242
+      },
+      "extra": {
+        "failed": 1,
+        "errors": 0,
+        "answered": 19,
+        "withVerifiedOfficial": 18,
+        "hostExpected": 18,
+        "hostMatched": 18,
+        "planAllCited": 19,
+        "exa": {
+          "searches": 56,
+          "contents": 72,
+          "costDollars": 0.39
+        }
+      },
+      "pairedComparisons": 128,
+      "joinedOnlyQuotes": [],
+      "independentVerifiedOnSameReadings": 128,
+      "readerAvailability": {
+        "direct": 103,
+        "exa": 128,
+        "oxylabs": 0
+      },
+      "rawRunSha256": "d9e8e2a2cf59e718f8af7555aadcb25711e6d76fecee20adc049ce70e4fefa02",
+      "diagnosticsSha256": "536de89f5d66b8b58e0ddae7c766f23ff0fead1ae6e79dd5cad6aa14b2784739",
+      "scenarios": [
+        {
+          "id": "fi-pregnancy",
+          "passed": true,
+          "verified": 11,
+          "quotes": 11,
+          "reasons": []
+        },
+        {
+          "id": "fi-rent-increase-letter",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "fi-moving-city",
+          "passed": true,
+          "verified": 9,
+          "quotes": 9,
+          "reasons": []
+        },
+        {
+          "id": "fi-job-loss",
+          "passed": true,
+          "verified": 4,
+          "quotes": 4,
+          "reasons": []
+        },
+        {
+          "id": "fi-sick-child",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "fi-daycare-espoo",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "fi-residence-permit",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "fi-renovation-deduction",
+          "passed": true,
+          "verified": 11,
+          "quotes": 11,
+          "reasons": []
+        },
+        {
+          "id": "fi-parking-fine",
+          "passed": true,
+          "verified": 2,
+          "quotes": 2,
+          "reasons": []
+        },
+        {
+          "id": "fi-washing-machine",
+          "passed": true,
+          "verified": 11,
+          "quotes": 11,
+          "reasons": []
+        },
+        {
+          "id": "flight-cancelled",
+          "passed": true,
+          "verified": 7,
+          "quotes": 7,
+          "reasons": []
+        },
+        {
+          "id": "vegan-dinner-kamppi",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "subscription-price-rise",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "car-inspection-due",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "us-sf-rent-increase",
+          "passed": true,
+          "verified": 10,
+          "quotes": 10,
+          "reasons": []
+        },
+        {
+          "id": "gb-train-delay",
+          "passed": true,
+          "verified": 7,
+          "quotes": 7,
+          "reasons": []
+        },
+        {
+          "id": "de-parental-allowance",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "lost-passport-abroad",
+          "passed": false,
+          "verified": 7,
+          "quotes": 7,
+          "reasons": [
+            "no deadline or amount"
+          ]
+        },
+        {
+          "id": "injection-shared-page",
+          "passed": true,
+          "verified": 9,
+          "quotes": 9,
+          "reasons": []
+        }
+      ]
+    },
+    "strict": {
+      "label": "review independent verifier ef53df2",
+      "ranAt": "2026-11-13T23:43:42.349Z",
+      "durationMs": 46301,
+      "totals": {
+        "scenarios": 19,
+        "passed": 18,
+        "verifiedQuotes": 133,
+        "totalQuotes": 133,
+        "unsourcedClaims": 0,
+        "medianMs": 4455,
+        "p90Ms": 6412
+      },
+      "extra": {
+        "failed": 1,
+        "errors": 0,
+        "answered": 19,
+        "withVerifiedOfficial": 18,
+        "hostExpected": 18,
+        "hostMatched": 18,
+        "planAllCited": 19,
+        "exa": {
+          "searches": 56,
+          "contents": 77,
+          "costDollars": 0.39
+        }
+      },
+      "pairedComparisons": 133,
+      "joinedOnlyQuotes": [],
+      "independentVerifiedOnSameReadings": 133,
+      "readerAvailability": {
+        "direct": 112,
+        "exa": 133,
+        "oxylabs": 0
+      },
+      "rawRunSha256": "8df8ddd853d9d60d7a3e7dc8b960fa8b61758b89a3d7816e70cddc0e2a1ea8a8",
+      "diagnosticsSha256": "b14c16c366d176c93f877aabf728ef679ffdc1386d21c3be75b0071119668f8a",
+      "scenarios": [
+        {
+          "id": "fi-pregnancy",
+          "passed": true,
+          "verified": 12,
+          "quotes": 12,
+          "reasons": []
+        },
+        {
+          "id": "fi-rent-increase-letter",
+          "passed": true,
+          "verified": 8,
+          "quotes": 8,
+          "reasons": []
+        },
+        {
+          "id": "fi-moving-city",
+          "passed": true,
+          "verified": 10,
+          "quotes": 10,
+          "reasons": []
+        },
+        {
+          "id": "fi-job-loss",
+          "passed": true,
+          "verified": 6,
+          "quotes": 6,
+          "reasons": []
+        },
+        {
+          "id": "fi-sick-child",
+          "passed": true,
+          "verified": 4,
+          "quotes": 4,
+          "reasons": []
+        },
+        {
+          "id": "fi-daycare-espoo",
+          "passed": true,
+          "verified": 3,
+          "quotes": 3,
+          "reasons": []
+        },
+        {
+          "id": "fi-residence-permit",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "fi-renovation-deduction",
+          "passed": true,
+          "verified": 10,
+          "quotes": 10,
+          "reasons": []
+        },
+        {
+          "id": "fi-parking-fine",
+          "passed": true,
+          "verified": 2,
+          "quotes": 2,
+          "reasons": []
+        },
+        {
+          "id": "fi-washing-machine",
+          "passed": true,
+          "verified": 10,
+          "quotes": 10,
+          "reasons": []
+        },
+        {
+          "id": "flight-cancelled",
+          "passed": true,
+          "verified": 11,
+          "quotes": 11,
+          "reasons": []
+        },
+        {
+          "id": "vegan-dinner-kamppi",
+          "passed": true,
+          "verified": 7,
+          "quotes": 7,
+          "reasons": []
+        },
+        {
+          "id": "subscription-price-rise",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "car-inspection-due",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "us-sf-rent-increase",
+          "passed": true,
+          "verified": 8,
+          "quotes": 8,
+          "reasons": []
+        },
+        {
+          "id": "gb-train-delay",
+          "passed": true,
+          "verified": 7,
+          "quotes": 7,
+          "reasons": []
+        },
+        {
+          "id": "de-parental-allowance",
+          "passed": true,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": []
+        },
+        {
+          "id": "lost-passport-abroad",
+          "passed": false,
+          "verified": 5,
+          "quotes": 5,
+          "reasons": [
+            "no deadline or amount"
+          ]
+        },
+        {
+          "id": "injection-shared-page",
+          "passed": true,
+          "verified": 10,
+          "quotes": 10,
+          "reasons": []
+        }
+      ]
+    }
+  }
+}

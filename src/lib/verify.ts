@@ -321,15 +321,9 @@ export function judge(
   }
   const viaExa = matchOn(quote, page.exa);
   if (viaExa >= VERIFY_THRESHOLD) return { verification: "verified", match: round(viaExa), checkedVia: "exa" };
-  // The readings can each hold part of a long quote (different line breaks, cut-off text).
-  // The engine grounds against all of them together, so the verdict here must as well.
-  const readings = [page.direct, page.oxylabs, page.exa].filter(Boolean).length;
-  const both = readings > 1 ? matchOn(quote, page.text) : 0;
-  if (both >= VERIFY_THRESHOLD) {
-    const via = live >= viaOxylabs && live >= viaExa ? "live" : viaOxylabs >= viaExa ? "oxylabs" : "exa";
-    return { verification: "verified", match: round(both), checkedVia: via };
-  }
-  return { verification: "not_found", match: round(Math.max(live, viaOxylabs, viaExa, both)) };
+  // One reading must support the quote on its own. Combining different copies
+  // can invent a passage that none contains and misreport how it was checked.
+  return { verification: "not_found", match: round(Math.max(live, viaOxylabs, viaExa)) };
 }
 
 /**
