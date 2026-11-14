@@ -21,6 +21,9 @@ services:
       EXA_API_KEY: ${EXA_API_KEY:-}
       # Written by scripts/deploy/server-deploy.sh; shown as "commit" in /api/health.
       KAVERI_COMMIT: ${KAVERI_COMMIT:-}
+      # The /ukk chat's backend (the hermes-web service) and its key. Server-side only.
+      UKK_API_URL: ${UKK_API_URL:-}
+      UKK_API_KEY: ${UKK_API_KEY:-}
     ports:
       - "127.0.0.1:${KAVERI_HTTP_PORT:-3000}:3000"
     volumes:
@@ -60,6 +63,7 @@ services:
 
   hermes:
     profiles: [bot]
+    image: kaveri-hermes
     build:
       context: .
       dockerfile: containers/hermes/Dockerfile
@@ -85,6 +89,39 @@ services:
     restart: ${KAVERI_RESTART:-no}
     # Allow the pinned runtime's reminder drain and cleanup budget before forced exit.
     stop_grace_period: 90s
+
+  # The same UKK for the /ukk web page: Hermes' API server only, no Telegram token, memory and
+  # scheduled jobs off, its own volume. Port 8642 is never published; only the web service calls it.
+  hermes-web:
+    profiles: [bot]
+    image: kaveri-hermes
+    env_file:
+      # Only NVIDIA_API_KEY. Never put the Telegram token here (see containers/hermes/env.web.example).
+      - path: .env.web
+        required: false
+    environment:
+      KAVERI_RUNTIME: web
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: 0.0.0.0
+      API_SERVER_PORT: "8642"
+      API_SERVER_KEY: ${UKK_API_KEY:-}
+      CASEFILE_URL: ${KAVERI_ENGINE_URL:-http://web:3000/api/mcp}
+      CASEFILE_SECRET: ${CASEFILE_SECRET:-}
+      EXA_API_KEY: ${EXA_API_KEY:-}
+    volumes:
+      - hermes-web-home:/opt/data
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, /opt/hermes/.venv/bin/python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8642/health', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 120s
+    init: true
+    restart: ${KAVERI_RESTART:-no}
+    stop_grace_period: 30s
 
   proxy:
     image: docker.io/library/caddy:2.11.8-alpine
@@ -117,6 +154,7 @@ services:
 volumes:
   case-data:
   hermes-home:
+  hermes-web-home:
   ollama-data:
   caddy-data:
   caddy-config:
