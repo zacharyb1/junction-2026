@@ -106,7 +106,7 @@ class ConfigureAdminTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
         settings = {call[2]: call[3] for call in calls if call[:2] == ["config", "set"]}
-        self.assertEqual(json.loads(settings["mcp_servers.casefile.tools.include"]), ["research_case", "case_get"])
+        self.assertEqual(json.loads(settings["mcp_servers.casefile.tools.include"]), ["research_case", "case_get", "find_gifts"])
 
     def test_telegram_runtime_keeps_every_case_tool(self):
         self.env_file.write_text("TELEGRAM_ALLOWED_USERS=123\n")

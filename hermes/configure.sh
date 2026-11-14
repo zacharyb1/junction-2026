@@ -108,8 +108,8 @@ set_key cron.wrap_response false
 if [ "$RUNTIME" = web ]; then
   # Bounds NVIDIA quota use by web visitors; the Telegram bot keeps the rest.
   set_key api_server.max_concurrent_runs 4
-  # Anonymous visitors research and read; they cannot change, re-check or publish anyone's case.
-  set_key mcp_servers.casefile.tools.include '["research_case", "case_get"]'
+  # Anonymous visitors research, read and search shops; they cannot change, re-check or publish anyone's case.
+  set_key mcp_servers.casefile.tools.include '["research_case", "case_get", "find_gifts"]'
 else
   # Slash commands (/sethome, /new, /model ...) only for the owner. Without this every user the bot
   # answers can run them, which matters once TELEGRAM_ALLOW_ALL_USERS is on (CHECKS.md, U10).
