@@ -62,7 +62,8 @@ class ContainerStateTests(unittest.TestCase):
         self.assertFalse((self.home / state.MARKER).exists())
 
     def test_invalid_group_and_admin_values_rejected(self):
-        for key, value in [("KAVERI_TELEGRAM_CHAT_ID", "-100typo"), ("TELEGRAM_ALLOWED_USERS", "*")]:
+        for key, value in [("KAVERI_TELEGRAM_CHAT_ID", "-100typo"), ("TELEGRAM_ALLOWED_USERS", "*"),
+                           ("KAVERI_TELEGRAM_OPEN_GROUPS", "yes")]:
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, key):
                 state.preflight(self.home, {**self.env, key: value})
 

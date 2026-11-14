@@ -3,6 +3,7 @@
 #
 #   bash hermes/configure.sh                     the model, Part 1 of config.snippet.yaml, persona, skills
 #   bash hermes/configure.sh --group <CHAT_ID>   Part 2: limit the bot to the family group (ID from /sethome)
+#   bash hermes/configure.sh --open-groups       after --group: accept every group, keep the home group's settings
 #   bash hermes/configure.sh --mode-b            switch to wake patterns (README, "Mode B")
 #   bash hermes/configure.sh --mode-a            back to ambient mode
 #
@@ -40,6 +41,12 @@ case "${1:-}" in
     set_key telegram.group_allowed_chats "[\"$CHAT_ID\"]"
     echo "Part 2 applied for chat $CHAT_ID. Restart the gateway, then send /new --yes in the group."
     exit 0 ;;
+  --open-groups)
+    # An empty allowed_chats is Hermes' "every group". Silence in the other groups relies on the
+    # kaveri-gate hook marking unaddressed messages reply_expected=False (allow_silence is per chat ID).
+    set_key telegram.allowed_chats ""
+    echo "Every group is accepted. Restart the gateway."
+    exit 0 ;;
   --mode-b)
     PATTERNS="[$(sed -n 's/^ *#B   - \(".*"\)$/\1/p' "$ROOT/hermes/config.snippet.yaml" | paste -sd, -)]"
     set_key telegram.mention_patterns "$PATTERNS"
@@ -55,7 +62,7 @@ case "${1:-}" in
     echo "Mode A (ambient) is on. Restart the gateway, then send /new --yes in the group."
     exit 0 ;;
   "") ;;
-  *) echo "usage: bash hermes/configure.sh [--group CHAT_ID | --mode-b | --mode-a]" >&2; exit 2 ;;
+  *) echo "usage: bash hermes/configure.sh [--group CHAT_ID | --open-groups | --mode-b | --mode-a]" >&2; exit 2 ;;
 esac
 
 echo "Model"

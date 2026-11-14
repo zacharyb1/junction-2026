@@ -8,6 +8,10 @@ if [ -n "${KAVERI_TELEGRAM_CHAT_ID:-}" ]; then
 else
   echo "No group ID supplied: existing group settings are retained; a fresh home is ready for DM/bootstrap only."
 fi
+if [ "${KAVERI_TELEGRAM_OPEN_GROUPS:-}" = true ]; then
+  # Every group is accepted; the home group above keeps its silence and reminder settings.
+  bash hermes/configure.sh --open-groups
+fi
 bash hermes/install-gate.sh
 hermes/bin/hermes config check
 /opt/hermes/.venv/bin/python containers/hermes/state.py verify

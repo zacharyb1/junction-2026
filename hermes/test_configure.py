@@ -86,6 +86,20 @@ class ConfigureAdminTest(unittest.TestCase):
             "platforms.telegram.extra.group_user_allowed_commands": ["start", "new"],
         })
 
+    def test_open_groups_clears_the_group_allowlist_only(self):
+        self.env_file.write_text("TELEGRAM_ALLOWED_USERS=123\n")
+        result = self.run_script("configure.sh", "--open-groups")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
+        # An empty allowed_chats is Hermes' "every group". Home-group settings stay as --group wrote them.
+        self.assertEqual(calls, [["config", "set", "telegram.allowed_chats", ""]])
+
+    def test_open_groups_still_requires_admins(self):
+        self.env_file.write_text("TELEGRAM_ALLOW_ALL_USERS=true\n")
+        result = self.run_script("configure.sh", "--open-groups")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.calls_file.exists())
+
     def test_open_bot_status_still_requires_admins(self):
         self.env_file.write_text("TELEGRAM_ALLOW_ALL_USERS=true\n")
         result = self.run_script("secrets.sh", "--status")

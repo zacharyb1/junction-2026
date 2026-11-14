@@ -95,6 +95,12 @@ async def _on_message(event, gateway=None, session_store=None, **kwargs):
     _log(entry)
 
     if decision.wake:
+        # Hermes drops a [SILENT] reply in a group only when reply_expected is False or the chat has
+        # allow_silence. Telegram leaves an unaddressed question ("?") at None, which would turn a silent
+        # decision into a visible notice in any group without allow_silence. Nobody addressed the bot,
+        # so silence is a valid answer; the model still replies to a real trigger.
+        if getattr(event, "reply_expected", None) is None:
+            event.reply_expected = False
         return None
     return {"action": "skip", "reason": f"kaveri-gate:{decision.source}:{decision.label}"}
 

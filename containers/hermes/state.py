@@ -36,6 +36,8 @@ def validate(env):
     group = env.get("KAVERI_TELEGRAM_CHAT_ID", "")
     if group and not re.fullmatch(r"-[1-9]\d*", group):
         raise ValueError("KAVERI_TELEGRAM_CHAT_ID must be a negative numeric group ID")
+    if env.get("KAVERI_TELEGRAM_OPEN_GROUPS", "") not in {"", "true", "false"}:
+        raise ValueError("KAVERI_TELEGRAM_OPEN_GROUPS must be true or false")
     endpoint = urlsplit(env["CASEFILE_URL"])
     if endpoint.scheme not in {"http", "https"} or not endpoint.hostname or endpoint.path != "/api/mcp":
         raise ValueError("CASEFILE_URL must be a full http(s) Engine URL ending in /api/mcp")
