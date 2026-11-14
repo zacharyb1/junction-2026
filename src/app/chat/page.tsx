@@ -39,7 +39,7 @@ export default async function ChatPage({ searchParams }: PageProps<"/chat">) {
             pages.
           </p>
         </header>
-        <AIDaddyChat code={code} needsCode={demoCodeRequired()} />
+        <AIDaddyChat code={code} needsCode={demoCodeRequired()} voiceAvailable={Boolean(process.env.ELEVENLABS_API_KEY)} />
         <p className="text-sm leading-relaxed text-muted-foreground">
           Prefer Telegram?{" "}
           <a href={`https://t.me/${bot}`} target="_blank" rel="noreferrer" className={link}>
