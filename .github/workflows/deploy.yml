@@ -26,6 +26,11 @@ jobs:
        github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # DEPLOY_SSH_KEY lives in this environment, which only main may use, so a workflow on another
+    # branch cannot read the key.
+    environment:
+      name: production
+      url: https://86.38.238.136.sslip.io
     env:
       DEPLOY_HOST: 86.38.238.136
       # The server's public host key, so the job only ever talks to that machine.
@@ -42,7 +47,7 @@ jobs:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
           if [ -z "$DEPLOY_SSH_KEY" ]; then
-            echo "::error::The DEPLOY_SSH_KEY secret is missing. See docs/DEPLOYMENT.md#automatic-deployment."
+            echo "::error::DEPLOY_SSH_KEY is missing from the production environment. See docs/DEPLOYMENT.md#automatic-deployment."
             exit 1
           fi
 

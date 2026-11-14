@@ -18,6 +18,43 @@ Earlier Telegram tests targeted a local Engine and used localhost links; product
 
 The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac/Linux setup and separate persistent volumes for Cases, Hermes state and Ollama models. The default Compose command starts only the web service; `--profile bot` explicitly starts Hermes and the Gemma gate too, and `--profile public` adds an HTTPS reverse proxy for a server. Starting containers does not move existing runtime state. Exa and NVIDIA remain external API services.
 
+## Automatic deployment
+
+Every push to `main` that passes CI is deployed to the production server by [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Merging a pull request is a push to `main`. Vercel keeps deploying `main` on its own as before.
+
+How it works:
+
+1. The workflow runs when the CI workflow succeeds for a push to `main`. Deploys run one at a time, in order.
+2. It sends the exact commit to the server as a git bundle over SSH. The server has no GitHub access.
+3. On the server, the deploy key can only run [`scripts/deploy/server-deploy.sh`](../scripts/deploy/server-deploy.sh), installed as `/usr/local/sbin/kaveri-deploy`. It checks out the commit, builds, and restarts only the containers whose image or settings changed. A change outside `hermes/` and `containers/hermes/` does not restart the bot.
+4. The deploy passes when `/api/health` reports the new commit and the bot stays up for 30 seconds. Otherwise the previous commit is deployed again and the workflow run fails. Bot memory, reminders, Cases and models are in volumes and survive either way.
+5. The workflow then checks the public site reports the new commit.
+
+To redeploy `main` by hand: GitHub, **Actions**, **Deploy**, **Run workflow** on `main`. The run's log shows the server output. A deploy takes about 1 to 2 minutes, and a failed one about 5, including the rollback.
+
+### One-time setup (repository owner)
+
+Only the owner of this personal repository can add secrets. The key is created on the owner's machine and never shared:
+
+1. GitHub, **Settings**, **Environments**, **New environment** named `production`. Under **Deployment branches and tags**, choose **Selected branches and tags** and add `main`. This keeps the key away from workflows on other branches.
+2. Create the key and store it in that environment, then delete the private key file:
+
+   ```bash
+   ssh-keygen -t ed25519 -N '' -C kaveri-deploy -f kaveri-deploy
+   gh secret set DEPLOY_SSH_KEY --env production -R zacharyb1/junction-2026 < kaveri-deploy
+   rm kaveri-deploy
+   ```
+
+3. Send `kaveri-deploy.pub` (the public key, safe to share) to whoever has server access. They add it to `/root/.ssh/authorized_keys` on the server as one line, so the key can only run the deploy script:
+
+   ```text
+   command="/usr/local/sbin/kaveri-deploy",restrict ssh-ed25519 AAAA... kaveri-deploy
+   ```
+
+4. Run the Deploy workflow by hand once and check it is green.
+
+When `scripts/deploy/server-deploy.sh` changes, copy it to `/usr/local/sbin/kaveri-deploy` on the server by hand. The deploy uses the installed copy, not the one in the commit it deploys.
+
 ## Deploying the web app
 
 The existing Git-connected Vercel project is the normal shared deployment. A teammate needs access to that Vercel project as well as the GitHub repository; GitHub access alone does not grant environment/storage administration.
