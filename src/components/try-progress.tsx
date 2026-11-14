@@ -65,8 +65,8 @@ function StateIcon({ state, className = "" }: { state: State; className?: string
   if (state === "running") {
     return <Loader2 className={`animate-spin text-muted-foreground motion-reduce:animate-none ${className}`} role="img" aria-label="Running" />;
   }
-  if (state === "stopped") return <CircleAlert className={`text-amber-600 dark:text-amber-400 ${className}`} role="img" aria-label="Stopped" />;
-  return <CircleCheck className={`text-emerald-600 dark:text-emerald-400 ${className}`} role="img" aria-label="Done" />;
+  if (state === "stopped") return <CircleAlert className={`text-(--hud-amber) ${className}`} role="img" aria-label="Stopped" />;
+  return <CircleCheck className={`text-(--hud-green) ${className}`} role="img" aria-label="Done" />;
 }
 
 function searchHeading(searches: Of<"search">[]) {
@@ -93,7 +93,7 @@ function SearchRow({ search, busy }: { search: Of<"search">; busy: boolean }) {
   // A search still marked as running after the stream has ended will never report back.
   const state: State = search.status === "done" ? "done" : search.status === "running" && busy ? "running" : "stopped";
   return (
-    <li className="flex animate-in gap-2 fade-in">
+    <li className="flex animate-in gap-2 fade-in motion-reduce:animate-none">
       <StateIcon state={state} className="mt-0.5 size-3.5 shrink-0" />
       <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
         <span>
@@ -117,7 +117,7 @@ function SearchRow({ search, busy }: { search: Of<"search">; busy: boolean }) {
 function PageRow({ page }: { page: Of<"page"> }) {
   const host = hostOf(page.url);
   return (
-    <li className="flex animate-in items-center gap-2 fade-in">
+    <li className="flex animate-in items-center gap-2 fade-in motion-reduce:animate-none">
       <Badge variant={page.official ? "secondary" : "outline"}>{page.official ? "Official" : "Secondary"}</Badge>
       {/* "relative" keeps the hidden words inside the cut-off line. Without it they sit past its end and widen the page. */}
       <a href={page.url} target="_blank" rel="noreferrer" className="relative min-w-0 flex-1 truncate py-0.5 hover:underline">
@@ -125,7 +125,7 @@ function PageRow({ page }: { page: Of<"page"> }) {
         {page.title !== host && <span className="text-muted-foreground"> · {page.title}</span>}
         <span className="sr-only"> (opens in a new tab)</span>
       </a>
-      <span className={`shrink-0 text-xs ${page.via === "none" ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground"}`}>
+      <span className={`shrink-0 text-xs ${page.via === "none" ? "text-(--hud-amber)" : "text-muted-foreground"}`}>
         {READ_BY[page.via]}
       </span>
     </li>
@@ -166,7 +166,7 @@ export function Timeline({ progress, busy, finished }: { progress: Progress; bus
         const end = i < started.length - 1 ? startOf(started[i + 1]) : (progress.verified?.ms ?? first.ms);
         const took = end - first.ms;
         return (
-          <li key={name} className="flex animate-in gap-2.5 fade-in">
+          <li key={name} className="flex animate-in gap-2.5 fade-in motion-reduce:animate-none">
             <StateIcon state={state} className="mt-0.5 size-4 shrink-0" />
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <div className="flex items-baseline gap-2">
@@ -174,7 +174,7 @@ export function Timeline({ progress, busy, finished }: { progress: Progress; bus
                   {name === "search" ? (
                     searchHeading(progress.searches)
                   ) : confirmed ? (
-                    <span className="font-medium text-emerald-800 dark:text-emerald-300">
+                    <span className="font-medium text-(--hud-green)">
                       {confirmed.verified} of {count(confirmed.total, "quote")} confirmed on{" "}
                       {confirmed.total === 1 ? "its page" : "their pages"}
                     </span>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { CONNECTIONS, type Connection } from "@/components/hud/setup-data";
 
@@ -36,12 +37,19 @@ function Channel({ connection }: { connection: Connection }) {
         <p className="hud-setup-state" aria-live="polite">
           <span className="hud-setup-dot" aria-hidden /> {on ? connection.whenOn : connection.whenOff}
         </p>
-        {connection.action && (
-          <a href={connection.action.href} target="_blank" rel="noreferrer" className="hud-btn hud-btn--primary hud-setup-action">
-            {connection.action.label}
-            <span className="hud-sr"> (opens Telegram)</span>
-          </a>
-        )}
+        <div className="hud-setup-links">
+          {connection.action && (
+            <a href={connection.action.href} target="_blank" rel="noreferrer" className="hud-btn hud-btn--primary">
+              {connection.action.label}
+              <span className="hud-sr"> (opens Telegram)</span>
+            </a>
+          )}
+          <Link href={connection.replay.href} className="hud-setup-replay">
+            Watch the replay
+            <span className="hud-sr"> of {connection.replay.of}</span>
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </div>
     </li>
   );

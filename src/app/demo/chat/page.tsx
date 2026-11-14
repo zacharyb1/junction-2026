@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ChatDemo } from "@/components/chat-demo/chat-demo";
+import { DemoFrame, demoMode } from "@/components/demo/demo-frame";
 import "@/components/chat-demo/chat-demo.css";
 
 export const metadata: Metadata = {
@@ -8,17 +9,19 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export const viewport: Viewport = { themeColor: "#517da2" };
+export const viewport: Viewport = { themeColor: "#05080d" };
 
-/** Issue #33: a replay for the demo video and the screen at the table. Add ?loop=1 to repeat it. */
+/** Issue #33: a replay for the demo video and the screen at the table. ?loop=1 repeats it; ?bare=1 shows it without the site around it. */
 export default async function ChatDemoPage({ searchParams }: PageProps<"/demo/chat">) {
-  const params = await searchParams;
+  const { loop, bare } = demoMode(await searchParams);
   return (
-    <main className="chatdemo-stage">
-      <ChatDemo loop={params.loop === "1"} />
-      <p className="chatdemo-caption">
-        Demo replay with a fictional family. The plan, its sources and the case link come from a real run.
-      </p>
-    </main>
+    <DemoFrame
+      scene="chat"
+      shape="phone"
+      bare={bare}
+      caption={<>Demo replay with a fictional family. The plan, its sources and the case link come from a real run.</>}
+    >
+      <ChatDemo loop={loop} />
+    </DemoFrame>
   );
 }

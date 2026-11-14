@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { scrollToEnd, useReplayClock } from "@/components/demo/replay";
 
 /**
  * Issue #35: a scripted replay of a face-to-face conversation while UKK, on the phone on the table,
@@ -36,32 +37,21 @@ const STEPS: [number, string][] = [
 ];
 
 export function TalkDemo({ loop = false }: { loop?: boolean }) {
-  const [now, setNow] = useState(0);
-  const start = useRef(0);
+  const now = useReplayClock(DURATION, loop);
   const list = useRef<HTMLOListElement>(null);
-  useEffect(() => {
-    start.current = performance.now();
-    let frame = 0;
-    const tick = () => {
-      const t = performance.now() - start.current;
-      if (t > DURATION && loop) start.current = performance.now();
-      setNow(Math.min(t, DURATION));
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [loop]);
 
   const said = LINES.filter((l) => l.at <= now);
   const working = now >= 6300 && now < 13800;
   const steps = STEPS.filter(([at]) => now >= at);
   const answered = now >= 14200;
   const drafted = now >= 30900;
-  const awake = said.at(-1)?.who === "UKK" || working;
+  // UKK is at work from his name until the answer lands, and again from the request for a draft until the draft is there.
+  const awake = working || (now >= 29600 && now < 30900);
 
+  // The task card and the answer card take room from the list when they appear, so the last line is brought back into view then too.
   useEffect(() => {
-    list.current?.scrollTo({ top: list.current.scrollHeight, behavior: "smooth" });
-  }, [said.length]);
+    scrollToEnd(list.current);
+  }, [said.length, working, answered]);
 
   return (
     <div className="tdemo">
@@ -70,7 +60,8 @@ export function TalkDemo({ loop = false }: { loop?: boolean }) {
         {awake ? "UKK is working" : "Listening for “UKK” · nothing is heard before his name"}
       </div>
 
-      <ol ref={list} className="tdemo-lines" aria-live="polite">
+      {/* No aria-live: a screen reader would read the whole script aloud, unasked. The list takes focus so the keyboard can scroll it. */}
+      <ol ref={list} className="tdemo-lines" tabIndex={0} aria-label="What is said at the table">
         {said.map((l) => (
           <li key={l.at} className={`tdemo-line tdemo-line--${l.who.toLowerCase()}`}>
             <span className="tdemo-who">{l.who === "UKK" ? "UKK" : `${l.who} · spoken`}</span>

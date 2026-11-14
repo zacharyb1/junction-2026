@@ -2,8 +2,11 @@
 
 import { CircleAlert, Loader2, Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { CopyButton } from "@/components/copy-button";
+import { linkButtonClasses } from "@/components/landing/link-button";
 import { type AvatarState, UkkAvatar } from "@/components/ukk-avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { readCompletionStream } from "@/lib/ukk-stream";
 
@@ -11,13 +14,20 @@ type Turn = { from: "you" | "ukk"; text: string };
 
 const LINK = /(https?:\/\/[^\s<>()]+[^\s<>().,;:!?])/g;
 
+/** What a visitor reads when the server refuses the access code, in the chat and in both voice paths. */
+const BAD_CODE = "That access code is not valid. Scan the QR code at our table again.";
+
+const BUBBLE = "rounded-lg border text-sm leading-relaxed whitespace-pre-wrap";
+const FROM_UKK = `${BUBBLE} max-w-[92%] self-start bg-card p-3`;
+const FROM_YOU = `${BUBBLE} max-w-[85%] self-end border-primary/40 bg-primary/10 px-3 py-2`;
+
 /** Reply text with its URLs as links (case files and official pages). */
 function Linked({ text }: { text: string }) {
   return (
     <>
       {text.split(LINK).map((part, i) =>
         i % 2 === 1 ? (
-          <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all underline underline-offset-2">
+          <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all text-primary underline underline-offset-2">
             {part}
           </a>
         ) : (
@@ -33,17 +43,51 @@ export function UkkChat({ code }: { code: string }) {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // The server refused the code: the error line then also offers the way to type another one.
+  const [badCode, setBadCode] = useState(false);
   const [elsewhere, setElsewhere] = useState("");
-  const end = useRef<HTMLDivElement>(null);
-  const voice = useVoice(code, setError);
+  const last = useRef<HTMLDivElement>(null);
+  const fail = (message: string, refused = false) => {
+    setError(message);
+    setBadCode(refused);
+  };
+  const voice = useVoice(code, fail);
 
-  useEffect(() => end.current?.scrollIntoView({ behavior: "smooth", block: "end" }), [turns]);
+  // Only a new message moves the page. A reply that is still arriving grows without pulling the reader along.
+  const count = turns.length;
+  useEffect(() => {
+    if (!count) return;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    last.current?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "nearest" });
+  }, [count]);
 
   if (!code) {
     return (
-      <p className="rounded-lg border p-4 text-sm">
-        Scan the QR code at our table to talk to UKK. It carries the access code for this demo.
-      </p>
+      <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 text-sm">
+        <p className="leading-relaxed">
+          The chat needs the access code for this demo. Scan the QR code at our table, or type the code here.
+        </p>
+        {/* A plain form, so it works before the script has loaded: it opens this page with ?code=... */}
+        <form action="/ukk" method="get" className="flex flex-col gap-2 sm:flex-row sm:items-end">
+          <div className="flex flex-1 flex-col gap-2">
+            <label htmlFor="ukk-code" className="font-medium">
+              Access code
+            </label>
+            <Input
+              id="ukk-code"
+              name="code"
+              required
+              autoComplete="off"
+              autoCapitalize="none"
+              className="h-11 px-3"
+              placeholder="From the QR code at our table"
+            />
+          </div>
+          <Button type="submit" size="lg" className="h-11 px-4 text-base sm:text-sm">
+            Open the chat
+          </Button>
+        </form>
+      </div>
     );
   }
 
@@ -52,7 +96,7 @@ export function UkkChat({ code }: { code: string }) {
     const message = draft.trim();
     if (!message || busy) return;
     setDraft("");
-    setError("");
+    fail("");
     setBusy(true);
     setTurns((t) => [...t, { from: "you", text: message }, { from: "ukk", text: "" }]);
     let full = "";
@@ -60,36 +104,37 @@ export function UkkChat({ code }: { code: string }) {
       full += delta;
       setTurns((t) => [...t.slice(0, -1), { from: "ukk", text: t[t.length - 1].text + delta }]);
     };
-    const dropEmptyReply = () => setTurns((t) => (t[t.length - 1]?.text ? t : t.slice(0, -1)));
+    // Nothing came back: the message returns to the box, so it can be sent again or copied, not typed again.
+    const giveBack = () => {
+      if (full) return;
+      setTurns((t) => (t[t.length - 1]?.text ? t : t.slice(0, -2)));
+      setDraft((d) => d || message);
+    };
     try {
       const res = await fetch("/api/ukk", {
         method: "POST",
         headers: { "content-type": "application/json", "x-demo-code": code },
         body: JSON.stringify({ message }),
       });
-      if (res.status === 503) {
-        const body = await res.json().catch(() => ({}));
-        setElsewhere(typeof body.chatUrl === "string" ? body.chatUrl : "");
-        dropEmptyReply();
-        return;
-      }
       if (!res.ok || !res.body) {
         const body = await res.json().catch(() => ({}));
-        setError(typeof body.error === "string" ? body.error : "UKK cannot answer right now. Please try again.");
-        dropEmptyReply();
+        giveBack();
+        if (res.status === 503 && typeof body.chatUrl === "string") setElsewhere(body.chatUrl);
+        else if (res.status === 401) fail(BAD_CODE, true);
+        else fail(typeof body.error === "string" ? body.error : "UKK cannot answer right now. Please try again.");
         return;
       }
       const received = await readCompletionStream(res.body, append);
       if (received === 0) {
         // A finished reply with no text (an error inside the run, or a silent turn) must not leave the spinner.
-        setError("UKK did not answer this time. Please send your message again.");
-        dropEmptyReply();
+        fail("UKK did not answer this time. Please send your message again.");
+        giveBack();
       } else {
         voice.speak(full);
       }
     } catch {
-      setError("The connection dropped. Please send your message again.");
-      dropEmptyReply();
+      fail("The connection dropped. Please send your message again.");
+      giveBack();
     } finally {
       setBusy(false);
     }
@@ -97,13 +142,19 @@ export function UkkChat({ code }: { code: string }) {
 
   if (elsewhere) {
     return (
-      <p className="rounded-lg border p-4 text-sm">
-        The chat with UKK runs on the team&apos;s server.{" "}
-        <a href={`${elsewhere}?code=${encodeURIComponent(code)}`} className="underline underline-offset-2">
-          Open it there
+      <div className="flex flex-col items-start gap-4 rounded-lg border bg-card p-4 text-sm">
+        <p className="leading-relaxed">The chat with UKK runs on the team&apos;s server, not on this one.</p>
+        {draft && (
+          <div className="flex w-full flex-col items-start gap-2">
+            <p className="text-muted-foreground">Your message was not sent. Copy it and send it there:</p>
+            <p className="w-full rounded-lg bg-muted p-3 leading-relaxed whitespace-pre-wrap">{draft}</p>
+            <CopyButton text={draft} />
+          </div>
+        )}
+        <a href={`${elsewhere}?code=${encodeURIComponent(code)}`} className={linkButtonClasses({ size: "cta" })}>
+          Open the chat there
         </a>
-        .
-      </p>
+      </div>
     );
   }
 
@@ -116,8 +167,8 @@ export function UkkChat({ code }: { code: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4 rounded-lg border p-3">
-        <UkkAvatar state={avatarState} level={voice.level} size={88} />
+      <div className="flex items-center gap-4 rounded-lg border bg-card p-3">
+        <UkkAvatar state={avatarState} level={voice.level} size={72} />
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-muted-foreground">
             {voice.recording
@@ -128,7 +179,15 @@ export function UkkChat({ code }: { code: string }) {
                   ? "UKK is reading his reply aloud."
                   : "Talk to UKK by voice or text. His voice is made with ElevenLabs."}
           </p>
-          <Button type="button" variant="outline" size="sm" onClick={voice.toggleSpeech} aria-pressed={voice.enabled} className="self-start">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={voice.toggleSpeech}
+            aria-pressed={voice.enabled}
+            // A full-size target on a phone, the compact one next to a mouse.
+            className="h-11 self-start px-3 sm:h-8"
+          >
             {voice.enabled ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
             {voice.enabled ? "Voice on" : "Voice off"}
           </Button>
@@ -136,22 +195,16 @@ export function UkkChat({ code }: { code: string }) {
       </div>
       <ol className="flex flex-col gap-3" aria-live="polite">
         {turns.length === 0 && (
-          <li className="rounded-lg bg-muted p-3 text-sm">
+          <li className={FROM_UKK}>
             UKK. Finland&apos;s FAQ. Tell me what is on your plate: a move, a new job, a letter you cannot read.
           </li>
         )}
         {turns.map((turn, i) => (
-          <li
-            key={i}
-            className={
-              turn.from === "you"
-                ? "self-end rounded-lg bg-primary px-3 py-2 text-sm whitespace-pre-wrap text-primary-foreground"
-                : "rounded-lg bg-muted p-3 text-sm whitespace-pre-wrap"
-            }
-          >
+          <li key={i} className={turn.from === "you" ? FROM_YOU : FROM_UKK}>
             {turn.from === "ukk" && !turn.text ? (
               <span className="inline-flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="size-4 animate-spin" aria-hidden /> UKK is consulting the official sources
+                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> UKK is consulting the official
+                sources
               </span>
             ) : (
               <Linked text={turn.text} />
@@ -159,40 +212,65 @@ export function UkkChat({ code }: { code: string }) {
           </li>
         ))}
       </ol>
-      <div ref={end} />
-      {error && (
-        <p className="flex items-center gap-2 text-sm text-destructive" role="alert">
-          <CircleAlert className="size-4 shrink-0" aria-hidden /> {error}
-        </p>
-      )}
-      <form onSubmit={send} className="flex items-end gap-2">
-        <Textarea
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) send(e);
-          }}
-          maxLength={1500}
-          rows={2}
-          placeholder="I just moved to Espoo. What do I register first?"
-          aria-label="Your message to UKK"
-          className="min-h-11"
-        />
-        <Button
-          type="button"
-          size="lg"
-          variant={voice.recording ? "destructive" : "outline"}
-          onClick={listen}
-          disabled={voice.transcribing}
-          aria-pressed={voice.recording}
-          aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
-        >
-          {voice.transcribing ? <Loader2 className="animate-spin" aria-hidden /> : voice.recording ? <Square aria-hidden /> : <Mic aria-hidden />}
-        </Button>
-        <Button type="submit" size="lg" disabled={busy || !draft.trim()} aria-label="Send">
-          {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Send aria-hidden />}
-        </Button>
-      </form>
+      {/* The newest message stops above the message box, which stays at the bottom of the screen. */}
+      <div ref={last} className="scroll-mb-28" />
+      {/*
+        Kept at the bottom of the screen while the conversation is longer than the screen, so the message box is
+        always in reach. An error travels with it, so it is never hidden behind the box.
+      */}
+      <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mx-0 sm:px-0">
+        {error && (
+          <p className="flex items-start gap-2 text-sm text-destructive" role="alert">
+            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+            <span>
+              {error}{" "}
+              {badCode && (
+                // A plain link: it must open the page without the refused code, so the field for a new one shows.
+                <a href="/ukk" className="font-medium text-foreground underline underline-offset-4">
+                  Or type the code
+                </a>
+              )}
+            </span>
+          </p>
+        )}
+        <form onSubmit={send} className="flex items-end gap-2">
+          <Textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              // Enter also confirms a word in Chinese, Japanese or Korean input; that Enter must not send.
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) send(e);
+            }}
+            maxLength={1500}
+            rows={2}
+            placeholder="I just moved to Espoo. What do I register first?"
+            aria-label="Your message to UKK"
+            className="max-h-40 min-h-11 px-3"
+          />
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            onClick={listen}
+            disabled={voice.transcribing}
+            aria-pressed={voice.recording}
+            aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
+            // Green while the microphone is live, the same colour as the ring around UKK.
+            className={`h-11 w-11 ${voice.recording ? "border-(--hud-green)/60 bg-(--hud-green)/10 text-(--hud-green) hover:bg-(--hud-green)/20 hover:text-(--hud-green)" : ""}`}
+          >
+            {voice.transcribing ? (
+              <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden />
+            ) : voice.recording ? (
+              <Square aria-hidden />
+            ) : (
+              <Mic aria-hidden />
+            )}
+          </Button>
+          <Button type="submit" size="lg" className="h-11 w-11" disabled={busy || !draft.trim()} aria-label="Send">
+            {busy ? <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden /> : <Send aria-hidden />}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -205,8 +283,12 @@ const MAX_RECORDING_MS = 30_000;
  * and moves the avatar's mouth with its loudness. The microphone records only between two taps on its button
  * (or 30 seconds at most); the transcript lands in the message box to check before sending.
  */
-function useVoice(code: string, onError: (message: string) => void) {
+function useVoice(code: string, onError: (message: string, refused?: boolean) => void) {
   const [enabled, setEnabled] = useState(false);
+  // The same switch, readable by a reply that was asked for before the visitor flipped it.
+  const wanted = useRef(false);
+  // True while the browser is still asking for the microphone, so a second tap cannot start a second recording.
+  const starting = useRef(false);
   const [speaking, setSpeaking] = useState(false);
   const [level, setLevel] = useState(0);
   const [recording, setRecording] = useState(false);
@@ -234,15 +316,17 @@ function useVoice(code: string, onError: (message: string) => void) {
   function toggleSpeech() {
     if (enabled) {
       source.current?.stop();
+      wanted.current = false;
       setEnabled(false);
       return;
     }
     void audio().resume();
+    wanted.current = true;
     setEnabled(true);
   }
 
   async function speak(text: string) {
-    if (!enabled || !text.trim()) return;
+    if (!wanted.current || !text.trim()) return;
     try {
       const res = await fetch("/api/ukk/speak", {
         method: "POST",
@@ -251,7 +335,8 @@ function useVoice(code: string, onError: (message: string) => void) {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        onError(typeof body.error === "string" ? body.error : "UKK could not read that aloud.");
+        if (res.status === 401) onError(BAD_CODE, true);
+        else onError(typeof body.error === "string" ? body.error : "UKK could not read that aloud.");
         return;
       }
       const ctx = audio();
@@ -275,9 +360,11 @@ function useVoice(code: string, onError: (message: string) => void) {
       };
       node.onended = () => {
         cancelAnimationFrame(frame);
+        // A reply that was cut off by the next one ends after the next one has started: that one is still speaking.
+        if (source.current !== node) return;
+        source.current = null;
         setLevel(0);
         setSpeaking(false);
-        if (source.current === node) source.current = null;
       };
       setSpeaking(true);
       node.start();
@@ -298,18 +385,34 @@ function useVoice(code: string, onError: (message: string) => void) {
         finished.current = resolve;
       });
     }
+    if (starting.current) return Promise.resolve("");
     return new Promise((resolve) => {
       finished.current = resolve;
+      starting.current = true;
       void (async () => {
         let stream: MediaStream;
+        let rec: MediaRecorder;
         try {
           stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         } catch {
+          starting.current = false;
+          finished.current = null;
           onError("The microphone is blocked. Allow it in the browser, or type instead.");
           resolve("");
           return;
         }
-        const rec = new MediaRecorder(stream);
+        try {
+          rec = new MediaRecorder(stream);
+        } catch {
+          // A browser that hands out the microphone but cannot record from it.
+          stream.getTracks().forEach((track) => track.stop());
+          starting.current = false;
+          finished.current = null;
+          onError("This browser cannot record a voice note. Please type instead.");
+          resolve("");
+          return;
+        }
+        starting.current = false;
         const chunks: Blob[] = [];
         const timer = window.setTimeout(() => rec.state === "recording" && rec.stop(), MAX_RECORDING_MS);
         rec.ondataavailable = (event) => event.data.size && chunks.push(event.data);
@@ -328,7 +431,8 @@ function useVoice(code: string, onError: (message: string) => void) {
             const res = await fetch("/api/ukk/listen", { method: "POST", headers: { "content-type": type, "x-demo-code": code }, body: blob });
             const body = await res.json().catch(() => ({}));
             if (!res.ok || typeof body.text !== "string") {
-              onError(typeof body.error === "string" ? body.error : "UKK could not hear that. Please type it instead.");
+              if (res.status === 401) onError(BAD_CODE, true);
+              else onError(typeof body.error === "string" ? body.error : "UKK could not hear that. Please type it instead.");
               done("");
             } else {
               done(body.text);

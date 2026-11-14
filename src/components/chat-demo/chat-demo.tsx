@@ -1,36 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { type Beat, DURATION, PEOPLE, SCRIPT } from "@/components/chat-demo/script";
+import { scrollToEnd, useReplayClock } from "@/components/demo/replay";
 
 /** A scripted replay of UKK in a family group chat (issue #33). Original styling, no app branding. */
 export function ChatDemo({ loop = false }: { loop?: boolean }) {
-  const [now, setNow] = useState(0);
-  const start = useRef(0);
+  const now = useReplayClock(DURATION, loop);
   const list = useRef<HTMLOListElement>(null);
-
-  useEffect(() => {
-    start.current = performance.now();
-    let frame = 0;
-    const tick = () => {
-      const t = performance.now() - start.current;
-      if (t > DURATION && loop) start.current = performance.now();
-      setNow(Math.min(t, DURATION));
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [loop]);
 
   const shown = SCRIPT.filter((b) => b.at <= now);
   const typing = SCRIPT.find(
     (b): b is Extract<Beat, { kind: "message" }> => b.kind === "message" && !!b.typing && now >= b.at - b.typing && now < b.at,
   );
-  const count = shown.length + (typing ? 1 : 0);
+  const isTyping = !!typing;
 
+  // Both are watched: a long message that takes the place of the typing dots must be scrolled into view as well.
   useEffect(() => {
-    list.current?.scrollTo({ top: list.current.scrollHeight, behavior: "smooth" });
-  }, [count]);
+    scrollToEnd(list.current);
+  }, [shown.length, isTyping]);
 
   return (
     <div className="chatdemo">
@@ -47,7 +35,8 @@ export function ChatDemo({ loop = false }: { loop?: boolean }) {
         </div>
       </header>
 
-      <ol ref={list} className="chatdemo-list" aria-live="polite">
+      {/* No aria-live: a screen reader would read the whole script aloud, unasked. The list takes focus so the keyboard can scroll it. */}
+      <ol ref={list} className="chatdemo-list" tabIndex={0} aria-label="Messages in the family chat">
         {shown.map((beat, i) =>
           beat.kind === "note" ? (
             <li key={i} className="chatdemo-note">

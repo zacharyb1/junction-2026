@@ -1,21 +1,15 @@
-/* /demo/chat (issue #33): a phone-sized group chat replay. Original styling, scoped to .chatdemo-stage. */
-
-.chatdemo-stage {
-  display: flex;
-  min-height: 100dvh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: #1f2a36;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
+/*
+ * /demo/chat (issue #33): a phone-sized group chat replay. Original styling, every selector prefixed chatdemo-.
+ * The page around the phone (ground, heading, caption) is the shared frame in src/components/demo/demo.css.
+ * The phone keeps its own light look on purpose: it is a picture of a chat app, not a part of this site.
+ */
 
 .chatdemo {
   display: flex;
   width: min(390px, 100%);
-  height: min(844px, calc(100dvh - 4rem));
+  /* --demo-chrome is how much of the screen's height the frame around the phone takes. */
+  height: min(844px, calc(100dvh - var(--demo-chrome, 4rem)));
+  min-height: min(480px, 100dvh);
   flex-direction: column;
   overflow: hidden;
   border-radius: 28px;
@@ -33,7 +27,8 @@
   align-items: center;
   gap: 0.6rem;
   padding: 2.4rem 0.9rem 0.7rem;
-  background: #517da2;
+  /* White text on this blue is 5.3:1. */
+  background: #456f93;
   color: #fff;
 }
 .chatdemo-back {
@@ -54,7 +49,6 @@
 }
 .chatdemo-sub {
   font-size: 0.8rem;
-  opacity: 0.85;
 }
 
 .chatdemo-list {
@@ -115,7 +109,7 @@
   border-radius: 4px;
   background: #e8eefc;
   color: #1d4ed8;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 .chatdemo-text {
@@ -132,7 +126,7 @@
   text-decoration: none;
 }
 .chatdemo-preview-site {
-  color: #517da2;
+  color: #456f93;
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -167,7 +161,8 @@
   margin: 0.25rem 0;
   padding: 0.25rem 0.7rem;
   border-radius: 999px;
-  background: rgb(0 0 0 / 0.28);
+  /* Dark enough for white text at this size on the pale wallpaper. */
+  background: rgb(0 0 0 / 0.55);
   color: #fff;
   font-size: 0.75rem;
   text-align: center;
@@ -198,15 +193,17 @@
   padding: 0.65rem 1rem;
   border-radius: 22px;
   background: #fff;
-  color: #9aa5af;
+  color: #66717d;
   font-size: 0.93rem;
 }
 
-.chatdemo-caption {
-  max-width: 390px;
-  color: #c8d3de;
-  font-size: 0.78rem;
-  text-align: center;
+/* The site's amber ring does not show on a white bubble, so focus inside the phone is drawn dark. */
+.site .chatdemo a:focus-visible {
+  outline-color: #14202c;
+}
+.site .chatdemo-list:focus-visible {
+  outline-offset: -3px;
+  outline-color: #14202c;
 }
 
 @keyframes chatdemo-in {

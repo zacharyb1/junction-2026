@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { landingConfig } from "@/components/landing/config";
+import { SiteLink } from "@/components/site/site-link";
+import { SiteShell } from "@/components/site/site-shell";
 import { UkkChat } from "@/components/ukk-chat";
 
 const title = "Talk to UKK";
@@ -10,38 +12,45 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  openGraph: { title, description, siteName: "UKK", type: "website" },
+  openGraph: { title, description, siteName: "AIDaddy", type: "website" },
   twitter: { card: "summary_large_image", title, description },
 };
 
 export default async function UkkPage({ searchParams }: PageProps<"/ukk">) {
   const params = await searchParams;
-  const code = typeof params.code === "string" ? params.code : "";
+  const code = typeof params.code === "string" ? params.code.trim() : "";
+  // The same bot as on the front page when it is configured there; otherwise the team's bot.
+  const bot = landingConfig().botUsername ?? "junction_kaveri_bot";
+  const link = "text-foreground underline underline-offset-4 hover:text-primary";
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-6 px-4 py-8 sm:py-12">
-      <header className="flex items-center gap-3">
-        <Image src="/ukk-avatar.jpg" alt="" width={56} height={56} className="size-14 rounded-full" priority />
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-semibold tracking-tight">UKK</h1>
-          <p className="text-sm text-muted-foreground">Finland&apos;s FAQ for newcomers</p>
-        </div>
-      </header>
-      <UkkChat code={code} />
-      <footer className="mt-auto flex flex-col gap-2 text-xs text-muted-foreground">
-        <p>Research with sources, not legal advice.</p>
-        <p>UKK is a made-up character, not an official service.</p>
-        <p>
+    <SiteShell>
+      {/* The same column and the same head as /try and the case file. */}
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-10 sm:py-14">
+        <header className="flex flex-col gap-3">
+          <p className="site-eyebrow">Finland&apos;s FAQ for newcomers</p>
+          <div className="flex items-center gap-3">
+            <Image src="/ukk-avatar.jpg" alt="" width={48} height={48} className="size-12 rounded-full border" priority />
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Talk to UKK</h1>
+          </div>
+          <p className="leading-relaxed text-muted-foreground">
+            UKK is the butler of AIDaddy. Tell him about a life event or an official letter, and he answers with a plan and
+            quotes from official pages.
+          </p>
+        </header>
+        <UkkChat code={code} />
+        <p className="text-sm leading-relaxed text-muted-foreground">
           Prefer Telegram?{" "}
-          <a href="https://t.me/junction_kaveri_bot" target="_blank" rel="noreferrer" className="underline underline-offset-2">
+          <a href={`https://t.me/${bot}`} target="_blank" rel="noreferrer" className={link}>
             Add UKK to your group
+            <span className="sr-only"> (opens in a new tab)</span>
           </a>
           . Or{" "}
-          <Link href={code ? `/try?code=${encodeURIComponent(code)}` : "/try"} className="underline underline-offset-2">
+          <SiteLink href="/try" className={link}>
             run one research case
-          </Link>{" "}
+          </SiteLink>{" "}
           without the chat.
         </p>
-      </footer>
-    </main>
+      </main>
+    </SiteShell>
   );
 }

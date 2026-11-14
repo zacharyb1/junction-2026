@@ -16,7 +16,7 @@ export function EarlierCases({ situation, failed }: { situation: string; failed:
   const match = CASES.find((c) => c.situation.trim() === situation.trim());
   const row = (c: Stored) => (
     <li key={c.id}>
-      <Link href={`/c/${c.id}`} target="_blank" className="inline-flex items-center gap-1 font-medium hover:underline">
+      <Link href={`/c/${c.id}`} target="_blank" className="inline-flex min-h-6 items-center gap-1 font-medium underline-offset-4 hover:text-primary hover:underline">
         {c.label}: {c.title} <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
         <span className="sr-only"> (opens in a new tab)</span>
       </Link>
@@ -29,19 +29,19 @@ export function EarlierCases({ situation, failed }: { situation: string; failed:
 
   if (failed) {
     return (
-      <div className="rounded-lg border bg-muted/50 p-3 text-sm">
+      <div className="rounded-lg border border-(--hud-amber)/40 bg-(--hud-amber)/5 p-3 text-sm">
         <p className="font-medium">Live research is not available right now.</p>
         <p className="mt-1 text-muted-foreground">
           {match ? `Here is the case we researched for this example on ${MADE}:` : `These cases were researched on ${MADE} with the same engine:`}
         </p>
-        <ul className="mt-2 flex flex-col gap-1.5">{(match ? [match] : CASES).map(row)}</ul>
+        <ul className="mt-2 flex flex-col gap-2">{(match ? [match] : CASES).map(row)}</ul>
       </div>
     );
   }
   return (
     <details className="text-xs text-muted-foreground">
-      <summary className="cursor-pointer hover:text-foreground">See results researched earlier ({MADE})</summary>
-      <ul className="mt-2 flex flex-col gap-1.5 text-sm text-foreground">{CASES.map(row)}</ul>
+      <summary className="cursor-pointer py-2 hover:text-foreground">See results researched earlier ({MADE})</summary>
+      <ul className="mt-1 flex flex-col gap-2 text-sm text-foreground">{CASES.map(row)}</ul>
     </details>
   );
 }

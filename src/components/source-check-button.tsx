@@ -35,7 +35,7 @@ export function SourceCheckButton({ id, label, busyLabel, recentLabel, failedLab
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
       {/* Still focusable while it is busy, so the keyboard focus stays here until the answer is back. */}
-      <Button variant="outline" size="lg" onClick={check} disabled={busy} focusableWhenDisabled>
+      <Button variant="outline" size="lg" className="h-11 px-3 sm:h-9" onClick={check} disabled={busy} focusableWhenDisabled>
         <RefreshCw className={busy ? "animate-spin motion-reduce:animate-none" : undefined} />
         {busy ? busyLabel : label}
       </Button>

@@ -101,15 +101,17 @@
   font-size: 1.05rem;
   font-weight: 600;
 }
+/* The title of a page other than the front page: an h1 at the size of a section title. */
+.hud h1.hud-title {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
 
 .hud-lede {
   max-width: 58ch;
   font-size: clamp(1.02rem, 1.6vw, 1.2rem);
   color: var(--hud-dim);
-}
-.hud-lede strong {
-  color: var(--hud-text);
-  font-weight: 500;
 }
 
 .hud-label {
@@ -129,16 +131,6 @@
   max-width: 72ch;
   font-size: 0.9rem;
   color: var(--hud-dim);
-}
-
-.hud-mark {
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.hud-mark b {
-  font-weight: 700;
-  color: var(--hud-cyan);
 }
 
 /* ---------- buttons ---------- */
@@ -373,42 +365,9 @@
 
 /* ---------- hero ---------- */
 
+/* The hero starts right under the site's shared header. */
 .hud-hero {
-  padding-bottom: clamp(3rem, 8vw, 6rem);
-}
-
-.hud-top {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  min-height: 64px;
-}
-.hud-online {
-  display: none;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-  font: 500 0.7rem / 1 var(--hud-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--hud-dim);
-}
-.hud-online i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--hud-green);
-  box-shadow: 0 0 10px var(--hud-green);
-  animation: hud-breathe 2.4s ease-in-out infinite;
-}
-.hud .hud-top-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin-left: auto;
-  font: 500 0.75rem / 1 var(--hud-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  padding-block: 1.5rem clamp(3rem, 8vw, 6rem);
 }
 
 .hud-hero-grid {
@@ -416,10 +375,11 @@
   gap: 1.5rem;
   align-items: center;
 }
+/* On a phone the core is small enough that the title and the buttons share the first screen with it. */
 .hud-hero-core {
   position: relative;
-  width: min(15rem, 62vw);
-  margin: 0.5rem auto 0;
+  width: min(11rem, 46vw);
+  margin: 0 auto;
 }
 .hud-orbit {
   display: none;
@@ -480,16 +440,14 @@
 }
 
 @media (min-width: 900px) {
-  .hud-online {
-    display: inline-flex;
+  .hud-hero {
+    padding-top: 0;
   }
-  .hud .hud-top-link {
-    margin-left: 0;
-  }
+  /* Header and hero fill the first screen together; the header is 61px tall. */
   .hud-hero-grid {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     gap: 3rem;
-    min-height: min(46rem, 100svh - 64px);
+    min-height: min(46rem, 100svh - 61px);
   }
   .hud-hero-core {
     order: 2;
@@ -543,6 +501,11 @@
   display: grid;
   gap: 0.9rem;
   margin-bottom: clamp(1.75rem, 4vw, 3rem);
+}
+/* A page that opens with a section sits under the shared header, which already draws the line. */
+.hud > main:first-child > .hud-section:first-child {
+  padding-top: clamp(2.5rem, 6vw, 4rem);
+  border-top: 0;
 }
 
 @keyframes hud-rise {
@@ -967,7 +930,7 @@
   display: inline-grid;
   place-items: center;
   min-width: 44px;
-  height: 36px;
+  height: 44px;
   border: 1px solid var(--hud-green);
   border-radius: 3px;
   background: rgb(61 220 151 / 0.08);
@@ -1024,6 +987,53 @@
   .hud-plan {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     gap: 3.5rem;
+  }
+}
+
+/* ---------- where UKK works ---------- */
+
+.hud-places {
+  display: grid;
+  border-top: 1px dashed var(--hud-line-soft);
+}
+.hud-places li {
+  display: grid;
+  gap: 0.35rem 2rem;
+  padding: 1.1rem 0 0.5rem;
+  border-bottom: 1px dashed var(--hud-line-soft);
+}
+.hud-place-text {
+  display: grid;
+  gap: 0.25rem;
+}
+.hud-place-text p {
+  max-width: 62ch;
+  font-size: 0.95rem;
+  color: var(--hud-dim);
+}
+.hud-place-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.75rem;
+}
+.hud .hud-place-links a,
+.hud .hud-setup-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 44px;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  .hud-places li {
+    grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    padding-block: 1rem;
+  }
+  .hud-place-links {
+    justify-content: flex-end;
   }
 }
 
@@ -1200,7 +1210,7 @@
   }
 }
 
-/* ---------- start and footer ---------- */
+/* ---------- start ---------- */
 
 .hud-start-panel {
   display: grid;
@@ -1231,30 +1241,6 @@
   .hud-start-panel .hud-actions {
     justify-content: flex-start;
   }
-}
-
-.hud-footer {
-  padding-block: 2.5rem 3rem;
-  border-top: 1px solid var(--hud-line-soft);
-  font-size: 0.86rem;
-  color: var(--hud-dim);
-}
-.hud-footer .hud-wrap {
-  display: grid;
-  gap: 0.6rem;
-}
-.hud-footer .hud-mark {
-  color: var(--hud-text);
-}
-.hud-footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-}
-.hud-footer-links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
 }
 
 /* ---------- motion preferences ---------- */
@@ -1324,6 +1310,7 @@
   animation: hud-rise 0.5s ease both;
 }
 .hud-autopilot-feed > li.hud-note {
+  max-width: none;
   border-left-color: var(--hud-line);
 }
 .hud-autopilot-feed p {
@@ -1386,9 +1373,13 @@
   color: var(--hud-text);
   font: inherit;
 }
-.hud .hud-autopilot-code .hud-btn:disabled {
+.hud .hud-autopilot-code .hud-btn:disabled,
+.hud .hud-autopilot-actions .hud-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.hud-autopilot-after {
+  margin-top: 1.5rem;
 }
 /* ---------- /setup (issue #42, mockup) ---------- */
 
@@ -1396,7 +1387,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding-block: 3rem 4rem;
+  padding-block: clamp(2.5rem, 6vw, 4rem) clamp(3.5rem, 9vw, 7rem);
 }
 .hud-setup-header {
   display: flex;
@@ -1412,11 +1403,7 @@
   box-shadow: 0 0 0 4px rgb(79 216 255 / 0.08);
 }
 .hud .hud-setup-h1 {
-  margin-block: 0.35rem 0.5rem;
-  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  margin-block: 0.5rem 0.75rem;
 }
 .hud-setup-grid {
   display: grid;
@@ -1527,9 +1514,13 @@
 .hud-setup-switch[aria-checked="true"] .hud-setup-knob {
   transform: translateX(28px);
 }
-.hud-setup-action {
-  align-self: flex-start;
+.hud-setup-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.25rem;
 }
+
 .hud-setup-footer {
   display: flex;
   flex-direction: column;

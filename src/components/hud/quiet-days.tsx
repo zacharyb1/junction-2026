@@ -9,7 +9,7 @@ const BEAT_MS = 850;
 const PAUSE_MS = 1500;
 
 /**
- * A family chat on an ordinary day. Small talk goes by and AIDaddy leaves it alone, then one message wakes it.
+ * A family chat on an ordinary day. Small talk goes by and UKK leaves it alone, then one message wakes him.
  *
  * The small-talk lines are messages the local gate really ignored in the team's labelled test
  * (eval/results/gate-gemma3-1b.json). The last line is the message of the recorded research run.
@@ -43,7 +43,7 @@ export function QuietDays({ ignored, trigger }: { ignored: string[]; trigger: st
       <div className="hud-panel hud-chat" aria-label="A family group chat">
         <p className="hud-panel-title">
           <span>Family group chat</span>
-          <span>AIDaddy is a member</span>
+          <span>UKK is a member</span>
         </p>
         <ol>
           {ignored.map((text, index) => (
@@ -54,7 +54,7 @@ export function QuietDays({ ignored, trigger }: { ignored: string[]; trigger: st
           ))}
           <li className="hud-msg hud-msg--trigger" data-shown={awake}>
             <p>{trigger}</p>
-            <span className="hud-tag">Life event. AIDaddy wakes up.</span>
+            <span className="hud-tag">Life event. UKK wakes up.</span>
           </li>
         </ol>
       </div>

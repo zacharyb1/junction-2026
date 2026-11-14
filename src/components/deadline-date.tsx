@@ -64,7 +64,7 @@ export function DeadlineDate({
   }
 
   const add = date && (
-    <Button variant="outline" size="lg" onClick={() => save(date)}>
+    <Button variant="outline" size="lg" className="h-11 px-3 sm:h-9" onClick={() => save(date)}>
       <CalendarPlus /> {t.addToCalendar}
     </Button>
   );
@@ -72,7 +72,7 @@ export function DeadlineDate({
   if (fixed) return <div className="mt-2">{add}</div>;
   return (
     <details className="mt-2 rounded-lg border bg-card text-sm">
-      <summary className="cursor-pointer px-3 py-2 font-medium">{t.workOut}</summary>
+      <summary className="cursor-pointer px-3 py-3 font-medium">{t.workOut}</summary>
       <div className="flex flex-col items-start gap-2 px-3 pb-3">
         <label htmlFor={id} className="text-muted-foreground">
           {label}
@@ -82,12 +82,12 @@ export function DeadlineDate({
           type="date"
           value={picked.from}
           onChange={(e) => setPicked({ from: e.target.value, on: today() })}
-          className="w-auto max-w-full"
+          className="h-11 w-auto max-w-full px-3"
         />
         {/* Always on the page, so a screen reader announces the day when it appears. Empty, it takes no room. */}
         <output htmlFor={id} className="flex flex-col gap-2 empty:-mt-2">
           {date && <span className="text-base font-semibold">{long(date)}</span>}
-          {date && toIso(date) < picked.on && <span className="text-amber-700 dark:text-amber-400">{t.passed}</span>}
+          {date && toIso(date) < picked.on && <span className="text-(--hud-amber)">{t.passed}</span>}
         </output>
         {date && (
           <>

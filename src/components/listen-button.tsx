@@ -44,7 +44,7 @@ export function ListenButton({
     <div className="flex flex-col items-start gap-2">
       {state !== "ready" && (
         // Still focusable while the audio loads, so the keyboard focus does not fall back to the top of the page.
-        <Button variant="outline" size="lg" onClick={start} disabled={state === "loading"} focusableWhenDisabled>
+        <Button variant="outline" size="lg" className="h-11 px-3 sm:h-9" onClick={start} disabled={state === "loading"} focusableWhenDisabled>
           {state === "loading" ? <LoaderCircle className="animate-spin motion-reduce:animate-none" /> : <Volume2 />}
           {state === "loading" ? loadingLabel : label}
         </Button>
