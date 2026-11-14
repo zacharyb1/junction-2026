@@ -86,6 +86,25 @@ class ConfigureAdminTest(unittest.TestCase):
             "platforms.telegram.extra.group_user_allowed_commands": ["start", "new"],
         })
 
+    def test_web_runtime_skips_admins_and_telegram(self):
+        # The web instance has no Telegram token and no admins; it must still be configured.
+        self.environment["KAVERI_RUNTIME"] = "web"
+        result = self.run_script()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
+        settings = {call[2]: call[3] for call in calls if call[:2] == ["config", "set"]}
+        self.assertFalse([key for key in settings if key.startswith("platforms.telegram") or key.startswith("display.platforms.telegram")])
+        disabled = json.loads(settings["agent.disabled_toolsets"])
+        self.assertEqual(disabled[-2:], ["memory", "cronjob"])
+        self.assertIn("terminal", disabled)
+        self.assertEqual(settings["api_server.max_concurrent_runs"], "4")
+
+    def test_telegram_runtime_still_requires_admins(self):
+        self.environment["KAVERI_RUNTIME"] = "telegram"
+        result = self.run_script()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("TELEGRAM_ALLOWED_USERS", result.stderr)
+
     def test_open_groups_clears_the_group_allowlist_only(self):
         self.env_file.write_text("TELEGRAM_ALLOWED_USERS=123\n")
         result = self.run_script("configure.sh", "--open-groups")

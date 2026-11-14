@@ -18,12 +18,16 @@ PROVIDER="${KAVERI_PROVIDER:-nvidia}"
 
 # Admins are required even when everyone may chat with the bot. Validate before
 # any config command so an incomplete setup cannot leave slash commands open.
+# KAVERI_RUNTIME=web is the /ukk instance: no Telegram, no admins, no memory, no jobs.
+RUNTIME="${KAVERI_RUNTIME:-telegram}"
 BOT_ENV="${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home/.env"
 OWNER=""
-if [ -f "$BOT_ENV" ]; then
+if [ "$RUNTIME" = web ]; then
+  :
+elif [ -f "$BOT_ENV" ]; then
   OWNER="$(sed -n 's/^TELEGRAM_ALLOWED_USERS=//p' "$BOT_ENV" | tail -n 1)"
 fi
-if [[ ! "$OWNER" =~ ^[[:space:]]*[1-9][0-9]*([[:space:]]*,[[:space:]]*[1-9][0-9]*)*[[:space:]]*$ ]]; then
+if [ "$RUNTIME" != web ] && [[ ! "$OWNER" =~ ^[[:space:]]*[1-9][0-9]*([[:space:]]*,[[:space:]]*[1-9][0-9]*)*[[:space:]]*$ ]]; then
   echo "ERROR: TELEGRAM_ALLOWED_USERS must contain comma-separated positive numeric Telegram user IDs. Admins are required even when TELEGRAM_ALLOW_ALL_USERS is enabled; no configuration was changed." >&2
   exit 1
 fi
@@ -81,7 +85,10 @@ set_key mcp_servers.exa.supports_parallel_tool_calls true
 set_key skills.external_dirs "[\"$SKILLS_DIR\"]"
 set_key skills.auto_load '["life-event-butler", "letter-decoder", "deadline-keeper"]'
 set_key skills.write_approval true
-set_key agent.disabled_toolsets '["terminal", "file", "code_execution", "browser", "computer_use", "delegation", "image_gen", "video_gen", "session_search"]'
+DISABLED='"terminal", "file", "code_execution", "browser", "computer_use", "delegation", "image_gen", "video_gen", "session_search"'
+# On the web, strangers share one instance: no memory across visitors and no scheduled jobs.
+[ "$RUNTIME" = web ] && DISABLED="$DISABLED, \"memory\", \"cronjob\""
+set_key agent.disabled_toolsets "[$DISABLED]"
 set_key agent.clarify_timeout 300
 set_key agent.reasoning_effort low
 set_key tools.tool_search.enabled off
@@ -90,20 +97,27 @@ set_key timezone Europe/Helsinki
 set_key display.busy_input_mode queue
 set_key display.busy_ack_enabled false
 set_key display.memory_notifications off
-set_key display.platforms.telegram.tool_progress off
-set_key display.platforms.telegram.interim_assistant_messages true
-set_key display.platforms.telegram.long_running_notifications false
+if [ "$RUNTIME" != web ]; then
+  set_key display.platforms.telegram.tool_progress off
+  set_key display.platforms.telegram.interim_assistant_messages true
+  set_key display.platforms.telegram.long_running_notifications false
+fi
 set_key auxiliary.background_review.enabled false
 set_key cron.wrap_response false
 
-# Slash commands (/sethome, /new, /model ...) only for the owner. Without this every user the bot
-# answers can run them, which matters once TELEGRAM_ALLOW_ALL_USERS is on (CHECKS.md, U10).
-echo "Slash commands: admin only"
-ADMINS="[\"$(printf '%s' "$OWNER" | sed 's/,/","/g')\"]"
-set_key platforms.telegram.extra.allow_admin_from "$ADMINS"
-set_key platforms.telegram.extra.group_allow_admin_from "$ADMINS"
-set_key platforms.telegram.extra.user_allowed_commands '["start", "new"]'
-set_key platforms.telegram.extra.group_user_allowed_commands '["start", "new"]'
+if [ "$RUNTIME" = web ]; then
+  # Bounds NVIDIA quota use by web visitors; the Telegram bot keeps the rest.
+  set_key api_server.max_concurrent_runs 4
+else
+  # Slash commands (/sethome, /new, /model ...) only for the owner. Without this every user the bot
+  # answers can run them, which matters once TELEGRAM_ALLOW_ALL_USERS is on (CHECKS.md, U10).
+  echo "Slash commands: admin only"
+  ADMINS="[\"$(printf '%s' "$OWNER" | sed 's/,/","/g')\"]"
+  set_key platforms.telegram.extra.allow_admin_from "$ADMINS"
+  set_key platforms.telegram.extra.group_allow_admin_from "$ADMINS"
+  set_key platforms.telegram.extra.user_allowed_commands '["start", "new"]'
+  set_key platforms.telegram.extra.group_user_allowed_commands '["start", "new"]'
+fi
 
 echo "Persona"
 PATH="$ROOT/hermes/bin:$PATH" bash "$ROOT/hermes/install.sh" --home "${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home" | sed -n '1,6p'

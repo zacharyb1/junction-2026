@@ -19,13 +19,27 @@ OPTIONAL = (
     "TELEGRAM_HOME_CHANNEL", "TELEGRAM_ALLOW_ALL_USERS", "TELEGRAM_GROUP_ALLOWED_USERS",
     "TELEGRAM_GUEST_MODE", "KAVERI_GATE_URL", "KAVERI_GATE_MODEL",
 )
+# The web instance (KAVERI_RUNTIME=web) serves /ukk through Hermes' API server. It never holds the
+# Telegram token, so its identity and required settings differ from the Telegram bot's.
+WEB_REQUIRED = ("NVIDIA_API_KEY", "EXA_API_KEY", "CASEFILE_URL", "CASEFILE_SECRET", "API_SERVER_KEY")
+WEB_OPTIONAL = ("API_SERVER_ENABLED", "API_SERVER_HOST", "API_SERVER_PORT", "KAVERI_GATE_MODEL")
+RUNTIMES = {"telegram", "web"}
 MARKER = ".kaveri-container.json"
 LOCK = ".kaveri-runtime.lock"
 # Upstream useradd -m seeds these shell files in the volume image.
 SEED_FILES = {".bashrc", ".bash_logout", ".profile"}
 
 
+def runtime(env):
+    value = env.get("KAVERI_RUNTIME", "").strip() or "telegram"
+    if value not in RUNTIMES:
+        raise ValueError("KAVERI_RUNTIME must be telegram or web")
+    return value
+
+
 def validate(env):
+    if runtime(env) == "web":
+        return validate_web(env)
     missing = [key for key in REQUIRED if not env.get(key, "").strip()]
     if missing:
         raise ValueError("Missing runtime settings: " + ", ".join(missing))
@@ -46,7 +60,23 @@ def validate(env):
             raise ValueError(f"{key} must be a single line")
 
 
+def validate_web(env):
+    if env.get("TELEGRAM_BOT_TOKEN", "").strip():
+        raise ValueError("The web instance must not hold TELEGRAM_BOT_TOKEN; only the Telegram bot polls it")
+    missing = [key for key in WEB_REQUIRED if not env.get(key, "").strip()]
+    if missing:
+        raise ValueError("Missing runtime settings: " + ", ".join(missing))
+    endpoint = urlsplit(env["CASEFILE_URL"])
+    if endpoint.scheme not in {"http", "https"} or not endpoint.hostname or endpoint.path != "/api/mcp":
+        raise ValueError("CASEFILE_URL must be a full http(s) Engine URL ending in /api/mcp")
+    for key in WEB_REQUIRED + WEB_OPTIONAL:
+        if any(c in env.get(key, "") for c in "\r\n\x00"):
+            raise ValueError(f"{key} must be a single line")
+
+
 def identity(env):
+    if runtime(env) == "web":
+        return {"schema": 1, "runtime": "web"}
     return {"schema": 1, "token_sha256": hashlib.sha256(env["TELEGRAM_BOT_TOKEN"].encode()).hexdigest()}
 
 
@@ -77,6 +107,15 @@ def configure(home, env):
     path.chmod(0o600)
     # Hermes' private secret scope and dotenv loader read this file; runtime env
     # must replace older values here on every container recreation.
+    if runtime(env) == "web":
+        for key in WEB_REQUIRED:
+            set_key(path, key, env[key], quote_mode="always")
+        for key in WEB_OPTIONAL:
+            if env.get(key):
+                set_key(path, key, env[key], quote_mode="always")
+            else:
+                unset_key(path, key)
+        return
     for key in REQUIRED:
         value = env[key]
         if key == "TELEGRAM_ALLOWED_USERS":
@@ -99,6 +138,11 @@ def verify(home):
     assert config["model"]["provider"] == os.environ.get("KAVERI_PROVIDER", "nvidia")
     assert "/opt/kaveri/hermes/skills" in config["skills"]["external_dirs"]
     assert config["mcp_servers"]["casefile"]["url"] == "${CASEFILE_URL}"
+    if runtime(os.environ) == "web":
+        # No gate on the web: every message there is addressed to UKK. Memory and jobs stay off.
+        disabled = config["agent"]["disabled_toolsets"]
+        assert "memory" in disabled and "cronjob" in disabled
+        return
     plugin = home / "plugins" / "kaveri-gate"
     assert (plugin / "plugin.yaml").is_file()
     assert json.loads((plugin / "wake_patterns.json").read_text())
