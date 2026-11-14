@@ -3,7 +3,7 @@
  * Researches every example of the browser demo once and records the case ids,
  * so the demo has real cases to fall back on when live research is not available.
  *
- *   CASEFILE_SECRET=... node --experimental-strip-types scripts/make-examples.mjs --base https://junction-2026.vercel.app
+ *   CASEFILE_SECRET=... node --experimental-strip-types scripts/make-examples.mjs --base https://86.38.238.136.sslip.io
  *
  * The cases are stored wherever that server stores cases. Run it against a server that writes to the
  * production store (the same BLOB_READ_WRITE_TOKEN) if the links should open on production.

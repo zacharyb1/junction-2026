@@ -2,7 +2,7 @@
 /**
  * Records one real research run for the front page to replay.
  *
- *   CASEFILE_SECRET=... node scripts/make-replay.mjs --base https://junction-2026.vercel.app
+ *   CASEFILE_SECRET=... node scripts/make-replay.mjs --base https://86.38.238.136.sslip.io
  *   node scripts/make-replay.mjs --quiet-only      keeps the recorded run, refreshes the gate part
  *
  * It calls POST /api/research with the event stream on, and writes every event with its real timing,

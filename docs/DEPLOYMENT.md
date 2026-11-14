@@ -8,7 +8,7 @@ This is an operational reference for the current implementation, not a roadmap o
 
 | Part | Current implementation / recorded state |
 |---|---|
-| Web app and Engine | Next.js on the existing Vercel project `junction-2026`, at `https://junction-2026.vercel.app`. The Git integration uses `main`; GitHub CI checks code but does not perform the deployment. This handover has not inspected current Vercel environment settings. |
+| Web app and Engine | Next.js in Compose on the Verda server, at `https://86.38.238.136.sslip.io`. The Vercel project `junction-2026` was deleted on Saturday 14 November at 15:51 Helsinki; `https://junction-2026.vercel.app` no longer serves this app. Cases live in the server's `case-data` volume. Merges to `main` reach the server through the Deploy workflow, which needs `DEPLOY_SSH_KEY` (see below). Nothing runs the daily source re-check from `vercel.json` any more. |
 | Hermes | A separate persistent process on a laptop/server, using Telegram polling and calling the Engine's MCP endpoint. It is not started by a Vercel deployment. The former local installation was removed after its source merged; its remaining Engine and gate processes were stopped at 05:48 EET on 14 November. No gateway or scheduler from that installation was running. |
 | Local gate | Ollama with Gemma, used by the Hermes plugin. Setup installs the plugin into each Hermes home; its presence alone does not establish a running model service. |
 | Case data | Private Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set; otherwise `.data/cases` under the Engine's working directory. The five former local test Cases are no longer available from the removed installation. |

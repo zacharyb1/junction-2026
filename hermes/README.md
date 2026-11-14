@@ -142,7 +142,7 @@ Expect: `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ALLOWED_USERS` in `~/.hermes/.env` (`
 hermes config env-path          # prints the .env location
 ```
 
-For the repo-local installation, use `bash hermes/secrets.sh --production` (production) or `bash hermes/secrets.sh --local-engine` instead of manually editing a global Hermes home. The team values come from `bot.env` and `app.env` in the separate private keys repo. For a manual installation, open the file above (`cli-commands.md:1378`) and set the three names from `hermes/env.example`: `EXA_API_KEY`, `CASEFILE_URL`, `CASEFILE_SECRET`; obtain matching production values from the Engine owner. `CASEFILE_URL` is `https://junction-2026.vercel.app/api/mcp`. Secrets belong in `.env`, not in `config.yaml` (`configuration.md:67`). `CASEFILE_SECRET` must be identical to the value in the Vercel project.
+For the repo-local installation, use `bash hermes/secrets.sh --production` (production) or `bash hermes/secrets.sh --local-engine` instead of manually editing a global Hermes home. The team values come from `bot.env` and `app.env` in the separate private keys repo. For a manual installation, open the file above (`cli-commands.md:1378`) and set the three names from `hermes/env.example`: `EXA_API_KEY`, `CASEFILE_URL`, `CASEFILE_SECRET`; obtain matching production values from the Engine owner. `CASEFILE_URL` is `https://86.38.238.136.sslip.io/api/mcp`. Secrets belong in `.env`, not in `config.yaml` (`configuration.md:67`). `CASEFILE_SECRET` must be identical to the value in the server's `.env.local`.
 
 ### 7. Install the persona
 
