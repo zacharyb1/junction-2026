@@ -66,6 +66,7 @@ This table records the questions and suggested checks from the initial documenta
 | U14 | `scope` on `research_case` | The engine accepts `scope` (`official`, `open`, default `auto`). The skill does not pass it and relies on `auto`. | Ask for a restaurant for an anniversary: expect an open-web plan. |
 | U15 | Wording of the evidence line | The skills say "N of M quotes checked on their pages", as `docs/CONTRACTS.md` does. The original brief said "on the live pages". | Decide which one the team wants. One line in `life-event-butler`. |
 | U16 | Keep-awake commands, supergroup ID change | `caffeinate` and `systemd-inhibit` are operating system commands. The new chat ID after a supergroup upgrade is Telegram behaviour. Neither is in the Hermes docs. | Close and reopen the laptop lid once before the demo. |
+| U17 | Specialist desks and `routine-maker` (issue 39) | Written from the Hermes docs and not yet run on the bot. Read, not run: `skill_manage` `create` with `name`, `content` and `category` (`user-guide/features/skills.md:650-657`), and that `skills.write_approval: true` stages every such write under `~/.hermes/pending/skills/` (`:681-693`). Not measured: whether the model picks the right desk, keeps each desk's memory line apart, and counts repeats correctly. Memory holds 2,200 characters for all chats together (`user-guide/features/memory.md:17`), so each desk keeps one line of at most 120 characters per chat. | Rehearse one matter per desk and three repeats of one task in a test group. After the third, `/skills pending` must list one staged skill and `hermes skills list` must not show it until `/skills approve`. |
 
 ## Places where the Hermes docs disagree with themselves or with the source
 
@@ -187,6 +188,7 @@ This table records the questions and suggested checks from the initial documenta
 | `mcp__exa__web_search_advanced_exa`, `mcp__exa__web_fetch_exa` | same prefix rule, tool names from Exa (U7) |
 | `clarify` | `reference/tools-reference.md:32-44`, timeout `user-guide/configuration.md:3252-3259` |
 | `memory` | `user-guide/features/memory.md:20` |
+| `skill_manage`, `skill_view` | `reference/tools-reference.md:185-186`, actions `user-guide/features/skills.md:650-657` |
 | `cronjob_manage` | `reference/tools-reference.md:71`, `catch_up` `user-guide/features/cron.md:1187-1193` |
 | `vision_analyze` | `reference/tools-reference.md:302`, `user-guide/features/vision.md:222` |
 

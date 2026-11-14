@@ -43,6 +43,10 @@ skills:
     - letter-decoder
     - deadline-keeper
   write_approval: true     # the bot may not rewrite skills on its own; changes wait in /skills pending
+  # Not auto-loaded, on purpose: the three desks (legal-desk, travel-desk, finance-desk) and routine-maker are
+  # loaded with skill_view when a matter needs them, so every other conversation stays as fast as it was measured.
+  # routine-maker writes new skills with skill_manage. With write_approval on, each write is only staged:
+  # the operator reads it with /skills pending and /skills diff <id>, then /skills approve <id> or /skills reject <id>.
 
 agent:
   # A bot that strangers can talk to gets no shell, no files, no code and no browser.
