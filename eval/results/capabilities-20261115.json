@@ -1,0 +1,232 @@
+{
+  "recorded_at": "2026-11-15T01:15:32+02:00",
+  "runtime": "Hermes v0.23.1, image pinned by containers/hermes/Dockerfile",
+  "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+  "scope": "Synthetic households; actual model and memory/skill tools. Phone tools are fixtures; no gateway, calls, or Telegram delivery.",
+  "results": [
+    {
+      "scenario": "routine",
+      "seconds": 44.2,
+      "replies": [
+        "Noted. The routine waits for the operator's approval. Until then I do it the long way."
+      ],
+      "tools": [
+        [
+          "skill_view",
+          "memory",
+          "clarify",
+          "skill_manage",
+          "memory"
+        ]
+      ],
+      "tool_inputs": [
+        [
+          {
+            "name": "skill_view",
+            "arguments": "{\"name\":\"routine-maker\"}"
+          },
+          {
+            "name": "memory",
+            "arguments": "{\"target\":\"memory\",\"operations\":[{\"action\":\"patch\",\"old_text\":\"Routines -100101: weekly lunch menu check 2\",\"content\":\"Routines -100101: weekly lunch menu check 3\"}]}"
+          },
+          {
+            "name": "clarify",
+            "arguments": "{\"questions\":[{\"question\":\"You have asked for weekly lunch menu check three times. Shall I learn it as a routine, so next time it takes one line?\",\"choices\":[\"Yes, learn it.\",\"Not now.\"]}]}"
+          },
+          {
+            "name": "skill_manage",
+            "arguments": "{\"operations\":[{\"name\":\"weekly-lunch-menu-check\",\"action\":\"create\",\"category\":\"learned\",\"content\":\"---\\nname: weekly-lunch-menu-check\\ndescription: \\\"When the household asks for the weekly school lunch menu check, report the coming week's menu in one short line.\\\"\\nversion: 1.0.0\\nauthor: AIDaddy, proposed in chat\\n---\\n\\n## When\\n\\nThe household asks to check the school lunch menu for the coming week, or confirms the weekly lunch menu check is done.\\n\\n## Procedure\\n\\n1. Acknowledge the request in one short line.\\n2. Check the school's posted lunch menu for the coming week.\\n3. Report the menu in one or two short lines, naming each day and its dish.\\n4. End with \\\"The weekly lunch menu check is complete.\\\"\\n\\n## Answer\\n\\nOne or two short lines listing the days and dishes, ending with \\\"The weekly lunch menu check is complete.\\\" No ceremony, no extra explanation.\\n\\n## Rules\\n\\n- Report only what the menu actually shows; do not invent dishes or prices.\\n- Do not send, file, book, or pay anything; the household decides and acts.\\n- This is not official advice; it is a routine summary of a posted menu.\"}]}"
+          },
+          {
+            "name": "memory",
+            "arguments": "{\"operations\":[{\"action\":\"patch\",\"content\":\"Routines -100101: weekly lunch menu check sent\",\"old_text\":\"Routines -100101: weekly lunch menu check 3\"}],\"target\":\"memory\"}"
+          }
+        ]
+      ],
+      "calls": [],
+      "questions": [
+        {
+          "qid": "q0",
+          "question": "You have asked for weekly lunch menu check three times. Shall I learn it as a routine, so next time it takes one line?",
+          "choices": [
+            "Yes, learn it. (Recommended)",
+            "Not now."
+          ],
+          "choices_offered": [
+            "Yes, learn it.",
+            "Not now."
+          ],
+          "multi_select": false
+        }
+      ],
+      "memory": "Household -100101: Espoo, Finland. Privacy note posted.\n\u00a7\nLegal -100101: deposit dispute with landlord, objection drafted, case TESTLEGAL\n\u00a7\nLegal -100202: faulty purchase from shop, case OTHERCHAT\n\u00a7\nTravel -100101: Helsinki trip, case TESTTRAVEL\n\u00a7\nRoutines -100101: weekly lunch menu check sent",
+      "pending_count": 1,
+      "active_skill_count": 0
+    },
+    {
+      "scenario": "specialist",
+      "seconds": 6.7,
+      "replies": [
+        "Done. The legal desk memory for this chat is cleared. The deposit dispute is closed, and nothing of it remains on the record."
+      ],
+      "tools": [
+        [
+          "memory"
+        ]
+      ],
+      "tool_inputs": [
+        [
+          {
+            "name": "memory",
+            "arguments": "{\"target\":\"memory\",\"operations\":[{\"action\":\"remove\",\"old_text\":\"Legal -100101: deposit dispute with landlord, objection drafted, case TESTLEGAL\"}]}"
+          }
+        ]
+      ],
+      "calls": [],
+      "questions": [],
+      "memory": "Household -100101: Espoo, Finland. Privacy note posted.\n\u00a7\nLegal -100202: faulty purchase from shop, case OTHERCHAT\n\u00a7\nTravel -100101: Helsinki trip, case TESTTRAVEL",
+      "pending_count": 0,
+      "active_skill_count": 0
+    },
+    {
+      "scenario": "call",
+      "seconds": 18.2,
+      "replies": [
+        "The call is proposed. Here are the details:\n\n**Task:** Call and order your usual dinner \u2014 vegetarian mushroom pizza, no olives, up to 15 euros \u2014 delivered to Espoo, Finland.\n**Recipient:** our test recipient (phone ending 0101)\n**Notice:** The phone conversation is real; any order or payment discussed is simulated \u2014 nothing is actually bought or charged.\n\nShall I call with these details, or would you like something different?",
+        "The call is finished. The test recipient accepted the details in the role-play: vegetarian mushroom pizza, no olives, up to 15 euros, delivered to Espoo.\n\nImportant: no purchase or payment was actually made \u2014 this was a simulated order. The real order still needs to be placed by you or your household."
+      ],
+      "tools": [
+        [
+          "mcp__casefile__prepare_demo_call"
+        ],
+        [
+          "mcp__casefile__prepare_demo_call",
+          "mcp__casefile__start_demo_call",
+          "mcp__casefile__get_demo_call"
+        ]
+      ],
+      "tool_inputs": [
+        [
+          {
+            "name": "mcp__casefile__prepare_demo_call",
+            "arguments": "{\"task\":\"Call and order the usual dinner: vegetarian mushroom pizza, no olives, up to 15 euros, delivered to Espoo, Finland.\",\"preferences\":\"Chat -100101 (Espoo, Finland). Usual dinner: vegetarian mushroom pizza, no olives, budget up to 15 euros.\"}"
+          }
+        ],
+        [
+          {
+            "name": "mcp__casefile__prepare_demo_call",
+            "arguments": "{\"task\":\"Call and order the usual dinner: vegetarian mushroom pizza, no olives, up to 15 euros, delivered to Espoo, Finland.\",\"preferences\":\"Chat -100101 (Espoo, Finland). Usual dinner: vegetarian mushroom pizza, no olives, budget up to 15 euros.\"}"
+          },
+          {
+            "name": "mcp__casefile__start_demo_call",
+            "arguments": "{\"confirmed\":true,\"id\":\"DEMOabcdefghijklmnopqrst\"}"
+          },
+          {
+            "name": "mcp__casefile__get_demo_call",
+            "arguments": "{\"id\":\"DEMOabcdefghijklmnopqrst\",\"wait_seconds\":60}"
+          }
+        ]
+      ],
+      "calls": [
+        {
+          "turn": "proposal",
+          "tool": "prepare_demo_call",
+          "input": {
+            "task": "Call and order the usual dinner: vegetarian mushroom pizza, no olives, up to 15 euros, delivered to Espoo, Finland.",
+            "preferences": "Chat -100101 (Espoo, Finland). Usual dinner: vegetarian mushroom pizza, no olives, budget up to 15 euros."
+          }
+        },
+        {
+          "turn": "confirmed",
+          "tool": "start_demo_call",
+          "input": {
+            "confirmed": true,
+            "id": "DEMOabcdefghijklmnopqrst"
+          }
+        },
+        {
+          "turn": "confirmed",
+          "tool": "get_demo_call",
+          "input": {
+            "id": "DEMOabcdefghijklmnopqrst",
+            "wait_seconds": 60
+          }
+        }
+      ],
+      "questions": [],
+      "memory": "Household -100101: Espoo, Finland. Privacy note posted.\n\u00a7\nLegal -100101: deposit dispute with landlord, objection drafted, case TESTLEGAL\n\u00a7\nLegal -100202: faulty purchase from shop, case OTHERCHAT\n\u00a7\nTravel -100101: Helsinki trip, case TESTTRAVEL\n\u00a7\nPreferences -100101: usual dinner is vegetarian mushroom pizza, no olives, up to 15 euros.\n\u00a7\nPreferences -100202: usual dinner is pepperoni, up to 30 euros.\n",
+      "pending_count": 0,
+      "active_skill_count": 0
+    },
+    {
+      "scenario": "collection",
+      "seconds": 15.4,
+      "replies": [
+        "AIDaddy has prepared the call for you:\n\n- **Task:** Arrange collection of your broken washing machine for Friday morning\n- **Household:** Espoo, Finland\n- **Recipient:** our test recipient (phone ending 0101)\n- **Status:** Proposed\n\nThe phone conversation is real, but any booking, purchase or payment discussed is simulated \u2014 nothing is actually ordered and no money moves.\n\nShall I call with these details, or would you like something different?",
+        "The call is finished. Here's what happened:\n\n- **Result:** The test recipient accepted the details in the role-play conversation.\n- **Collection:** Friday morning washing machine collection \u2014 arranged in the demo conversation.\n- **Important:** This was a simulated call to a test recipient. No actual booking was made and no money moved.\n\nAIDaddy cannot place a real collection order \u2014 that remains for you to arrange with your waste-collection service or appliance retailer. Would you like help drafting a message or email to send them?"
+      ],
+      "tools": [
+        [
+          "mcp__casefile__prepare_demo_call"
+        ],
+        [
+          "mcp__casefile__prepare_demo_call",
+          "mcp__casefile__start_demo_call",
+          "mcp__casefile__get_demo_call"
+        ]
+      ],
+      "tool_inputs": [
+        [
+          {
+            "name": "mcp__casefile__prepare_demo_call",
+            "arguments": "{\"task\":\"Arrange collection of a broken washing machine for Friday morning\",\"preferences\":\"Household is in Espoo, Finland. Collection requested for Friday morning. No previously recorded usual preference for this task \u2014 using today's request as the basis.\"}"
+          }
+        ],
+        [
+          {
+            "name": "mcp__casefile__prepare_demo_call",
+            "arguments": "{\"task\":\"Arrange collection of a broken washing machine for Friday morning\",\"preferences\":\"Household is in Espoo, Finland. Collection requested for Friday morning. No previously recorded usual preference for this task \u2014 using today's request as the basis.\"}"
+          },
+          {
+            "name": "mcp__casefile__start_demo_call",
+            "arguments": "{\"confirmed\":true,\"id\":\"DEMOabcdefghijklmnopqrst\"}"
+          },
+          {
+            "name": "mcp__casefile__get_demo_call",
+            "arguments": "{\"id\":\"DEMOabcdefghijklmnopqrst\",\"wait_seconds\":60}"
+          }
+        ]
+      ],
+      "calls": [
+        {
+          "turn": "proposal",
+          "tool": "prepare_demo_call",
+          "input": {
+            "task": "Arrange collection of a broken washing machine for Friday morning",
+            "preferences": "Household is in Espoo, Finland. Collection requested for Friday morning. No previously recorded usual preference for this task \u2014 using today's request as the basis."
+          }
+        },
+        {
+          "turn": "confirmed",
+          "tool": "start_demo_call",
+          "input": {
+            "confirmed": true,
+            "id": "DEMOabcdefghijklmnopqrst"
+          }
+        },
+        {
+          "turn": "confirmed",
+          "tool": "get_demo_call",
+          "input": {
+            "id": "DEMOabcdefghijklmnopqrst",
+            "wait_seconds": 60
+          }
+        }
+      ],
+      "questions": [],
+      "memory": "Household -100101: Espoo, Finland. Privacy note posted.\n\u00a7\nLegal -100101: deposit dispute with landlord, objection drafted, case TESTLEGAL\n\u00a7\nLegal -100202: faulty purchase from shop, case OTHERCHAT\n\u00a7\nTravel -100101: Helsinki trip, case TESTTRAVEL\n\u00a7\nPreferences -100101: usual dinner is vegetarian mushroom pizza, no olives, up to 15 euros.\n\u00a7\nPreferences -100202: usual dinner is pepperoni, up to 30 euros.\n",
+      "pending_count": 0,
+      "active_skill_count": 0
+    }
+  ]
+}
