@@ -1,0 +1,17 @@
+# Allow only the inputs needed to build the web app. Private runtime state,
+# env files, agent worktrees and host dependencies never enter the build context.
+**
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!next.config.ts
+!tsconfig.json
+!eslint.config.mjs
+!src/
+!src/**
+!public/
+!public/**
+# Keep future env/key files out even if added under an allowed source directory.
+**/.env*
+**/*.pem
+**/*.key
