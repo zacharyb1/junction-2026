@@ -8,7 +8,13 @@ import { labels } from "@/lib/i18n";
  */
 
 const MODEL = "eleven_flash_v2_5";
-const DEFAULT_VOICE = "JBFqnCBsd6RMkjVDRZzb";
+/**
+ * UKK's own voice, designed for this project with ElevenLabs Voice Design from a text description
+ * (an older, calm statesman with a light Nordic accent). It is not a clone of anyone's voice.
+ * It lives in the team's ElevenLabs account; ELEVENLABS_VOICE_ID overrides it, for example for another account.
+ */
+export const UKK_VOICE = "UWUOFJTWwuSmZFHzbMpM";
+const DEFAULT_VOICE = UKK_VOICE;
 const voiceId = () => process.env.ELEVENLABS_VOICE_ID || DEFAULT_VOICE;
 
 export const SPOKEN_LIMIT = 1500;
@@ -80,4 +86,41 @@ export async function renderSpeech(text: string, language?: string): Promise<Buf
   const audio = Buffer.from(await res.arrayBuffer());
   if (!audio.length) throw new Error("ElevenLabs sent no audio");
   return audio;
+}
+
+/** The longest chat reply UKK reads aloud. Longer replies are cut after the last whole sentence that fits. */
+export const SPEAKABLE_LIMIT = 900;
+
+/**
+ * A chat reply made fit for speaking: links and markdown are written for the eye, so they are dropped,
+ * and a long reply ends at a sentence boundary. Nothing is added; the words come from the reply itself.
+ */
+export function speakable(text: string): string {
+  const plain = text
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/[*_`#>|]+/g, "")
+    .replace(/\s*\[\d+\]/g, "")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+  if (plain.length <= SPEAKABLE_LIMIT) return plain;
+  const cut = plain.slice(0, SPEAKABLE_LIMIT);
+  const end = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("! "), cut.lastIndexOf("? "), cut.lastIndexOf(".\n"));
+  return end > 0 ? cut.slice(0, end + 1) : cut;
+}
+
+/** Speech to text with ElevenLabs Scribe. Returns the transcript, or an empty string when nothing was said. */
+export async function transcribe(audio: Blob): Promise<string> {
+  const form = new FormData();
+  form.append("model_id", "scribe_v2");
+  form.append("file", audio, "voice-note");
+  const res = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
+    method: "POST",
+    headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY ?? "" },
+    body: form,
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!res.ok) throw new Error(`ElevenLabs answered ${res.status}`);
+  const body = (await res.json()) as { text?: string };
+  return (body.text ?? "").trim();
 }
