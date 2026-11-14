@@ -6,6 +6,8 @@ Built for international families in Finland at Junction 2026, Espoo, 13–15 Nov
 
 ## Start here
 
+**What is still open:** [docs/NEXT.md](docs/NEXT.md) lists the team's undecided questions and suggested work in order. Read it first.
+
 This is the **Saturday 14 November morning handover**, updated after the Hermes work merged into `main`. Source integration and deployment are separate: check the current branch, PRs and running services before relying on a dated status report.
 
 | Workstream | State at handover |

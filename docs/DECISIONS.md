@@ -85,3 +85,5 @@ Vlad delegated “Delegate remaining internal design reviews”. The coordinator
 [Sat 06:35] One more Exa search per case lists official pages published or updated in the last four months on the case topic. They are shown as pointers, not as checked claims. The plan waits at most 1.2 s for it. Cost per case is now about $0.028.
 [Sat 06:35] The app re-checks sources itself: a daily Vercel cron and a button on the case page. CRON_SECRET is set on the Vercel project for production. Telling the family in the chat stays with the bot.
 [Sat 06:35] The plan can be read aloud with ElevenLabs. The button stays hidden until ELEVENLABS_API_KEY is set on the deployment.
+
+[Sat 06:00] Vlad hands over the Hermes bot, containers and landing page and proposes Hermes as the bot track without the 10:30 bake-off. Reason: the other track has no commit since Fri 21:57. The operator, the demo Engine, the scenarios and the Gemini role stay open for the team; suggestions are in docs/NEXT.md — Vlad.
