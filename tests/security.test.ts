@@ -206,13 +206,28 @@ describe("the public rate limit", () => {
     expect(answers.filter(Boolean).length).toBe(40);
   });
 
-  it("caps public traffic over a whole day, and never the bot", async () => {
+  it("caps public traffic over a whole day, says so in the log, and never limits the bot", async () => {
     vi.stubEnv("VERCEL", "1");
     vi.stubEnv("DEMO_RATE_TOTAL_PER_DAY", "30");
+    const log = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { allow } = await load();
     const answers = Array.from({ length: 35 }, (_, i) => allow(request({ "x-vercel-forwarded-for": `203.0.113.${i}` }), false));
     expect(answers.filter(Boolean).length).toBe(30);
+    expect(log).toHaveBeenCalledTimes(1);
     expect(allow(request({ "x-vercel-forwarded-for": "203.0.113.200" }), true)).toBe(true);
+    log.mockRestore();
+  });
+
+  it("lets one address use only a part of the day, so it cannot use up the day for the others", async () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("DEMO_RATE_PER_MINUTE", "100");
+    vi.stubEnv("DEMO_RATE_TOTAL_PER_MINUTE", "100");
+    vi.stubEnv("DEMO_RATE_PER_DAY", "25");
+    const { allow } = await load();
+    const one = request({ "x-vercel-forwarded-for": "203.0.113.9" });
+    const answers = Array.from({ length: 30 }, () => allow(one, false));
+    expect(answers.filter(Boolean).length).toBe(25);
+    expect(allow(request({ "x-vercel-forwarded-for": "203.0.113.10" }), false)).toBe(true);
   });
 });
 
