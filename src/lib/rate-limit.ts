@@ -4,14 +4,19 @@
  * carry the valid bot secret are not limited.
  *
  * A whole venue can sit behind one address, so the per-client limit is generous
- * and a second limit caps public traffic as a whole.
+ * and a second limit caps public traffic as a whole. A third limit caps a whole day:
+ * where the demo is open without the access code, it bounds what strangers can spend
+ * while nobody is watching.
  */
 
 const WINDOW_MS = 60_000;
+const DAY_MS = 86_400_000;
 const PER_CLIENT = Number(process.env.DEMO_RATE_PER_MINUTE ?? 20);
 const PUBLIC_TOTAL = Number(process.env.DEMO_RATE_TOTAL_PER_MINUTE ?? 40);
+const PUBLIC_DAY = Number(process.env.DEMO_RATE_TOTAL_PER_DAY ?? 1000);
 const hits = new Map<string, number[]>();
 let all: number[] = [];
+let today: number[] = [];
 
 /**
  * The address a request came from, taken from a header the caller cannot write.
@@ -31,9 +36,11 @@ export function allow(req: Request, trusted: boolean): boolean {
   const now = Date.now();
   const recent = (hits.get(client) ?? []).filter((t) => now - t < WINDOW_MS);
   all = all.filter((t) => now - t < WINDOW_MS);
-  if (recent.length >= PER_CLIENT || all.length >= PUBLIC_TOTAL) return false;
+  today = today.filter((t) => now - t < DAY_MS);
+  if (recent.length >= PER_CLIENT || all.length >= PUBLIC_TOTAL || today.length >= PUBLIC_DAY) return false;
   recent.push(now);
   all.push(now);
+  today.push(now);
   // Only a request that was let through is remembered, so refused ones cannot fill the memory.
   if (hits.size > 5000) hits.clear();
   hits.set(client, recent);

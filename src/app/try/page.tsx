@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/site/site-shell";
 import { TryForm } from "@/components/try-form";
+import { demoCodeRequired } from "@/lib/cases";
 
 const title = "Try AIDaddy in the browser";
 const description =
@@ -31,7 +32,7 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
             every page it cites, and keeps only what it can point at.
           </p>
         </header>
-        <TryForm code={code} />
+        <TryForm code={code} needsCode={demoCodeRequired()} />
         <p className="text-xs leading-relaxed text-muted-foreground">
           Do not paste anything you would not show a stranger: this demo stores the case under an unguessable link.
         </p>

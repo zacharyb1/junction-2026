@@ -15,7 +15,9 @@ const Input = z.object({ message: z.string().trim().min(1).max(1500) });
 const WEB_CONTEXT =
   "This conversation is on the UKK web page (/ukk), not Telegram. Every message is addressed to you. " +
   "You have no memory and no reminders here: ask for the city when you need it, never offer to set reminders, " +
-  "and say reminders work when UKK is added to a Telegram group.";
+  "and say reminders work when UKK is added to a Telegram group. " +
+  // Visitors here are anonymous and deep research costs several times more, so the web page asks for the fast mode.
+  "Research in the fast mode here: call research_case with depth fast, also when a visitor asks for deep research.";
 
 const json = (body: unknown, status: number) => Response.json(body, { status });
 

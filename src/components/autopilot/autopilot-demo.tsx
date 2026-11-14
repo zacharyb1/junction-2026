@@ -60,7 +60,7 @@ function Quotes({ quotes }: { quotes: CheckedQuote[] }) {
   );
 }
 
-export function AutopilotDemo({ code: linkCode }: { code: string }) {
+export function AutopilotDemo({ code: linkCode, needsCode }: { code: string; needsCode: boolean }) {
   const [playing, setPlaying] = useState(false);
   const [shown, setShown] = useState(0);
   const [suggestions, setSuggestions] = useState(false);
@@ -113,7 +113,7 @@ export function AutopilotDemo({ code: linkCode }: { code: string }) {
       const step = SCRIPT[shown];
       setShown(shown + 1);
       // A finished check is kept for the next play, so one visit pays for one research run.
-      if (step.kind === "specialist" && step.check && code.trim() && check.state === "idle") void runCheck(code);
+      if (step.kind === "specialist" && step.check && (code.trim() || !needsCode) && check.state === "idle") void runCheck(code);
     }, STEP_MS);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runCheck and code are read when the step appears, not watched
@@ -158,7 +158,7 @@ export function AutopilotDemo({ code: linkCode }: { code: string }) {
     return (
       <>
         <p className="hud-autopilot-status">
-          {check.state === "failed" ? `The live check did not run: ${check.reason} ` : "No live check without an access code. "}
+          {check.state === "failed" ? `The live check did not run: ${check.reason} ` : needsCode ? "No live check without an access code. " : ""}
           Shown instead: a run of the same question recorded on {RECORDED.on} ({RECORDED.summary}).
         </p>
         <Quotes quotes={RECORDED.quotes} />
@@ -166,20 +166,25 @@ export function AutopilotDemo({ code: linkCode }: { code: string }) {
           className="hud-autopilot-code"
           onSubmit={(event) => {
             event.preventDefault();
-            if (code.trim()) void runCheck(code);
+            if (code.trim() || !needsCode) void runCheck(code);
           }}
         >
-          <label htmlFor="autopilot-code">Access code</label>
-          <input
-            id="autopilot-code"
-            type="text"
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-            placeholder="The same code as for /try"
-          />
-          <button type="submit" className="hud-btn" disabled={!code.trim()}>
+          {/* The field is left out where the deployment opened the demo to everyone (DEMO_OPEN=1). */}
+          {needsCode && (
+            <>
+              <label htmlFor="autopilot-code">Access code</label>
+              <input
+                id="autopilot-code"
+                type="text"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                autoComplete="off"
+                spellCheck={false}
+                placeholder="The same code as for /try"
+              />
+            </>
+          )}
+          <button type="submit" className="hud-btn" disabled={needsCode && !code.trim()}>
             Check live with Exa
           </button>
         </form>

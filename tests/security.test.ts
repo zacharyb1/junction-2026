@@ -205,6 +205,15 @@ describe("the public rate limit", () => {
     const answers = Array.from({ length: 45 }, (_, i) => allow(request({ "x-vercel-forwarded-for": `203.0.113.${i}` }), false));
     expect(answers.filter(Boolean).length).toBe(40);
   });
+
+  it("caps public traffic over a whole day, and never the bot", async () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("DEMO_RATE_TOTAL_PER_DAY", "30");
+    const { allow } = await load();
+    const answers = Array.from({ length: 35 }, (_, i) => allow(request({ "x-vercel-forwarded-for": `203.0.113.${i}` }), false));
+    expect(answers.filter(Boolean).length).toBe(30);
+    expect(allow(request({ "x-vercel-forwarded-for": "203.0.113.200" }), true)).toBe(true);
+  });
 });
 
 describe("POST /api/research", () => {
@@ -220,6 +229,14 @@ describe("POST /api/research", () => {
     vi.stubEnv("CASEFILE_SECRET", "devsecret");
     vi.stubEnv("DEMO_ACCESS_CODE", "junction");
     vi.mocked(researchCase).mockReset();
+  });
+
+  it("is open to a visitor without a code where the deployment opened the demo, with fast research only", async () => {
+    vi.stubEnv("DEMO_OPEN", "1");
+    vi.mocked(researchCase).mockResolvedValue({ id: "x" } as ResearchResult);
+    const res = await research(ask({}, { depth: "deep" }));
+    expect(res.status).toBe(200);
+    expect(vi.mocked(researchCase).mock.calls[0][0].depth).toBe("fast");
   });
 
   it("answers 401 without the secret or the demo code, and to the demo code sent as the secret", async () => {

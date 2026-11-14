@@ -28,7 +28,7 @@ Keep an existing `.env.local` instead of replacing it. Edit it locally:
 |---|---|
 | `EXA_API_KEY` | Exa key, used for live research. Compose also passes it to Hermes. |
 | `CASEFILE_SECRET` | A long random secret for the Engine; Compose passes the same value to Hermes. |
-| `DEMO_ACCESS_CODE` | The code used to open `/try`. |
+| `DEMO_ACCESS_CODE` | The code used to open `/try`. With `DEMO_OPEN=1` the demo needs no code. |
 | `BLOB_READ_WRITE_TOKEN` | Leave empty for isolated local Case storage. |
 | `PUBLIC_BASE_URL` | `http://localhost:3000` for use on this Mac; a public HTTPS origin for shared deployment. This controls Case links and page metadata. |
 

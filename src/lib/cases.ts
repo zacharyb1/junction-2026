@@ -41,9 +41,21 @@ export function isAuthorised(req: Request): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-/** Research is open to the bot (secret) and to the public demo (access code). */
+/**
+ * Whether the public demo asks a visitor for an access code. It does, unless the deployment sets DEMO_OPEN=1.
+ * The code keeps strangers from spending the Exa credits, but it also stands between a visitor and the product:
+ * someone who opens the site without the QR link meets a locked form. A server that sets DEMO_OPEN=1 answers
+ * every visitor, and the limits in src/lib/rate-limit.ts are then what protects the credits. Opening is a choice
+ * each deployment writes into its own settings, so a copy of this code with real keys is never open by accident.
+ */
+export function demoCodeRequired(): boolean {
+  return process.env.DEMO_OPEN !== "1";
+}
+
+/** Research is open to the bot (secret) and to the public demo: with its access code, or to everyone where the deployment opened it. */
 export function mayResearch(req: Request): boolean {
   if (isAuthorised(req)) return true;
+  if (!demoCodeRequired()) return true;
   const code = process.env.DEMO_ACCESS_CODE;
   if (!code) return false;
   const given = req.headers.get("x-demo-code") ?? "";
