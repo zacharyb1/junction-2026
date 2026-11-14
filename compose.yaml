@@ -68,7 +68,7 @@ services:
         required: false
     environment:
       # Default: the web service in this project. Set KAVERI_ENGINE_URL to use another Engine,
-      # e.g. https://junction-2026.vercel.app/api/mcp, with that Engine's CASEFILE_SECRET.
+      # e.g. https://86.38.238.136.sslip.io/api/mcp, with that Engine's CASEFILE_SECRET.
       CASEFILE_URL: ${KAVERI_ENGINE_URL:-http://web:3000/api/mcp}
       CASEFILE_SECRET: ${CASEFILE_SECRET:-}
       EXA_API_KEY: ${EXA_API_KEY:-}
