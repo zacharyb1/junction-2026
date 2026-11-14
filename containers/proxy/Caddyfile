@@ -1,0 +1,8 @@
+# Reverse proxy for running Kaveri on a server (compose profile "public").
+# KAVERI_DOMAIN is the public hostname, e.g. kaveri.example.org or <server-ip>.sslip.io.
+# Caddy obtains and renews its HTTPS certificate automatically.
+{$KAVERI_DOMAIN} {
+	encode zstd gzip
+	# Caddy appends the client address to X-Forwarded-For, which src/lib/rate-limit.ts reads.
+	reverse_proxy web:3000
+}

@@ -10,6 +10,7 @@ The default command starts only the website. Adding `--profile bot` starts the T
 | `hermes` | Telegram gateway, conversation, approved drafts and reminders | `hermes-home` at `/opt/data` |
 | `ollama` | Local model server for the Gemma gate | `ollama-data` for downloaded models |
 | `gate-init` | One-off model download and warm-up before Hermes starts | Uses the Ollama service; exits when ready |
+| `proxy` | Caddy reverse proxy with automatic HTTPS, only with `--profile public` on a server | `caddy-data` and `caddy-config` for certificates |
 
 ## First run on a Mac
 
@@ -118,7 +119,9 @@ Include the bot profile when stopping the full stack: plain `down` only selects 
 
 Profiles select services; they do not lock a Telegram token. Explicitly targeting `hermes` can also start it, even without the profile flag. The repository has no cross-machine ownership lease or reminder deduplication. A teammate's separate bot token and fresh home are the independent-development boundary. [Docker's profile reference](https://docs.docker.com/compose/how-tos/profiles/) explains selection and stopping behavior.
 
-The host must remain awake and online. The Compose setup has no automatic reboot/restart policy; after restarting Docker or the host, run the appropriate `up -d` command. Closing a coding-agent session is not a controlled bot shutdown.
+The host must remain awake and online. By default the services have no restart policy: after restarting Docker or the host, run the appropriate `up -d` command. Closing a coding-agent session is not a controlled bot shutdown.
+
+On a dedicated server, set `KAVERI_RESTART=unless-stopped` in the shell or in `.env.local` before `up -d`. Docker then restarts `web`, `ollama`, `hermes` and `proxy` after a crash, a Docker restart or a reboot, until someone runs `stop`. It stays off by default on purpose: on a laptop that once ran the shared token, an automatic restart would bring the bot back without anyone deciding to, and nothing would stop a second machine polling the same token. A configuration that fails its startup check, such as a missing credential, restarts in a loop; run the `hermes check` command above first.
 
 ## Where the data goes
 
@@ -136,7 +139,32 @@ Without a Blob token, the Engine writes to `/app/.data/cases` in `case-data`. If
 
 ## Using a server
 
-The same Compose setup can run on an awake Linux server. For other people to open Case links, supply an HTTPS reverse proxy, a public hostname, and that origin as `PUBLIC_BASE_URL` before building. The checked-in web port is loopback-only so a reverse proxy on that host can forward requests to it. This repository does not provision the server, DNS, TLS or proxy. Vercel remains a separate web-hosting option.
+The same Compose setup can run on an awake Linux server, such as a small cloud VM. The `public` profile adds a [Caddy](https://caddyserver.com/docs/automatic-https) reverse proxy that obtains a Let's Encrypt certificate and forwards HTTPS to the web service, so Case links and `/try` open on other people's phones. The web port itself stays on the server's loopback address.
+
+Before starting it:
+
+1. Point a hostname at the server. A real domain is best. Without one, `<server-ip>.sslip.io` resolves to the server's address and can get a certificate, for example `203.0.113.10.sslip.io`.
+2. Allow inbound ports 80 and 443 (TCP, plus UDP 443 for HTTP/3) in the provider's firewall. Let's Encrypt needs port 80 to issue the certificate. Docker-published ports bypass `ufw` on the host.
+3. In `.env.local`, set `KAVERI_DOMAIN` to the hostname, `PUBLIC_BASE_URL` to `https://<hostname>`, and `KAVERI_RESTART=unless-stopped`. `PUBLIC_BASE_URL` is also a build setting, so set it before the first build.
+
+Then start the web app with the proxy, adding the bot profile when this server is meant to own the Telegram token:
+
+```bash
+docker compose --env-file .env.local --profile public up --build -d
+docker compose --env-file .env.local --profile public --profile bot up --build -d
+```
+
+Check `https://<hostname>/api/health` from a phone. The proxy refuses to start without `KAVERI_DOMAIN`. Caddy appends the client address to `X-Forwarded-For`, which the rate limit in `src/lib/rate-limit.ts` reads, so each visitor keeps their own limit. Include `--profile public` in `stop` and `down` commands to select the proxy too.
+
+### Using another Engine
+
+Hermes calls the web service in the same project by default. To have it call another Engine instead, such as the Vercel deployment, set `KAVERI_ENGINE_URL` to that Engine's full `/api/mcp` URL and `CASEFILE_SECRET` to that Engine's secret:
+
+```bash
+KAVERI_ENGINE_URL=https://junction-2026.vercel.app/api/mcp
+```
+
+Case links then come from that Engine's own `PUBLIC_BASE_URL`, and its Cases live in its own storage. The local web service still starts, because Hermes waits for it before starting, but the bot does not use it. That Engine must have a working search provider: check that its `/api/health` does not report `"provider":"none"`.
 
 Moving images to a server does not move the existing bot's state. Stop the old gateway and scheduler, retain and reconcile private data, then start the intended replacement. A fresh deployment starts with fresh volumes and no old memories or reminders.
 
@@ -177,4 +205,6 @@ node scripts/hermes-container-smoke.mjs docker kaveri-hermes:check kaveri-web:ch
 
 The smoke-check runners need host Node 22+, unlike normal Compose startup. GitHub CI builds both images, validates both Compose modes and runs the isolated checks on Linux amd64 and native ARM64 runners; the [latest run](https://github.com/zacharyb1/junction-2026/actions/workflows/ci.yml) records their results. ARM64 covers the container architecture used by Apple Silicon, not the macOS/Docker Desktop host. The pinned upstream Hermes image emits a bundled-pnpm advisory during configuration; the configured gateway does not use pnpm, and the local checks succeeded without installing additional tools.
 
-Actual Mac execution, live Exa research, Telegram delivery and reminder delivery remain outside these container checks. Earlier native Telegram evidence remains separate in the [Hermes handover](HERMES_HANDOVER.md).
+The `public` profile was checked on macOS with OrbStack on 14 November: the proxy refused to start without `KAVERI_DOMAIN`, and with `KAVERI_DOMAIN=localhost` it served `/api/health` and the landing page over HTTPS through Caddy, redirected plain HTTP to HTTPS and compressed responses. A public hostname, Let's Encrypt issuance and a server deployment were not tested. `KAVERI_RESTART` and `KAVERI_ENGINE_URL` were checked only in the rendered Compose configuration.
+
+Actual Mac execution of the bot profile, live Exa research, Telegram delivery and reminder delivery remain outside these container checks. Earlier native Telegram evidence remains separate in the [Hermes handover](HERMES_HANDOVER.md).

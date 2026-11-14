@@ -14,7 +14,7 @@ This is an operational reference for the current implementation, not a roadmap o
 
 Earlier Telegram tests targeted a local Engine and used localhost links; production bot integration and reminder delivery are unverified. The removed installation's private bot state and reminder were not in Git, and targeted checks found no surviving external backup. A new installation starts with fresh state unless a separate backup is supplied. Detailed evidence is in [HERMES_HANDOVER.md](HERMES_HANDOVER.md).
 
-The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac/Linux setup and separate persistent volumes for Cases, Hermes state and Ollama models. The default Compose command starts only the web service; `--profile bot` explicitly starts Hermes and the Gemma gate too. Starting containers does not move existing runtime state. Exa and NVIDIA remain external API services.
+The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac/Linux setup and separate persistent volumes for Cases, Hermes state and Ollama models. The default Compose command starts only the web service; `--profile bot` explicitly starts Hermes and the Gemma gate too, and `--profile public` adds an HTTPS reverse proxy for a server. Starting containers does not move existing runtime state. Exa and NVIDIA remain external API services.
 
 ## Deploying the web app
 
@@ -77,7 +77,7 @@ The installer is pinned and uses `.hermes-local/`; it does not depend on a teamm
 
 **Shared-key helper caveat:** `hermes/secrets.sh` copies the shared `TELEGRAM_BOT_TOKEN` and other values on each run. It can overwrite a locally entered test token. The independent setup above uses a local env file deliberately. Re-running the shared helper is not a harmless refresh for a test bot. The helper can also offer to write missing values back to the shared private keys repo.
 
-The bot host must stay awake and online. `start.sh` backgrounds processes; this project does not install a reboot/restart supervisor. A server can use the team's existing service manager, with only one active gateway for the token. Closing a coding-agent session is not a controlled runtime shutdown.
+The bot host must stay awake and online. `start.sh` backgrounds processes; the native setup does not install a reboot/restart supervisor. The container setup can restart itself on a dedicated server with `KAVERI_RESTART=unless-stopped` (see [CONTAINERS.md](CONTAINERS.md#updates-stopping-and-duplicate-bots)). A server can use the team's existing service manager, with only one active gateway for the token. Closing a coding-agent session is not a controlled runtime shutdown.
 
 ### The shared bot and duplicate prevention
 
