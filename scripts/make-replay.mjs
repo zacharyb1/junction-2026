@@ -29,14 +29,15 @@ const OUT = path.join(ROOT, "src/data/replay.json");
 
 /** Runs the research once and returns its events and result. */
 async function record() {
+  // The secret skips the demo's limits. A deployment with DEMO_OPEN=1 answers without it.
   const secret = process.env.CASEFILE_SECRET;
-  if (!secret) {
-    console.error("Set CASEFILE_SECRET.");
-    process.exit(2);
-  }
   const res = await fetch(`${base}/api/research`, {
     method: "POST",
-    headers: { authorization: `Bearer ${secret}`, "content-type": "application/json", accept: "text/event-stream" },
+    headers: {
+      ...(secret ? { authorization: `Bearer ${secret}` } : {}),
+      "content-type": "application/json",
+      accept: "text/event-stream",
+    },
     body: JSON.stringify(request),
   });
   if (!res.ok || !res.body) {
