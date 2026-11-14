@@ -30,6 +30,8 @@ Not run: U5 (guest mode), U6 (the consent note was not looked for), reminder del
 - Prior session deleted the isolated engine and its local cases during the switch to the root engine. The 02:30 reminder was created after two failed case updates (`No case with id …`); its link is broken. Reminder delivery was not tested.
 - The 02:36 washing-machine message arrived in the **group**, reused an earlier plan without `research_case`, and linked to a case whose API returns HTTP 404. This does not pass the DM milestone.
 - The full 20-message silence check (at least five questions) and three consecutive pregnancy triggers remain unconfirmed.
+- At 02:42 the private Helsinki-to-Tampere move turn called `research_case`: all four plan lines, the 5/5 evidence count and URL match the Telegram reply. Both the case page and API returned HTTP 200. The approved draft was saved through `case_update` and confirmed in the stored case. DM milestone passes against the local engine.
+- DM timing from database timestamps: acknowledgement 12.4 s, plan 32.1 s, draft completion 49.2 s including approval. The five-second acknowledgement target failed.
 - See `docs/HERMES_HANDOVER.md` for the current state, commands and outstanding checks.
 
 ## UNVERIFIED: test these first

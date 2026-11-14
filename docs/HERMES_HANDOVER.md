@@ -7,7 +7,7 @@ Snapshot: Saturday 14 November, 02:37 Helsinki. Live acceptance testing is still
 | Milestone | State | Evidence and remaining check |
 |---|---|---|
 | 1. Pinned, removable Hermes | Done | v0.23.1, commit `3b421578588243f920886e6fe79a6faa87ea026e`. Prior session's one-shot answer took 4 s. Runtime and home are inside `.hermes-local/`. |
-| 2. Telegram DM returns a plan | Partly done | CLI rehearsal calls `mcp__casefile__research_case` and returns plan lines and a case link. Telegram group research is also recorded. The 02:36 washing-machine test arrived in the group and reused an old plan whose link returns HTTP 404. A successful Telegram DM research turn is still awaiting confirmation; CLI success does not satisfy this check. |
+| 2. Telegram DM returns a plan | Done against the local engine | At 02:42, Helsinki-to-Tampere move: `research_case` returned four plan lines and 5/5 verified quotes. All four lines, counts and URL match the DM reply. Case page and API returned HTTP 200. The approved draft was saved with `case_update` and is present in the stored case. |
 | 3. Family group with silence | Partly done | Group research, approval buttons and intentional silence observed. Four small-talk messages were skipped by the live gate. The required 20 small-talk messages including five questions, plus three consecutive pregnancy turns, are not yet demonstrated. |
 | 4. Local gate | Done for the labelled-set check | `eval/results/gate-gemma3-1b.json`: 60 messages, 20 triggers, 40 small talk; 0 missed triggers, 4 false wakes, 0 gate errors. The live gateway also logged `pre_gateway_dispatch skip: reason=kaveri-gate:gemma:small_talk`. |
 | 5. Handover | Draft prepared | This document and PR #6; update after the remaining live tests and before the machine is handed over. |
@@ -69,7 +69,7 @@ Private keys repo: `bot.env` and `app.env`. Local copies: `.hermes-local/home/.e
 
 ## Blockers and review work
 
-- Vlad: remaining DM and group acceptance messages from Telegram. Do not substitute CLI rehearsals for these.
+- Telegram: the fresh DM plan, case link and saved draft passed. Remaining group checks are separate; CLI rehearsals do not establish Telegram delivery.
 - Zachary: deployed engine URL and matching secret; validate production case links and review grounding fixes.
 - Separate reviewer branch `review-grounding`: local refs show `340ae31` (verify independent readings), `3125e57` (withhold unsupported amounts), `b35abc9` (live scorecard comparison). These are not applied to this bot branch. Original reviewer edits were removed from this checkout; do not resurrect the obsolete patch. Read the current branch's `docs/REVIEW_NOTES.md` before integrating.
 - Chat-scoped watch template exists separately as `cd8c82a` on `review-watch-template`. Current runbook's unscoped daily-watch job can mix profile-wide cases with delivery to one home chat. Do not enable it before reconciling numeric chat labels and delivery scope. No daily watch was created tonight.
@@ -101,3 +101,5 @@ Before merging anything, compare Milan's `scaffold/milestone-1-2` with main: it 
 The bot configuration is reversible by stopping the runtime or removing its plugin. Running services, scheduled jobs and private local case data need separate handling; reverting a commit does not undo them. Preserve appended decision lines when resolving conflicts. This handover does not certify the engine verifier or production deployment.
 
 Validation in this continuation: `pnpm lint`, `pnpm typecheck` and `pnpm build` passed on an isolated copy of `d8eaf23` with the installed lockfile dependencies. Only Markdown changed afterward; `git diff --check` passed. No production deployment or live reminder delivery was tested.
+
+DM check at 02:42: acknowledgement 12.4 s, plan 32.1 s, draft completion 49.2 s including approval (stored timestamps relative to the incoming message). The five-second acknowledgement target failed. Case `1-RdJPwmdIcLORUj` and its saved draft were retrieved successfully from the local engine.
