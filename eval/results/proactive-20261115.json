@@ -1,0 +1,123 @@
+{
+  "scenario": "proactive",
+  "seconds": 25.7,
+  "replies": [
+    "Okay."
+  ],
+  "tools": [
+    [
+      "skill_view",
+      "mcp__casefile__research_case",
+      "mcp__casefile__case_update",
+      "memory",
+      "clarify"
+    ]
+  ],
+  "tool_inputs": [
+    [
+      {
+        "name": "skill_view",
+        "arguments": "{\"name\":\"life-event-butler\"}"
+      },
+      {
+        "name": "mcp__casefile__research_case",
+        "arguments": "{\"situation\":\"moving out of a rented flat in Espoo at the end of February, need to know what to do: notice period, moving notification, address registration, electricity, internet, cleaning, deposit return\",\"country\":\"Finland\",\"region\":\"Espoo\",\"language\":\"English\",\"household\":\"-100101\"}"
+      },
+      {
+        "name": "mcp__casefile__case_update",
+        "arguments": "{\"id\":\"TESTPROACTIVE\",\"patch\":{\"drafts\":[{\"title\":\"Notice to landlord \u2014 moving out\",\"kind\":\"letter\",\"body\":\"Subject: Notice of moving out \u2014 end of tenancy\\n\\nI am giving written notice that I will move out of my rented flat in Espoo at the end of February.\\n\\nPlease confirm receipt of this notice and let me know about the move-out inspection and the return of my deposit.\\n\\n[Your name]\\n[Flat address]\\n[Date]\"}]}}"
+      },
+      {
+        "name": "memory",
+        "arguments": "{\"target\":\"memory\",\"operations\":[{\"action\":\"add\",\"content\":\"Open case TESTPROACTIVE: Moving out in Espoo (chat -100101)\"}]}"
+      },
+      {
+        "name": "clarify",
+        "arguments": "{\"questions\":[{\"question\":\"What would you like to do next with this case?\",\"choices\":[\"Set reminders\",\"Not now\"]}]}"
+      }
+    ]
+  ],
+  "calls": [
+    {
+      "turn": "proposal",
+      "tool": "research_case",
+      "input": {
+        "situation": "moving out of a rented flat in Espoo at the end of February, need to know what to do: notice period, moving notification, address registration, electricity, internet, cleaning, deposit return",
+        "country": "Finland",
+        "region": "Espoo",
+        "language": "English",
+        "household": "-100101"
+      }
+    },
+    {
+      "turn": "proposal",
+      "tool": "case_update",
+      "input": {
+        "id": "TESTPROACTIVE",
+        "patch": {
+          "drafts": [
+            {
+              "title": "Notice to landlord \u2014 moving out",
+              "kind": "letter",
+              "body": "Subject: Notice of moving out \u2014 end of tenancy\n\nI am giving written notice that I will move out of my rented flat in Espoo at the end of February.\n\nPlease confirm receipt of this notice and let me know about the move-out inspection and the return of my deposit.\n\n[Your name]\n[Flat address]\n[Date]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "questions": [
+    {
+      "qid": "q0",
+      "question": "What would you like to do next with this case?",
+      "choices": [
+        "Set reminders (Recommended)",
+        "Not now"
+      ],
+      "choices_offered": [
+        "Set reminders",
+        "Not now"
+      ],
+      "multi_select": false
+    }
+  ],
+  "memory": "Household -100101: Espoo, Finland. Privacy note posted.\n\u00a7\nLegal -100101: deposit dispute with landlord, objection drafted, case TESTLEGAL\n\u00a7\nLegal -100202: faulty purchase from shop, case OTHERCHAT\n\u00a7\nTravel -100101: Helsinki trip, case TESTTRAVEL\n\u00a7\nOpen case TESTPROACTIVE: Moving out in Espoo (chat -100101)",
+  "pending_count": 0,
+  "active_skill_count": 0,
+  "trigger": "I'm moving out of my rented flat in Espoo at the end of February.",
+  "drafts": [
+    {
+      "title": "Notice to landlord \u2014 moving out",
+      "kind": "letter",
+      "body": "Subject: Notice of moving out \u2014 end of tenancy\n\nI am giving written notice that I will move out of my rented flat in Espoo at the end of February.\n\nPlease confirm receipt of this notice and let me know about the move-out inspection and the return of my deposit.\n\n[Your name]\n[Flat address]\n[Date]"
+    }
+  ],
+  "premature_questions": [],
+  "assistant_messages": [
+    "A matter of state. AIDaddy is consulting the official sources.",
+    "The agreement, in one article:\n\n1. Prepare a written notice for your landlord and review it before sending. [1]\n\n1 of 1 quotes checked on their pages.\n\nCase: https://aidaddy.example/c/TESTPROACTIVE\n\nI drafted Notice to landlord \u2014 moving out. Sending waits for your click on the case page.",
+    "Okay."
+  ],
+  "passed": true,
+  "evidence_scope": {
+    "date": "2026-11-15",
+    "source_base": "12c4c1122568467edf607af4deb73e5b1c2bd4d2",
+    "runtime": "Hermes v0.23.1",
+    "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+    "synthetic": [
+      "household",
+      "case",
+      "research results",
+      "source verification",
+      "next-action response"
+    ],
+    "not_exercised": [
+      "Exa",
+      "Telegram delivery",
+      "scheduled execution",
+      "production cron",
+      "real sending"
+    ],
+    "assertion_replay": "Draft approval wording and chat ownership checks also passed against this saved transcript."
+  }
+}

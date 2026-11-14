@@ -3,6 +3,7 @@ import { CaseInput, CasePatch, type Case } from "@/lib/case";
 import { approveCaseAction, publishCase, recheckCase, updateCase } from "@/lib/cases";
 import { loadCase } from "@/lib/store";
 import { verifyEvidence } from "@/lib/verify";
+import proactiveRehearsal from "../eval/results/proactive-20261115.json";
 
 // The case store without files, and the verifier without the network.
 const stored = new Map<string, Case>();
@@ -62,6 +63,26 @@ describe("the action log on a case", () => {
 
   it("does not let the bot log an irreversible action itself", () => {
     expect(CasePatch.safeParse({ log: [{ kind: "irreversible", trigger: "message", summary: "Sent it" }] }).success).toBe(false);
+  });
+
+  it("keeps sending an unsolicited draft waiting for approval after later case work", async () => {
+    const { id } = await publishCase({ ...input, drafts: [] }, "https://aidaddy.example");
+    const update = proactiveRehearsal.calls.find((call) => call.tool === "case_update");
+    if (!update || !("patch" in update.input)) throw new Error("Recorded agent did not attach a draft");
+    // Replay the real agent's synthetic tool payload through the real Case schema and storage path.
+    await updateCase(id, CasePatch.parse(update.input.patch), "https://aidaddy.example");
+    const draft = (await loadCase(id))!.drafts[0];
+    await recheckCase(id, "cron");
+    await updateCase(id, CasePatch.parse({
+      drafts: [{ title: draft.title, body: "Please review this notice before sending it." }],
+    }), "https://aidaddy.example");
+
+    const actions = (await loadCase(id))!.actions!;
+    expect(actions.filter((a) => a.kind === "irreversible")).toEqual([
+      expect.objectContaining({ status: "waiting", trigger: "message", draftId: draft.id }),
+    ]);
+    expect(actions.some((a) => a.approvedAt)).toBe(false);
+    expect(actions.find((a) => a.kind === "draft")).toMatchObject({ status: "done", draftId: draft.id });
   });
 
   it("logs a scheduled re-check, and a page change when a quote is gone", async () => {
