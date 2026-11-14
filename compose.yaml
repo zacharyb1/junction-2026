@@ -151,6 +151,22 @@ services:
         condition: service_healthy
     restart: ${KAVERI_RESTART:-no}
 
+  # The watched-page trigger: once a day it asks the Engine to re-read the cited pages of recent cases.
+  # Server only (profile public). Needs CRON_SECRET in .env.local, which the web service reads too.
+  scheduler:
+    image: docker.io/curlimages/curl:8.11.1
+    profiles: [public]
+    entrypoint: [/bin/sh, /kaveri/run.sh]
+    environment:
+      CRON_SECRET: ${CRON_SECRET:-}
+    volumes:
+      - ./containers/scheduler/run.sh:/kaveri/run.sh:ro
+    depends_on:
+      web:
+        condition: service_healthy
+    init: true
+    restart: ${KAVERI_RESTART:-no}
+
 volumes:
   case-data:
   hermes-home:
