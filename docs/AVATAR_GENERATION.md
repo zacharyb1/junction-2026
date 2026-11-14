@@ -33,6 +33,8 @@ Canonical poses use `gemini-nano-banana-2.1`: first generate the front view from
 
 ## Generate only after choosing a budget
 
+A Google AI Pro consumer subscription is separate from API billing. The API's paid tier starts with a minimum $5 prepayment; buying a monthly subscription is not required by this workflow. At the rates checked on 14 November, the output-only estimate for one 1K portrait plus a four-second 720p loop is about $0.31, and two portraits plus the full 30-second clip set is about $2.15. Input/thinking charges and retakes add to those estimates. Start by judging one loop before generating the full set. The user's willingness to consider a purchase has not been treated as an instruction to spend. [Google AI plans](https://aistudio.google.com/docs/google-ai-plans), [API billing](https://aistudio.google.com/docs/billing), [pricing](https://aistudio.google.com/docs/pricing).
+
 For the later Gemini integration, explicitly select `--provider gemini` and place `GEMINI_API_KEY` in this worktree's ignored `.env.local`, or provide it through the process environment. The scripts never print its value. Billing/model access and actual account quota must be checked in AI Studio. Do not infer account quota from the earlier chat. [Current pricing](https://aistudio.google.com/docs/pricing)
 
 Dry run requires no key and makes no HTTP requests:

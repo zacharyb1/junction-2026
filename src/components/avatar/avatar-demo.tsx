@@ -31,6 +31,9 @@ export function AvatarDemo({ profiles, code: initialCode, liveConfigured, needsC
     if (audio.current) {
       audio.current.onended = null;
       audio.current.onerror = null;
+      audio.current.onplaying = null;
+      audio.current.onwaiting = null;
+      audio.current.onpause = null;
       audio.current.pause();
       audio.current = null;
     }
@@ -79,30 +82,37 @@ export function AvatarDemo({ profiles, code: initialCode, liveConfigured, needsC
     }
   }
 
-  async function speak() {
+  async function speak(recorded = false) {
     stop();
     const task = new AbortController();
     controller.current = task;
     setBusy(true);
     setVoiceNote("Preparing voice…");
     try {
-      const res = await fetch("/api/ukk/speak", {
-        method: "POST", headers: { "content-type": "application/json", "x-demo-code": code },
-        body: JSON.stringify({ text: agent.text.slice(0, 5000) }), signal: task.signal,
-      });
-      if (!res.ok) throw new Error(res.status === 503 ? "Voice is not configured here. You can preview the speaking motion below." : "Voice could not play. The reply is still available above.");
-      const blob = await res.blob();
-      if (task.signal.aborted) return;
-      audioUrl.current = URL.createObjectURL(blob);
-      const player = new Audio(audioUrl.current);
+      let source = "/hud/plan.mp3";
+      if (!recorded) {
+        const res = await fetch("/api/ukk/speak", {
+          method: "POST", headers: { "content-type": "application/json", "x-demo-code": code },
+          body: JSON.stringify({ text: agent.text.slice(0, 5000) }), signal: task.signal,
+        });
+        if (!res.ok) throw new Error(res.status === 503 ? "Voice is not configured here. Try the recorded voice example under movements." : "Voice could not play. The reply is still available above.");
+        const blob = await res.blob();
+        if (task.signal.aborted) return;
+        source = URL.createObjectURL(blob);
+        audioUrl.current = source;
+      }
+      const player = new Audio(source);
       audio.current = player;
       const finish = () => { if (!task.signal.aborted) { emit({ type: "speech-end" }); stop(); } };
       player.onended = finish;
       player.onerror = () => { setVoiceNote("Audio playback failed."); finish(); };
+      player.onplaying = () => { if (!task.signal.aborted) emit({ type: "speech-start" }); };
+      player.onwaiting = player.onpause = () => { if (!task.signal.aborted) emit({ type: "speech-end" }); };
       await player.play();
       if (task.signal.aborted) { player.pause(); return; }
-      emit({ type: "speech-start" });
-      setVoiceNote("ElevenLabs voice · motion is not lip-synced");
+      setVoiceNote(recorded
+        ? "Recorded ElevenLabs example: pregnancy plan · 40 seconds · motion is not lip-synced"
+        : "ElevenLabs voice · motion is not lip-synced");
     } catch (error) {
       if (!task.signal.aborted) { setVoiceNote(error instanceof Error ? error.message : "Voice could not play."); stop(); }
     }
@@ -143,6 +153,8 @@ export function AvatarDemo({ profiles, code: initialCode, liveConfigured, needsC
       <details><summary>Try the movements</summary>
         <p className="avatar-caption">Manual preview, with no microphone or API calls. A movement finishes before the next begins.</p>
         <div className="avatar-controls">{ACTIVITIES.map((activity) => <button key={activity} disabled={busy} aria-pressed={manual === activity} onClick={() => setManual(activity)}>{activity}</button>)}<button disabled={busy} onClick={() => setManual(null)}>Follow agent</button></div>
+        <p className="avatar-caption">The recorded voice example plays an earlier pregnancy plan from the project. It demonstrates how actual audio controls the speaking motion.</p>
+        <div className="avatar-controls"><button disabled={busy} onClick={() => void speak(true)}>Play recorded voice (40 s)</button></div>
       </details>
       <details><summary>Events for this demonstration</summary><ol className="avatar-event-list">{log.length ? log.map((line, i) => <li key={i}>{line}</li>) : <li>No events yet.</li>}</ol></details>
     </>

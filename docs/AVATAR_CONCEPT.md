@@ -23,6 +23,8 @@ Each live question uses the team's research credits. Without `AVATAR_UPSTREAM`, 
 
 The controller reads Hermes tool-progress and response events. Concurrent tools keep it working until the last tool completes. Text arriving is not speech. “Read aloud” uses the existing local ElevenLabs endpoint, and only actual playback activates speaking. This voice endpoint needs its own local key even when chat is relayed; missing voice shows a message and leaves the reply readable. Listening is a movement preview only; this concept does not capture the microphone.
 
+“Play recorded voice (40 s)” under “Try the movements” exercises the same audio-driven speaking state without an API call. It reuses `public/hud/plan.mp3`, the project's earlier ElevenLabs pregnancy-plan recording, independently of the current conversation. This is not the current reply or a demonstration of the later custom UKK voice. Playback, buffering, completion and Stop control the motion; the existing reply stays intact. The associated recorded plan lives in `src/data/replay.json`; a complete verified audio transcript is not available locally.
+
 The scheduler chooses the shortest pose transition at clip boundaries. A working request moves from `front` through `to-desk`, then alternates working loops. When the request finishes it uses `to-front`. It re-evaluates the latest action at each boundary, so cancellation does not queue stale work. The outgoing decoded frame remains visible until the incoming clip can play. A slow download can hold that frame; this avoids a blank flash but is not a claim of uninterrupted motion.
 
 The test profile has eight small local video files. The appearance template is separate from acting rules in `scripts/avatar/template.mjs`. [Generation instructions](AVATAR_GENERATION.md) cover the complete offline preparation/publication workflow and the later model integration. The fixture and Gemini renderers share the same image/video job interface. Publishing a complete offline preview replaces the bundled test profile; a complete generated profile adds the real appearance to the selector.
@@ -31,7 +33,7 @@ The test profile has eight small local video files. The appearance template is s
 
 - Paid image/video access and an agreed spending limit. A free-tier Gemini key is configured locally; no paid generation has run.
 - Generate and inspect a natural human avatar, especially its hands, identity and the first/last-frame joins.
-- Try ElevenLabs playback with a configured key. Lip synchronization is not implemented.
+- Try dynamic ElevenLabs playback with a configured key. Recorded audio playback is available without one. Lip synchronization is not implemented.
 - Finish the concept independently of Gemini, then connect Gemini to the original media-generation jobs, as Vlad requested. Hydrogen can produce specifications or analyze media but cannot render images/videos. Product inclusion remains the team's decision; runtime narration is optional and deferred.
 
 The live page's replies keep source URLs clickable. The avatar changes presentation only: it does not change research, grounding, approvals, roles or the shared Telegram runtime.
@@ -46,3 +48,5 @@ The live page's replies keep source URLs clickable. The avatar changes presentat
 - The local voice endpoint returned its expected unavailable state without falsely animating speech. Actual ElevenLabs playback still requires a configured key.
 
 Preview screenshots were saved locally as `/tmp/avatar-desktop.png`, `/tmp/avatar-mobile.png` and `/tmp/avatar-live.png` (not committed).
+
+The recorded voice addition passed the production build, ESLint and all 31 avatar tests. Chromium checks covered decoded MP3 playback activating the speaking clip, Stop pausing the audio, and the audio ending returning to idle. No API requests occurred in this check. Desktop/mobile screenshots showed no overflow, and the browser reported no console errors. This validates the local recording path, not a live ElevenLabs request.
