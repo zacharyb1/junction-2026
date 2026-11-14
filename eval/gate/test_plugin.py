@@ -71,6 +71,36 @@ class GateHookTest(unittest.IsolatedAsyncioTestCase):
         self.classify.assert_not_called()
         self.assertEqual(self.log.call_args.args[0]["label"], "media")
 
+    # Hermes lets the bot stay silent in a group only when reply_expected is False or the chat has
+    # allow_silence. Telegram leaves an unaddressed question ("?") at None, so in a group without
+    # allow_silence a silent decision would become a visible notice. The gate settles it.
+    def group_event(self, text, reply_expected):
+        return SimpleNamespace(
+            source=SimpleNamespace(chat_type="group", chat_id="any-group"),
+            text=text, reply_expected=reply_expected,
+        )
+
+    async def test_unaddressed_wake_permits_silence(self):
+        event = self.group_event("we are expecting a baby, what now?", None)
+        self.assertIsNone(await plugin._on_message(event))
+        self.assertIs(event.reply_expected, False)
+
+    async def test_unaddressed_question_in_open_window_permits_silence(self):
+        await plugin._on_message(self.group_event("we are expecting a baby", None))
+        event = self.group_event("is it raining?", None)
+        self.assertIsNone(await plugin._on_message(event))
+        self.assertIs(event.reply_expected, False)
+
+    async def test_addressed_message_still_expects_reply(self):
+        event = self.group_event("UKK, what do we register first?", True)
+        self.assertIsNone(await plugin._on_message(event))
+        self.assertIs(event.reply_expected, True)
+
+    async def test_skipped_message_is_left_unchanged(self):
+        event = self.group_event("lunch?", None)
+        self.assertEqual((await plugin._on_message(event))["action"], "skip")
+        self.assertIsNone(event.reply_expected)
+
 
 if __name__ == "__main__":
     unittest.main()

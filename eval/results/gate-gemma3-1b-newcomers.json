@@ -1,0 +1,153 @@
+{
+  "summary": {
+    "gate": "gemma3:1b",
+    "ranAt": "2026-11-14T08:31:00+0000",
+    "messages": 12,
+    "triggers": 8,
+    "smallTalk": 4,
+    "missedTriggers": 0,
+    "falseWakes": 0,
+    "byLanguage": {
+      "en": {
+        "missedTriggers": 0,
+        "falseWakes": 0
+      },
+      "fi": {
+        "missedTriggers": 0,
+        "falseWakes": 0
+      }
+    },
+    "decidedBy": {
+      "rule": 0,
+      "patterns": 2,
+      "gemma": 10
+    },
+    "gateErrors": 0,
+    "msMedian": 3301,
+    "msMax": 3413,
+    "missed": [],
+    "falseWakeTexts": []
+  },
+  "rows": [
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "we just moved to Espoo, how do we register our address?",
+      "wake": true,
+      "source": "gemma",
+      "got": "trigger",
+      "ms": 3291,
+      "error": ""
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "I still don't have a Finnish personal identity code, the bank says they need it",
+      "wake": true,
+      "source": "gemma",
+      "got": "trigger",
+      "ms": 3218,
+      "error": ""
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "do I need a tax card before my first salary?",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": ""
+    },
+    {
+      "lang": "en",
+      "label": "trigger",
+      "text": "how do I get registered with Kela as a new resident?",
+      "wake": true,
+      "source": "gemma",
+      "got": "trigger",
+      "ms": 3311,
+      "error": ""
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "miten saan pankkitunnukset kun olen vasta muuttanut Suomeen?",
+      "wake": true,
+      "source": "gemma",
+      "got": "trigger",
+      "ms": 3353,
+      "error": ""
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "pitääkö oleskelulupaa varten varata aika poliisille vai Migriin?",
+      "wake": true,
+      "source": "patterns",
+      "got": "trigger",
+      "ms": 0,
+      "error": ""
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "en ole vielä kirjautunut terveysasemalle, miten se tehdään?",
+      "wake": true,
+      "source": "gemma",
+      "got": "trigger",
+      "ms": 3387,
+      "error": ""
+    },
+    {
+      "lang": "fi",
+      "label": "trigger",
+      "text": "pitäisikö mun ilmoittautua työnhakijaksi nyt kun sopimus loppui?",
+      "wake": true,
+      "source": "gemma",
+      "got": "trigger",
+      "ms": 3413,
+      "error": ""
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "which bus goes to Kamppi from here?",
+      "wake": false,
+      "source": "gemma",
+      "got": "small_talk",
+      "ms": 3363,
+      "error": ""
+    },
+    {
+      "lang": "en",
+      "label": "small_talk",
+      "text": "the sauna last night was amazing",
+      "wake": false,
+      "source": "gemma",
+      "got": "small_talk",
+      "ms": 3176,
+      "error": ""
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "onko kenelläkään hyvää pullareseptiä?",
+      "wake": false,
+      "source": "gemma",
+      "got": "small_talk",
+      "ms": 3378,
+      "error": ""
+    },
+    {
+      "lang": "fi",
+      "label": "small_talk",
+      "text": "lunta sataa taas, ihanaa",
+      "wake": false,
+      "source": "gemma",
+      "got": "small_talk",
+      "ms": 3178,
+      "error": ""
+    }
+  ]
+}

@@ -55,6 +55,15 @@ Only the owner of this personal repository can add secrets. The key is created o
 
 When `scripts/deploy/server-deploy.sh` changes, copy it to `/usr/local/sbin/kaveri-deploy` on the server by hand. The deploy uses the installed copy, not the one in the commit it deploys.
 
+### The web chat (`/ukk`)
+
+`hermes-web` serves the `/ukk` page: the same UKK, web-only, with memory and reminders off and only the `research_case` and `case_get` Engine tools. It needs, on the server:
+
+- `.env.local`: `UKK_API_URL=http://hermes-web:8642` and `UKK_API_KEY` (a long random value; Compose passes it to `hermes-web` as `API_SERVER_KEY`).
+- `.env.web`: only `NVIDIA_API_KEY` (template `containers/hermes/env.web.example`). Never the Telegram token; the web instance refuses to start with it.
+
+Port 8642 is not published; only the `web` service reaches it. Without `UKK_API_URL` (on Vercel) the page links to `NEXT_PUBLIC_UKK_CHAT_URL`, by default the server's `/ukk`.
+
 ## Deploying the web app
 
 The existing Git-connected Vercel project is the normal shared deployment. A teammate needs access to that Vercel project as well as the GitHub repository; GitHub access alone does not grant environment/storage administration.

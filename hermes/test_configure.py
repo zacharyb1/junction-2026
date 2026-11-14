@@ -86,6 +86,55 @@ class ConfigureAdminTest(unittest.TestCase):
             "platforms.telegram.extra.group_user_allowed_commands": ["start", "new"],
         })
 
+    def test_web_runtime_skips_admins_and_telegram(self):
+        # The web instance has no Telegram token and no admins; it must still be configured.
+        self.environment["KAVERI_RUNTIME"] = "web"
+        result = self.run_script()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
+        settings = {call[2]: call[3] for call in calls if call[:2] == ["config", "set"]}
+        self.assertFalse([key for key in settings if key.startswith("platforms.telegram") or key.startswith("display.platforms.telegram")])
+        disabled = json.loads(settings["agent.disabled_toolsets"])
+        self.assertEqual(disabled[-2:], ["memory", "cronjob"])
+        self.assertIn("terminal", disabled)
+        self.assertEqual(settings["api_server.max_concurrent_runs"], "4")
+
+    def test_web_runtime_can_research_and_read_cases_only(self):
+        # Anonymous web visitors must not be able to talk UKK into changing someone else's case.
+        self.environment["KAVERI_RUNTIME"] = "web"
+        result = self.run_script()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
+        settings = {call[2]: call[3] for call in calls if call[:2] == ["config", "set"]}
+        self.assertEqual(json.loads(settings["mcp_servers.casefile.tools.include"]), ["research_case", "case_get"])
+
+    def test_telegram_runtime_keeps_every_case_tool(self):
+        self.env_file.write_text("TELEGRAM_ALLOWED_USERS=123\n")
+        result = self.run_script()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
+        self.assertFalse([call for call in calls if "mcp_servers.casefile.tools" in " ".join(call)])
+
+    def test_telegram_runtime_still_requires_admins(self):
+        self.environment["KAVERI_RUNTIME"] = "telegram"
+        result = self.run_script()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("TELEGRAM_ALLOWED_USERS", result.stderr)
+
+    def test_open_groups_clears_the_group_allowlist_only(self):
+        self.env_file.write_text("TELEGRAM_ALLOWED_USERS=123\n")
+        result = self.run_script("configure.sh", "--open-groups")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
+        # An empty allowed_chats is Hermes' "every group". Home-group settings stay as --group wrote them.
+        self.assertEqual(calls, [["config", "set", "telegram.allowed_chats", ""]])
+
+    def test_open_groups_still_requires_admins(self):
+        self.env_file.write_text("TELEGRAM_ALLOW_ALL_USERS=true\n")
+        result = self.run_script("configure.sh", "--open-groups")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.calls_file.exists())
+
     def test_open_bot_status_still_requires_admins(self):
         self.env_file.write_text("TELEGRAM_ALLOW_ALL_USERS=true\n")
         result = self.run_script("secrets.sh", "--status")

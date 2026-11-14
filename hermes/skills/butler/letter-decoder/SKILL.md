@@ -18,7 +18,7 @@ Someone shares a photo, screenshot or PDF of an official letter or document: lan
 
 ## Procedure
 
-1. Acknowledge in one line, in the user's language, in the same assistant message as your first tool call.
+1. Acknowledge in one line, in the user's language, in the same assistant message as your first tool call: "A difficult letter. Taking it to the sauna. Back shortly." For a frightening letter (eviction, a debt, a deportation or illness matter) say it plainly instead: "Reading it now. I'll tell you what it asks and by when."
 2. Read the document.
    - Photo or screenshot: read it directly. If the text is too small, call `vision_analyze` with the saved image path and a `region` to zoom in.
    - PDF or other file: this bot has no file tools. Ask for a photo or screenshot of each page, then stop.

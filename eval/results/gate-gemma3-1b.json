@@ -1,20 +1,20 @@
 {
   "summary": {
     "gate": "gemma3:1b",
-    "ranAt": "2026-11-14T00:30:58+0200",
+    "ranAt": "2026-11-14T08:30:23+0000",
     "messages": 60,
     "triggers": 20,
     "smallTalk": 40,
     "missedTriggers": 0,
-    "falseWakes": 4,
+    "falseWakes": 1,
     "byLanguage": {
       "en": {
         "missedTriggers": 0,
-        "falseWakes": 2
+        "falseWakes": 0
       },
       "fi": {
         "missedTriggers": 0,
-        "falseWakes": 2
+        "falseWakes": 1
       }
     },
     "decidedBy": {
@@ -23,13 +23,10 @@
       "gemma": 43
     },
     "gateErrors": 0,
-    "msMedian": 3528,
-    "msMax": 5166,
+    "msMedian": 3230,
+    "msMax": 3437,
     "missed": [],
     "falseWakeTexts": [
-      "running 10 min late",
-      "the bus was packed again this morning",
-      "oon vähän myöhässä, 10 min",
       "treenit loppuu viideltä"
     ]
   },
@@ -41,7 +38,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4581,
+      "ms": 3324,
       "error": ""
     },
     {
@@ -51,7 +48,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4538,
+      "ms": 3211,
       "error": ""
     },
     {
@@ -61,17 +58,17 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3663,
+      "ms": 3332,
       "error": ""
     },
     {
       "lang": "en",
       "label": "small_talk",
       "text": "running 10 min late",
-      "wake": true,
+      "wake": false,
       "source": "gemma",
-      "got": "trigger",
-      "ms": 3701,
+      "got": "small_talk",
+      "ms": 3323,
       "error": ""
     },
     {
@@ -81,7 +78,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3503,
+      "ms": 3299,
       "error": ""
     },
     {
@@ -91,7 +88,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3404,
+      "ms": 3301,
       "error": ""
     },
     {
@@ -101,17 +98,17 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3540,
+      "ms": 3219,
       "error": ""
     },
     {
       "lang": "en",
       "label": "small_talk",
       "text": "the bus was packed again this morning",
-      "wake": true,
+      "wake": false,
       "source": "gemma",
-      "got": "trigger",
-      "ms": 5097,
+      "got": "small_talk",
+      "ms": 3306,
       "error": ""
     },
     {
@@ -121,7 +118,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 5166,
+      "ms": 3204,
       "error": ""
     },
     {
@@ -131,7 +128,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3512,
+      "ms": 3312,
       "error": ""
     },
     {
@@ -141,7 +138,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3487,
+      "ms": 3288,
       "error": ""
     },
     {
@@ -151,7 +148,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3450,
+      "ms": 3190,
       "error": ""
     },
     {
@@ -161,7 +158,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4298,
+      "ms": 3385,
       "error": ""
     },
     {
@@ -171,7 +168,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3413,
+      "ms": 3321,
       "error": ""
     },
     {
@@ -181,7 +178,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3619,
+      "ms": 3218,
       "error": ""
     },
     {
@@ -191,7 +188,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3504,
+      "ms": 3313,
       "error": ""
     },
     {
@@ -201,7 +198,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3470,
+      "ms": 3202,
       "error": ""
     },
     {
@@ -211,7 +208,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3557,
+      "ms": 3332,
       "error": ""
     },
     {
@@ -221,7 +218,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3311,
+      "ms": 3297,
       "error": ""
     },
     {
@@ -231,7 +228,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4714,
+      "ms": 3192,
       "error": ""
     },
     {
@@ -241,7 +238,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4914,
+      "ms": 3327,
       "error": ""
     },
     {
@@ -251,7 +248,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3819,
+      "ms": 3283,
       "error": ""
     },
     {
@@ -261,17 +258,17 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3633,
+      "ms": 3348,
       "error": ""
     },
     {
       "lang": "fi",
       "label": "small_talk",
       "text": "oon vähän myöhässä, 10 min",
-      "wake": true,
+      "wake": false,
       "source": "gemma",
-      "got": "trigger",
-      "ms": 4126,
+      "got": "small_talk",
+      "ms": 3348,
       "error": ""
     },
     {
@@ -281,7 +278,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3932,
+      "ms": 3214,
       "error": ""
     },
     {
@@ -291,7 +288,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4014,
+      "ms": 3365,
       "error": ""
     },
     {
@@ -301,7 +298,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4406,
+      "ms": 3317,
       "error": ""
     },
     {
@@ -311,7 +308,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3719,
+      "ms": 3215,
       "error": ""
     },
     {
@@ -321,7 +318,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3764,
+      "ms": 3337,
       "error": ""
     },
     {
@@ -331,7 +328,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3756,
+      "ms": 3208,
       "error": ""
     },
     {
@@ -341,7 +338,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3540,
+      "ms": 3400,
       "error": ""
     },
     {
@@ -351,7 +348,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3678,
+      "ms": 3320,
       "error": ""
     },
     {
@@ -361,7 +358,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3883,
+      "ms": 3204,
       "error": ""
     },
     {
@@ -371,7 +368,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3954,
+      "ms": 3346,
       "error": ""
     },
     {
@@ -381,7 +378,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3619,
+      "ms": 3195,
       "error": ""
     },
     {
@@ -391,7 +388,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 4481,
+      "ms": 3321,
       "error": ""
     },
     {
@@ -401,7 +398,7 @@
       "wake": true,
       "source": "gemma",
       "got": "trigger",
-      "ms": 3883,
+      "ms": 3285,
       "error": ""
     },
     {
@@ -411,7 +408,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3503,
+      "ms": 3241,
       "error": ""
     },
     {
@@ -421,7 +418,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3517,
+      "ms": 3325,
       "error": ""
     },
     {
@@ -431,7 +428,7 @@
       "wake": false,
       "source": "gemma",
       "got": "small_talk",
-      "ms": 3679,
+      "ms": 3437,
       "error": ""
     },
     {
@@ -511,7 +508,7 @@
       "wake": true,
       "source": "gemma",
       "got": "trigger",
-      "ms": 4432,
+      "ms": 3194,
       "error": ""
     },
     {
@@ -531,7 +528,7 @@
       "wake": true,
       "source": "gemma",
       "got": "trigger",
-      "ms": 3334,
+      "ms": 3290,
       "error": ""
     },
     {
@@ -631,7 +628,7 @@
       "wake": true,
       "source": "gemma",
       "got": "trigger",
-      "ms": 3221,
+      "ms": 3277,
       "error": ""
     }
   ]

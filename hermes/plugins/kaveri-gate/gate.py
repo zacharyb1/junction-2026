@@ -34,9 +34,9 @@ SCHEMA = {
     "required": ["label"],
 }
 
-SYSTEM = """You sort messages from a family's group chat. Answer with one label.
+SYSTEM = """You sort messages from a household's group chat (family, flatmates or newcomers who moved to Finland). Answer with one label.
 
-trigger: the message mentions a life event or a paperwork task for the household. Examples of topics: pregnancy or birth, moving home, losing or changing a job, a sick child, a rent increase, a letter from a landlord or an authority, a fine, a residence permit or visa, taxes, a benefit decision, a cancelled or delayed flight or train, a broken appliance, a subscription or price change, planning a wedding or anniversary.
+trigger: the message mentions a life event or a paperwork task for the household. Examples of topics: pregnancy or birth, moving home, losing or changing a job, a sick child, a rent increase, a letter from a landlord or an authority, a fine, a residence permit or visa, registering an address or a personal identity code, a bank ID, a tax card, Kela registration, health centre registration, job-seeker registration, taxes, a benefit decision, a cancelled or delayed flight or train, a broken appliance, a subscription or price change, planning a wedding or anniversary.
 
 small_talk: everyday chatter. Examples of topics: food, shopping, greetings, jokes, who picks up whom, being late, weather, TV, thanks, plans for tonight.
 
@@ -54,10 +54,12 @@ SHOTS = [
     ("The train to Turku was two hours late, can we get money back?", "trigger"),
     ("mennäänkö kävelylle?", "small_talk"),
     ("Migristä tuli päätös", "trigger"),
+    ("I moved here last week, where do I get a tax card?", "trigger"),
+    ("miten rekisteröin osoitteeni DVV:hen?", "trigger"),
 ]
 
-# The bot's name, as people type it. "AIDaddy", its earlier name, still wakes it.
-BOT_NAME = re.compile(r"(?<!\w)(ai ?daddy|kaveri)(?!\w)", re.IGNORECASE)
+# The bot's name, as people type it: UKK. Its earlier names, AIDaddy and Kaveri, still wake it.
+BOT_NAME = re.compile(r"(?<!\w)(ukk|ai ?daddy|kaveri)(?!\w)", re.IGNORECASE)
 
 
 @dataclass

@@ -13,7 +13,7 @@ set -euo pipefail
 
 APP_DIR=${KAVERI_APP_DIR:-/opt/kaveri}
 PROFILES=(--profile public --profile bot)
-HEALTH_TIMEOUT=${KAVERI_HEALTH_TIMEOUT:-240}
+HEALTH_TIMEOUT=${KAVERI_HEALTH_TIMEOUT:-360}
 BOT_STABLE_SECONDS=30
 
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >&2; }
@@ -62,14 +62,33 @@ healthy() {
   port=$(sed -n 's/^KAVERI_HTTP_PORT=//p' .env.local | tail -n1)
   port=${port:-3000}
   deadline=$((SECONDS + HEALTH_TIMEOUT))
-  until curl -fsS -m 5 "http://127.0.0.1:$port/api/health" 2>/dev/null | grep -q "\"commit\":\"$want\""; do
+  until curl -fsS -m 5 "http://127.0.0.1:$port/api/health" 2>/dev/null | grep "\"commit\":\"$want\"" >/dev/null; do
     if ((SECONDS > deadline)); then
       log "web did not report commit $want within ${HEALTH_TIMEOUT}s"
       return 1
     fi
     sleep 3
   done
-  restarts=$(docker inspect -f '{{.RestartCount}}' "$(compose ps -q hermes)")
+  # The bot configures itself for about 80 s after a restart; "up" means connected to Telegram.
+  local bot started
+  bot=$(compose ps -q hermes)
+  started=$(docker inspect -f '{{.State.StartedAt}}' "$bot")
+  until docker logs --since "$started" "$bot" 2>&1 | grep "Connected to Telegram" >/dev/null; do
+    if ((SECONDS > deadline)); then
+      log "the bot did not connect to Telegram within ${HEALTH_TIMEOUT}s"
+      return 1
+    fi
+    sleep 3
+  done
+  # The /ukk instance answers its own health endpoint once its API server is up.
+  until [[ $(docker inspect -f '{{.State.Health.Status}}' "$(compose ps -q hermes-web)" 2>/dev/null) == healthy ]]; do
+    if ((SECONDS > deadline)); then
+      log "the web chat instance did not become healthy within ${HEALTH_TIMEOUT}s"
+      return 1
+    fi
+    sleep 3
+  done
+  restarts=$(docker inspect -f '{{.RestartCount}}' "$bot")
   sleep "$BOT_STABLE_SECONDS"
   if [[ $(docker inspect -f '{{.State.Status}} {{.RestartCount}}' "$(compose ps -q hermes)") != "running $restarts" ]]; then
     log "the bot is not staying up"
