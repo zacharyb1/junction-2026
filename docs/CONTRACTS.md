@@ -218,8 +218,9 @@ Response `200`:
 }
 ```
 
-- Each Exa search has a structured output that proposes products. A product is kept only when its price's figures are on its own page and `priceQuote` is the page's own sentence; `dropped` counts the rest.
-- Fewer than 3 kept products after a search: it searches again with a different query (a prompt as written, then as a shop search, then for product pages with a price; clues all together, then one at a time) and skips pages it already returned, at most 3 searches. `attempts` says how many it took.
+- Each Exa search has a structured output that proposes products. A product is kept only when its URL is one product's page (not a guide, blog, category, search or front page), its price's figures are on that page and `priceQuote` is the page's own sentence; `dropped` counts the rest. At most 8 are returned.
+- Any product, not only gifts: the MCP tool `find_products` (used by AIDaddy's `product-finder` skill) runs the same search.
+- Fewer than 5 kept products after a search: it searches again with a different query (a prompt as written, then as a shop search, then for product pages with a price; clues all together, then one at a time) and skips pages it already returned, at most 3 searches. `attempts` says how many it took.
 - `delivery` is the page's own sentence. `arrivesBy` is worked out from it (working days skip weekends) and is absent when the sentence gives no number of days. `late` is absent when either date is unknown.
 - `image` is the product page's own preview image from the same Exa result (https only), absent when the page has none. `GET /api/gifts/image?url=<product url>` returns it for a product the search found (no access code: it only reads what the search stored, in memory until a restart); the `/chat` page shows it above that product link.
 - Products that arrive in time come first. The bot never orders or pays: `url` is for the person to open.

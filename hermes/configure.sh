@@ -83,7 +83,7 @@ set_key mcp_servers.exa.headers.x-api-key '${EXA_API_KEY}'
 set_key mcp_servers.exa.timeout 120
 set_key mcp_servers.exa.supports_parallel_tool_calls true
 set_key skills.external_dirs "[\"$SKILLS_DIR\"]"
-set_key skills.auto_load '["life-event-butler", "letter-decoder", "deadline-keeper", "birthday-planner", "law-check", "gift-finder"]'
+set_key skills.auto_load '["life-event-butler", "letter-decoder", "deadline-keeper", "birthday-planner", "law-check", "product-finder"]'
 set_key skills.write_approval true
 DISABLED='"terminal", "file", "code_execution", "browser", "computer_use", "delegation", "image_gen", "video_gen", "session_search"'
 # On the web, strangers share one instance: no memory across visitors and no scheduled jobs.
@@ -109,7 +109,7 @@ if [ "$RUNTIME" = web ]; then
   # Bounds NVIDIA quota use by web visitors; the Telegram bot keeps the rest.
   set_key api_server.max_concurrent_runs 4
   # Anonymous visitors research, read and search shops; they cannot change, re-check or publish anyone's case.
-  set_key mcp_servers.casefile.tools.include '["research_case", "case_get", "find_gifts"]'
+  set_key mcp_servers.casefile.tools.include '["research_case", "case_get", "find_products"]'
 else
   # Slash commands (/sethome, /new, /model ...) only for the owner. Without this every user the bot
   # answers can run them, which matters once TELEGRAM_ALLOW_ALL_USERS is on (CHECKS.md, U10).

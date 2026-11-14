@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, deliveryDays, GiftInput, giftQueries, groundIdea, MAX_ATTEMPTS, metaImage, priceValue, productPicture } from "@/lib/engine/gifts";
+import { addDays, deliveryDays, GiftInput, giftQueries, groundIdea, MAX_ATTEMPTS, metaImage, priceValue, productPage, productPicture } from "@/lib/engine/gifts";
 
 describe("productPicture", () => {
   it("keeps product photos", () => {
@@ -125,6 +125,22 @@ describe("addDays", () => {
   });
 });
 
+describe("productPage", () => {
+  it("keeps one product's page", () => {
+    expect(productPage("https://shop.porsche.com/fi/en-FI/p/porsche-taycan-turbo-gt-model")).toBe(true);
+    expect(productPage("https://www.karkkainen.com/verkkokauppa/hot-wheels-20-pack-pikkuauto-lahjapakkaus")).toBe(true);
+  });
+
+  it("drops guides, blogs, categories and front pages", () => {
+    expect(productPage("https://www.autelonline.com/blogs/news/gifts-for-a-car-person")).toBe(false);
+    expect(productPage("https://www.uncommongoods.com/sets/car-gifts")).toBe(false);
+    expect(productPage("https://www.nbcnews.com/select/shopping/best-gifts-for-dads")).toBe(false);
+    expect(productPage("https://lautapelit.poromagia.com/en/catalogue/")).toBe(false);
+    expect(productPage("https://kirjalanpaahtimo.fi/en")).toBe(false);
+    expect(productPage("https://shop.example/")).toBe(false);
+  });
+});
+
 describe("groundIdea", () => {
   const idea = {
     name: "Mojo Chalk Bag",
@@ -153,6 +169,17 @@ describe("groundIdea", () => {
 
   it("drops a product whose price is not on its page", () => {
     expect(groundIdea({ ...idea, price: "19,90 €", priceQuote: "Mojo Chalk Bag hinta 19,90 € sis. alv." }, PAGE, "2026-11-14")).toBeNull();
+  });
+
+  it("drops a price that is really the delivery fee", () => {
+    const page = `Ibuxin Rapid 400 mg 10 tabl.
+Ibuxin Rapid hinta 6,95 € sis. alv.
+Nouto Postin toimipisteestä 4,90 €
+Lue pakkausseloste ennen käyttöä.`;
+    const shop = "https://www.apteekki.example/ibuxin-rapid-400-mg-10";
+    const base = { name: "Ibuxin Rapid 400 mg", why: "headache", url: shop };
+    expect(groundIdea({ ...base, price: "4,90 €", priceQuote: "Nouto Postin toimipisteestä 4,90 €" }, page, "2026-11-14")).toBeNull();
+    expect(groundIdea({ ...base, price: "6,95 €", priceQuote: "Ibuxin Rapid hinta 6,95 € sis. alv." }, page, "2026-11-14")?.price).toBe("6,95 €");
   });
 
   it("drops a product over the budget", () => {
