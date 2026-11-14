@@ -9,7 +9,7 @@
  * The file is loaded as a plain script before content.js, and by the unit tests through module.exports.
  */
 
-var UkkGate = (() => {
+var AIDaddyGate = (() => {
   /** Words that mark a page about a duty, a deadline or an entitlement. English, Finnish and Swedish. */
   const ADMIN_WORDS =
     /\b(apply|application|applying|deadline|due date|benefit|allowance|permit|residence|register|registration|notify|notification|tax return|tax card|refund|claim|appeal|objection|declaration|subsidy|grant|insurance|pension|unemployment|tenancy|rent increase|hakemus|hae |hakeminen|määräaika|eräpäivä|tuki|etuus|lupa|oleskelulupa|ilmoitus|ilmoita|verokortti|veroilmoitus|oikaisu|valitus|korvaus|eläke|työttömyys|vuokra|ansökan|ansök|sista dag|förmån|tillstånd|anmälan|skattekort|deklaration)/i;
@@ -120,4 +120,4 @@ var UkkGate = (() => {
   return { decide, question, fieldKind, profileValue, highlightUrl, hostOf, official, countryOf };
 })();
 
-if (typeof module !== "undefined") module.exports = { UkkGate };
+if (typeof module !== "undefined") module.exports = { AIDaddyGate };

@@ -80,7 +80,7 @@ healthy() {
     fi
     sleep 3
   done
-  # The /ukk instance answers its own health endpoint once its API server is up.
+  # The instance behind the /chat page answers its own health endpoint once its API server is up.
   until [[ $(docker inspect -f '{{.State.Health.Status}}' "$(compose ps -q hermes-web)" 2>/dev/null) == healthy ]]; do
     if ((SECONDS > deadline)); then
       log "the web chat instance did not become healthy within ${HEALTH_TIMEOUT}s"

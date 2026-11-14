@@ -34,7 +34,7 @@ export async function readCompletionStream(
       }
       if (event?.error) {
         await reader.cancel().catch(() => {});
-        throw new Error("UKK could not answer");
+        throw new Error("AIDaddy could not answer");
       }
       const content = event?.choices?.[0]?.delta?.content;
       if (typeof content === "string" && content) {

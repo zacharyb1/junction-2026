@@ -6,7 +6,7 @@ const Input = z.object({ index: z.number().int().min(0).max(100) });
 
 /**
  * The family's click on a proposal that waits in the case's action log (issue #27).
- * Whoever holds the unguessable case link may approve. UKK still sends nothing: the answer
+ * Whoever holds the unguessable case link may approve. AIDaddy still sends nothing: the answer
  * carries the draft so the family can send or hand it in themselves.
  */
 export async function POST(req: Request, ctx: RouteContext<"/api/cases/[id]/approve">) {

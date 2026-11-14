@@ -2,15 +2,15 @@
 
 import { CircleAlert, Loader2, Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { AIDaddyAvatar, type AvatarState } from "@/components/aidaddy-avatar";
 import { CopyButton } from "@/components/copy-button";
 import { linkButtonClasses } from "@/components/landing/link-button";
-import { type AvatarState, UkkAvatar } from "@/components/ukk-avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { readCompletionStream } from "@/lib/ukk-stream";
+import { readCompletionStream } from "@/lib/chat-stream";
 
-type Turn = { from: "you" | "ukk"; text: string };
+type Turn = { from: "you" | "aidaddy"; text: string };
 
 const LINK = /(https?:\/\/[^\s<>()]+[^\s<>().,;:!?])/g;
 
@@ -18,7 +18,7 @@ const LINK = /(https?:\/\/[^\s<>()]+[^\s<>().,;:!?])/g;
 const BAD_CODE = "That access code is not valid. Scan the QR code at our table again.";
 
 const BUBBLE = "rounded-lg border text-sm leading-relaxed whitespace-pre-wrap";
-const FROM_UKK = `${BUBBLE} max-w-[92%] self-start bg-card p-3`;
+const FROM_AIDADDY = `${BUBBLE} max-w-[92%] self-start bg-card p-3`;
 const FROM_YOU = `${BUBBLE} max-w-[85%] self-end border-primary/40 bg-primary/10 px-3 py-2`;
 
 // Pictures already asked for, by link, so a reply that re-renders while it streams asks the server once per link.
@@ -37,7 +37,7 @@ function pictureFor(url: string): Promise<string | null> {
 }
 
 /**
- * A link in UKK's reply, with the product's picture above it when the link is a product the gift search found, so a
+ * A link in AIDaddy's reply, with the product's picture above it when the link is a product the gift search found, so a
  * gift is seen as well as named. The server knows the picture; the model only has to post the link.
  */
 function ReplyLink({ url }: { url: string }) {
@@ -92,7 +92,7 @@ function Linked({ text }: { text: string }) {
   );
 }
 
-export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean }) {
+export function AIDaddyChat({ code, needsCode }: { code: string; needsCode: boolean }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -123,13 +123,13 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
           The chat needs the access code for this demo. Scan the QR code at our table, or type the code here.
         </p>
         {/* A plain form, so it works before the script has loaded: it opens this page with ?code=... */}
-        <form action="/ukk" method="get" className="flex flex-col gap-2 sm:flex-row sm:items-end">
+        <form action="/chat" method="get" className="flex flex-col gap-2 sm:flex-row sm:items-end">
           <div className="flex flex-1 flex-col gap-2">
-            <label htmlFor="ukk-code" className="font-medium">
+            <label htmlFor="chat-code" className="font-medium">
               Access code
             </label>
             <Input
-              id="ukk-code"
+              id="chat-code"
               name="code"
               required
               autoComplete="off"
@@ -153,11 +153,11 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
     setDraft("");
     fail("");
     setBusy(true);
-    setTurns((t) => [...t, { from: "you", text: message }, { from: "ukk", text: "" }]);
+    setTurns((t) => [...t, { from: "you", text: message }, { from: "aidaddy", text: "" }]);
     let full = "";
     const append = (delta: string) => {
       full += delta;
-      setTurns((t) => [...t.slice(0, -1), { from: "ukk", text: t[t.length - 1].text + delta }]);
+      setTurns((t) => [...t.slice(0, -1), { from: "aidaddy", text: t[t.length - 1].text + delta }]);
     };
     // Nothing came back: the message returns to the box, so it can be sent again or copied, not typed again.
     const giveBack = () => {
@@ -166,7 +166,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
       setDraft((d) => d || message);
     };
     try {
-      const res = await fetch("/api/ukk", {
+      const res = await fetch("/api/aidaddy", {
         method: "POST",
         headers: { "content-type": "application/json", "x-demo-code": code },
         body: JSON.stringify({ message }),
@@ -176,13 +176,13 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
         giveBack();
         if (res.status === 503 && typeof body.chatUrl === "string") setElsewhere(body.chatUrl);
         else if (res.status === 401) fail(BAD_CODE, true);
-        else fail(typeof body.error === "string" ? body.error : "UKK cannot answer right now. Please try again.");
+        else fail(typeof body.error === "string" ? body.error : "AIDaddy cannot answer right now. Please try again.");
         return;
       }
       const received = await readCompletionStream(res.body, append);
       if (received === 0) {
         // A finished reply with no text (an error inside the run, or a silent turn) must not leave the spinner.
-        fail("UKK did not answer this time. Please send your message again.");
+        fail("AIDaddy did not answer this time. Please send your message again.");
         giveBack();
       } else {
         voice.speak(full);
@@ -198,7 +198,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
   if (elsewhere) {
     return (
       <div className="flex flex-col items-start gap-4 rounded-lg border bg-card p-4 text-sm">
-        <p className="leading-relaxed">The chat with UKK runs on the team&apos;s server, not on this one.</p>
+        <p className="leading-relaxed">The chat with AIDaddy runs on the team&apos;s server, not on this one.</p>
         {draft && (
           <div className="flex w-full flex-col items-start gap-2">
             <p className="text-muted-foreground">Your message was not sent. Copy it and send it there:</p>
@@ -223,7 +223,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-4 rounded-lg border bg-card p-3">
-        <UkkAvatar state={avatarState} level={voice.level} size={72} />
+        <AIDaddyAvatar state={avatarState} level={voice.level} size={72} />
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-muted-foreground">
             {voice.recording
@@ -231,8 +231,8 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
               : voice.transcribing
                 ? "Turning your voice note into text."
                 : voice.speaking
-                  ? "UKK is reading his reply aloud."
-                  : "Talk to UKK by voice or text. His voice is made with ElevenLabs."}
+                  ? "AIDaddy is reading its reply aloud."
+                  : "Talk to AIDaddy by voice or text. Its voice is made with ElevenLabs."}
           </p>
           <Button
             type="button"
@@ -250,15 +250,15 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
       </div>
       <ol className="flex flex-col gap-3" aria-live="polite">
         {turns.length === 0 && (
-          <li className={FROM_UKK}>
-            UKK. Finland&apos;s FAQ. Tell me what is on your plate: a move, a new job, a letter you cannot read.
+          <li className={FROM_AIDADDY}>
+            AIDaddy here. Tell me what is on your plate: a move, a new job, a letter you cannot read.
           </li>
         )}
         {turns.map((turn, i) => (
-          <li key={i} className={turn.from === "you" ? FROM_YOU : FROM_UKK}>
-            {turn.from === "ukk" && !turn.text ? (
+          <li key={i} className={turn.from === "you" ? FROM_YOU : FROM_AIDADDY}>
+            {turn.from === "aidaddy" && !turn.text ? (
               <span className="inline-flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> UKK is working on it
+                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> AIDaddy is working on it
               </span>
             ) : (
               <Linked text={turn.text} />
@@ -280,7 +280,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
               {error}{" "}
               {badCode && (
                 // A plain link: it must open the page without the refused code, so the field for a new one shows.
-                <a href="/ukk" className="font-medium text-foreground underline underline-offset-4">
+                <a href="/chat" className="font-medium text-foreground underline underline-offset-4">
                   Or type the code
                 </a>
               )}
@@ -298,7 +298,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
             maxLength={1500}
             rows={2}
             placeholder="I just moved to Espoo. What do I register first?"
-            aria-label="Your message to UKK"
+            aria-label="Your message to AIDaddy"
             className="max-h-40 min-h-11 px-3"
           />
           <Button
@@ -309,7 +309,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
             disabled={voice.transcribing}
             aria-pressed={voice.recording}
             aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
-            // Green while the microphone is live, the same colour as the ring around UKK.
+            // Green while the microphone is live, the same colour as the ring around the avatar.
             className={`h-11 w-11 ${voice.recording ? "border-(--hud-green)/60 bg-(--hud-green)/10 text-(--hud-green) hover:bg-(--hud-green)/20 hover:text-(--hud-green)" : ""}`}
           >
             {voice.transcribing ? (
@@ -333,8 +333,8 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
 const MAX_RECORDING_MS = 30_000;
 
 /**
- * Voice for the chat, all of it started by a tap. "Voice on" reads each reply aloud in UKK's ElevenLabs voice
- * and moves the avatar's mouth with its loudness. The microphone records only between two taps on its button
+ * Voice for the chat, all of it started by a tap. "Voice on" reads each reply aloud in AIDaddy's ElevenLabs voice
+ * and makes the avatar's heart glow with its loudness. The microphone records only between two taps on its button
  * (or 30 seconds at most); the transcript lands in the message box to check before sending.
  */
 function useVoice(code: string, onError: (message: string, refused?: boolean) => void) {
@@ -382,7 +382,7 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
   async function speak(text: string) {
     if (!wanted.current || !text.trim()) return;
     try {
-      const res = await fetch("/api/ukk/speak", {
+      const res = await fetch("/api/aidaddy/speak", {
         method: "POST",
         headers: { "content-type": "application/json", "x-demo-code": code },
         body: JSON.stringify({ text }),
@@ -390,7 +390,7 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         if (res.status === 401) onError(BAD_CODE, true);
-        else onError(typeof body.error === "string" ? body.error : "UKK could not read that aloud.");
+        else onError(typeof body.error === "string" ? body.error : "AIDaddy could not read that aloud.");
         return;
       }
       const ctx = audio();
@@ -425,7 +425,7 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
       tick();
     } catch {
       setSpeaking(false);
-      onError("UKK could not read that aloud.");
+      onError("AIDaddy could not read that aloud.");
     }
   }
 
@@ -482,11 +482,11 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
           if (!blob.size) return done("");
           setTranscribing(true);
           try {
-            const res = await fetch("/api/ukk/listen", { method: "POST", headers: { "content-type": type, "x-demo-code": code }, body: blob });
+            const res = await fetch("/api/aidaddy/listen", { method: "POST", headers: { "content-type": type, "x-demo-code": code }, body: blob });
             const body = await res.json().catch(() => ({}));
             if (!res.ok || typeof body.text !== "string") {
               if (res.status === 401) onError(BAD_CODE, true);
-              else onError(typeof body.error === "string" ? body.error : "UKK could not hear that. Please type it instead.");
+              else onError(typeof body.error === "string" ? body.error : "AIDaddy could not hear that. Please type it instead.");
               done("");
             } else {
               done(body.text);

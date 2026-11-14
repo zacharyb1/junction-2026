@@ -1,5 +1,5 @@
 /*
- * /demo/calendar (issue #36): a month view with UKK's birthday planner. Every selector is prefixed cdemo-.
+ * /demo/calendar (issue #36): a month view with AIDaddy's birthday planner. Every selector is prefixed cdemo-.
  * The page around the calendar (ground, heading, caption) is the shared frame in src/components/demo/demo.css.
  * The calendar keeps its own light look on purpose: it is a picture of a calendar app.
  */

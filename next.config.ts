@@ -2,10 +2,10 @@ import type { NextConfig } from "next";
 
 /**
  * What a page may ask the browser for. Everything is off except the microphone, which the site's own pages may use:
- * the chat with UKK records a voice note between two taps on its microphone button, and with the microphone off
+ * the chat with AIDaddy records a voice note between two taps on its microphone button, and with the microphone off
  * the browser refused it before asking the visitor. The header belongs to the first page a visitor loads, and the
- * site's own links do not load a new document, so allowing it on /ukk alone still refused everyone who arrived
- * through a link. Only /ukk ever asks for it.
+ * site's own links do not load a new document, so allowing it on the chat page alone still refused everyone who
+ * arrived through a link. Only /chat ever asks for it.
  */
 const permissions = "camera=(), microphone=(self), geolocation=(), payment=(), usb=()";
 
@@ -23,8 +23,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   headers: async () => [{ source: "/:path*", headers: securityHeaders }],
-  // The scaffold's /chat page is gone (docs/DECISIONS.md, Fri 23:35 and Sat 19:00). Its address leads to the real chat.
-  redirects: async () => [{ source: "/chat", destination: "/ukk", permanent: false }],
+  // The chat lives at /chat. Its earlier address, /ukk, leads there with its query string, so printed QR codes and
+  // shared links keep working.
+  redirects: async () => [{ source: "/ukk", destination: "/chat", permanent: false }],
   // The container runs the traced server; native/Vercel builds keep their current mode.
   ...(process.env.KAVERI_STANDALONE === "1" ? { output: "standalone" as const } : {}),
   // Cache Components is off on purpose: case pages read live storage on every request.

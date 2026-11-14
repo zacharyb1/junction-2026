@@ -291,7 +291,7 @@ function Header({ c, t }: { c: Case; t: Labels }) {
   const place = [c.jurisdiction.region, t.country(c.jurisdiction.country)].filter(Boolean).join(", ");
   const quotesTone = !c.evidence.length ? "" : verified === c.evidence.length ? "text-(--hud-green)" : "text-(--hud-amber)";
   return (
-    // The same head as /try and /ukk: a small label, the title, one paragraph.
+    // The same head as /try and /chat: a small label, the title, one paragraph.
     <header className="flex flex-col gap-3">
       <p className="site-eyebrow flex flex-wrap items-center gap-x-2 gap-y-1">
         <MapPin className="size-3.5 shrink-0" aria-hidden="true" />

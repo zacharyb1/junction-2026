@@ -24,7 +24,7 @@ export const viewport: Viewport = { themeColor: "#05080d" };
 
 /**
  * The front page tells one story from top to bottom: quiet days, the moment that matters, the research,
- * the plan, the places UKK works, the proof. It is also the entrance to every other page of the site.
+ * the plan, the places AIDaddy works, the proof. It is also the entrance to every other page of the site.
  * Every figure on it is read from a file a script wrote:
  * src/data/replay.json (one recorded run, see scripts/make-replay.mjs) and src/data/scorecard.json (the eval harness).
  * The calmer "reading table" edition of this page lives at /reading.
@@ -45,8 +45,8 @@ export default async function Home() {
             id="quiet"
             index="01"
             label="Most days"
-            title="He reads along and says nothing."
-            lede="A family chat is mostly dinner, keys and who picks up the kids. A small model on our own server decides, message by message, whether anything needs UKK at all."
+            title="It reads along and says nothing."
+            lede="A family chat is mostly dinner, keys and who picks up the kids. A small model on our own server decides, message by message, whether anything needs AIDaddy at all."
           >
             <QuietDays ignored={quiet.ignored} trigger={quiet.trigger} />
             <GateFigures gate={quiet.gate} />
@@ -56,8 +56,8 @@ export default async function Home() {
             id="research"
             index="02"
             label="The moment that matters"
-            title="Then he goes to work."
-            lede="Three Exa searches at once on the official sites of the right country, then a fourth for pages published in the last four months. Every page he wants to cite is opened again, and every quote is looked up on that page before it may stay."
+            title="Then it goes to work."
+            lede="Three Exa searches at once on the official sites of the right country, then a fourth for pages published in the last four months. Every page AIDaddy wants to cite is opened again, and every quote is looked up on that page before it may stay."
           >
             <ResearchReplay data={replay}>
               <SiteLink href="/try" className="hud-btn hud-btn--primary">
@@ -79,9 +79,9 @@ export default async function Home() {
           <Section
             id="where"
             index="04"
-            label="Where he works"
+            label="Where it works"
             title="One butler, wherever the household is."
-            lede="Today UKK works in the Telegram group chat and in a chat on this site. The other places are ideas. Each one is shown as a scripted replay or a mockup, and says so."
+            lede="Today AIDaddy works in the Telegram group chat and in a chat on this site. The other places are ideas. Each one is shown as a scripted replay or a mockup, and says so."
           >
             <Places />
           </Section>

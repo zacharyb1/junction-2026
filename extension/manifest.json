@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "UKK: one step ahead in your browser",
-  "short_name": "UKK",
+  "name": "AIDaddy: one step ahead in your browser",
+  "short_name": "AIDaddy",
   "version": "0.1.0",
   "description": "Looks at the page you have open and tells you what to do, by when, with the official sentence that says so. It fills a form only when you click.",
   "permissions": ["storage"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js" },
-  "action": { "default_title": "UKK", "default_popup": "popup.html" },
+  "action": { "default_title": "AIDaddy", "default_popup": "popup.html" },
   "options_page": "welcome.html",
   "content_scripts": [
     {

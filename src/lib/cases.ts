@@ -306,7 +306,7 @@ export async function recheckCase(id: string, by: Watcher = "bot"): Promise<Rech
 }
 
 /**
- * The family's click on a proposal that waits (an "irreversible" action). UKK still sends nothing: the
+ * The family's click on a proposal that waits (an "irreversible" action). AIDaddy still sends nothing: the
  * click records the decision and hands back the draft for the family to send or hand in themselves.
  */
 export async function approveCaseAction(id: string, index: number): Promise<{ action: CaseAction; draft?: Draft } | null> {

@@ -9,12 +9,12 @@ import { labels } from "@/lib/i18n";
 
 const MODEL = "eleven_flash_v2_5";
 /**
- * UKK's own voice, designed for this project with ElevenLabs Voice Design from a text description
- * (an older, calm statesman with a light Nordic accent). It is not a clone of anyone's voice.
+ * AIDaddy's own voice, designed for this project with ElevenLabs Voice Design from a text description
+ * (an older, calm voice with a light Nordic accent). It is not a clone of anyone's voice.
  * It lives in the team's ElevenLabs account; ELEVENLABS_VOICE_ID overrides it, for example for another account.
  */
-export const UKK_VOICE = "UWUOFJTWwuSmZFHzbMpM";
-const DEFAULT_VOICE = UKK_VOICE;
+export const AIDADDY_VOICE = "UWUOFJTWwuSmZFHzbMpM";
+const DEFAULT_VOICE = AIDADDY_VOICE;
 const voiceId = () => process.env.ELEVENLABS_VOICE_ID || DEFAULT_VOICE;
 
 export const SPOKEN_LIMIT = 1500;
@@ -88,7 +88,7 @@ export async function renderSpeech(text: string, language?: string): Promise<Buf
   return audio;
 }
 
-/** The longest chat reply UKK reads aloud. Longer replies are cut after the last whole sentence that fits. */
+/** The longest chat reply AIDaddy reads aloud. Longer replies are cut after the last whole sentence that fits. */
 export const SPEAKABLE_LIMIT = 900;
 
 /**
@@ -123,4 +123,22 @@ export async function transcribe(audio: Blob): Promise<string> {
   if (!res.ok) throw new Error(`ElevenLabs answered ${res.status}`);
   const body = (await res.json()) as { text?: string };
   return (body.text ?? "").trim();
+}
+
+/** The Finnish case endings and the one particle people write straight after the name, as the gate accepts them. */
+const NAME_ENDING = "(?:n|a|ä|lle|lla|llä|lta|ltä|ssa|ssä|sta|stä|yn|na|nä|ksi)?(?:kin|kaan|kään|han|hän|ko|kö|pa|pä)?";
+
+/** The name as speech to text writes it down: "AI Daddy", "Ai daddy", "AI-Daddy", "A.I. Daddy", with or without an ending. */
+const NAME_AS_HEARD = new RegExp(
+  `(?<![\\p{L}\\p{N}_])(?:ai|a\\.\\s?i\\.?)[ \\u00a0\\u2010\\u2011-]?daddy(${NAME_ENDING})(?![\\p{L}\\p{N}_])`,
+  "giu",
+);
+
+/**
+ * A transcript with the name spelled the way the product spells it. Speech to text hears "AIDaddy" as two words,
+ * and the transcript goes into the visitor's message box. Only the name changes, and an ending written straight
+ * after it stays ("AI Daddyn" becomes "AIDaddyn"): "daddy" alone, "AI" alone and every other word are left as heard.
+ */
+export function spellName(transcript: string): string {
+  return transcript.replace(NAME_AS_HEARD, "AIDaddy$1");
 }

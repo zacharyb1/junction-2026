@@ -31,7 +31,7 @@ beforeEach(() => stored.clear());
 
 describe("the action log on a case", () => {
   it("records the research, the draft and a waiting proposal when a case is published", async () => {
-    const { id } = await publishCase(input, "https://ukk.example", undefined, trail);
+    const { id } = await publishCase(input, "https://aidaddy.example", undefined, trail);
     const actions = (await loadCase(id))!.actions!;
     expect(actions.map((a) => [a.kind, a.status])).toEqual([
       ["read", "done"],
@@ -43,7 +43,7 @@ describe("the action log on a case", () => {
   });
 
   it("logs only new drafts on update, plus what the bot reports doing", async () => {
-    const { id } = await publishCase(input, "https://ukk.example");
+    const { id } = await publishCase(input, "https://aidaddy.example");
     const before = (await loadCase(id))!.actions!.length;
     const patch = CasePatch.parse({
       drafts: [
@@ -52,7 +52,7 @@ describe("the action log on a case", () => {
       ],
       log: [{ kind: "read", trigger: "deadline", summary: "Reminder sent: daycare application closes Friday" }],
     });
-    await updateCase(id, patch, "https://ukk.example");
+    await updateCase(id, patch, "https://aidaddy.example");
     const added = (await loadCase(id))!.actions!.slice(before);
     expect(added.map((a) => [a.kind, a.trigger])).toEqual([
       ["draft", "message"],
@@ -65,7 +65,7 @@ describe("the action log on a case", () => {
   });
 
   it("logs a scheduled re-check, and a page change when a quote is gone", async () => {
-    const { id } = await publishCase(input, "https://ukk.example");
+    const { id } = await publishCase(input, "https://aidaddy.example");
     vi.mocked(verifyEvidence).mockImplementationOnce(async (items) =>
       items.map((e) => ({ ...e, sourceType: "official", verification: "not_found", match: 0.2, fetchedAt: new Date().toISOString(), checkedVia: "live" })) as never,
     );
@@ -75,7 +75,7 @@ describe("the action log on a case", () => {
   });
 
   it("approves a waiting proposal once", async () => {
-    const { id } = await publishCase(input, "https://ukk.example");
+    const { id } = await publishCase(input, "https://aidaddy.example");
     const index = (await loadCase(id))!.actions!.findIndex((a) => a.status === "waiting");
     const first = await approveCaseAction(id, index);
     expect(first?.action.status).toBe("approved");

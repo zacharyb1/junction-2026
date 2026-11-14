@@ -1,4 +1,4 @@
-/* The welcome and settings page. Saying yes here is the one permission UKK asks for. */
+/* The welcome and settings page. Saying yes here is the one permission AIDaddy asks for. */
 
 const PROFILE = ["givenName", "familyName", "email", "phone", "street", "postcode", "city", "birthDate"];
 const CONNECTION = ["engine", "code", "country", "language"];
@@ -6,7 +6,7 @@ const DEFAULT_ENGINE = "https://86.38.238.136.sslip.io";
 const $ = (id) => document.getElementById(id);
 
 function showState(consent) {
-  $("state").textContent = consent ? "UKK is looking at the pages you open." : "UKK is not looking. Nothing is read.";
+  $("state").textContent = consent ? "AIDaddy is looking at the pages you open." : "AIDaddy is not looking. Nothing is read.";
   $("state").dataset.on = String(consent);
   $("allow").hidden = consent;
   $("stop").hidden = !consent;

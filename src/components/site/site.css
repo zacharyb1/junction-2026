@@ -2,7 +2,7 @@
  * The frame every page of the site shares: one dark ground, one palette, one header, one footer.
  *
  * The palette is the front page's control room (src/components/hud/hud.css). Here it is also handed to the
- * shared Tailwind tokens (--background, --primary, --border ...), so /try, the case file and the chat with UKK
+ * shared Tailwind tokens (--background, --primary, --border ...), so /try, the case file and the chat with AIDaddy
  * are drawn in the same colours as the front page without restyling each component.
  *
  * Everything is scoped to .site. The reading table at /reading does not use this frame and keeps its paper.

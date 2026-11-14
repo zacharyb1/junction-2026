@@ -3,9 +3,9 @@
 import { useReplayClock } from "@/components/demo/replay";
 
 /**
- * Issue #34: a scripted replay of UKK noticing that someone is stuck on a tax return, fixing the
+ * Issue #34: a scripted replay of AIDaddy noticing that someone is stuck on a tax return, fixing the
  * mistake, and calling them. The form is illustrative (made-up address, no authority's branding).
- * The rules UKK cites come from a real run on vero.fi pages:
+ * The rules AIDaddy cites come from a real run on vero.fi pages:
  * https://86.38.238.136.sslip.io/c/VmOaZsrU6ej6MtdN (6 of 6 quotes checked). The call is a concept.
  */
 export const CASE_URL = "https://86.38.238.136.sslip.io/c/VmOaZsrU6ej6MtdN";
@@ -15,7 +15,7 @@ const typed = (text: string, from: number, to: number, now: number) =>
   now < from ? "" : text.slice(0, Math.ceil(((Math.min(now, to) - from) / (to - from)) * text.length));
 
 const CAPTIONS: [number, string][] = [
-  [24200, "Hi Aino, it's UKK. You were stuck on commuting expenses."],
+  [24200, "Hi Aino, it's AIDaddy. You were stuck on commuting expenses."],
   [27000, "The rule says the cheapest fare counts, even if you drove [1]."],
   [29800, "The first 800 euros are your own share [3]. I switched it to public transport."],
   [32600, "Check it, and press submit when you're ready. I won't send anything."],
@@ -56,7 +56,7 @@ export function BrowserDemo({ loop = false }: { loop?: boolean }) {
           <label className={`bdemo-field${fixed ? " is-fixed" : ""}`}>
             <span>Means of transport</span>
             <output>{transport}</output>
-            {fixed && <em>Changed by UKK</em>}
+            {fixed && <em>Changed by AIDaddy</em>}
           </label>
           <label className="bdemo-field">
             <span>Distance one way</span>
@@ -74,15 +74,15 @@ export function BrowserDemo({ loop = false }: { loop?: boolean }) {
             <span className="bdemo-back">Back</span>
             <span className={`bdemo-submit${now >= 18200 ? " is-waiting" : ""}`}>Submit return</span>
           </div>
-          {now >= 18200 && <p className="bdemo-wait">Submitting waits for your click. UKK never submits.</p>}
+          {now >= 18200 && <p className="bdemo-wait">Submitting waits for your click. AIDaddy never submits.</p>}
         </form>
 
         <aside className={`bdemo-panel${panel ? " is-open" : ""}`} aria-hidden={!panel}>
           <div className="bdemo-panel-head">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ukk-avatar.jpg" alt="" />
+            <img src="/aidaddy-avatar.svg" alt="" />
             <div>
-              <p className="bdemo-panel-name">UKK</p>
+              <p className="bdemo-panel-name">AIDaddy</p>
               <p className="bdemo-panel-sub">reading along in your browser</p>
             </div>
           </div>
@@ -107,10 +107,10 @@ export function BrowserDemo({ loop = false }: { loop?: boolean }) {
       {call && (
         // The dock is what lets the call follow the screen on a phone, where the window is taller than the screen.
         <div className="bdemo-call-dock">
-          <div className="bdemo-call" role="group" aria-label="UKK is calling: a concept">
+          <div className="bdemo-call" role="group" aria-label="AIDaddy is calling: a concept">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ukk-avatar.jpg" alt="" className={ringing ? "is-ringing" : ""} />
-            <p className="bdemo-call-name">UKK</p>
+            <img src="/aidaddy-avatar.svg" alt="" className={ringing ? "is-ringing" : ""} />
+            <p className="bdemo-call-name">AIDaddy</p>
             <p className="bdemo-call-state">{ringing ? "calling…" : "00:" + String(Math.floor((now - 23400) / 1000)).padStart(2, "0")}</p>
             <div className="bdemo-captions">
               {captions.map(([at, text]) => (
@@ -121,7 +121,7 @@ export function BrowserDemo({ loop = false }: { loop?: boolean }) {
               <span className="is-decline">✕</span>
               <span className={`is-accept${ringing ? " is-pulse" : ""}`}>✆</span>
             </div>
-            <p className="bdemo-concept">Concept: UKK cannot place calls yet.</p>
+            <p className="bdemo-concept">Concept: AIDaddy cannot place calls yet.</p>
           </div>
         </div>
       )}

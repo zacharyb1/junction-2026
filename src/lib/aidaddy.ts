@@ -1,12 +1,14 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-/** Where the /ukk chat runs when this deployment has no UKK backend (for example on Vercel). */
-export const DEFAULT_CHAT_URL = "https://86.38.238.136.sslip.io/ukk";
+/** Where the /chat page runs when this deployment has no AIDaddy backend (for example on Vercel). */
+export const DEFAULT_CHAT_URL = "https://86.38.238.136.sslip.io/chat";
 
-export const SESSION_COOKIE = "ukk_session";
+export const SESSION_COOKIE = "aidaddy_session";
 
-/** True when this deployment can reach the web-only UKK instance (hermes-web on the server). */
-export function ukkConfigured(): boolean {
+// The UKK_ variable names below predate the rename to AIDaddy and stay, because the server's private env file sets them.
+
+/** True when this deployment can reach the web-only AIDaddy instance (hermes-web on the server). */
+export function aidaddyConfigured(): boolean {
   return Boolean(process.env.UKK_API_URL && process.env.UKK_API_KEY);
 }
 

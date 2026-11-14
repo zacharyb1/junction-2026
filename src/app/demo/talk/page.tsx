@@ -4,8 +4,9 @@ import { CASE_URL, TalkDemo } from "@/components/talk-demo/talk-demo";
 import "@/components/talk-demo/talk-demo.css";
 
 export const metadata: Metadata = {
-  title: "UKK in the background: demo replay",
-  description: "A scripted replay of UKK solving a problem while two people keep talking. Concept; the research is a real run.",
+  // The name is already in the title, so the layout's " · AIDaddy" ending is left off.
+  title: { absolute: "AIDaddy in the background: demo replay" },
+  description: "A scripted replay of AIDaddy solving a problem while two people keep talking. Concept; the research is a real run.",
   robots: { index: false },
 };
 
@@ -21,7 +22,7 @@ export default async function TalkDemoPage({ searchParams }: PageProps<"/demo/ta
       bare={bare}
       caption={
         <>
-          Concept demo: UKK cannot listen on the phone yet. The research and its quotes are a <a href={CASE_URL}>real run</a>{" "}
+          Concept demo: AIDaddy cannot listen on the phone yet. The research and its quotes are a <a href={CASE_URL}>real run</a>{" "}
           on kkv.fi, the Finnish consumer authority.
         </>
       }

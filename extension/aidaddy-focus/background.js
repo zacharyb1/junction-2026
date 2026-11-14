@@ -1,4 +1,4 @@
-// UKK Focus (issue #31): notice a half-done official task left for social media, and nudge once.
+// AIDaddy Focus (issue #31): notice a half-done official task left for social media, and nudge once.
 // Only hostnames are compared, state lives in this browser session, and nothing is sent anywhere.
 
 const TASKS = [
@@ -59,10 +59,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (!active || !DISTRACTIONS.test(hostOf(active.url))) return;
   const still = await chrome.tabs.get(task.tabId).catch(() => null);
   if (!still) return;
-  chrome.notifications.create("ukk-nudge", {
+  chrome.notifications.create("aidaddy-nudge", {
     type: "basic",
     iconUrl: "icon-128.png",
-    title: "UKK",
+    title: "AIDaddy",
     message: `${task.name[0].toUpperCase()}${task.name.slice(1)} is still open on ${task.site}. Back to it? A few more steps and it is done.`,
     buttons: [{ title: "Back to it" }, { title: `Later (${SNOOZE_MINUTES} min)` }],
     priority: 1,
@@ -70,7 +70,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 chrome.notifications.onButtonClicked.addListener(async (id, button) => {
-  if (id !== "ukk-nudge") return;
+  if (id !== "aidaddy-nudge") return;
   chrome.notifications.clear(id);
   const { task } = await state();
   if (button === 0 && task) {
