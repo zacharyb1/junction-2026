@@ -11,7 +11,7 @@ const json = (error: string, status: number) => Response.json({ error }, { statu
 /**
  * Isolated concept transport. Normally uses the existing local chat handler, including its
  * access and rate limits. Setting AVATAR_UPSTREAM explicitly opts this deployment into
- * relaying to that HTTPS origin's public /api/ukk endpoint. No remote default is built in.
+ * relaying to that HTTPS origin's public /api/aidaddy endpoint. No remote default is built in.
  * The remote path is fixed and neither cookies, bearer tokens nor proxy headers cross it.
  */
 export async function POST(req: Request) {
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
   const signal = AbortSignal.any([req.signal, AbortSignal.timeout(280_000)]);
   let upstream: Response;
   try {
-    upstream = await fetch(new URL("/api/ukk", origin), {
+    upstream = await fetch(new URL("/api/aidaddy", origin), {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -57,6 +57,7 @@ export async function POST(req: Request) {
     if (upstream.status === 401) return json("The access code is not valid on the chat server.", 401);
     if (upstream.status === 429) return json("The assistant is busy. Try again in a minute.", 429);
     if (upstream.status === 503) return json("Live chat is not available on this server.", 503);
+    if (upstream.status === 404) return json("Live chat is unavailable at this address. You can still watch the recorded example.", 502);
     return json("The chat server could not answer. Try again.", 502);
   }
 

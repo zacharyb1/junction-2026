@@ -22,9 +22,9 @@ beforeEach(() => {
   vi.stubEnv("AVATAR_UPSTREAM", "https://team.example");
   vi.mocked(mayResearch).mockReturnValue(true);
   vi.mocked(allow).mockReturnValue(true);
-  vi.stubGlobal("fetch", vi.fn(async () => new Response("data: [DONE]\n\n", {
+  vi.stubGlobal("fetch", vi.fn(async (url: string | URL | Request) => new URL(String(url)).pathname === "/api/aidaddy" ? new Response("data: [DONE]\n\n", {
     headers: { "content-type": "text/event-stream", "set-cookie": "remote=secret" },
-  })));
+  }) : new Response("<html>Not found</html>", { status: 404, headers: { "content-type": "text/html" } })));
 });
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
@@ -40,7 +40,7 @@ describe("avatar chat relay", () => {
   it("forwards only a validated message and demo code to the fixed path", async () => {
     const response = await POST(request({ message: "  Hello  " }));
     const [url, init] = vi.mocked(fetch).mock.calls[0];
-    expect(String(url)).toBe("https://team.example/api/ukk");
+    expect(String(url)).toBe("https://team.example/api/aidaddy");
     expect(init).toMatchObject({ method: "POST", redirect: "error", body: '{"message":"Hello"}' });
     expect(init?.headers).toEqual({ "content-type": "application/json", accept: "text/event-stream", "x-demo-code": "demo" });
     expect(response.headers.get("set-cookie")).toBeNull();
@@ -90,5 +90,12 @@ describe("avatar chat relay", () => {
   it("rejects an HTML success page instead of pretending it is a reply stream", async () => {
     vi.mocked(fetch).mockResolvedValue(new Response("<html>login</html>", { headers: { "content-type": "text/html" } }));
     expect((await POST(request())).status).toBe(502);
+  });
+
+  it("offers the recorded example when the remote chat route is missing", async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response("<html>Not found</html>", { status: 404 }));
+    const response = await POST(request());
+    expect(response.status).toBe(502);
+    expect((await response.json()).error).toBe("Live chat is unavailable at this address. You can still watch the recorded example.");
   });
 });
