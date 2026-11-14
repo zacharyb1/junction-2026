@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Attention, Check, Cross } from "@/components/landing/glyphs";
-import { approvalStep, firstGap } from "@/components/landing/sample";
+import { approvalStep, firstGap } from "@/components/site/sample";
 import { Section } from "@/components/landing/section";
 import { labels } from "@/lib/i18n";
 import { cn } from "@/lib/utils";

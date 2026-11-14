@@ -4,7 +4,7 @@ import { CircleAlert, Loader2, Mic, Send, Square, Volume2, VolumeX } from "lucid
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { AIDaddyAvatar, type AvatarState } from "@/components/aidaddy-avatar";
 import { CopyButton } from "@/components/copy-button";
-import { linkButtonClasses } from "@/components/landing/link-button";
+import { linkButtonClasses } from "@/components/site/link-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

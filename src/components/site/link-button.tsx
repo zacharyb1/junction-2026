@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { SiteLink } from "@/components/site/site-link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -17,10 +18,10 @@ type Look = {
  * <a> directly, so this hands out the same class recipe for use on a real link.
  */
 export function linkButtonClasses({ variant = "default", size = "default" }: Look = {}, className?: string) {
-  return cn(buttonVariants({ variant, size: "lg" }), size === "cta" && "h-11 px-5 text-base", className);
+  return cn(buttonVariants({ variant, size: "lg" }), size === "cta" && "site-btn--cta", className);
 }
 
-/** A link that looks like a button. Site paths use next/link, everything else opens in a new tab. */
+/** A link that looks like a button. Site paths use SiteLink (the access code travels along), "#" links next/link, everything else opens in a new tab. */
 export function LinkButton({
   href,
   children,
@@ -29,11 +30,18 @@ export function LinkButton({
 }: Look & { href: string; children: ReactNode; className?: string }) {
   const classes = linkButtonClasses(look, className);
 
-  if (href.startsWith("/") || href.startsWith("#")) {
+  if (href.startsWith("#")) {
     return (
       <Link href={href} className={classes}>
         {children}
       </Link>
+    );
+  }
+  if (href.startsWith("/")) {
+    return (
+      <SiteLink href={href} className={classes}>
+        {children}
+      </SiteLink>
     );
   }
   return (

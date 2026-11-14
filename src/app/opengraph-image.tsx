@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { loadScorecard, seconds } from "@/components/landing/scorecard-data";
+import { loadScorecard, seconds } from "@/components/site/scorecard-data";
 import { heading, PreviewCard, tone } from "@/lib/preview-card";
 
 export const alt = "AIDaddy: the butler in your family group chat, with a source on every line";

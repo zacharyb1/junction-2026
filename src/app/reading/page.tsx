@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { landingConfig } from "@/components/landing/config";
+import { landingConfig } from "@/components/site/config";
 import { Hero } from "@/components/landing/hero";
 import { readingBody, readingDisplay, readingHand, readingSans } from "@/components/landing/fonts";
 import { readingPaper } from "@/components/landing/reading-plates";
@@ -10,7 +10,7 @@ import { ChatIllustration } from "@/components/landing/chat-illustration";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Privacy } from "@/components/landing/privacy";
 import { Scorecard } from "@/components/landing/scorecard";
-import { loadScorecard } from "@/components/landing/scorecard-data";
+import { loadScorecard } from "@/components/site/scorecard-data";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { Trust } from "@/components/landing/trust";
 

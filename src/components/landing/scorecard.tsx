@@ -7,7 +7,7 @@ import {
   type Scorecard as ScorecardData,
   type ScorecardRow,
   seconds,
-} from "@/components/landing/scorecard-data";
+} from "@/components/site/scorecard-data";
 import { Section } from "@/components/landing/section";
 
 const DASH = "–";

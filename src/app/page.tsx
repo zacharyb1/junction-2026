@@ -3,8 +3,8 @@ import { officialSites, planRows, quiet, replayData } from "@/components/hud/dat
 import { QuietDays } from "@/components/hud/quiet-days";
 import { ResearchReplay } from "@/components/hud/research-replay";
 import { GateFigures, Hero, Places, PlanPanel, Readouts, Schematic, Section, Start } from "@/components/hud/sections";
-import { landingConfig } from "@/components/landing/config";
-import { loadScorecard } from "@/components/landing/scorecard-data";
+import { landingConfig } from "@/components/site/config";
+import { loadScorecard } from "@/components/site/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
 import "@/components/hud/hud.css";

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CalendarDays, MapPin, ArrowRight } from "lucide-react";
 import { ReadingPlate } from "@/components/landing/reading-plates";
 import { InkReveal, ReadingMotion } from "@/components/landing/reading-motion";
-import { planLines } from "@/components/landing/sample";
+import { planLines } from "@/components/site/sample";
 import { TryLink } from "@/components/landing/try-link";
 
 const INK = ["wordmark-ink", "headline-highlight", "intro-ink", "sample-circle", "case-underline", "plan-highlight", "proof-bracket", "bracket-underline", "plan-arrow", "publisher-highlight", "source-highlight", "source-arrow", "divider"] as const;

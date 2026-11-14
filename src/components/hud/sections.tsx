@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Core } from "@/components/hud/core";
 import type { PlanRow } from "@/components/hud/data";
 import { HearPlan } from "@/components/hud/hear-plan";
-import type { Scorecard } from "@/components/landing/scorecard-data";
+import type { Scorecard } from "@/components/site/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
 
 const oneDecimal = (ms: number) => (ms / 1000).toFixed(1);

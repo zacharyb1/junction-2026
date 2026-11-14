@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Arrow } from "@/components/landing/glyphs";
-import { type PlanLine, planLines, planTitle } from "@/components/landing/sample";
+import { type PlanLine, planLines, planTitle } from "@/components/site/sample";
 import { WayContent, wayClasses } from "@/components/landing/way";
 import { labels } from "@/lib/i18n";
 import { cn } from "@/lib/utils";

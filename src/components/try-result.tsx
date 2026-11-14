@@ -2,7 +2,7 @@
 
 import { ArrowRight, BadgeCheck, ChevronRight, CircleAlert, ExternalLink } from "lucide-react";
 import { type Ref, useState } from "react";
-import { linkButtonClasses } from "@/components/landing/link-button";
+import { linkButtonClasses } from "@/components/site/link-button";
 import { hostOf } from "@/components/try-progress";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { linkButtonClasses } from "@/components/landing/link-button";
+import { linkButtonClasses } from "@/components/site/link-button";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
 
