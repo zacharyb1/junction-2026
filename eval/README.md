@@ -39,6 +39,12 @@ Writes `eval/results/<timestamp>.json` (full detail), `eval/results/latest.md` a
 
 Verified is at least `expect.minVerified`, jurisdiction is right, nothing is unsourced, and there is a deadline or amount unless `needsDeadlineOrAmount` is false. Text in `expect.mustNotContain` must not appear in the plan or case. HTTP errors fail, after one retry on 429 or 5xx. Silent scenarios are manual chat-bot checks, outside the totals.
 
+## Refusals
+
+Scenarios with `"expect": { "refuse": true, "status": 422 }` (group `refusals`) are messages the engine must not answer with a plan: keyboard mash, placeholder text, a greeting, an unknown country. Each passes when `POST /api/research` answers with a 4xx status, no case id and a message a person can act on. They run after the plan scenarios, are printed as `[refuse]` lines, get their own section in `latest.md`, and are written to `scorecard.json` as `refusals: { passed, total }`. They are not part of the plan totals.
+
+Known limit: a message that repeats one real word ("test test test test") still gets a plan, because the check only asks whether a word of the message comes back in what the search wrote.
+
 ## Add a scenario
 
 Append an object to `scenarios.json`: unique `id`, `group`, `title`, the message as `situation`, `country`, `region`, `language`, `expect`. Optional: `household`, `document`. Leave `officialHostsAny` empty when unsure.

@@ -641,7 +641,9 @@ async function main() {
   }
   const selected = selectScenarios(scenarios, opts);
   const manual = selected.filter((s) => s.expect.silent);
-  const scored = selected.filter((s) => !s.expect.silent);
+  // Messages the engine must refuse: nothing to research, or a country it does not know. Scored on their own.
+  const refusing = selected.filter((s) => s.expect.refuse);
+  const scored = selected.filter((s) => !s.expect.silent && !s.expect.refuse);
 
   opts.auth = {
     ...(process.env.CASEFILE_SECRET ? { authorization: `Bearer ${process.env.CASEFILE_SECRET}` } : {}),
@@ -675,6 +677,23 @@ async function main() {
     return result;
   });
 
+  // Refusals run one at a time after the plans: each should answer in a few seconds without a case.
+  const refusals = [];
+  for (const scenario of refusing) {
+    const answer = await call(`${opts.base}/api/research`, {
+      method: "POST",
+      headers: { ...opts.auth, "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ situation: scenario.situation, country: scenario.country, language: scenario.language || "en", depth: opts.depth }),
+      timeoutMs: opts.timeout * 1000,
+    });
+    const message = typeof answer.json?.error === "string" ? answer.json.error : "";
+    const refused = answer.status >= 400 && answer.status < 500 && ![401, 429].includes(answer.status) && !answer.json?.id && message.length > 0;
+    const pass = refused && (!scenario.expect.status || answer.status === scenario.expect.status);
+    refusals.push({ n: scenario.n, id: scenario.id, title: scenario.title, situation: scenario.situation, status: answer.status || null, pass, message });
+    console.log(`[refuse] ${pass ? "pass" : "FAIL"}  ${scenario.id.padEnd(width)}  HTTP ${answer.status || "none"}${pass ? "" : `  <- ${answer.json?.id ? "a plan came back" : answer.error || message || "unexpected answer"}`}`);
+  }
+  const refusalTotals = refusals.length ? { passed: refusals.filter((r) => r.pass).length, total: refusals.length } : undefined;
+
   const mock = results.some((r) => r.mock);
   const label = `${mock && !/mock/i.test(opts.label ?? "") ? "MOCK " : ""}${opts.label || `run ${ranAt.slice(0, 16)}Z`}`;
   const totals = totalsFor(results);
@@ -701,8 +720,8 @@ async function main() {
     timeoutSeconds: opts.timeout,
     durationMs: Math.round(performance.now() - started),
     filters: { only: opts.only, group: opts.group },
-    filtered: results.length < scenarios.filter((s) => !s.expect.silent).length,
-    scorable: scenarios.filter((s) => !s.expect.silent).length,
+    filtered: results.length < scenarios.filter((s) => !s.expect.silent && !s.expect.refuse).length,
+    scorable: scenarios.filter((s) => !s.expect.silent && !s.expect.refuse).length,
     credentials: { bearer: Boolean(opts.auth.authorization), demoCode: Boolean(opts.auth["x-demo-code"]) },
     mock,
     node: process.version,
@@ -711,8 +730,17 @@ async function main() {
     extra,
     results,
     manual: manual.map((s) => ({ n: s.n, id: s.id, title: s.title, group: s.group, status: MANUAL, situation: s.situation })),
+    refusals,
   };
-  const scorecard = { label, ranAt, base: opts.base, depth: opts.depth, totals, rows: results.map(rowFor) };
+  const scorecard = {
+    label,
+    ranAt,
+    base: opts.base,
+    depth: opts.depth,
+    totals,
+    ...(refusalTotals ? { refusals: refusalTotals } : {}),
+    rows: results.map(rowFor),
+  };
 
   const written = [];
   let wroteScorecard = false;
@@ -724,7 +752,20 @@ async function main() {
       written.push(relative.startsWith("..") ? file : relative);
     };
     await write(path.join(RESULTS_DIR, detailFile), `${JSON.stringify(run, null, 2)}\n`);
-    await write(path.join(RESULTS_DIR, "latest.md"), markdown(run));
+    const refusalSection = refusals.length
+      ? [
+          "",
+          "## Refusals",
+          "",
+          `Messages the engine must not answer with a plan. Refused ${refusalTotals.passed} of ${refusalTotals.total}.`,
+          "",
+          "| Scenario | Message | Answer | Result |",
+          "|---|---|---|---|",
+          ...refusals.map((r) => `| ${r.title} | ${r.situation.replace(/\|/g, "/").slice(0, 60)} | HTTP ${r.status ?? "none"} | ${r.pass ? "refused" : "**not refused**"} |`),
+          "",
+        ].join("\n")
+      : "";
+    await write(path.join(RESULTS_DIR, "latest.md"), markdown(run) + refusalSection);
     if (opts.scorecard) {
       await mkdir(path.dirname(SCORECARD_FILE), { recursive: true });
       await write(SCORECARD_FILE, `${JSON.stringify(scorecard, null, 2)}\n`);
@@ -741,6 +782,7 @@ async function main() {
       `Verified quotes ${totals.verifiedQuotes} of ${totals.totalQuotes}.  Unsourced claims ${totals.unsourcedClaims}.  ` +
       `Median ${seconds(totals.medianMs)}, p90 ${seconds(totals.p90Ms)}.`,
   );
+  if (refusalTotals) console.log(`Refused ${refusalTotals.passed} of ${refusalTotals.total} messages that hold nothing to research.`);
   for (const file of written) console.log(`Wrote ${file}`);
   if (manual.length) console.log(`${manual.length} chat-bot scenario(s) are manual and not in the totals.`);
   if (mock) console.log("This was the mock server: the numbers are fake. Delete these files before you commit.");

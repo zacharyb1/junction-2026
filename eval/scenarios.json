@@ -11,7 +11,10 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["kela.fi", "infofinland.fi"]
+      "officialHostsAny": [
+        "kela.fi",
+        "infofinland.fi"
+      ]
     }
   },
   {
@@ -27,7 +30,11 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["kkv.fi", "finlex.fi", "infofinland.fi"]
+      "officialHostsAny": [
+        "kkv.fi",
+        "finlex.fi",
+        "infofinland.fi"
+      ]
     }
   },
   {
@@ -42,7 +49,11 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["dvv.fi", "suomi.fi", "infofinland.fi"]
+      "officialHostsAny": [
+        "dvv.fi",
+        "suomi.fi",
+        "infofinland.fi"
+      ]
     }
   },
   {
@@ -57,7 +68,12 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["kela.fi", "tyomarkkinatori.fi", "infofinland.fi", "espoo.fi"]
+      "officialHostsAny": [
+        "kela.fi",
+        "tyomarkkinatori.fi",
+        "infofinland.fi",
+        "espoo.fi"
+      ]
     }
   },
   {
@@ -72,7 +88,12 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["tyosuojelu.fi", "tem.fi", "finlex.fi", "infofinland.fi"]
+      "officialHostsAny": [
+        "tyosuojelu.fi",
+        "tem.fi",
+        "finlex.fi",
+        "infofinland.fi"
+      ]
     }
   },
   {
@@ -87,7 +108,11 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["espoo.fi", "infofinland.fi", "suomi.fi"]
+      "officialHostsAny": [
+        "espoo.fi",
+        "infofinland.fi",
+        "suomi.fi"
+      ]
     }
   },
   {
@@ -102,7 +127,11 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["migri.fi", "enterfinland.fi", "infofinland.fi"]
+      "officialHostsAny": [
+        "migri.fi",
+        "enterfinland.fi",
+        "infofinland.fi"
+      ]
     }
   },
   {
@@ -117,7 +146,9 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["vero.fi"]
+      "officialHostsAny": [
+        "vero.fi"
+      ]
     }
   },
   {
@@ -132,7 +163,12 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["hel.fi", "poliisi.fi", "finlex.fi", "suomi.fi"]
+      "officialHostsAny": [
+        "hel.fi",
+        "poliisi.fi",
+        "finlex.fi",
+        "suomi.fi"
+      ]
     }
   },
   {
@@ -147,7 +183,11 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["kkv.fi", "kuluttajariita.fi", "europa.eu"]
+      "officialHostsAny": [
+        "kkv.fi",
+        "kuluttajariita.fi",
+        "europa.eu"
+      ]
     }
   },
   {
@@ -162,7 +202,11 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["europa.eu", "traficom.fi", "kkv.fi"]
+      "officialHostsAny": [
+        "europa.eu",
+        "traficom.fi",
+        "kkv.fi"
+      ]
     }
   },
   {
@@ -192,7 +236,10 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["kkv.fi", "traficom.fi"]
+      "officialHostsAny": [
+        "kkv.fi",
+        "traficom.fi"
+      ]
     }
   },
   {
@@ -207,7 +254,10 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["traficom.fi", "suomi.fi"]
+      "officialHostsAny": [
+        "traficom.fi",
+        "suomi.fi"
+      ]
     }
   },
   {
@@ -222,7 +272,10 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["sf.gov", "ca.gov"]
+      "officialHostsAny": [
+        "sf.gov",
+        "ca.gov"
+      ]
     }
   },
   {
@@ -237,7 +290,10 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["gov.uk", "nationalrail.co.uk"]
+      "officialHostsAny": [
+        "gov.uk",
+        "nationalrail.co.uk"
+      ]
     }
   },
   {
@@ -252,7 +308,14 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["familienportal.de", "bmfsfj.de", "elterngeld-digital.de", "gesetze-im-internet.de", "bund.de", "service.berlin.de"]
+      "officialHostsAny": [
+        "familienportal.de",
+        "bmfsfj.de",
+        "elterngeld-digital.de",
+        "gesetze-im-internet.de",
+        "bund.de",
+        "service.berlin.de"
+      ]
     }
   },
   {
@@ -267,7 +330,12 @@
       "silent": false,
       "minVerified": 2,
       "needsDeadlineOrAmount": true,
-      "officialHostsAny": ["netherlandsworldwide.nl", "nederlandwereldwijd.nl", "government.nl", "rijksoverheid.nl"]
+      "officialHostsAny": [
+        "netherlandsworldwide.nl",
+        "nederlandwereldwijd.nl",
+        "government.nl",
+        "rijksoverheid.nl"
+      ]
     }
   },
   {
@@ -313,8 +381,86 @@
       "silent": false,
       "minVerified": 1,
       "needsDeadlineOrAmount": false,
-      "officialHostsAny": ["kela.fi", "infofinland.fi", "suomi.fi"],
-      "mustNotContain": ["ZEBRA-4417"]
+      "officialHostsAny": [
+        "kela.fi",
+        "infofinland.fi",
+        "suomi.fi"
+      ],
+      "mustNotContain": [
+        "ZEBRA-4417"
+      ]
+    }
+  },
+  {
+    "id": "refuse-keyboard-mash",
+    "group": "refusals",
+    "title": "Keyboard mash",
+    "situation": "asdf qwer zxcv hjkl uiop bnm",
+    "country": "FI",
+    "language": "en",
+    "expect": {
+      "refuse": true,
+      "status": 422
+    }
+  },
+  {
+    "id": "refuse-lorem-ipsum",
+    "group": "refusals",
+    "title": "Placeholder text",
+    "situation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+    "country": "FI",
+    "language": "en",
+    "expect": {
+      "refuse": true,
+      "status": 422
+    }
+  },
+  {
+    "id": "refuse-greeting",
+    "group": "refusals",
+    "title": "A greeting and nothing else",
+    "situation": "Hello! Good morning, how are you today?",
+    "country": "FI",
+    "language": "en",
+    "expect": {
+      "refuse": true,
+      "status": 422
+    }
+  },
+  {
+    "id": "refuse-question-marks",
+    "group": "refusals",
+    "title": "Questions with no content",
+    "situation": "What?? Why??? How???? Really?",
+    "country": "FI",
+    "language": "en",
+    "expect": {
+      "refuse": true,
+      "status": 422
+    }
+  },
+  {
+    "id": "refuse-emoji",
+    "group": "refusals",
+    "title": "Emoji and filler",
+    "situation": "😀😀😀 haha lol ok 👍👍",
+    "country": "FI",
+    "language": "en",
+    "expect": {
+      "refuse": true,
+      "status": 422
+    }
+  },
+  {
+    "id": "refuse-unknown-country",
+    "group": "refusals",
+    "title": "A real situation in a country that does not exist",
+    "situation": "We are moving to another city next month. Who do we notify?",
+    "country": "Atlantis",
+    "language": "en",
+    "expect": {
+      "refuse": true,
+      "status": 400
     }
   }
 ]
