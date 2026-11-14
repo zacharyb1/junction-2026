@@ -167,7 +167,7 @@ export function groundIdea(
 // ---- Product images ----------------------------------------------------------
 
 /**
- * Images of products the search found, by product URL, so the /ukk chat can show a picture next to a product link
+ * Images of products the search found, by product URL, so the /chat page can show a picture next to a product link
  * whatever the model wrote. In memory only: a restart forgets them, and the chat then shows the link alone.
  */
 // One map per server process. On globalThis because the MCP route and the image route can each load their own copy of

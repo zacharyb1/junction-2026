@@ -14,14 +14,14 @@ These work today. Each has a note you can paste into the form.
 
 - **Why it fits:** this is the challenge the product was built for.
 - **Note to paste:**
-  > UKK is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web: 19 of 19 scenarios, 98 of 98 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 5.6 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
+  > AIDaddy is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web: 19 of 19 scenarios, 98 of 98 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 5.6 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
 - **Evidence:** `src/data/scorecard.json`, `eval/results/latest.md`, the front page replay.
 
 ### - [ ] NVIDIA: Best Use of Nemotron
 
-- **Why it fits:** Nemotron 3.5 Super VL is UKK's conversation model, in Telegram and on `/ukk`.
+- **Why it fits:** Nemotron 3.5 Super VL is AIDaddy's conversation model, in Telegram and on `/chat`.
 - **Required:** a text in the form naming the model, what it does, why it matters and how we improved its outputs. Paste this:
-  > **Model:** `nvidia/nemotron-3.5-super-vl-120b-a12b`, through the Hermes Agent runtime's NVIDIA provider. **What it does:** it is the whole conversation layer of UKK. It decides whether a message in a group needs an answer, calls our research tool, writes drafts of letters for the household to send, sets reminders after approval, and reads photos of official letters with its own vision (no separate OCR model). **Why it matters:** one open model handles text, images and tool calls, so a newcomer can drop a photo of a Finnish letter into the chat and get a plan back. **How we improved its outputs:** (1) The model never states a figure itself. Deadlines and amounts come only from our research engine, which keeps a line only when its quoted sentence is found on the cited page; the model posts those lines unchanged. (2) A persona file and ten short skills give it exact procedures and the reasons behind each rule. (3) A local Gemma gate stops small talk before it reaches Nemotron, and the model answers `[SILENT]` when it is still unsure. (4) We rehearsed 12 scenarios from the command line and recorded live group runs, then fixed what failed: recovery when a case is missing, and duplicate reminders. Measured: first reply 3 to 12 seconds; a letter photo was read correctly in all six field groups with two street-name errors.
+  > **Model:** `nvidia/nemotron-3.5-super-vl-120b-a12b`, through the Hermes Agent runtime's NVIDIA provider. **What it does:** it is the whole conversation layer of AIDaddy. It decides whether a message in a group needs an answer, calls our research tool, writes drafts of letters for the household to send, sets reminders after approval, and reads photos of official letters with its own vision (no separate OCR model). **Why it matters:** one open model handles text, images and tool calls, so a newcomer can drop a photo of a Finnish letter into the chat and get a plan back. **How we improved its outputs:** (1) The model never states a figure itself. Deadlines and amounts come only from our research engine, which keeps a line only when its quoted sentence is found on the cited page; the model posts those lines unchanged. (2) A persona file and ten short skills give it exact procedures and the reasons behind each rule. (3) A local Gemma gate stops small talk before it reaches Nemotron, and the model answers `[SILENT]` when it is still unsure. (4) We rehearsed 12 scenarios from the command line and recorded live group runs, then fixed what failed: recovery when a case is missing, and duplicate reminders. Measured: first reply 3 to 12 seconds; a letter photo was read correctly in all six field groups with two street-name errors.
 - **Evidence:** `docs/HERMES_HANDOVER.md`, `hermes/SOUL.md`, `hermes/skills/`, `eval/bot/`.
 
 ### - [ ] Google DeepMind: Best Use of Gemma
@@ -33,11 +33,11 @@ These work today. Each has a note you can paste into the form.
 
 ### - [ ] Major League Hacking: Best Use of ElevenLabs
 
-- **Why it fits:** UKK has his own voice, and it is used in four places.
-- **Do first:** the server has no ElevenLabs key yet (`/api/health` says `"voice":"none"`), so `/ukk` shows "Voice is not set up on this server". Add `ELEVENLABS_API_KEY` to the server's `.env.local` (Milan). The front page's "Hear the plan" works without it.
+- **Why it fits:** AIDaddy has its own voice, and the voice is used in four places.
+- **Do first:** the server has no ElevenLabs key yet (`/api/health` says `"voice":"none"`), so `/chat` shows "Voice is not set up on this server". Add `ELEVENLABS_API_KEY` to the server's `.env.local` (Milan). The front page's "Hear the plan" works without it.
 - **Note to paste:**
-  > UKK's voice was made with ElevenLabs Voice Design from a text description (a calm older statesman with a light Nordic accent). It is not a clone of anyone. ElevenLabs is used in four places: (1) every case file can be read aloud, and the audio says only what the file shows; (2) on /ukk each reply is spoken while a drawn avatar moves its mouth with the audio; (3) the microphone button sends speech to ElevenLabs Scribe and puts the words in the message box to check before sending; (4) the front page's "Hear the plan" and the pitch voiceover. We checked the spoken words by transcribing the audio back to text.
-- **Evidence:** `src/lib/speech.ts`, `src/app/api/ukk/speak`, `src/app/api/ukk/listen`, `public/hud/plan.mp3`, `docs/pitch/voiceover/`.
+  > AIDaddy's voice was made with ElevenLabs Voice Design from a text description (a calm older voice with a light Nordic accent). It is not a clone of anyone. ElevenLabs is used in four places: (1) every case file can be read aloud, and the audio says only what the file shows; (2) on /chat each reply is spoken while a drawn avatar glows with the audio; (3) the microphone button sends speech to ElevenLabs Scribe and puts the words in the message box to check before sending; (4) the front page's "Hear the plan" and the pitch voiceover. We checked the spoken words by transcribing the audio back to text.
+- **Evidence:** `src/lib/speech.ts`, `src/app/api/aidaddy/speak`, `src/app/api/aidaddy/listen`, `public/hud/plan.mp3`, `docs/pitch/voiceover/`.
 
 ### - [ ] Verda: Verda Compute Track
 
@@ -75,7 +75,7 @@ Selecting these would not help. One line each, so nobody has to wonder.
 | Bahn: Spread | A simulation game with its own leaderboard. |
 | AfterQuery: Break the Agent | A reinforcement-learning environment. Our scorecard is a test set, not an environment. |
 | Valio Aimo: Trusted Trade Agents | A purchasing interface for a wholesaler. |
-| City of Espoo: Rethinking Recruitment | About recruitment events. UKK helps newcomers with paperwork, not with hiring. |
+| City of Espoo: Rethinking Recruitment | About recruitment events. AIDaddy helps newcomers with paperwork, not with hiring. |
 | S-Pankki: Personal Economic Trainer | Built on their bank-transaction dataset. Our finance desk gives rules and sources, not spending analysis. |
 | MariaDB: Wikipedia Through Time | Needs MariaDB and Wikipedia data. |
 | Stoa: Make Blueprints Talk | Construction drawings. |

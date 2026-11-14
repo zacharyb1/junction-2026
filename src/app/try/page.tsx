@@ -8,7 +8,8 @@ const description =
   "Describe a life event, pick your country, and watch AIDaddy research it on official sources with Exa.";
 
 export const metadata: Metadata = {
-  title,
+  // The name is already in the title, so the layout's " · AIDaddy" ending is left off.
+  title: { absolute: title },
   description,
   openGraph: { title, description, siteName: "AIDaddy", type: "website" },
   twitter: { card: "summary_large_image", title, description },

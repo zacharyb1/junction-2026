@@ -37,7 +37,7 @@ function pictureFor(url: string): Promise<string | null> {
 }
 
 /**
- * A link in UKK's reply, with the product's picture above it when the link is a product the gift search found, so a
+ * A link in AIDaddy's reply, with the product's picture above it when the link is a product the gift search found, so a
  * gift is seen as well as named. The server knows the picture; the model only has to post the link.
  */
 function ReplyLink({ url }: { url: string }) {
