@@ -36,7 +36,7 @@ export default async function Home() {
 
   return (
     <div className="hud">
-      <Hero botUrl={botUrl} sites={officialSites} card={card} />
+      <Hero sites={officialSites} card={card} />
       <main>
         <Section
           id="quiet"
