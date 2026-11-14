@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { GiftSearch } from "@/components/gift-search";
 import { landingConfig } from "@/components/landing/config";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
@@ -39,6 +40,7 @@ export default async function UkkPage({ searchParams }: PageProps<"/ukk">) {
           </p>
         </header>
         <UkkChat code={code} needsCode={demoCodeRequired()} />
+        <GiftSearch code={code} />
         <p className="text-sm leading-relaxed text-muted-foreground">
           Prefer Telegram?{" "}
           <a href={`https://t.me/${bot}`} target="_blank" rel="noreferrer" className={link}>
