@@ -26,6 +26,7 @@ const aliases = new Map([
   ["@/lib/text", new URL("../src/lib/text.ts", import.meta.url).href],
   // The real contract: cases.ts now takes several helpers from it, not only verifiedCount.
   ["@/lib/case", new URL("../src/lib/case.ts", import.meta.url).href],
+  ["@/lib/actions", new URL("../src/lib/actions.ts", import.meta.url).href],
   ["nanoid", moduleUrl('let n = 0; export const nanoid = () => `testcase${String(++n).padStart(8, "0")}`;')],
 ]);
 const hooks = registerHooks({
