@@ -19,7 +19,7 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-8 sm:py-12">
       <header className="flex flex-col gap-2">
-        <Link href="/" className="text-sm text-muted-foreground hover:underline">
+        <Link href="/" className="self-start py-0.5 text-sm text-muted-foreground hover:underline">
           Kaveri
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Try it on your own life</h1>

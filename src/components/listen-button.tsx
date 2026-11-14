@@ -1,7 +1,7 @@
 "use client";
 
 import { LoaderCircle, Volume2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -22,6 +22,12 @@ export function ListenButton({
   const audio = useRef<HTMLAudioElement>(null);
   const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
 
+  // The player takes the place of the button. If the button had the keyboard focus, the focus is now nowhere,
+  // so the player takes it and the reader carries on from the same spot.
+  useEffect(() => {
+    if (state === "ready" && document.activeElement === document.body) audio.current?.focus();
+  }, [state]);
+
   const start = () => {
     const player = audio.current;
     if (!player) return;
@@ -37,8 +43,9 @@ export function ListenButton({
   return (
     <div className="flex flex-col items-start gap-2">
       {state !== "ready" && (
-        <Button variant="outline" size="lg" onClick={start} disabled={state === "loading"}>
-          {state === "loading" ? <LoaderCircle className="animate-spin" /> : <Volume2 />}
+        // Still focusable while the audio loads, so the keyboard focus does not fall back to the top of the page.
+        <Button variant="outline" size="lg" onClick={start} disabled={state === "loading"} focusableWhenDisabled>
+          {state === "loading" ? <LoaderCircle className="animate-spin motion-reduce:animate-none" /> : <Volume2 />}
           {state === "loading" ? loadingLabel : label}
         </Button>
       )}

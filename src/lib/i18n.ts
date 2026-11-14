@@ -96,6 +96,9 @@ const en = {
   notConfirmed: "Not confirmed on a source",
   showOnPage: "Open the page at this sentence",
   mentionsYear: (year: number) => `Names ${year}`,
+  // Read by screen readers only, where the page shows just a number or an icon.
+  sourceNumber: (n: number) => `Source ${n}`,
+  newTab: "opens in a new tab",
   listen: "Listen to the plan",
   listenLoading: "Preparing the audio…",
   listenError: "The audio could not be loaded. Try again.",
@@ -185,6 +188,8 @@ const fi: Labels = {
   notConfirmed: "Ei vahvistettu lähteestä",
   showOnPage: "Avaa sivu tämän lauseen kohdalta",
   mentionsYear: (year) => `Mainitsee vuoden ${year}`,
+  sourceNumber: (n) => `Lähde ${n}`,
+  newTab: "avautuu uuteen välilehteen",
   listen: "Kuuntele suunnitelma",
   listenLoading: "Ääntä valmistellaan…",
   listenError: "Ääntä ei voitu ladata. Yritä uudelleen.",
@@ -199,4 +204,13 @@ const ALL: Record<string, Labels> = { en, fi };
 
 export function labels(language: string | undefined): Labels {
   return ALL[(language ?? "en").toLowerCase().slice(0, 2)] ?? en;
+}
+
+/**
+ * The value for a `lang` attribute. A case's language is free text from whoever published it ("fi", "Finnish"),
+ * and a made-up tag is worse than none. Without a real tag the page is marked in the language of its labels.
+ */
+export function langOf(language: string | undefined): string {
+  const tag = (language ?? "").trim();
+  return /^[a-z]{2,3}(-[a-z0-9]{2,8})*$/i.test(tag) ? tag : labels(language).locale.slice(0, 2);
 }

@@ -106,7 +106,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
           if (name === "done") {
             finished = true;
             setResult(payload as ResearchResult);
-            setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+            const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            setTimeout(() => resultRef.current?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" }), 50);
           } else if (name === "error") {
             finished = true;
             const message = (payload as { error: string }).error;
@@ -135,7 +136,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 wrap-anywhere">
       <form onSubmit={run} className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <label htmlFor="situation" className="text-sm font-medium">
@@ -201,7 +202,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
             </label>
             <select id="language" className={field} value={language} onChange={(e) => setLanguage(e.target.value)}>
               {LANGUAGES.map(([value, label]) => (
-                <option key={value} value={value}>
+                // Each language is written in itself, so a screen reader should pronounce it that way.
+                <option key={value} value={value} lang={value}>
                   {label}
                 </option>
               ))}
@@ -209,17 +211,19 @@ export function TryForm({ code: initialCode }: { code: string }) {
           </div>
         </div>
 
-        <details className="rounded-lg border px-3 py-2 text-sm">
-          <summary className="cursor-pointer font-medium">Got a letter? Paste its text</summary>
-          <Textarea
-            className="mt-3"
-            aria-label="Text of the letter"
-            rows={5}
-            maxLength={6000}
-            value={document}
-            onChange={(e) => setDocument(e.target.value)}
-            placeholder="Paste the text of the letter, in its original language."
-          />
+        <details className="rounded-lg border text-sm">
+          {/* The padding is on the summary, so the whole row opens it, not only the line of text. */}
+          <summary className="cursor-pointer px-3 py-2 font-medium">Got a letter? Paste its text</summary>
+          <div className="px-3 pt-1 pb-2">
+            <Textarea
+              aria-label="Text of the letter"
+              rows={5}
+              maxLength={6000}
+              value={document}
+              onChange={(e) => setDocument(e.target.value)}
+              placeholder="Paste the text of the letter, in its original language."
+            />
+          </div>
         </details>
 
         {(!initialCode || rejected) && (
@@ -231,34 +235,43 @@ export function TryForm({ code: initialCode }: { code: string }) {
           </div>
         )}
 
-        <Button type="submit" size="lg" disabled={busy}>
-          {busy ? <Loader2 className="animate-spin" /> : <Search />}
+        {/* Still focusable while it is busy: a disabled button drops the keyboard focus to the top of the page. */}
+        <Button type="submit" size="lg" disabled={busy} focusableWhenDisabled>
+          {busy ? <Loader2 className="animate-spin motion-reduce:animate-none" /> : <Search />}
           {busy ? "Researching live" : "Research it"}
         </Button>
       </form>
 
-      {(progress.stages.length > 0 || error) && (
-        <Card aria-live="polite">
-          <CardHeader>
-            <CardTitle className="text-base">What is happening</CardTitle>
-            <CardDescription>Each search, each page and each check, as it happens.</CardDescription>
-            {progress.stages.length > 0 && (
-              <CardAction>
-                <Elapsed busy={busy} final={result?.ms} />
-              </CardAction>
-            )}
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-sm">
-            <Timeline progress={progress} busy={busy} finished={Boolean(result)} />
-            {error && (
-              <p className="flex items-start gap-2 text-destructive">
-                <CircleAlert className="mt-0.5 size-4 shrink-0" /> {error}
-              </p>
-            )}
-            {error && liveDown && <EarlierCases situation={situation} failed />}
-          </CardContent>
-        </Card>
-      )}
+      {/*
+        The live region is on the page before anything happens: a screen reader announces what is added to a region
+        it already knows, not a region that arrives with its text. While it is empty it takes no room.
+      */}
+      <div aria-live="polite" className="empty:-mt-6">
+        {(progress.stages.length > 0 || error) && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base" role="heading" aria-level={2}>
+                What is happening
+              </CardTitle>
+              <CardDescription>Each search, each page and each check, as it happens.</CardDescription>
+              {progress.stages.length > 0 && (
+                <CardAction>
+                  <Elapsed busy={busy} final={result?.ms} />
+                </CardAction>
+              )}
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 text-sm">
+              <Timeline progress={progress} busy={busy} finished={Boolean(result)} />
+              {error && (
+                <p className="flex items-start gap-2 text-destructive">
+                  <CircleAlert className="mt-0.5 size-4 shrink-0" /> {error}
+                </p>
+              )}
+              {error && liveDown && <EarlierCases situation={situation} failed />}
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {result && <TryResult result={result} ref={resultRef} />}
     </div>

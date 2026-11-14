@@ -51,9 +51,13 @@ function Sentence({ e }: { e: Cited }) {
           target="_blank"
           rel="noreferrer"
           title={e.title}
-          className="inline-flex items-center gap-1 font-medium text-foreground hover:underline"
+          className="inline-flex items-center gap-1 py-1 font-medium text-foreground hover:underline"
         >
           {hostOf(e.url)} <ExternalLink className="size-3 shrink-0" />
+          {/* Several lines can cite the same site, so a screen reader also hears which page this is. */}
+          <span className="sr-only">
+            : {e.title} (opens in a new tab)
+          </span>
         </a>
         {verified ? (
           <span className="inline-flex items-center gap-1 text-emerald-800 dark:text-emerald-300">
@@ -118,7 +122,9 @@ export function TryResult({ result, ref }: { result: ResearchResult; ref?: Ref<H
   return (
     <Card ref={ref} className="scroll-mt-4 border-primary/40">
       <CardHeader>
-        <CardTitle>{result.title}</CardTitle>
+        <CardTitle role="heading" aria-level={2}>
+          {result.title}
+        </CardTitle>
         <CardDescription className="flex flex-wrap items-center gap-2">
           <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
             <BadgeCheck /> {result.evidenceVerified} of {result.evidenceTotal} quotes found on their pages
@@ -152,9 +158,10 @@ export function TryResult({ result, ref }: { result: ResearchResult; ref?: Ref<H
           href={result.url}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 self-center text-xs text-muted-foreground hover:underline"
+          className="inline-flex items-center gap-1 self-center py-1 text-xs text-muted-foreground hover:underline"
         >
           Open in a new tab <ExternalLink className="size-3" />
+          <span className="sr-only">: the case file</span>
         </a>
       </CardContent>
     </Card>

@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { type Case, type Evidence, type Step, verifiedCount } from "@/lib/case";
-import { type Labels, labels } from "@/lib/i18n";
+import { type Labels, labels, langOf } from "@/lib/i18n";
 import { loadCase } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
@@ -95,7 +95,7 @@ function due(value: string | undefined, t: Labels) {
   return value;
 }
 
-function Refs({ refs }: { refs: number[] }) {
+function Refs({ refs, t }: { refs: number[]; t: Labels }) {
   if (!refs.length) return null;
   return (
     <span className="ml-1 inline-flex gap-1 align-baseline">
@@ -103,7 +103,9 @@ function Refs({ refs }: { refs: number[] }) {
         <a
           key={n}
           href={`#source-${n}`}
-          className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground no-underline hover:bg-primary hover:text-primary-foreground"
+          aria-label={t.sourceNumber(n)}
+          // 24 px each way: the smallest target a finger can hit without catching its neighbour.
+          className="min-w-6 rounded bg-muted px-1.5 py-1 text-center font-mono text-xs text-muted-foreground no-underline hover:bg-primary hover:text-primary-foreground"
         >
           {n}
         </a>
@@ -126,11 +128,11 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
   const deadline = confirmed ? due(step.due, t) : null;
   return (
     <li className="flex gap-3">
-      <Icon className={`mt-0.5 size-5 shrink-0 ${status.tone}`} aria-label={t[status.label]} />
+      <Icon className={`mt-0.5 size-5 shrink-0 ${status.tone}`} role="img" aria-label={t[status.label]} />
       <div className="min-w-0 flex-1">
         <p className="font-medium leading-snug">
           {step.title}
-          <Refs refs={step.evidence} />
+          <Refs refs={step.evidence} t={t} />
         </p>
         {step.detail && <p className="mt-1 text-sm text-muted-foreground">{step.detail}</p>}
         {step.conflict && (
@@ -147,7 +149,11 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
           {deadline && (
             // A deadline can be a whole phrase, so the badge may wrap on a narrow screen.
             <Badge variant="secondary" className="h-auto max-w-full items-start whitespace-normal py-1 text-left">
-              <CalendarClock className="mt-0.5" /> {deadline}
+              <CalendarClock className="mt-0.5" />
+              <span>
+                <span className="sr-only">{t.spokenDeadline}: </span>
+                {deadline}
+              </span>
             </Badge>
           )}
           {step.owner && <Badge variant="outline">{step.owner}</Badge>}
@@ -199,9 +205,10 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
             href={e.url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 font-medium leading-snug hover:underline"
+            className="inline-flex min-h-6 items-center gap-1 font-medium leading-snug hover:underline"
           >
             {e.title} <ExternalLink className="size-3.5 shrink-0" />
+            <span className="sr-only">({t.newTab})</span>
           </a>
           <p className="text-xs text-muted-foreground">
             {e.publisher && e.publisher !== host(e.url) ? `${e.publisher} · ` : ""}
@@ -216,9 +223,13 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
           href={highlightUrl(e.url, e.quote) ?? e.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1 pl-3.5 text-sm font-medium text-primary hover:underline"
+          className="mt-2 inline-flex min-h-6 items-center gap-1 pl-3.5 text-sm font-medium text-primary hover:underline"
         >
           <Highlighter className="size-3.5 shrink-0" /> {t.showOnPage}
+          {/* Every source has this link, so a screen reader also hears which one it belongs to. */}
+          <span className="sr-only">
+            : {t.sourceNumber(e.n)}, {e.title} ({t.newTab})
+          </span>
         </a>
       )}
       {e.priorBelief && (
@@ -305,7 +316,8 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
   const verified = new Set(c.evidence.filter((e) => e.verification === "verified").map((e) => e.n));
 
   return (
-    <main lang={c.language} className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-8 sm:py-12">
+    // A word longer than the screen (a Finnish compound, a pasted address) breaks instead of widening the page.
+    <main lang={langOf(c.language)} className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-8 wrap-anywhere sm:py-12">
       <Header c={c} t={t} />
 
       {c.steps.length > 0 && (
@@ -326,7 +338,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
                 <CardHeader>
                   <CardDescription>
                     {m.label}
-                    <Refs refs={m.evidence} />
+                    <Refs refs={m.evidence} t={t} />
                   </CardDescription>
                   <CardTitle className="text-base">{m.amount}</CardTitle>
                 </CardHeader>
@@ -389,8 +401,9 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
           <ul className="flex flex-col gap-2">
             {c.news.map((n) => (
               <li key={n.url} className="rounded-xl border bg-card p-3 text-sm">
-                <a href={n.url} target="_blank" rel="noreferrer" className="inline-flex items-start gap-1 font-medium leading-snug hover:underline">
+                <a href={n.url} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-start gap-1 font-medium leading-snug hover:underline">
                   {n.title} <ExternalLink className="mt-0.5 size-3.5 shrink-0" />
+                  <span className="sr-only">({t.newTab})</span>
                 </a>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {due(n.date, t)} · {n.publisher && n.publisher !== host(n.url) ? `${n.publisher} · ` : ""}
@@ -405,7 +418,8 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
       {c.trail && (
         <Section title={t.researched}>
           <details className="rounded-xl border bg-card p-4 text-sm">
-            <summary className="cursor-pointer font-medium">
+            {/* Stretched over the padding of the box, so the whole row opens it. */}
+            <summary className="-m-4 cursor-pointer p-4 font-medium">
               {t.trail(c.trail.searches, c.trail.pagesRead, (c.trail.ms / 1000).toFixed(1))}
             </summary>
             <ol className="mt-3 flex flex-col gap-1.5">

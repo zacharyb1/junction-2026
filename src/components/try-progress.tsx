@@ -60,10 +60,13 @@ const READ_BY: Record<Of<"page">["via"], string> = {
 
 type State = "running" | "done" | "stopped";
 
+// role="img" makes every screen reader read the label: on a bare <svg> some of them skip it.
 function StateIcon({ state, className = "" }: { state: State; className?: string }) {
-  if (state === "running") return <Loader2 className={`animate-spin text-muted-foreground ${className}`} aria-label="Running" />;
-  if (state === "stopped") return <CircleAlert className={`text-amber-600 dark:text-amber-400 ${className}`} aria-label="Stopped" />;
-  return <CircleCheck className={`text-emerald-600 dark:text-emerald-400 ${className}`} aria-label="Done" />;
+  if (state === "running") {
+    return <Loader2 className={`animate-spin text-muted-foreground motion-reduce:animate-none ${className}`} role="img" aria-label="Running" />;
+  }
+  if (state === "stopped") return <CircleAlert className={`text-amber-600 dark:text-amber-400 ${className}`} role="img" aria-label="Stopped" />;
+  return <CircleCheck className={`text-emerald-600 dark:text-emerald-400 ${className}`} role="img" aria-label="Done" />;
 }
 
 function searchHeading(searches: Of<"search">[]) {
@@ -116,9 +119,11 @@ function PageRow({ page }: { page: Of<"page"> }) {
   return (
     <li className="flex animate-in items-center gap-2 fade-in">
       <Badge variant={page.official ? "secondary" : "outline"}>{page.official ? "Official" : "Secondary"}</Badge>
-      <a href={page.url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate hover:underline">
+      {/* "relative" keeps the hidden words inside the cut-off line. Without it they sit past its end and widen the page. */}
+      <a href={page.url} target="_blank" rel="noreferrer" className="relative min-w-0 flex-1 truncate py-0.5 hover:underline">
         {host}
         {page.title !== host && <span className="text-muted-foreground"> · {page.title}</span>}
+        <span className="sr-only"> (opens in a new tab)</span>
       </a>
       <span className={`shrink-0 text-xs ${page.via === "none" ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground"}`}>
         {READ_BY[page.via]}

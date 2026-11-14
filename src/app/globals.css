@@ -60,12 +60,14 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* Dark enough for small text on the muted grey as well as on white: 4.8:1 and 5.3:1. */
+  --muted-foreground: oklch(0.53 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  /* The edge of a text field is the only thing that shows where it is, so it needs 3:1 on white. */
+  --input: oklch(0.65 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -127,4 +129,13 @@
   html {
     @apply font-sans;
   }
+}
+
+/*
+ * Keyboard focus. The default ring is a light grey at half strength, 1.5:1 on white, too faint to follow.
+ * Unlayered, so it also reaches the controls that switch their own outline off. The landing page has its own.
+ */
+:focus-visible:not(.landing *) {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
 }

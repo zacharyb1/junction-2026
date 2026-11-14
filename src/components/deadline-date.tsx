@@ -84,12 +84,13 @@ export function DeadlineDate({
           onChange={(e) => setPicked({ from: e.target.value, on: today() })}
           className="w-auto max-w-full"
         />
+        {/* Always on the page, so a screen reader announces the day when it appears. Empty, it takes no room. */}
+        <output htmlFor={id} className="flex flex-col gap-2 empty:-mt-2">
+          {date && <span className="text-base font-semibold">{long(date)}</span>}
+          {date && toIso(date) < picked.on && <span className="text-amber-700 dark:text-amber-400">{t.passed}</span>}
+        </output>
         {date && (
           <>
-            <output htmlFor={id} className="text-base font-semibold">
-              {long(date)}
-            </output>
-            {toIso(date) < picked.on && <p className="text-amber-700 dark:text-amber-400">{t.passed}</p>}
             <p className="text-muted-foreground">
               {t.sourceSays}: “{phrase}”
             </p>

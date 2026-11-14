@@ -15,21 +15,27 @@ export function CopyButton({
 }) {
   const [copied, setCopied] = useState(false);
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(text);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        } catch {
-          // Clipboard can be blocked inside in-app browsers. The text stays selectable.
-        }
-      }}
-    >
-      {copied ? <Check /> : <Copy />}
-      {copied ? copiedLabel : label}
-    </Button>
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          } catch {
+            // Clipboard can be blocked inside in-app browsers. The text stays selectable.
+          }
+        }}
+      >
+        {copied ? <Check /> : <Copy />}
+        {copied ? copiedLabel : label}
+      </Button>
+      {/* A screen reader does not notice the word on the button change, so the result is announced here. */}
+      <span role="status" className="sr-only">
+        {copied ? copiedLabel : ""}
+      </span>
+    </>
   );
 }
