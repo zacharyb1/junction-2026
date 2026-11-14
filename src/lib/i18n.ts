@@ -79,6 +79,14 @@ const en = {
   notConfirmed: "Not confirmed on a source",
   showOnPage: "Open the page at this sentence",
   mentionsYear: (year: number) => `Names ${year}`,
+  listen: "Listen to the plan",
+  listenLoading: "Preparing the audio…",
+  listenError: "The audio could not be loaded. Try again.",
+  // The only words the spoken plan adds to stored case text (src/lib/speech.ts).
+  spokenDeadline: "Deadline",
+  spokenConflict: "Two different figures were found for this step. See the case file.",
+  spokenClosing: (found: number, total: number) =>
+    `${found} of ${total} quotes were found on their pages. The sources are in the case file.`,
 };
 
 export type Labels = typeof en;
@@ -157,6 +165,14 @@ const fi: Labels = {
   notConfirmed: "Ei vahvistettu lähteestä",
   showOnPage: "Avaa sivu tämän lauseen kohdalta",
   mentionsYear: (year) => `Mainitsee vuoden ${year}`,
+  listen: "Kuuntele suunnitelma",
+  listenLoading: "Ääntä valmistellaan…",
+  listenError: "Ääntä ei voitu ladata. Yritä uudelleen.",
+  spokenDeadline: "Määräaika",
+  spokenConflict: "Tälle vaiheelle löytyi kaksi eri lukua. Katso tapaussivu.",
+  // Numbers stay in their basic form, so the voice does not have to inflect them.
+  spokenClosing: (found, total) =>
+    `Lainauksia on ${total}. Niistä ${found} löytyi sivultaan. Lähteet ovat tapaussivulla.`,
 };
 
 const ALL: Record<string, Labels> = { en, fi };

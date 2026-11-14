@@ -237,6 +237,25 @@ The public route behind "Check the sources again". No body, no credentials.
 - Readings that do fetch count against the public rate limit shared with the demo. Two requests for the same case
   at the same moment share one reading (per server instance). Errors: `404` unknown id, `429` rate limited, `502` the check failed.
 
+## `GET /api/cases/:id/audio`: the plan read aloud
+
+Returns `audio/mpeg`, the case spoken with ElevenLabs. Like reading a case it needs no secret, so a bot can pass the
+address straight to Telegram as a voice message, and the case page plays it behind the "Listen to the plan" button.
+
+- What is said (`spokenText` in `src/lib/speech.ts`), from the stored case only: the title; each step that has a quote
+  found on its page, as its title and its deadline exactly as stored; each money line that has such a quote, as label
+  and amount; then "N of M quotes were found on their pages. The sources are in the case file."
+  No summary, no advice, nothing rephrased. A step with a `conflict` gets the fixed sentence
+  "Two different figures were found for this step. See the case file." The connecting words are Finnish for a Finnish case.
+- At most 1,500 characters. A longer plan loses whole steps from the end, never part of a sentence.
+- Model `eleven_flash_v2_5`. A Finnish case is sent with `language_code: "fi"`, so the voice does not change language
+  on its own for an English phrase quoted inside the plan. Other cases are sent without a language.
+- Each version of the spoken text is rendered once and stored next to the case (`audio/<id>-<hash>.mp3`), so a second
+  request costs nothing. An updated case gets new audio on the next request.
+- Supports `Range` requests. Sends `cache-control: private, max-age=3600`.
+- Errors: `404` unknown case, or `ELEVENLABS_API_KEY` is not set (the button is then not shown), `429` rate limited
+  (only requests that would render new audio count), `502` ElevenLabs failed or took longer than 20 seconds.
+
 ## Page readers
 
 Finding is always Exa. Reading a cited page to check a quote can go three ways:
@@ -270,6 +289,8 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `DEMO_RATE_PER_MINUTE` | Vercel, optional | public requests per client address per minute, default 20 (a venue shares one address) |
 | `DEMO_RATE_TOTAL_PER_MINUTE` | Vercel, optional | all public requests per minute, default 40 |
 | `OXYLABS_API_KEY` | Vercel, optional | third page reader for sites that refuse our request |
+| `ELEVENLABS_API_KEY` | Vercel, optional | turns on the spoken plan: `GET /api/cases/:id/audio` and the button on the case page |
+| `ELEVENLABS_VOICE_ID` | Vercel, optional | voice for the spoken plan, default `JBFqnCBsd6RMkjVDRZzb` (George) |
 | `BLOB_READ_WRITE_TOKEN` | Vercel, set by the Blob store | case storage |
 | `PUBLIC_BASE_URL` | Vercel, optional | overrides the origin used in case links |
 | `NEXT_PUBLIC_BOT_USERNAME` | Vercel | QR code and links to the Telegram bot |

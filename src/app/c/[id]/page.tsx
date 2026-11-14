@@ -16,6 +16,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
 import { DeadlineDate } from "@/components/deadline-date";
+import { ListenButton } from "@/components/listen-button";
 import { SourceCheckPanel } from "@/components/source-check-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -276,6 +277,9 @@ function Header({ c, t }: { c: Case; t: Labels }) {
       </div>
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{c.title}</h1>
       <p className="text-muted-foreground">{c.summary}</p>
+      {process.env.ELEVENLABS_API_KEY && (
+        <ListenButton src={`/api/cases/${c.id}/audio`} label={t.listen} loadingLabel={t.listenLoading} errorLabel={t.listenError} />
+      )}
       <dl className="grid grid-cols-3 gap-2 text-center">
         {[
           { value: `${verified}/${c.evidence.length}`, label: t.quotesVerified },
