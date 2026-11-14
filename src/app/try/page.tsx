@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LinkButton } from "@/components/landing/link-button";
 import { TryForm } from "@/components/try-form";
 
 const title = "Try AIDaddy in the browser";
@@ -28,6 +29,11 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
           every page it cites, and keeps only what it can point at.
         </p>
       </header>
+      {code && (
+        <LinkButton href={`/ukk?code=${encodeURIComponent(code)}`} variant="outline" className="self-start">
+          Talk to UKK instead
+        </LinkButton>
+      )}
       <TryForm code={code} />
       <p className="text-xs text-muted-foreground">
         This is research, not legal advice. Do not paste anything you would not show a stranger: this demo stores the case

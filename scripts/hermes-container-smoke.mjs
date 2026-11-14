@@ -56,7 +56,7 @@ try {
 
   const first = check();
   assert.equal(first.status, 0, `${first.stderr}\n${first.stdout}`);
-  assert.match(first.stdout, /AIDaddy configuration passed/);
+  assert.match(first.stdout, /UKK configuration passed/);
   python(`
 from pathlib import Path
 import json

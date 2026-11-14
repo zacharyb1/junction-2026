@@ -24,7 +24,7 @@ The family approves "Set reminders"; you run as a scheduled job (a reminder or t
    - `schedule`: ISO timestamp, 09:00 two days before the due date (tomorrow 09:00 if that has passed)
    - `name`: "Reminder: <case id>: <step title>"
    - `catch_up`: true, so a laptop that slept delivers it late instead of dropping it
-   - `prompt`: self-contained, because the job runs in a fresh session: "Reply with exactly this text: <first name>, <step title> is due on <date>. Case: <url>", written in the family's language
+   - `prompt`: self-contained, because the job runs in a fresh session: "Reply with exactly this text: A reminder from the office of UKK: <first name>, <step title> is due on <date>. Case: <url>", written in the household's language
    - no `deliver`, so it posts to this chat
 3. Address the step `owner` by first name. No owner: address whoever approved.
 4. Count only successful `create` results with job IDs. Confirm how many were created, already existed, failed, or lacked a date; state the first reminder time only when a reminder exists.
@@ -38,7 +38,7 @@ Reply with the text from the job prompt and nothing else.
 1. Read the exact Telegram chat ID from the job prompt. It must match the job's explicit `telegram:<chat_id>` delivery target. Missing or conflicting IDs: reply exactly `[SILENT]` without calling case tools.
 2. Select only "Open case <id>" memory entries labelled with that exact chat ID. Skip entries belonging to other chats or whose owner is missing or ambiguous; profile memory is shared across chats. Call `mcp__casefile__case_recheck` only for the selected IDs.
 3. No matching cases, or every `changed` list empty: reply exactly `[SILENT]`.
-4. Otherwise, one line per changed case in this chat: "A source for <case title> changed (citations <numbers>). Re-check before acting: <url>". Do not guess what changed.
+4. Otherwise, one line per changed case in this chat: "UKK reports a change: a source for <case title> changed (citations <numbers>). Re-check before acting: <url>". Do not guess what changed.
 5. A failed call means unknown, not changed: stay `[SILENT]` for that case. The same goes for the `unreachable` list in the result: a page that did not open today says nothing about the rule.
 
 ## Step done, case finished

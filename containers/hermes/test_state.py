@@ -62,7 +62,8 @@ class ContainerStateTests(unittest.TestCase):
         self.assertFalse((self.home / state.MARKER).exists())
 
     def test_invalid_group_and_admin_values_rejected(self):
-        for key, value in [("KAVERI_TELEGRAM_CHAT_ID", "-100typo"), ("TELEGRAM_ALLOWED_USERS", "*")]:
+        for key, value in [("KAVERI_TELEGRAM_CHAT_ID", "-100typo"), ("TELEGRAM_ALLOWED_USERS", "*"),
+                           ("KAVERI_TELEGRAM_OPEN_GROUPS", "yes")]:
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, key):
                 state.preflight(self.home, {**self.env, key: value})
 
@@ -79,6 +80,49 @@ class ContainerStateTests(unittest.TestCase):
         (self.home / ".hermes-update-paused-gateways.test.json").write_text("{}")
         with self.assertRaisesRegex(ValueError, "gateway-update recovery"):
             state.preflight(self.home, self.env)
+
+
+class WebRuntimeTests(unittest.TestCase):
+    """The web instance serves /ukk through the API server and must never hold the Telegram token."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.home = Path(self.tmp.name)
+        self.env = {
+            "KAVERI_RUNTIME": "web",
+            "NVIDIA_API_KEY": "fake-provider",
+            "EXA_API_KEY": "fake-exa",
+            "CASEFILE_URL": "http://web:3000/api/mcp",
+            "CASEFILE_SECRET": "fake-case-secret",
+            "API_SERVER_KEY": "fake-api-key",
+        }
+
+    def test_web_runtime_needs_no_telegram(self):
+        state.preflight(self.home, self.env)
+        self.assertEqual(json.loads((self.home / state.MARKER).read_text()), {"schema": 1, "runtime": "web"})
+
+    def test_web_runtime_refuses_telegram_token(self):
+        with self.assertRaisesRegex(ValueError, "TELEGRAM_BOT_TOKEN"):
+            state.preflight(self.home, {**self.env, "TELEGRAM_BOT_TOKEN": "12345:fake-test-token"})
+        self.assertFalse((self.home / state.MARKER).exists())
+
+    def test_web_runtime_requires_api_key(self):
+        env = dict(self.env)
+        del env["API_SERVER_KEY"]
+        with self.assertRaisesRegex(ValueError, "API_SERVER_KEY"):
+            state.preflight(self.home, env)
+
+    def test_telegram_home_refuses_web_runtime(self):
+        telegram = {key: value for key, value in self.env.items() if key not in {"KAVERI_RUNTIME", "API_SERVER_KEY"}}
+        telegram.update({"TELEGRAM_BOT_TOKEN": "12345:fake-test-token", "TELEGRAM_ALLOWED_USERS": "42"})
+        state.preflight(self.home, telegram)
+        with self.assertRaisesRegex(ValueError, "different"):
+            state.preflight(self.home, self.env)
+
+    def test_unknown_runtime_rejected(self):
+        with self.assertRaisesRegex(ValueError, "KAVERI_RUNTIME"):
+            state.preflight(self.home, {**self.env, "KAVERI_RUNTIME": "chat"})
 
 
 if __name__ == "__main__":
