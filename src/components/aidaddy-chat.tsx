@@ -92,7 +92,7 @@ function Linked({ text }: { text: string }) {
   );
 }
 
-export function AIDaddyChat({ code, needsCode }: { code: string; needsCode: boolean }) {
+export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string; needsCode: boolean; voiceAvailable: boolean }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -226,26 +226,30 @@ export function AIDaddyChat({ code, needsCode }: { code: string; needsCode: bool
         <AIDaddyAvatar state={avatarState} level={voice.level} size={72} />
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-muted-foreground">
-            {voice.recording
-              ? "Recording. Tap the square to stop."
-              : voice.transcribing
-                ? "Turning your voice note into text."
-                : voice.speaking
-                  ? "AIDaddy is reading its reply aloud."
-                  : "Talk to AIDaddy by voice or text. Its voice is made with ElevenLabs."}
+            {!voiceAvailable
+              ? "Type your message to AIDaddy. Voice is unavailable in this demo."
+              : voice.recording
+                ? "Recording. Tap the square to stop."
+                : voice.transcribing
+                  ? "Turning your voice note into text."
+                  : voice.speaking
+                    ? "AIDaddy is reading its reply aloud."
+                    : "Talk to AIDaddy by voice or text. Its voice is made with ElevenLabs."}
           </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={voice.toggleSpeech}
-            aria-pressed={voice.enabled}
-            // A full-size target on a phone, the compact one next to a mouse.
-            className="h-11 self-start px-3 sm:h-8"
-          >
-            {voice.enabled ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
-            {voice.enabled ? "Voice on" : "Voice off"}
-          </Button>
+          {voiceAvailable && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={voice.toggleSpeech}
+              aria-pressed={voice.enabled}
+              // A full-size target on a phone, the compact one next to a mouse.
+              className="h-11 self-start px-3 sm:h-8"
+            >
+              {voice.enabled ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
+              {voice.enabled ? "Voice on" : "Voice off"}
+            </Button>
+          )}
         </div>
       </div>
       <ol className="flex flex-col gap-3" aria-live="polite">
@@ -301,25 +305,27 @@ export function AIDaddyChat({ code, needsCode }: { code: string; needsCode: bool
             aria-label="Your message to AIDaddy"
             className="max-h-40 min-h-11 px-3"
           />
-          <Button
-            type="button"
-            size="lg"
-            variant="outline"
-            onClick={listen}
-            disabled={voice.transcribing}
-            aria-pressed={voice.recording}
-            aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
-            // Green while the microphone is live, the same colour as the ring around the avatar.
-            className={`h-11 w-11 ${voice.recording ? "border-(--hud-green)/60 bg-(--hud-green)/10 text-(--hud-green) hover:bg-(--hud-green)/20 hover:text-(--hud-green)" : ""}`}
-          >
-            {voice.transcribing ? (
-              <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden />
-            ) : voice.recording ? (
-              <Square aria-hidden />
-            ) : (
-              <Mic aria-hidden />
-            )}
-          </Button>
+          {voiceAvailable && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              onClick={listen}
+              disabled={voice.transcribing}
+              aria-pressed={voice.recording}
+              aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
+              // Green while the microphone is live, the same colour as the ring around the avatar.
+              className={`h-11 w-11 ${voice.recording ? "border-(--hud-green)/60 bg-(--hud-green)/10 text-(--hud-green) hover:bg-(--hud-green)/20 hover:text-(--hud-green)" : ""}`}
+            >
+              {voice.transcribing ? (
+                <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden />
+              ) : voice.recording ? (
+                <Square aria-hidden />
+              ) : (
+                <Mic aria-hidden />
+              )}
+            </Button>
+          )}
           <Button type="submit" size="lg" className="h-11 w-11" disabled={busy || !draft.trim()} aria-label="Send">
             {busy ? <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden /> : <Send aria-hidden />}
           </Button>
