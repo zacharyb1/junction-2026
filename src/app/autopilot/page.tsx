@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AutopilotDemo } from "@/components/autopilot/autopilot-demo";
 import { Section } from "@/components/hud/sections";
 import { SiteShell } from "@/components/site/site-shell";
+import { demoCodeRequired } from "@/lib/cases";
 import "@/components/hud/hud.css";
 
 const title = "AIDaddy autopilot: a demo of proactive help";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#05080d" };
 
 export default async function Autopilot({ searchParams }: PageProps<"/autopilot">) {
-  // The same access code as /try. With it, the lawyer's step runs a live check.
+  // The lawyer's step runs a live check. The demo is open; a code in the address matters only while the server asks for one.
   const params = await searchParams;
   const code = typeof params.code === "string" ? params.code : "";
 
@@ -35,7 +36,7 @@ export default async function Autopilot({ searchParams }: PageProps<"/autopilot"
             lede="UKK has specialists for law, money and travel, and each keeps its own notes. In this demo a situation goes to the ones that have something to add, and nothing happens until the family says yes."
             pageTitle
           >
-            <AutopilotDemo code={code} />
+            <AutopilotDemo code={code} needsCode={demoCodeRequired()} />
             <p className="hud-note hud-autopilot-after">
               What UKK may follow is the family&apos;s choice. <Link href="/setup">See the setup screen</Link>, a mockup.
             </p>

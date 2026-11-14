@@ -36,7 +36,15 @@ afterEach(() => {
 });
 
 describe("POST /api/ukk", () => {
-  it("refuses a visitor without the demo code", async () => {
+  it("answers a visitor without a code", async () => {
+    vi.stubGlobal("fetch", upstream());
+    const res = await ukk(request({ message: "hi" }, { "x-demo-code": "" }));
+    expect(res.status).toBe(200);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("refuses a visitor without the demo code once the code is switched on", async () => {
+    vi.stubEnv("DEMO_REQUIRE_CODE", "1");
     vi.stubGlobal("fetch", upstream());
     const res = await ukk(request({ message: "hi" }, { "x-demo-code": "" }));
     expect(res.status).toBe(401);

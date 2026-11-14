@@ -38,7 +38,7 @@ function Linked({ text }: { text: string }) {
   );
 }
 
-export function UkkChat({ code }: { code: string }) {
+export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -61,7 +61,8 @@ export function UkkChat({ code }: { code: string }) {
     last.current?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "nearest" });
   }, [count]);
 
-  if (!code) {
+  // The chat is open; this notice exists only while the server is set to ask for a code.
+  if (needsCode && !code) {
     return (
       <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 text-sm">
         <p className="leading-relaxed">

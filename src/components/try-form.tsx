@@ -40,7 +40,7 @@ const LANGUAGES = [
 const tall = "h-11 px-3";
 const field = `${tall} w-full rounded-lg border border-input bg-input/30 text-base outline-none transition-colors focus-visible:border-ring md:text-sm`;
 
-export function TryForm({ code: initialCode }: { code: string }) {
+export function TryForm({ code: initialCode, needsCode }: { code: string; needsCode: boolean }) {
   const [situation, setSituation] = useState("");
   const [country, setCountry] = useState("FI");
   const [otherCountry, setOtherCountry] = useState("");
@@ -229,7 +229,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
           </div>
         </details>
 
-        {(!initialCode || rejected) && (
+        {/* The demo is open; the field exists only while the server is set to ask for a code. */}
+        {needsCode && (!initialCode || rejected) && (
           <div className="flex flex-col gap-2">
             <label htmlFor="code" className="text-sm font-medium">
               Access code

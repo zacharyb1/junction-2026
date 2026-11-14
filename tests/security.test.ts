@@ -222,7 +222,15 @@ describe("POST /api/research", () => {
     vi.mocked(researchCase).mockReset();
   });
 
-  it("answers 401 without the secret or the demo code, and to the demo code sent as the secret", async () => {
+  it("is open to a visitor without a code, with fast research only", async () => {
+    vi.mocked(researchCase).mockResolvedValue({ id: "x" } as ResearchResult);
+    const res = await research(ask({}, { depth: "deep" }));
+    expect(res.status).toBe(200);
+    expect(vi.mocked(researchCase).mock.calls[0][0].depth).toBe("fast");
+  });
+
+  it("answers 401 without the secret or the demo code once the code is switched on, and to the demo code sent as the secret", async () => {
+    vi.stubEnv("DEMO_REQUIRE_CODE", "1");
     expect((await research(ask({}))).status).toBe(401);
     expect((await research(ask({ "x-demo-code": "junctio" }))).status).toBe(401);
     expect((await research(ask({ authorization: "Bearer junction" }))).status).toBe(401);
