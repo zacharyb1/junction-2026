@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UKK in your browser</title>
+    <link rel="stylesheet" href="ui.css" />
+  </head>
+  <body>
+    <main>
+      <p class="label">UKK · one step ahead</p>
+      <h1>May UKK look at the pages you open?</h1>
+      <p class="lede">
+        Say yes once. From then on UKK looks at every page you open in this browser and steps in when a page is about a
+        deadline, a benefit or an official form.
+      </p>
+
+      <section class="panel">
+        <h2>What it does</h2>
+        <ul>
+          <li><strong>It reads the page you are on.</strong> Not your other tabs, and not what you type into fields.</li>
+          <li><strong>It decides on your computer first.</strong> Most pages are read here and nothing is sent anywhere.</li>
+          <li>
+            <strong>Only a page about life admin goes to the Engine:</strong> its address, title, field labels and the first 500
+            characters of its text. The answer comes back with the official sentence for every line.
+          </li>
+          <li><strong>It never reads a page with a password or payment field.</strong></li>
+          <li><strong>It fills a form only when you click,</strong> only in empty fields, and it never submits.</li>
+        </ul>
+        <p id="state" class="state" role="status"></p>
+        <div class="row">
+          <button id="allow" class="primary">Yes, look at my pages</button>
+          <button id="stop" hidden>Stop looking</button>
+        </div>
+        <p class="small">You can pause it on one site or everywhere from the UKK icon in the toolbar.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Connection</h2>
+        <label>Engine address <input id="engine" type="url" autocomplete="off" /></label>
+        <label>Access code <input id="code" type="text" autocomplete="off" placeholder="the code from the team's QR" /></label>
+        <label>
+          Your country, when a page does not tell
+          <select id="country">
+            <option value="FI">Finland</option>
+            <option value="SE">Sweden</option>
+            <option value="EE">Estonia</option>
+            <option value="DE">Germany</option>
+            <option value="NL">Netherlands</option>
+            <option value="GB">United Kingdom</option>
+            <option value="US">United States</option>
+          </select>
+        </label>
+        <label>
+          Answer in
+          <select id="language">
+            <option value="en">English</option>
+            <option value="fi">Finnish</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="panel">
+        <h2>What UKK may fill in for you</h2>
+        <p class="small">Kept on this computer only. Leave a field empty and UKK never fills it. It never fills an identity number, a bank account or a password.</p>
+        <div class="grid">
+          <label>First name <input id="givenName" autocomplete="off" /></label>
+          <label>Last name <input id="familyName" autocomplete="off" /></label>
+          <label>Email <input id="email" type="email" autocomplete="off" /></label>
+          <label>Phone <input id="phone" autocomplete="off" /></label>
+          <label>Street address <input id="street" autocomplete="off" /></label>
+          <label>Postcode <input id="postcode" autocomplete="off" /></label>
+          <label>City <input id="city" autocomplete="off" /></label>
+          <label>Date of birth <input id="birthDate" type="date" autocomplete="off" /></label>
+        </div>
+        <div class="row">
+          <button id="save" class="primary">Save</button>
+          <span id="saved" class="small" role="status"></span>
+        </div>
+      </section>
+    </main>
+    <script src="welcome.js"></script>
+  </body>
+</html>
