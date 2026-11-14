@@ -1284,6 +1284,57 @@
   }
 }
 
+/* ---------- autopilot demo ---------- */
+
+.hud-autopilot {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 48rem;
+}
+.hud-autopilot-consent {
+  display: grid;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--hud-line);
+  font-size: 0.92rem;
+  color: var(--hud-dim);
+}
+.hud-autopilot-consent label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  color: var(--hud-text);
+  cursor: pointer;
+}
+.hud-autopilot-feed {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hud-autopilot-feed > li {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid var(--hud-cyan);
+  background: rgb(79 216 255 / 0.04);
+  animation: hud-rise 0.5s ease both;
+}
+.hud-autopilot-feed > li.hud-note {
+  border-left-color: var(--hud-line);
+}
+.hud-autopilot-feed p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.hud-autopilot-quotes {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  color: var(--hud-dim);
+}
 /* ---------- /setup (issue #42, mockup) ---------- */
 
 .hud-setup {
