@@ -2,7 +2,27 @@
 
 Hermes docs: repository `main`, commit `4932eea7`, cloned 13 Nov 2026. Line references are files under `website/docs/` in that repository. "Source" means the Python code of the same commit, read but never run.
 
-What was tested here: `config.snippet.yaml` parses in Mode A and Mode B with no duplicate keys, the nine wake patterns match 54 trigger sentences and none of 29 small-talk sentences, the skills' front matter and word counts, `install.sh` with `bash -n` and against a stub `hermes`. **Nothing was run against a live Hermes or a live Telegram bot.**
+What was tested here: `config.snippet.yaml` parses in Mode A and Mode B with no duplicate keys, the nine wake patterns match 54 trigger sentences and none of 29 small-talk sentences, the skills' front matter and word counts, `install.sh` with `bash -n` and against a stub `hermes`. Since then part of it was run live: see the next section.
+
+## Run against a live Hermes, Fri night to Sat 02:30 (Vlad's laptop, Fedora)
+
+Hermes v0.23.1 (commit `3b421578`), installed by `hermes/setup-local.sh`. Model `nvidia/nemotron-3.5-super-vl-120b-a12b`, provider `nvidia`. Engine on localhost. "Seen" means it is in the gateway or agent log or in the session database of that run.
+
+| Item | Result |
+|---|---|
+| U1 release versus docs | v0.23.1 has `allow_silence`, `pre_gateway_dispatch`, `clarify_timeout`, `channel_overrides`, `skills.auto_load`, `tools.tool_search`. No key from the snippet was refused. |
+| U2 tool prefix | Double underscore, as the runbook says: `mcp__casefile__research_case` registered and called. |
+| U3 `allow_silence` in a Telegram group | Works. Before Part 2: `silence marker rejected on a user turn` and a Hermes notice in the chat. After: `Suppressing intentional silence marker`, nothing sent. |
+| U4 acknowledgement | Nemotron writes it when told to in `SOUL.md`. 12 of 12 rehearsal runs opened with "On it, ...". In the group one first line was a question. Not timed against the 5-second target: the first model call took 2 to 12 s. |
+| U7 Exa MCP server | `hermes mcp test exa` lists `web_search_advanced_exa` and `web_fetch_exa` (and four resource and prompt helpers). Never called in a turn: `research_case` did not fail. |
+| U8 `hermes config set` | Every command in `hermes/configure.sh` was accepted. `telegram.allowed_chats` is stored as a string holding a JSON list, which the adapter decodes. The group flow works with it. |
+| U10 slash commands | `allow_admin_from` works: `/sethome` from a non-admin was refused with a visible line. |
+| `clarify` buttons in a group | Work: country question and next-step buttons were answered by tapping. |
+| Letter photo | Works with Nemotron: `Image routing: native (model supports vision)`, one photo, all fields read, two street names misspelt. |
+| `pre_gateway_dispatch` | Works: the gate skipped four small-talk messages in the live group with no model call. |
+| A second profile (`hermes profile create X --clone`) | Copies `.env` with the bot token. The running gateway then serves it too. `eval/bot/rehearse.py` strips the `TELEGRAM_` lines. |
+
+Not run: U5 (guest mode), U6 (the consent note was not looked for), reminders and `cronjob_manage` (U11 `catch_up`), the daily change watch, Mode B in a live chat, PDFs (U13), `scope` (U14), a direct message from an account outside `TELEGRAM_ALLOWED_USERS`, voice.
 
 ## UNVERIFIED: test these first
 

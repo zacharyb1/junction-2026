@@ -5,7 +5,7 @@ From an empty laptop to "the bot answers in the family group". Follow the steps 
 ## Read this first
 
 - **Source of truth.** Everything here was checked against the Hermes repository at `main`, commit `4932eea7`, cloned on 13 Nov 2026. References such as `telegram.md:270` are file and line under `website/docs/` in that repository. `CHECKS.md` lists every key, variable, command and tool name with its full doc path.
-- **Nothing here has been run against a live Hermes.** The config was parsed, the wake patterns were tested with Python, and `install.sh` was run against a stub. Treat the "Expect" lines as the test.
+- **Part of this was run against a live Hermes** on Fri night (v0.23.1, Nemotron, Fedora): the quick start below, steps 3 and 8 to 12, the group flow of step 14 and the gate. `CHECKS.md` lists what was seen and what was not run. For the rest, treat the "Expect" lines as the test.
 - **Version drift.** The installer puts you on the latest stable release (`installation.md:90`), which can be older than the docs above. If a documented feature is missing, see "UNVERIFIED" at the top of `CHECKS.md`.
 - **Contract.** The bot does not research. It calls `research_case` on our web app and posts what comes back (`docs/CONTRACTS.md`).
 
@@ -41,6 +41,15 @@ Then follow the runbook from step 10 (direct message test). After `/sethome` in 
 - **Remove everything:** `bash hermes/stop.sh && rm -rf .hermes-local .env.local`. The gate's container image is the only thing stored elsewhere: `podman rmi docker.io/ollama/ollama:0.40.16`.
 
 The gate (a small local Gemma that drops small talk before any cloud call) has its own section below.
+
+**Rehearse a scenario without Telegram:** `python3 eval/bot/rehearse.py "I'm pregnant, due in May."` runs the message three times through the same agent, in a Hermes profile of its own, and prints time, tools called and the first line of each reply. `-f eval/bot/scenarios.txt` runs the four messages that are known to work. It is a direct chat, so it does not test silence or the gate.
+
+**What differs from the long runbook below**
+- Steps 1, 2, 5 to 8 and 12 are done by `setup-local.sh`, `secrets.sh` and `configure.sh`. There is no `hermes model` or `hermes gateway setup` step.
+- The bot is open to all direct messages when `TELEGRAM_ALLOW_ALL_USERS=true` is in the keys repo. Slash commands are then limited to the IDs in `TELEGRAM_ALLOWED_USERS`; everyone else has `/start` and `/new`. Use the ID of the account you actually write from, or `/sethome` is refused.
+- You do not need `/sethome` to find the chat ID: after one message in the group, `grep "inbound message" .hermes-local/home/logs/gateway.log | tail -1` shows `chat=-...`. `/sethome` is still needed for reminders.
+- In a direct chat the bot always answers. `[SILENT]` is for groups only, and only after step 12, otherwise Hermes posts its own notice.
+- A plan arrives as an interim message, so `gateway.log` shows `Sending response (5 chars)` for the closing "Okay." and nothing for the plan itself. Read the transcript in `state.db` or the chat.
 
 ## What is in this folder
 
