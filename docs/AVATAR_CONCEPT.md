@@ -25,14 +25,14 @@ The controller reads Hermes tool-progress and response events. Concurrent tools 
 
 The scheduler chooses the shortest pose transition at clip boundaries. A working request moves from `front` through `to-desk`, then alternates working loops. When the request finishes it uses `to-front`. It re-evaluates the latest action at each boundary, so cancellation does not queue stale work. The outgoing decoded frame remains visible until the incoming clip can play. A slow download can hold that frame; this avoids a blank flash but is not a claim of uninterrupted motion.
 
-The test profile has eight small local video files. The appearance template is separate from acting rules in `scripts/avatar/template.mjs`. [Generation instructions](AVATAR_GENERATION.md) describe the first-frame/last-frame experiment and bounded generation workflow. Publishing a complete generated profile locally adds it to the appearance selector automatically.
+The test profile has eight small local video files. The appearance template is separate from acting rules in `scripts/avatar/template.mjs`. [Generation instructions](AVATAR_GENERATION.md) cover the complete offline preparation/publication workflow and the later model integration. The fixture and Gemini renderers share the same image/video job interface. Publishing a complete offline preview replaces the bundled test profile; a complete generated profile adds the real appearance to the selector.
 
 ## Still needed for the intended concept
 
 - Paid image/video access and an agreed spending limit. A free-tier Gemini key is configured locally; no paid generation has run.
 - Generate and inspect a natural human avatar, especially its hands, identity and the first/last-frame joins.
 - Try ElevenLabs playback with a configured key. Lip synchronization is not implemented.
-- Decide with the team whether to include this and how Gemini should participate at runtime. The current runtime uses a deterministic controller, not Gemini; no sponsor claim should imply otherwise.
+- Finish the concept independently of Gemini, then connect Gemini to the original media-generation jobs, as Vlad requested. Hydrogen can produce specifications or analyze media but cannot render images/videos. Product inclusion remains the team's decision; runtime narration is optional and deferred.
 
 The live page's replies keep source URLs clickable. The avatar changes presentation only: it does not change research, grounding, approvals, roles or the shared Telegram runtime.
 

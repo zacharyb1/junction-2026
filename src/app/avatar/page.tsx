@@ -15,6 +15,11 @@ export const dynamic = "force-dynamic";
 export default async function AvatarPage({ searchParams }: PageProps<"/avatar">) {
   const params = await searchParams;
   const profiles: Manifest[] = [testProfile as Manifest];
+  // An offline publication exercises the same complete-profile handoff as generation.
+  try {
+    const preview = JSON.parse(await readFile(path.join(process.cwd(), "public/avatar/preview/manifest.json"), "utf8")) as Manifest;
+    if (preview.placeholder === true && !validateManifest(preview).length) profiles[0] = preview;
+  } catch { /* The bundled test profile remains usable before any local publication. */ }
   // The generation script installs this profile only after every clip is present.
   try {
     const generated = JSON.parse(await readFile(path.join(process.cwd(), "public/avatar/default/manifest.json"), "utf8")) as Manifest;
