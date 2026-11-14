@@ -9,16 +9,20 @@
  * Household photo: Unsplash (free licence), a mother with her two children at home.
  */
 
-import { ArrowUp, Gift, Home, Loader2, Menu, MessageCircle, Pill, ShoppingBag, Sparkles, SquarePen, X } from "lucide-react";
+import { ArrowUp, Gift, Home, Loader2, Menu, MessageCircle, Pill, ShoppingBag, Sparkles, SquarePen, Users, Wrench, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { type FormEvent, type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { CommunityView } from "@/components/community-view";
 import { AboutYou, OpportunityView, type Palette, useOpportunities } from "@/components/opportunity-panel";
+import { TaskView } from "@/components/task-view";
 import { Linked } from "@/components/ukk-chat";
 import { readCompletionStream } from "@/lib/ukk-stream";
 
 type Turn = { from: "you" | "ukk"; text: string };
-type View = "opportunities" | "chat";
+type View = "opportunities" | "tasks" | "communities" | "chat";
+
+const TITLES: Record<View, string> = { opportunities: "Hidden opportunities", tasks: "Get it done", communities: "Communities", chat: "Chat with UKK" };
 
 // The page's own palette: warm paper, dark ink, a clay accent.
 const C: Palette = {
@@ -186,6 +190,14 @@ export function ChatScreen({ code }: { code: string }) {
             )
           )}
         </button>
+        <button type="button" onClick={() => open("tasks")} aria-current={view === "tasks" ? "page" : undefined} className={tab(view === "tasks")}>
+          <Wrench className="size-4 shrink-0" style={{ color: C.accent }} aria-hidden />
+          <span className="flex-1">Get it done</span>
+        </button>
+        <button type="button" onClick={() => open("communities")} aria-current={view === "communities" ? "page" : undefined} className={tab(view === "communities")}>
+          <Users className="size-4 shrink-0" style={{ color: C.accent }} aria-hidden />
+          <span className="flex-1">Communities</span>
+        </button>
         <button type="button" onClick={() => open("chat")} aria-current={view === "chat" ? "page" : undefined} className={tab(view === "chat")}>
           <MessageCircle className="size-4 shrink-0" style={{ color: C.accent }} aria-hidden />
           <span className="flex-1">Chat with UKK</span>
@@ -224,21 +236,29 @@ export function ChatScreen({ code }: { code: string }) {
         >
           <button type="button" onClick={() => setMenu(true)} aria-label="Open menu" className="relative flex size-10 items-center justify-center rounded-lg">
             <Menu className="size-5" aria-hidden />
-            {count > 0 && view === "chat" && <span className="absolute top-2 right-2 size-2 rounded-full" style={{ background: C.accent }} />}
+            {count > 0 && view !== "opportunities" && <span className="absolute top-2 right-2 size-2 rounded-full" style={{ background: C.accent }} />}
           </button>
-          <span className="flex-1 font-serif text-lg font-semibold">{view === "chat" ? "Chat with UKK" : "Hidden opportunities"}</span>
+          <span className="flex-1 font-serif text-lg font-semibold">{TITLES[view]}</span>
           <button type="button" onClick={newChat} disabled={busy} aria-label="New chat" className="flex size-10 items-center justify-center rounded-lg disabled:opacity-40">
             <SquarePen className="size-5" aria-hidden />
           </button>
         </header>
 
         {view === "opportunities" ? (
-          <main className="flex-1 overflow-y-auto">
+          <main className="min-h-0 flex-1 overflow-y-auto">
             <OpportunityView household={household} colors={C} onAsk={(text) => void send(text)} />
+          </main>
+        ) : view === "tasks" ? (
+          <main className="min-h-0 flex-1 overflow-y-auto">
+            <TaskView code={code} colors={C} city={household.profile.city} />
+          </main>
+        ) : view === "communities" ? (
+          <main className="min-h-0 flex-1 overflow-y-auto">
+            <CommunityView code={code} colors={C} city={household.profile.city} />
           </main>
         ) : (
           <>
-            <main className="flex-1 overflow-y-auto">
+            <main className="min-h-0 flex-1 overflow-y-auto">
               <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
                 {turns.length === 0 ? (
                   <div className="flex min-h-[55dvh] flex-col items-center justify-center gap-8 text-center">
