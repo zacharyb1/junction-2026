@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { CaseAction } from "@/lib/actions";
 
 /**
  * The case contract. Hermes produces this through the `case_publish` MCP tool,
@@ -126,6 +127,18 @@ export const CasePatch = z.object({
   drafts: z.array(DraftInput).max(LIMITS.drafts).optional(),
   unverified: z.array(z.string().max(300)).max(10).optional(),
   openQuestions: z.array(z.string().max(300)).max(10).optional(),
+  log: z
+    .array(
+      z.object({
+        // The bot may report reading and drafting. Sending, paying or submitting is never its to log.
+        kind: z.enum(["read", "draft"]),
+        trigger: z.enum(["message", "page_change", "deadline", "schedule"]),
+        summary: z.string().min(1).max(200),
+      }),
+    )
+    .max(5)
+    .optional()
+    .describe("What you did for this case outside the Engine, e.g. a reminder sent. Shown in the case's action log."),
 });
 
 export type CaseInput = z.infer<typeof CaseInput>;
@@ -191,6 +204,8 @@ export type Case = Omit<CaseInput, "evidence" | "steps" | "drafts"> & {
   trail?: Trail;
   /** Source re-checks, oldest first, the last `CHECKS_KEPT`. */
   checks?: SourceCheck[];
+  /** What UKK did on this case, oldest first (issue #27). Missing on cases stored before the log existed. */
+  actions?: CaseAction[];
 };
 
 export function verifiedCount(c: Pick<Case, "evidence">) {

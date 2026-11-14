@@ -14,6 +14,7 @@ import {
   verifiedCount,
   type Watcher,
 } from "@/lib/case";
+import { approveAction, type CaseAction, draftActions, logAction, recheckActions } from "@/lib/actions";
 import { loadCase, saveCase } from "@/lib/store";
 import { type FetchedPage, verifyEvidence } from "@/lib/verify";
 
@@ -150,15 +151,26 @@ export async function publishCase(
   trail?: Trail,
 ): Promise<PublishResult> {
   const now = new Date().toISOString();
+  const drafts = withIds(input.drafts) as Draft[];
+  let actions = logAction(undefined, {
+    kind: "read",
+    trigger: "message",
+    status: "done",
+    summary: trail
+      ? `Researched official sources: ${trail.searches} searches, ${trail.pagesRead} pages read`
+      : `Published a plan with ${input.evidence.length} cited sources`,
+  });
+  for (const d of drafts) for (const a of draftActions(d, "message")) actions = logAction(actions, a);
   const c = withVerifiedMoney({
     ...input,
     id: nanoid(16),
     createdAt: now,
     updatedAt: now,
     steps: withIds(input.steps) as Step[],
-    drafts: withIds(input.drafts) as Draft[],
+    drafts,
     evidence: await verifyEvidence(input.evidence, pages),
     trail,
+    actions,
   });
   await saveCase(c);
   return resultFor(c, origin);
@@ -196,8 +208,18 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
     evidence = mergeBy(evidence, checked, (e) => e.n).sort((a, b) => a.n - b.n);
   }
 
+  const incomingDrafts = patch.drafts ? (withIds(patch.drafts) as Draft[]) : undefined;
+  let actions = current.actions;
+  // Only a draft with a new title is new work; an edited draft keeps its place in the log.
+  for (const d of incomingDrafts ?? []) {
+    if (current.drafts.some((old) => old.title === d.title)) continue;
+    for (const a of draftActions(d, "message")) actions = logAction(actions, a);
+  }
+  for (const entry of patch.log ?? []) actions = logAction(actions, { ...entry, status: "done" });
+
   const next = withVerifiedMoney({
     ...current,
+    actions,
     title: patch.title ?? current.title,
     summary: patch.summary ?? current.summary,
     steps: mergeBy<Step>(
@@ -208,7 +230,7 @@ export async function updateCase(id: string, patch: CasePatch, origin: string): 
       { status: "todo", evidence: [] },
     ),
     money: mergeBy(current.money, patch.money, (m) => m.label, { evidence: [] }),
-    drafts: mergeBy(current.drafts, patch.drafts ? (withIds(patch.drafts) as Draft[]) : undefined, (d) => d.title),
+    drafts: mergeBy(current.drafts, incomingDrafts, (d) => d.title),
     evidence,
     unverified: patch.unverified ?? current.unverified,
     openQuestions: patch.openQuestions ?? current.openQuestions,
@@ -259,7 +281,9 @@ export async function recheckSources(current: Case, by: Watcher): Promise<Rechec
     return { changed: [], unreachable: [], check: latestCheck(latest) ?? check, case: latest };
   }
   // `updatedAt` stays: it marks the last change to the content, and the daily job stops watching 14 days after it.
-  const next: Case = { ...current, evidence, checks: [...earlier, check].slice(-CHECKS_KEPT) };
+  let actions = current.actions;
+  for (const a of recheckActions(check, current.evidence.length, by)) actions = logAction(actions, a);
+  const next: Case = { ...current, evidence, actions, checks: [...earlier, check].slice(-CHECKS_KEPT) };
   await saveCase(next);
   return { changed, unreachable, check, case: next };
 }
@@ -267,6 +291,20 @@ export async function recheckSources(current: Case, by: Watcher): Promise<Rechec
 export async function recheckCase(id: string, by: Watcher = "bot"): Promise<RecheckResult | null> {
   const current = await loadCase(id);
   return current ? recheckSources(current, by) : null;
+}
+
+/**
+ * The family's click on a proposal that waits (an "irreversible" action). UKK still sends nothing: the
+ * click records the decision and hands back the draft for the family to send or hand in themselves.
+ */
+export async function approveCaseAction(id: string, index: number): Promise<{ action: CaseAction; draft?: Draft } | null> {
+  const current = await loadCase(id);
+  if (!current) return null;
+  const actions = approveAction(current.actions, index);
+  if (!actions) return null;
+  await saveCase({ ...current, actions });
+  const action = actions[index];
+  return { action, draft: current.drafts.find((d) => d.id === action.draftId) };
 }
 
 export { loadCase };

@@ -26,6 +26,7 @@ The family approves "Set reminders"; you run as a scheduled job (a reminder or t
    - `catch_up`: true, so a laptop that slept delivers it late instead of dropping it
    - `prompt`: self-contained, because the job runs in a fresh session: "Reply with exactly this text: A reminder from the office of UKK: <first name>, <step title> is due on <date>. Case: <url>", written in the household's language
    - no `deliver`, so it posts to this chat
+2b. After the reminders are created, log it on the case: `mcp__casefile__case_update` with `patch.log`: `[{"kind": "read", "trigger": "deadline", "summary": "Reminder set for <step title> on <date>"}]`.
 3. Address the step `owner` by first name. No owner: address whoever approved.
 4. Count only successful `create` results with job IDs. Confirm how many were created, already existed, failed, or lacked a date; state the first reminder time only when a reminder exists.
 
