@@ -17,7 +17,7 @@ export function Wordmark() {
 
 const oneDecimal = (ms: number) => (ms / 1000).toFixed(1);
 
-export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: number; card: Scorecard | null }) {
+export function Hero({ sites, card }: { sites: number; card: Scorecard | null }) {
   const boot = ["AIDaddy online", "Watching: family group chat", `Official sites on file for Finland: ${sites}`, "Mode: silent until a life event"];
   return (
     <header className="hud-hero">
@@ -27,7 +27,9 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
           <span className="hud-online">
             <i aria-hidden="true" /> Junction 2026 · Exa challenge
           </span>
-          <TryLink className="hud-top-link">Try it live</TryLink>
+          <Link href="/setup" className="hud-top-link">
+            Set it up
+          </Link>
         </nav>
 
         <div className="hud-hero-grid">
@@ -56,17 +58,16 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
             <p className="hud-lede">
               AIDaddy lives in your family&apos;s group chat. It lets the small talk pass. When life happens, it researches
               the live web with Exa and comes back with a plan in which every line points at a sentence on an official page.
+              Nobody has to ask: it speaks first.
             </p>
             <div className="hud-actions">
-              <a href="#research" className="hud-btn hud-btn--primary">
+              <Link href="/setup" className="hud-btn hud-btn--primary">
+                Set it up in 3 steps
+              </Link>
+              <a href="#research" className="hud-btn">
                 Watch it work
               </a>
               <TryLink className="hud-btn">Try it live</TryLink>
-              {botUrl ? (
-                <a href={botUrl} className="hud-btn" target="_blank" rel="noopener noreferrer">
-                  Add to Telegram
-                </a>
-              ) : null}
             </div>
             {card ? (
               <dl className="hud-strip">
