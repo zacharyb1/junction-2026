@@ -16,6 +16,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
 import { DeadlineDate } from "@/components/deadline-date";
+import { SourceCheckPanel } from "@/components/source-check-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -370,6 +371,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
 
       {c.evidence.length > 0 && (
         <Section title={t.sources} hint={t.sourcesHint}>
+          <SourceCheckPanel c={c} t={t} />
           <ol className="flex flex-col gap-3">
             {c.evidence.map((e) => (
               <EvidenceCard key={e.n} e={e} t={t} />

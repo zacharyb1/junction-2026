@@ -3,6 +3,10 @@
  * gets Finnish labels. Add a language by adding one object here.
  */
 
+/** "3", "3 and 5", "3, 5 and 7", in the language of the labels. */
+const listOf = (locale: string, numbers: number[]) =>
+  new Intl.ListFormat(locale, { type: "conjunction" }).format(numbers.map(String));
+
 const en = {
   locale: "en-GB",
   updated: "Updated",
@@ -35,6 +39,23 @@ const en = {
   sources: "Sources",
   sourcesHint:
     "Each page was opened again, by our own server and through Exa, to check that the quoted sentence is really there.",
+  sourcesChecked: (time: string) => `Sources last checked ${time}.`,
+  quotesAllThere: (total: number) =>
+    total === 1 ? "The quote is still on its page." : `All ${total} quotes are still on their pages.`,
+  quotesSomeThere: (found: number, total: number) =>
+    total === 1
+      ? `The quote was ${found ? "" : "not "}found on its page.`
+      : `${found} of ${total} quotes were found on their pages.`,
+  quotesGone: (numbers: number[]) =>
+    numbers.length === 1
+      ? `The page changed: quote ${numbers[0]} is no longer there. Read the step again before you act.`
+      : `The pages changed: quotes ${listOf("en-GB", numbers)} are no longer there. Read those steps again before you act.`,
+  pagesNotOpened: (numbers: number[]) =>
+    `${numbers.length === 1 ? `The page of source ${numbers[0]}` : `The pages of sources ${listOf("en-GB", numbers)}`} did not open this time, which says nothing about the rule.`,
+  checkAgain: "Check the sources again",
+  checking: "Checking the sources…",
+  checkedRecently: "These sources were checked less than 10 minutes ago.",
+  checkFailed: "The check did not run. Please try again in a minute.",
   foundLive: "Quote found on the live page",
   foundExa: "Quote found in Exa's copy of the page",
   foundOxylabs: "Quote found on the live page, read through Oxylabs",
@@ -94,6 +115,25 @@ const fi: Labels = {
   sources: "Lähteet",
   sourcesHint:
     "Jokainen sivu avattiin uudelleen, omalta palvelimeltamme ja Exan kautta, jotta varmistettiin, että lainattu lause todella löytyy sivulta.",
+  sourcesChecked: (time) => `Lähteet tarkistettu viimeksi ${time}.`,
+  quotesAllThere: (total) =>
+    total === 1 ? "Lainaus on yhä sivullaan." : `Kaikki ${total} lainausta ovat yhä sivuillaan.`,
+  quotesSomeThere: (found, total) =>
+    total === 1
+      ? found
+        ? "Lainaus löytyi sivultaan."
+        : "Lainausta ei löytynyt sivultaan."
+      : `${total} lainauksesta ${found} löytyi sivultaan.`,
+  quotesGone: (numbers) =>
+    numbers.length === 1
+      ? `Sivu on muuttunut: lainausta ${numbers[0]} ei enää löydy. Lue vaihe uudelleen ennen kuin toimit.`
+      : `Sivut ovat muuttuneet: lainauksia ${listOf("fi-FI", numbers)} ei enää löydy. Lue vaiheet uudelleen ennen kuin toimit.`,
+  pagesNotOpened: (numbers) =>
+    `${numbers.length === 1 ? `Lähteen ${numbers[0]} sivu ei auennut` : `Lähteiden ${listOf("fi-FI", numbers)} sivut eivät auenneet`} tällä kertaa, mikä ei kerro säännöstä mitään.`,
+  checkAgain: "Tarkista lähteet uudelleen",
+  checking: "Tarkistetaan lähteitä…",
+  checkedRecently: "Nämä lähteet tarkistettiin alle 10 minuuttia sitten.",
+  checkFailed: "Tarkistus ei onnistunut. Yritä hetken kuluttua uudelleen.",
   foundLive: "Lainaus löytyi sivulta",
   foundExa: "Lainaus löytyi Exan tallentamasta sivusta",
   foundOxylabs: "Lainaus löytyi sivulta, luettu Oxylabsin kautta",

@@ -11,6 +11,7 @@ If you change something here, change it in `src/lib/case.ts` or `src/lib/engine/
 | Case store and verifier | `src/lib/cases.ts`, `src/lib/verify.ts`, `src/lib/store.ts` | Vercel Blob, Exa Contents |
 | MCP server | `src/app/api/mcp/route.ts` | called by Hermes |
 | REST API | `src/app/api/research`, `src/app/api/cases` | called by the eval harness, the `/try` page, scripts |
+| Daily source re-check | `src/app/api/cron/recheck`, scheduled in `vercel.json` | called by Vercel Cron, reads the store and the cited pages |
 | Bot, track A | Hermes Agent with `hermes/` config and skills (Vlad) | Telegram, MCP server |
 | Bot, track B | Hono server with a Mastra agent (Milan) | Telegram, REST API or MCP server |
 | Pages | `/` landing, `/try` web demo, `/c/[id]` case file | REST API, store |
@@ -25,6 +26,8 @@ judges without Telegram can use the same engine at `/try`, and the bot runtime c
 - Bot and scripts: `Authorization: Bearer <CASEFILE_SECRET>`.
 - Public web demo: header `x-demo-code: <DEMO_ACCESS_CODE>`, rate limited. The code is in the QR link on our table.
 - Reading a case needs nothing. The id is 16 random characters.
+- Asking for a source re-check from the case page (`POST /api/cases/:id/check`) needs nothing either. It is rate limited and reads a case at most once in 10 minutes.
+- The daily job: `Authorization: Bearer <CRON_SECRET>`, which Vercel sends to cron routes. The bot secret works too.
 
 ## `POST /api/research` and MCP tool `research_case`
 
@@ -158,7 +161,7 @@ MCP tools on the same server, REST equivalents in brackets:
 | `case_publish` (`POST /api/cases`) | a full case, see `CaseInput` in `src/lib/case.ts` | id, url, verified counts, failed citation numbers |
 | `case_update` (`PATCH /api/cases/:id`) | `{ id, patch }`, see `CasePatch` | same as publish |
 | `case_get` (`GET /api/cases/:id`) | `{ id }` | the stored case with a verification mark per source |
-| `case_recheck` (`POST /api/cases/:id`) | `{ id }` | `{ id, changed: number[], unreachable: number[], url }`. `changed`: the sentence is gone from a page that still opens. `unreachable`: the page did not open this time, the last confirmed state is kept. Stay silent when `changed` is empty |
+| `case_recheck` (`POST /api/cases/:id`) | `{ id }` | `{ id, changed: number[], unreachable: number[], url }`. `changed`: the sentence is gone from a page that still opens, and the bot has not been told yet. A change is reported once, also when the daily job or the page button found it first. `unreachable`: the page did not open this time, the last confirmed state is kept. Stay silent when `changed` is empty |
 
 `case_update` changes only the fields you send. A step is matched by its title, a money line by its label, evidence by `n`.
 A quote last confirmed on a live reading must still be on a live reading at re-check, whatever Exa's older copy says.
@@ -166,6 +169,73 @@ A quote last confirmed on a live reading must still be on a live reading at re-c
 Verification marks on each evidence item: `verified`, `not_found`, `unreachable`, plus `match` from 0 to 1
 and `checkedVia`: `live` (our own request to the page), `oxylabs` (a live read through the Oxylabs Web API,
 for pages that refuse our request) or `exa` (Exa's reading of the page).
+
+## Source re-checks
+
+A re-check opens every cited page of a stored case again (`recheckSources` in `src/lib/cases.ts`). Three callers:
+the bot (`case_recheck`), the daily job, and the button on the case page. Each one appends to `checks` on the stored case,
+which keeps the last 10:
+
+```json
+{ "at": "2026-11-14T03:17:42.000Z", "by": "cron", "changed": [3], "unreachable": [] }
+```
+
+- `by`: `bot`, `cron` or `page`.
+- `changed`: citation numbers whose sentence was confirmed on its page earlier and is not there now. A number stays listed
+  from check to check until the quote is found again or `case_update` replaces it. Its evidence item is marked `not_found`.
+- `unreachable`: citation numbers whose page did not open this time. That is not a change: a quote that was confirmed keeps its mark.
+- A re-check does not move `updatedAt`. That field is the last publish or `case_update`.
+- If the case was updated while its pages were being read, the update wins and that check is not stored.
+
+The case page shows the newest entry above the sources: when the pages were last read, an amber notice for `changed`,
+a neutral line for `unreachable`, and the button. A case that was never re-checked shows the reading at publish.
+
+### `GET /api/cron/recheck`
+
+The daily job. `vercel.json` schedules it at 03:17 UTC (the Hobby plan allows one run a day and may start it later in that hour).
+It needs `CRON_SECRET` on the Vercel project: without it Vercel sends no Authorization header and the route answers `401`.
+
+It re-checks cases that were published or updated in the last 14 days, at most 15 per run, one after another,
+and starts no new case after 240 seconds. Cases whose file has gone longest without a write come first, and a re-check
+writes the file, so with more than 15 cases in the watch they take turns over several days.
+A case whose pages were read in the last hour is left alone, so a cron event delivered twice costs nothing.
+
+```json
+{
+  "checked": 3,
+  "withChanges": 1,
+  "failed": 0,
+  "skipped": 2,
+  "waiting": 0,
+  "ms": 9120,
+  "cases": [{ "id": "3C5sH6YwQzT-lhBd", "changed": [3], "unreachable": [] }]
+}
+```
+
+`changed` here lists what this run found gone that the previous run still saw. `skipped`: looked at and left alone
+(content older than 14 days, nothing cited, or read within the last hour). `waiting`: cases in the watch this run did not reach.
+The job only records. It posts nothing to a chat: the bot's own `case_recheck` does that.
+
+### `POST /api/cases/:id/check`
+
+The public route behind "Check the sources again". No body, no credentials.
+
+```json
+{
+  "id": "3C5sH6YwQzT-lhBd",
+  "fresh": true,
+  "checkedAt": "2026-11-14T09:02:11.000Z",
+  "changed": [3],
+  "unreachable": [],
+  "evidenceTotal": 6,
+  "evidenceVerified": 5
+}
+```
+
+- `changed`: every quote that is gone as of this check, not only the new ones. `fresh: false`: the pages were read less than
+  10 minutes ago (a new case counts as read when it was published), so the stored result came back and nothing was fetched.
+- Readings that do fetch count against the public rate limit shared with the demo. Two requests for the same case
+  at the same moment share one reading (per server instance). Errors: `404` unknown id, `429` rate limited, `502` the check failed.
 
 ## Page readers
 
@@ -185,6 +255,7 @@ Not yet run against the real Oxylabs API: it was tested against a local stand-in
 
 The bot (Hermes) owns: reading the chat, staying silent, the acknowledgement, calling `research_case`,
 posting the plan and link, approval buttons, writing drafts, `case_update`, reminders, and any scheduled `case_recheck`. This defines ownership, not enabled features: no daily watch is enabled in the current [Hermes handover](HERMES_HANDOVER.md).
+The app's own daily job re-checks recent cases as well when `CRON_SECRET` is set on the deployment, but it only updates the case page. Telling the family in the chat stays with the bot.
 
 The bot does not do the research itself unless `research_case` fails. Fallback: Exa MCP tools plus `case_publish`.
 
@@ -195,6 +266,7 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `EXA_API_KEY` | Vercel, Hermes `.env` | engine and verifier, Hermes web search |
 | `CASEFILE_SECRET` | Vercel, Hermes `.env` | bot and script writes |
 | `DEMO_ACCESS_CODE` | Vercel | public `/try` access |
+| `CRON_SECRET` | Vercel | lets Vercel Cron call the daily source re-check. Any long random string |
 | `DEMO_RATE_PER_MINUTE` | Vercel, optional | public requests per client address per minute, default 20 (a venue shares one address) |
 | `DEMO_RATE_TOTAL_PER_MINUTE` | Vercel, optional | all public requests per minute, default 40 |
 | `OXYLABS_API_KEY` | Vercel, optional | third page reader for sites that refuse our request |

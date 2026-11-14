@@ -1,6 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { get, put } from "@vercel/blob";
+import { get, list, put } from "@vercel/blob";
 import type { Case } from "@/lib/case";
 
 /**
@@ -10,7 +10,8 @@ import type { Case } from "@/lib/case";
 
 const LOCAL_DIR = path.join(process.cwd(), ".data", "cases");
 const blobEnabled = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-const blobPath = (id: string) => `cases/${id}.json`;
+const BLOB_PREFIX = "cases/";
+const blobPath = (id: string) => `${BLOB_PREFIX}${id}.json`;
 const safeId = (id: string) => /^[A-Za-z0-9_-]{8,40}$/.test(id);
 
 export function storageKind(): "blob" | "local" {
@@ -48,4 +49,36 @@ export async function loadCase(id: string): Promise<Case | null> {
   } catch {
     return null;
   }
+}
+
+export type CaseListing = { id: string; modifiedAt: string };
+
+/**
+ * Stored cases, most recently written first. `modifiedAt` is when the document was last saved,
+ * which a source re-check also does. `since` keeps only cases saved at or after that time.
+ */
+export async function listCases({ limit = 100, since }: { limit?: number; since?: Date } = {}): Promise<CaseListing[]> {
+  const found: CaseListing[] = [];
+  if (blobEnabled()) {
+    // Blob lists by name, not by time, so every page is read before sorting.
+    let cursor: string | undefined;
+    do {
+      const page = await list({ prefix: BLOB_PREFIX, cursor });
+      for (const blob of page.blobs.filter((b) => b.pathname.endsWith(".json"))) {
+        found.push({ id: blob.pathname.slice(BLOB_PREFIX.length, -".json".length), modifiedAt: blob.uploadedAt.toISOString() });
+      }
+      cursor = page.hasMore ? page.cursor : undefined;
+    } while (cursor && found.length < 10_000);
+  } else {
+    const names = await readdir(LOCAL_DIR).catch(() => [] as string[]);
+    for (const name of names.filter((n) => n.endsWith(".json"))) {
+      const file = await stat(path.join(LOCAL_DIR, name)).catch(() => null);
+      if (file) found.push({ id: name.slice(0, -".json".length), modifiedAt: file.mtime.toISOString() });
+    }
+  }
+  const from = since?.toISOString() ?? "";
+  return found
+    .filter((c) => safeId(c.id) && c.modifiedAt >= from)
+    .sort((a, b) => b.modifiedAt.localeCompare(a.modifiedAt))
+    .slice(0, limit);
 }

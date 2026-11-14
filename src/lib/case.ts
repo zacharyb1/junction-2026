@@ -161,16 +161,60 @@ export type Trail = {
   events: { ms: number; detail: string }[];
 };
 
+/** Who asked for a source re-check: the bot's change watch, the daily job, or the button on the case page. */
+export type Watcher = "bot" | "cron" | "page";
+
+/** One reading of every cited page. */
+export type SourceCheck = {
+  at: string;
+  /** Missing on the reading at publish, which no watcher asked for. */
+  by?: Watcher;
+  /**
+   * Citation numbers whose sentence was confirmed on its page earlier and is not there now.
+   * A number stays listed from check to check until the quote is found again or replaced.
+   */
+  changed: number[];
+  /** Citation numbers whose page did not open this time. */
+  unreachable: number[];
+};
+
+export const CHECKS_KEPT = 10;
+
 export type Case = Omit<CaseInput, "evidence" | "steps" | "drafts"> & {
   id: string;
   createdAt: string;
+  /** Last publish or update of the content. A source re-check does not move it. */
   updatedAt: string;
   evidence: Evidence[];
   steps: Step[];
   drafts: Draft[];
   trail?: Trail;
+  /** Source re-checks, oldest first, the last `CHECKS_KEPT`. */
+  checks?: SourceCheck[];
 };
 
 export function verifiedCount(c: Pick<Case, "evidence">) {
   return c.evidence.filter((e) => e.verification === "verified").length;
+}
+
+/**
+ * What the last reading of every cited page found: the newest re-check, or the reading at publish
+ * for a case that was never re-checked. Null when the case cites nothing.
+ */
+export function latestCheck(c: Pick<Case, "evidence" | "checks">): SourceCheck | null {
+  const last = c.checks?.at(-1);
+  if (last) {
+    // A quote that was replaced since the check stands on its own reading, so it is no longer listed as gone.
+    const stillGone = new Set(
+      c.evidence.filter((e) => e.verification !== "verified" && e.fetchedAt <= last.at).map((e) => e.n),
+    );
+    return { ...last, changed: last.changed.filter((n) => stillGone.has(n)) };
+  }
+  if (!c.evidence.length) return null;
+  return {
+    // Evidence added later was read later, so the oldest reading is when every page was last opened.
+    at: c.evidence.map((e) => e.fetchedAt).sort()[0],
+    changed: [],
+    unreachable: c.evidence.filter((e) => e.verification === "unreachable").map((e) => e.n),
+  };
 }
