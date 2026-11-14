@@ -4,8 +4,9 @@ import { DemoFrame, demoMode } from "@/components/demo/demo-frame";
 import "@/components/chat-demo/chat-demo.css";
 
 export const metadata: Metadata = {
-  title: "UKK in a family chat: demo replay",
-  description: "A scripted replay of UKK in a family group chat. The plan and its sources come from a real run.",
+  // The name is already in the title, so the layout's " · AIDaddy" ending is left off.
+  title: { absolute: "AIDaddy in a family chat: demo replay" },
+  description: "A scripted replay of AIDaddy in a family group chat. The plan and its sources come from a real run.",
   robots: { index: false },
 };
 

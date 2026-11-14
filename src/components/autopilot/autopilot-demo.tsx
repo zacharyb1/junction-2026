@@ -5,7 +5,7 @@ import { type CheckedQuote, checkedQuotes, progressLine, QUESTION, readResearchS
 import type { ResearchResult } from "@/lib/engine/research";
 
 /**
- * A demo of proactive help. The family chat, UKK's routing step and the suggestion are fixed text written
+ * A demo of proactive help. The family chat, AIDaddy's routing step and the suggestion are fixed text written
  * for the demo: nothing listens, reads a browser, or sends anything on the family's behalf.
  *
  * One part is real. With an access code, the lawyer's step asks the Engine its question, and the Engine
@@ -198,13 +198,13 @@ export function AutopilotDemo({ code: linkCode, needsCode }: { code: string; nee
     <div className="hud-panel hud-autopilot">
       <div className="hud-autopilot-consent">
         <p>
-          <strong>Demo.</strong> The chat, UKK&apos;s routing and the suggestion are a fixed script. Nothing listens to you, nothing
-          reads your browser, and nothing is sent on your behalf or paid. One part is real: the lawyer&apos;s check sends its one
-          fixed question to the research engine, which searches official sites with Exa and opens every page it quotes.
+          <strong>Demo.</strong> The chat, AIDaddy&apos;s routing and the suggestion are a fixed script. Nothing listens to you,
+          nothing reads your browser, and nothing is sent on your behalf or paid. One part is real: the lawyer&apos;s check sends
+          its one fixed question to the research engine, which searches official sites with Exa and opens every page it quotes.
         </p>
         <label>
           <input type="checkbox" checked={suggestions} onChange={(event) => setSuggestions(event.target.checked)} />
-          Let UKK suggest next steps
+          Let AIDaddy suggest next steps
         </label>
       </div>
 
@@ -234,7 +234,7 @@ export function AutopilotDemo({ code: linkCode, needsCode }: { code: string; nee
               ) : null}
               {step.kind === "orchestrator" ? (
                 <>
-                  <span className="hud-flow-tech">UKK</span>
+                  <span className="hud-flow-tech">AIDaddy</span>
                   <p>{step.text}</p>
                 </>
               ) : null}

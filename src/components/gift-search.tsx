@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * A search box for gifts on the UKK page, so a visitor can try the gift search (issue 30) with their own words and
+ * A search box for gifts on the chat page, so a visitor can try the gift search (issue 30) with their own words and
  * see real products whose prices were found on the shop's own page.
  */
 
@@ -52,8 +52,8 @@ export function GiftSearch({ code }: { code: string }) {
           <Gift className="size-5" /> Find a gift
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Describe what you are looking for. UKK searches shops with Exa and keeps only products whose price is on the
-          shop&apos;s own page.
+          Describe what you are looking for. AIDaddy searches shops with Exa and keeps only products whose price is on
+          the shop&apos;s own page.
         </p>
       </div>
 

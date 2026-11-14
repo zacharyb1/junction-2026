@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { type Beat, DURATION, PEOPLE, SCRIPT } from "@/components/chat-demo/script";
 import { scrollToEnd, useReplayClock } from "@/components/demo/replay";
 
-/** A scripted replay of UKK in a family group chat (issue #33). Original styling, no app branding. */
+/** A scripted replay of AIDaddy in a family group chat (issue #33). Original styling, no app branding. */
 export function ChatDemo({ loop = false }: { loop?: boolean }) {
   const now = useReplayClock(DURATION, loop);
   const list = useRef<HTMLOListElement>(null);
@@ -31,7 +31,7 @@ export function ChatDemo({ loop = false }: { loop?: boolean }) {
         </span>
         <div>
           <p className="chatdemo-title">Lehtonen family</p>
-          <p className="chatdemo-sub">{typing ? "UKK is typing…" : "Aino, Mikko, UKK"}</p>
+          <p className="chatdemo-sub">{typing ? "AIDaddy is typing…" : "Aino, Mikko, AIDaddy"}</p>
         </div>
       </header>
 
@@ -48,8 +48,8 @@ export function ChatDemo({ loop = false }: { loop?: boolean }) {
         )}
         {typing && (
           <li className="chatdemo-row">
-            <Avatar who="ukk" />
-            <div className="chatdemo-bubble chatdemo-typing" aria-label="UKK is typing">
+            <Avatar who="aidaddy" />
+            <div className="chatdemo-bubble chatdemo-typing" aria-label="AIDaddy is typing">
               <span />
               <span />
               <span />
@@ -65,10 +65,10 @@ export function ChatDemo({ loop = false }: { loop?: boolean }) {
   );
 }
 
-function Avatar({ who }: { who: "aino" | "mikko" | "ukk" }) {
-  if (who === "ukk") {
+function Avatar({ who }: { who: "aino" | "mikko" | "aidaddy" }) {
+  if (who === "aidaddy") {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img className="chatdemo-avatar" src="/ukk-avatar.jpg" alt="" />;
+    return <img className="chatdemo-avatar" src="/aidaddy-avatar.svg" alt="" />;
   }
   return (
     <span className="chatdemo-avatar" style={{ background: PEOPLE[who].color }}>
@@ -86,7 +86,7 @@ function Message({ beat }: { beat: Extract<Beat, { kind: "message" }> }) {
         {!mine && (
           <p className="chatdemo-name" style={{ color: PEOPLE[beat.from].color }}>
             {PEOPLE[beat.from].name}
-            {beat.from === "ukk" && <span className="chatdemo-bot">bot</span>}
+            {beat.from === "aidaddy" && <span className="chatdemo-bot">bot</span>}
           </p>
         )}
         <p className="chatdemo-text">{beat.text}</p>

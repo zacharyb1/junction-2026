@@ -21,7 +21,8 @@ services:
       EXA_API_KEY: ${EXA_API_KEY:-}
       # Written by scripts/deploy/server-deploy.sh; shown as "commit" in /api/health.
       KAVERI_COMMIT: ${KAVERI_COMMIT:-}
-      # The /ukk chat's backend (the hermes-web service) and its key. Server-side only.
+      # The /chat page's backend (the hermes-web service) and its key. Server-side only.
+      # The UKK_ names predate the rename to AIDaddy; the server's .env.local sets them, so they stay.
       UKK_API_URL: ${UKK_API_URL:-}
       UKK_API_KEY: ${UKK_API_KEY:-}
     ports:
@@ -90,7 +91,7 @@ services:
     # Allow the pinned runtime's reminder drain and cleanup budget before forced exit.
     stop_grace_period: 90s
 
-  # The same UKK for the /ukk web page: Hermes' API server only, no Telegram token, memory and
+  # The same AIDaddy for the /chat web page: Hermes' API server only, no Telegram token, memory and
   # scheduled jobs off, its own volume. Port 8642 is never published; only the web service calls it.
   hermes-web:
     profiles: [bot]

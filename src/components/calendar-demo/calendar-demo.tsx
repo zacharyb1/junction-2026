@@ -3,11 +3,11 @@
 import { useReplayClock } from "@/components/demo/replay";
 
 /**
- * Issue #36: a scripted replay of UKK planning a birthday found in the calendar (the birthday-planner
+ * Issue #36: a scripted replay of AIDaddy planning a birthday found in the calendar (the birthday-planner
  * skill from issue #23). The family is fictional. The three options and their facts come from a real
  * occasion research run on the venues' own pages, 3 of 3 quotes checked, 5.2 seconds:
  * https://86.38.238.136.sslip.io/c/zPi7P2DsH3CBC7ua (the drafted invitation is on that case).
- * The dates UKK proposes for booking and buying are his suggestions, not facts.
+ * The dates AIDaddy proposes for booking and buying are its suggestions, not facts.
  */
 export const CASE_URL = "https://86.38.238.136.sslip.io/c/zPi7P2DsH3CBC7ua";
 export const DURATION = 31000;
@@ -92,13 +92,13 @@ export function CalendarDemo({ loop = false }: { loop?: boolean }) {
       <aside className={`cdemo-panel${panel ? " is-open" : ""}`} aria-hidden={!panel}>
         <div className="cdemo-panel-head">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/ukk-avatar.jpg" alt="" />
+          <img src="/aidaddy-avatar.svg" alt="" />
           <div>
-            <p className="cdemo-name">UKK</p>
+            <p className="cdemo-name">AIDaddy</p>
             <p className="cdemo-sub">birthday planner</p>
           </div>
         </div>
-        {panel && <p className="cdemo-msg">A reminder from the office of UKK: Liisa turns 60 on Saturday 28 November, in two weeks.</p>}
+        {panel && <p className="cdemo-msg">A reminder from the office of AIDaddy: Liisa turns 60 on Saturday 28 November, in two weeks.</p>}
         {searching && <p className="cdemo-progress">Looking for options in Espoo, available now…</p>}
         {options.length > 0 && (
           <ol className="cdemo-options">

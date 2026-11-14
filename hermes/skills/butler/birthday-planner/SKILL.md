@@ -2,22 +2,22 @@
 name: birthday-planner
 description: "Birthdays of the people closest to the household: choose them, remember the dates, plan each one ahead"
 version: 1.0.0
-author: UKK team
+author: AIDaddy team
 ---
 
 # Birthday planner
 
-Issue #23. The household chooses whose birthdays matter (parents, grandparents, children, partners, siblings). UKK remembers them, reminds two weeks ahead, and comes with a plan: gift and celebration ideas from real, current sources. Reading and drafting run unattended; anything that books, orders or pays waits for the family's click, and UKK never does it himself.
+Issue #23. The household chooses whose birthdays matter (parents, grandparents, children, partners, siblings). AIDaddy remembers them, reminds two weeks ahead, and comes with a plan: gift and celebration ideas from real, current sources. Reading and drafting run unattended; anything that books, orders or pays waits for the family's click, and AIDaddy never does it itself.
 
 ## When
 
-- Someone asks to plan or remember birthdays ("UKK, remember our birthdays", "Mum turns 60 in March", "syntymäpäivät").
+- Someone asks to plan or remember birthdays ("AIDaddy, remember our birthdays", "Mum turns 60 in March", "syntymäpäivät").
 - A birthday reminder job fires (see "Reminder job").
 - "Which birthdays are coming up?": list the saved ones, soonest first, with the days left.
 
 ## Choose the people
 
-1. Acknowledge in one line, in UKK's voice: "A matter of the family's calendar. Let us set it up."
+1. Acknowledge in one line, in AIDaddy's voice: "A matter of the family's calendar. Let us set it up."
 2. Ask with `clarify`, letting them pick several: Mother, Father, Grandparents, Children, Partner, Siblings, Someone else. On the web page there are no buttons: ask the same in one plain sentence.
 3. For the chosen relations, ask in ONE message for each person's first name and birthday (day and month; the year only if they want the age mentioned). Example: "Mum Liisa 3 March, Grandpa Pekka 12 December".
 4. Confirm the list back in one short message, sorted by the next date. Wrong date? Correct it, then confirm again.
@@ -35,7 +35,7 @@ Issue #23. The household chooses whose birthdays matter (parents, grandparents, 
 
 ## Reminder job
 
-8. One line: "A reminder from the office of UKK: <first name>'s birthday is on <day> <month>, in two weeks."
+8. One line: "A reminder from the office of AIDaddy: <first name>'s birthday is on <day> <month>, in two weeks."
 9. Research with `mcp__casefile__research_case`: `situation` "Birthday of <relation> <first name> on <date>[, turning <age>], in <city>. Ideas for a gift and a place or way to celebrate, available now." with `country`, `region` (city from memory) and `language`. This uses the Engine's occasion research: real, currently available options with quotes from the provider's own pages.
 10. Post up to 4 options as the tool returned them, citation numbers included, and the case link. Add nothing the tool did not return.
 11. Work ahead, unasked: draft a short invitation or greeting for the family to send, attach it with `mcp__casefile__case_update` (`patch.drafts`, kind `email` or `letter`), and log it: `patch.log`: `[{"kind": "draft", "trigger": "schedule", "summary": "Birthday plan for <first name>: options researched, invitation drafted"}]`.

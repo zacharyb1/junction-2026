@@ -9,12 +9,12 @@ import { labels } from "@/lib/i18n";
 
 const MODEL = "eleven_flash_v2_5";
 /**
- * UKK's own voice, designed for this project with ElevenLabs Voice Design from a text description
- * (an older, calm statesman with a light Nordic accent). It is not a clone of anyone's voice.
+ * AIDaddy's own voice, designed for this project with ElevenLabs Voice Design from a text description
+ * (an older, calm voice with a light Nordic accent). It is not a clone of anyone's voice.
  * It lives in the team's ElevenLabs account; ELEVENLABS_VOICE_ID overrides it, for example for another account.
  */
-export const UKK_VOICE = "UWUOFJTWwuSmZFHzbMpM";
-const DEFAULT_VOICE = UKK_VOICE;
+export const AIDADDY_VOICE = "UWUOFJTWwuSmZFHzbMpM";
+const DEFAULT_VOICE = AIDADDY_VOICE;
 const voiceId = () => process.env.ELEVENLABS_VOICE_ID || DEFAULT_VOICE;
 
 export const SPOKEN_LIMIT = 1500;
@@ -88,7 +88,7 @@ export async function renderSpeech(text: string, language?: string): Promise<Buf
   return audio;
 }
 
-/** The longest chat reply UKK reads aloud. Longer replies are cut after the last whole sentence that fits. */
+/** The longest chat reply AIDaddy reads aloud. Longer replies are cut after the last whole sentence that fits. */
 export const SPEAKABLE_LIMIT = 900;
 
 /**

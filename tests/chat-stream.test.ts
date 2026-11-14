@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readCompletionStream } from "@/lib/ukk-stream";
+import { readCompletionStream } from "@/lib/chat-stream";
 
 function stream(...parts: string[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -41,7 +41,7 @@ describe("readCompletionStream", () => {
 
   it("rejects an error event from the backend", async () => {
     const error = `data: ${JSON.stringify({ error: { message: "provider failed" } })}\n\n`;
-    await expect(readCompletionStream(stream(error, "data: [DONE]\n\n"), () => {})).rejects.toThrow("UKK could not answer");
+    await expect(readCompletionStream(stream(error, "data: [DONE]\n\n"), () => {})).rejects.toThrow("AIDaddy could not answer");
   });
 
   it("rejects a stream that closes before [DONE]", async () => {

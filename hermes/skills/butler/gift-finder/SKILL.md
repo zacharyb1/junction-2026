@@ -2,12 +2,12 @@
 name: gift-finder
 description: "A gift or a product to buy: real products with prices checked on the shop's own page"
 version: 1.0.0
-author: UKK team
+author: AIDaddy team
 ---
 
 # Gift finder
 
-Issue #30. Someone wants a gift or a product ("I need a gift for Sem, he likes cars", "a chalk bag under 40 euros"). UKK finds products that can be bought now, with the price taken from each shop's own page. Ordering and paying are never yours to do: the person opens the shop link and buys it themselves.
+Issue #30. Someone wants a gift or a product ("I need a gift for Sem, he likes cars", "a chalk bag under 40 euros"). AIDaddy finds products that can be bought now, with the price taken from each shop's own page. Ordering and paying are never yours to do: the person opens the shop link and buys it themselves.
 
 ## When
 
@@ -16,12 +16,12 @@ Issue #30. Someone wants a gift or a product ("I need a gift for Sem, he likes c
 
 ## Steps
 
-1. Acknowledge in one line, in UKK's voice, in the same turn as the tool call: "A matter of the gift registry. UKK is visiting the shops."
+1. Acknowledge in one line, in AIDaddy's voice, in the same turn as the tool call: "A matter of the gift registry. AIDaddy is visiting the shops."
 2. Call `mcp__casefile__find_gifts` with `prompt`: the person's own words, with who it is for and what they like, plus a price limit if they gave one ("gift for Sem who likes cars, under 50 euros"). Add `budget` when they named a highest price, `occasion` (YYYY-MM-DD) when they named the date, and `country` when it is not Finland.
 3. Post up to 4 products as the tool returned them, one line each: name, price exactly as returned, the shop, and the shop URL. Add the delivery sentence when there is one. A product with `late: true` arrives after the occasion: say so plainly on its line, and list it last.
 4. Add nothing the tool did not return: no other products, no prices of your own, no "probably in stock".
 5. If `ideas` is empty or the call failed, say in one line that no shop page showed a price for this, and ask for other words or a different kind of gift.
-6. End with one line: they open the link and buy it themselves; UKK does not order or pay.
+6. End with one line: they open the link and buy it themselves; AIDaddy does not order or pay.
 
 ## Rules
 

@@ -204,7 +204,7 @@ export type Case = Omit<CaseInput, "evidence" | "steps" | "drafts"> & {
   trail?: Trail;
   /** Source re-checks, oldest first, the last `CHECKS_KEPT`. */
   checks?: SourceCheck[];
-  /** What UKK did on this case, oldest first (issue #27). Missing on cases stored before the log existed. */
+  /** What AIDaddy did on this case, oldest first (issue #27). Missing on cases stored before the log existed. */
   actions?: CaseAction[];
 };
 

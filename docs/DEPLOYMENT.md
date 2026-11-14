@@ -55,14 +55,14 @@ Only the owner of this personal repository can add secrets. The key is created o
 
 When `scripts/deploy/server-deploy.sh` changes, copy it to `/usr/local/sbin/kaveri-deploy` on the server by hand. The deploy uses the installed copy, not the one in the commit it deploys.
 
-### The web chat (`/ukk`)
+### The web chat (`/chat`)
 
-`hermes-web` serves the `/ukk` page: the same UKK, web-only, with memory and reminders off and only the `research_case` and `case_get` Engine tools. It needs, on the server:
+`hermes-web` serves the `/chat` page: the same AIDaddy, web-only, with memory and reminders off and only the `research_case` and `case_get` Engine tools. It needs, on the server:
 
 - `.env.local`: `UKK_API_URL=http://hermes-web:8642` and `UKK_API_KEY` (a long random value; Compose passes it to `hermes-web` as `API_SERVER_KEY`).
 - `.env.web`: only `NVIDIA_API_KEY` (template `containers/hermes/env.web.example`). Never the Telegram token; the web instance refuses to start with it.
 
-Port 8642 is not published; only the `web` service reaches it. Without `UKK_API_URL` (on Vercel) the page links to `NEXT_PUBLIC_UKK_CHAT_URL`, by default the server's `/ukk`.
+Port 8642 is not published; only the `web` service reaches it. Without `UKK_API_URL` (on Vercel) the page links to `NEXT_PUBLIC_UKK_CHAT_URL`, by default the server's `/chat`. The names `UKK_API_URL`, `UKK_API_KEY` and `NEXT_PUBLIC_UKK_CHAT_URL` predate the rename to AIDaddy and still configure the `/chat` page.
 
 ## Deploying the web app
 

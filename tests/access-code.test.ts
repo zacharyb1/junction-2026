@@ -4,12 +4,12 @@ import { withCode } from "@/components/site/access-code";
 describe("withCode", () => {
   it("leaves every address alone when the visitor has no code", () => {
     expect(withCode("/try", "")).toBe("/try");
-    expect(withCode("/ukk", "")).toBe("/ukk");
+    expect(withCode("/chat", "")).toBe("/chat");
   });
 
   it("adds the code to the three pages that read one", () => {
     expect(withCode("/try", "table7")).toBe("/try?code=table7");
-    expect(withCode("/ukk", "table7")).toBe("/ukk?code=table7");
+    expect(withCode("/chat", "table7")).toBe("/chat?code=table7");
     expect(withCode("/autopilot", "table7")).toBe("/autopilot?code=table7");
   });
 
@@ -21,7 +21,7 @@ describe("withCode", () => {
 
   it("keeps a query and an anchor that are already there", () => {
     expect(withCode("/try?lang=fi", "table7")).toBe("/try?lang=fi&code=table7");
-    expect(withCode("/ukk#voice", "table7")).toBe("/ukk?code=table7#voice");
+    expect(withCode("/chat#voice", "table7")).toBe("/chat?code=table7#voice");
   });
 
   it("escapes a code that is not plain letters", () => {

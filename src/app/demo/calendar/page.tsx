@@ -4,8 +4,9 @@ import { DemoFrame, demoMode } from "@/components/demo/demo-frame";
 import "@/components/calendar-demo/calendar-demo.css";
 
 export const metadata: Metadata = {
-  title: "UKK plans a birthday: demo replay",
-  description: "A scripted replay of UKK planning a birthday from the calendar. The options come from a real run.",
+  // The name is already in the title, so the layout's " · AIDaddy" ending is left off.
+  title: { absolute: "AIDaddy plans a birthday: demo replay" },
+  description: "A scripted replay of AIDaddy planning a birthday from the calendar. The options come from a real run.",
   robots: { index: false },
 };
 
@@ -21,8 +22,8 @@ export default async function CalendarDemoPage({ searchParams }: PageProps<"/dem
       bare={bare}
       caption={
         <>
-          Concept: UKK cannot read or write a calendar yet. Demo replay with a fictional family. The three options and their facts come from a <a href={CASE_URL}>real run</a> on
-          the venues&apos; own pages; the booking dates are UKK&apos;s suggestions.
+          Concept: AIDaddy cannot read or write a calendar yet. Demo replay with a fictional family. The three options and their facts come from a <a href={CASE_URL}>real run</a> on
+          the venues&apos; own pages; the booking dates are AIDaddy&apos;s suggestions.
         </>
       }
     >

@@ -92,7 +92,7 @@ class GateHookTest(unittest.IsolatedAsyncioTestCase):
         self.assertIs(event.reply_expected, False)
 
     async def test_addressed_message_still_expects_reply(self):
-        event = self.group_event("UKK, what do we register first?", True)
+        event = self.group_event("AIDaddy, what do we register first?", True)
         self.assertIsNone(await plugin._on_message(event))
         self.assertIs(event.reply_expected, True)
 

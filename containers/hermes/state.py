@@ -19,7 +19,7 @@ OPTIONAL = (
     "TELEGRAM_HOME_CHANNEL", "TELEGRAM_ALLOW_ALL_USERS", "TELEGRAM_GROUP_ALLOWED_USERS",
     "TELEGRAM_GUEST_MODE", "KAVERI_GATE_URL", "KAVERI_GATE_MODEL",
 )
-# The web instance (KAVERI_RUNTIME=web) serves /ukk through Hermes' API server. It never holds the
+# The web instance (KAVERI_RUNTIME=web) serves /chat through Hermes' API server. It never holds the
 # Telegram token, so its identity and required settings differ from the Telegram bot's.
 WEB_REQUIRED = ("NVIDIA_API_KEY", "EXA_API_KEY", "CASEFILE_URL", "CASEFILE_SECRET", "API_SERVER_KEY")
 WEB_OPTIONAL = ("API_SERVER_ENABLED", "API_SERVER_HOST", "API_SERVER_PORT", "KAVERI_GATE_MODEL")
@@ -139,7 +139,7 @@ def verify(home):
     assert "/opt/kaveri/hermes/skills" in config["skills"]["external_dirs"]
     assert config["mcp_servers"]["casefile"]["url"] == "${CASEFILE_URL}"
     if runtime(os.environ) == "web":
-        # No gate on the web: every message there is addressed to UKK. Memory and jobs stay off.
+        # No gate on the web: every message there is addressed to AIDaddy. Memory and jobs stay off.
         disabled = config["agent"]["disabled_toolsets"]
         assert "memory" in disabled and "cronjob" in disabled
         assert config["mcp_servers"]["casefile"]["tools"]["include"] == ["research_case", "case_get"]

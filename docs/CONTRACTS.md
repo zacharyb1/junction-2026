@@ -40,7 +40,7 @@ A JSON body larger than 1 MB is not read and is answered `400` like any other in
 Every response carries `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin` (a case link is a secret, so
 other sites never see it), `X-Frame-Options: DENY` with `Content-Security-Policy: frame-ancestors 'none'`, and a
 `Permissions-Policy` that turns off camera, location, payment and USB and allows the microphone to the site's own
-pages only, because `/ukk` records voice notes (`next.config.ts`).
+pages only, because `/chat` records voice notes (`next.config.ts`).
 
 ## `POST /api/research` and MCP tool `research_case`
 

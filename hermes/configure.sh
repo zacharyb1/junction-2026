@@ -18,7 +18,7 @@ PROVIDER="${KAVERI_PROVIDER:-nvidia}"
 
 # Admins are required even when everyone may chat with the bot. Validate before
 # any config command so an incomplete setup cannot leave slash commands open.
-# KAVERI_RUNTIME=web is the /ukk instance: no Telegram, no admins, no memory, no jobs.
+# KAVERI_RUNTIME=web is the instance behind the /chat page: no Telegram, no admins, no memory, no jobs.
 RUNTIME="${KAVERI_RUNTIME:-telegram}"
 BOT_ENV="${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}/home/.env"
 OWNER=""

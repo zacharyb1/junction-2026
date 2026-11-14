@@ -8,7 +8,7 @@ import "@/components/demo/demo.css";
 export const metadata: Metadata = {
   title: "Demos",
   description:
-    "Five short scenes of UKK, the butler of AIDaddy, at work: four scripted replays and one demo with a live check. Each says what in it comes from a real research run.",
+    "Five short scenes of AIDaddy at work: four scripted replays and one demo with a live check. Each says what in it comes from a real research run.",
 };
 
 export const viewport: Viewport = { themeColor: "#05080d" };
@@ -22,10 +22,10 @@ export default function DemoHub() {
       <main className="demo-hub">
         <div className="site-wrap">
           <p className="site-eyebrow">Demos</p>
-          <h1>See UKK at work</h1>
+          <h1>See AIDaddy at work</h1>
           <p className="demo-hub-lede">
-            UKK is the butler of AIDaddy. Here are five short scenes of him at work. Four are scripted replays, and each one
-            says which parts come from a real research run. The fifth runs one check live.
+            AIDaddy is a butler for your family&apos;s group chat. Here are five short scenes of it at work. Four are scripted
+            replays, and each one says which parts come from a real research run. The fifth runs one check live.
           </p>
 
           <ol className="demo-programme">
@@ -59,8 +59,8 @@ export default function DemoHub() {
               <SiteLink href="/try" className="demo-btn demo-btn--primary">
                 Try it live
               </SiteLink>
-              <SiteLink href="/ukk" className="demo-btn">
-                Talk to UKK
+              <SiteLink href="/chat" className="demo-btn">
+                Talk to AIDaddy
               </SiteLink>
             </div>
           </div>

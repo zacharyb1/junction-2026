@@ -7,11 +7,11 @@
  *
  * Field values are never read. A page with a password or payment field is not read at all.
  */
-/* global UkkGate, UKK_OFFICIAL_HOSTS */
+/* global AIDaddyGate, AIDADDY_OFFICIAL_HOSTS */
 
 (() => {
-  if (window.top !== window || window.__ukkLoaded) return;
-  window.__ukkLoaded = true;
+  if (window.top !== window || window.__aidaddyLoaded) return;
+  window.__aidaddyLoaded = true;
 
   const TEXT_LIMIT = 3000;
   let root = null; // the shadow root of the panel
@@ -68,18 +68,18 @@
   const STYLE = `
     :host { all: initial; }
     * { box-sizing: border-box; }
-    .ukk { position: fixed; right: 16px; bottom: 16px; z-index: 2147483647; width: min(360px, calc(100vw - 32px));
+    .aidaddy { position: fixed; right: 16px; bottom: 16px; z-index: 2147483647; width: min(360px, calc(100vw - 32px));
       font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: #e6f1ff; }
     .pill { display: flex; align-items: center; gap: 8px; margin-left: auto; width: fit-content; min-height: 36px; padding: 0 12px;
       border: 1px solid rgb(79 216 255 / .35); border-radius: 18px; background: #05080d; color: #9db0c9; cursor: pointer;
       font: 600 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .pill:hover { color: #e6f1ff; border-color: #4fd8ff; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #4fd8ff; }
-    .ukk[data-state="working"] .dot { background: #ffb547; animation: beat 1s ease-in-out infinite; }
-    .ukk[data-state="ready"] .dot { background: #3ddc97; }
-    .ukk[data-state="off"] .dot { background: #6b7a90; }
-    .ukk[data-state="working"] .pill { color: #ffb547; border-color: #ffb547; }
-    .ukk[data-state="ready"] .pill { color: #3ddc97; border-color: #3ddc97; }
+    .aidaddy[data-state="working"] .dot { background: #ffb547; animation: beat 1s ease-in-out infinite; }
+    .aidaddy[data-state="ready"] .dot { background: #3ddc97; }
+    .aidaddy[data-state="off"] .dot { background: #6b7a90; }
+    .aidaddy[data-state="working"] .pill { color: #ffb547; border-color: #ffb547; }
+    .aidaddy[data-state="ready"] .pill { color: #3ddc97; border-color: #3ddc97; }
     @keyframes beat { 50% { transform: scale(1.7); opacity: .5; } }
     .panel { margin-bottom: 8px; padding: 14px; border: 1px solid rgb(79 216 255 / .35); border-radius: 6px;
       background: #0a121d; box-shadow: 0 12px 40px rgb(0 0 0 / .5); max-height: min(70vh, 520px); overflow: auto; }
@@ -107,20 +107,20 @@
 
   function mount() {
     if (root) return root;
-    const host = el("div", { id: "ukk-root" });
+    const host = el("div", { id: "aidaddy-root" });
     root = host.attachShadow({ mode: "open" });
-    root.append(el("style", { text: STYLE }), el("div", { class: "ukk", "data-state": "idle" }));
+    root.append(el("style", { text: STYLE }), el("div", { class: "aidaddy", "data-state": "idle" }));
     document.documentElement.append(host);
     return root;
   }
 
   /** Draws the pill and, when there is something to say, the panel above it. */
   function show({ state, pill, title, lines = [], body = [], open = false }) {
-    const box = mount().querySelector(".ukk");
+    const box = mount().querySelector(".aidaddy");
     box.dataset.state = state;
-    const panel = el("div", { class: "panel", role: "dialog", "aria-label": "UKK" }, [
+    const panel = el("div", { class: "panel", role: "dialog", "aria-label": "AIDaddy" }, [
       el("div", { class: "head" }, [
-        el("div", {}, [el("p", { class: "label", text: "UKK · looking at this page" }), title ? el("h2", { text: title }) : null]),
+        el("div", {}, [el("p", { class: "label", text: "AIDaddy · looking at this page" }), title ? el("h2", { text: title }) : null]),
         el("button", { class: "x", "aria-label": "Close", text: "×", onclick: () => (panel.hidden = true) }),
       ]),
       lines.length ? el("ol", {}, lines) : null,
@@ -138,7 +138,7 @@
 
   /** Pausing on a site is one click, and it is remembered. */
   function pauseButton(settings) {
-    const host = UkkGate.hostOf(location.href);
+    const host = AIDaddyGate.hostOf(location.href);
     return el("button", {
       class: "btn small",
       text: `Do not look at ${host}`,
@@ -153,8 +153,8 @@
 
   function fillable(page, profile) {
     return page.inputs
-      .map((field, index) => ({ field, kind: UkkGate.fieldKind(page.fields[index]) }))
-      .map((item) => ({ ...item, value: item.kind ? UkkGate.profileValue(item.kind, profile) : "" }))
+      .map((field, index) => ({ field, kind: AIDaddyGate.fieldKind(page.fields[index]) }))
+      .map((item) => ({ ...item, value: item.kind ? AIDaddyGate.profileValue(item.kind, profile) : "" }))
       .filter((item) => item.value && !item.field.value && !item.field.readOnly && !item.field.disabled);
   }
 
@@ -195,7 +195,7 @@
         item.append(
           el("a", {
             class: "src",
-            href: UkkGate.highlightUrl(source.url, source.quote),
+            href: AIDaddyGate.highlightUrl(source.url, source.quote),
             target: "_blank",
             rel: "noopener noreferrer",
             title: `“${source.quote}”`,
@@ -210,29 +210,48 @@
 
   async function look(force = false) {
     const mine = ++run;
-    const settings = await send({ type: "ukk:settings" });
+    const settings = await send({ type: "aidaddy:settings" });
+    if (settings.ok === false) {
+      // No answer at all: Chrome is still running the background worker of an earlier version of the extension
+      // (it swaps the worker only when the extension is reloaded). Say so instead of going quiet. Nothing is read.
+      let consent = false;
+      try {
+        ({ consent = false } = await chrome.storage.local.get("consent"));
+      } catch {
+        // The extension itself was reloaded and this page still holds its old copy: stay quiet.
+      }
+      if (consent) {
+        show({
+          state: "off",
+          pill: "AIDaddy needs a reload",
+          title: "The extension was updated",
+          body: [el("p", { text: "Open chrome://extensions and press the reload arrow on AIDaddy. Your settings stay as they are." })],
+        });
+      }
+      return;
+    }
     if (!settings.consent) return; // the person has not said yes: nothing is read and nothing is shown
 
     const page = readPage();
-    const first = UkkGate.decide(page, settings, UKK_OFFICIAL_HOSTS);
+    const first = AIDaddyGate.decide(page, settings, AIDADDY_OFFICIAL_HOSTS);
     if (!first.read) {
-      show({ state: "off", pill: "UKK is not looking", title: "Not reading this page", body: [el("p", { text: `Reason: ${first.why}.` })] });
+      show({ state: "off", pill: "AIDaddy is not looking", title: "Not reading this page", body: [el("p", { text: `Reason: ${first.why}.` })] });
       return;
     }
     // Only now is the page's text read.
     page.text = clean(page.main.innerText).slice(0, TEXT_LIMIT);
-    const verdict = UkkGate.decide(page, settings, UKK_OFFICIAL_HOSTS);
+    const verdict = AIDaddyGate.decide(page, settings, AIDADDY_OFFICIAL_HOSTS);
     const filler = () => fillButton(page, settings.profile ?? {});
 
     const ask = async () => {
-      show({ state: "working", pill: "UKK is checking", title: "Checking official sources", body: [el("p", { text: "Searching official sites and reading every page it will cite. About ten seconds." })], open: force });
-      const answer = await send({ type: "ukk:research", url: page.url.split("#")[0], question: UkkGate.question(page), country: verdict.country });
+      show({ state: "working", pill: "AIDaddy is checking", title: "Checking official sources", body: [el("p", { text: "Searching official sites and reading every page it will cite. About ten seconds." })], open: force });
+      const answer = await send({ type: "aidaddy:research", url: page.url.split("#")[0], question: AIDaddyGate.question(page), country: verdict.country });
       if (mine !== run) return; // the person moved on to another page
       if (answer.ok) {
         const { result } = answer;
         show({
           state: "ready",
-          pill: `UKK: ${result.plan.length} thing${result.plan.length === 1 ? "" : "s"} to know`,
+          pill: `AIDaddy: ${result.plan.length} thing${result.plan.length === 1 ? "" : "s"} to know`,
           title: result.title,
           lines: planLines(result),
           body: [
@@ -246,14 +265,14 @@
         return;
       }
       const reasons = {
-        "no-code": "Add the access code on UKK's settings page (right-click the UKK icon, then Options).",
-        "bad-code": "The access code was not accepted. Check it on UKK's settings page.",
+        "no-code": "Add the access code on AIDaddy's settings page (right-click the AIDaddy icon, then Options).",
+        "bad-code": "The access code was not accepted. Check it on AIDaddy's settings page.",
         busy: "The demo is busy. Try again in a minute.",
         nothing: "Nothing on this page needs a plan.",
       };
       show({
         state: answer.error === "nothing" ? "idle" : "off",
-        pill: answer.error === "nothing" ? "UKK is watching" : "UKK needs you",
+        pill: answer.error === "nothing" ? "AIDaddy is watching" : "AIDaddy needs you",
         title: answer.error === "nothing" ? "Nothing to do here" : "Could not check this page",
         body: [el("p", { text: reasons[answer.error] ?? answer.error }), filler(), pauseButton(settings)],
         open: answer.error !== "nothing",
@@ -263,7 +282,7 @@
     if (verdict.relevant || force) return ask();
     show({
       state: "idle",
-      pill: "UKK is watching",
+      pill: "AIDaddy is watching",
       title: "Nothing to do here",
       body: [
         el("p", { text: `This page was read on your computer only (${verdict.why}). Nothing was sent.` }),
@@ -286,7 +305,7 @@
     // Saying yes, pausing or resuming takes effect on open pages at once.
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== "local" || !(changes.consent || changes.paused || changes.pausedHosts)) return;
-      if (changes.consent && !changes.consent.newValue && root) root.querySelector(".ukk").replaceChildren();
+      if (changes.consent && !changes.consent.newValue && root) root.querySelector(".aidaddy").replaceChildren();
       else look();
     });
   }

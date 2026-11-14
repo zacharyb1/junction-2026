@@ -1,13 +1,13 @@
 import type { Draft, SourceCheck, Watcher } from "@/lib/case";
 
 /**
- * What UKK did on a case, in order, for the family to read on the case page (issue #27).
+ * What AIDaddy did on a case, in order, for the family to read on the case page (issue #27).
  *
  * Every action carries a kind:
  * - "read": research and source re-checks. Runs unattended.
  * - "draft": a letter, email or checklist written into the case. Runs unattended and changes nothing outside it.
- * - "irreversible": sending, paying or submitting. UKK never does these himself. He proposes one, it waits
- *   for the family's click, and the click hands them the prepared action to carry out themselves.
+ * - "irreversible": sending, paying or submitting. AIDaddy never does these itself. It proposes one, the proposal
+ *   waits for the family's click, and the click hands them the prepared action to carry out themselves.
  */
 export type ActionKind = "read" | "draft" | "irreversible";
 

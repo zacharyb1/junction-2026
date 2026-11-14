@@ -21,7 +21,7 @@ const MAX_KEPT = 40;
 const settings = async () => ({ ...DEFAULTS, ...(await chrome.storage.local.get(Object.keys(DEFAULTS))) });
 
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
-  // The first thing the person sees is the question, in plain words, whether UKK may look.
+  // The first thing the person sees is the question, in plain words, whether AIDaddy may look.
   if (reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") });
 });
 
@@ -83,11 +83,11 @@ async function research({ url, question, country }) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, reply) => {
-  if (message?.type === "ukk:research") {
+  if (message?.type === "aidaddy:research") {
     research(message).then(reply);
     return true; // the reply comes later
   }
-  if (message?.type === "ukk:settings") {
+  if (message?.type === "aidaddy:settings") {
     settings().then(reply);
     return true;
   }
