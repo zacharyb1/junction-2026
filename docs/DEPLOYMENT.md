@@ -4,6 +4,8 @@ This is an operational reference for the current implementation, not a roadmap o
 
 ## What runs where
 
+**Production since Saturday 14 November, 09:00 Helsinki:** the whole runtime runs on one Verda CPU server with Compose from `/opt/kaveri` (branch `ops/server-compose`): the web app and Engine at <https://86.38.238.136.sslip.io>, Hermes with the shared token, and the Gemma gate. Services restart after a crash or reboot. **The shared Telegram token is in use there; do not start it on another machine.** Ask in the team chat for SSH access. The table below describes the parts in general.
+
 | Part | Current implementation / recorded state |
 |---|---|
 | Web app and Engine | Next.js on the existing Vercel project `junction-2026`, at `https://junction-2026.vercel.app`. The Git integration uses `main`; GitHub CI checks code but does not perform the deployment. This handover has not inspected current Vercel environment settings. |
@@ -14,7 +16,44 @@ This is an operational reference for the current implementation, not a roadmap o
 
 Earlier Telegram tests targeted a local Engine and used localhost links; production bot integration and reminder delivery are unverified. The removed installation's private bot state and reminder were not in Git, and targeted checks found no surviving external backup. A new installation starts with fresh state unless a separate backup is supplied. Detailed evidence is in [HERMES_HANDOVER.md](HERMES_HANDOVER.md).
 
-The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac/Linux setup and separate persistent volumes for Cases, Hermes state and Ollama models. The default Compose command starts only the web service; `--profile bot` explicitly starts Hermes and the Gemma gate too. Starting containers does not move existing runtime state. Exa and NVIDIA remain external API services.
+The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac/Linux setup and separate persistent volumes for Cases, Hermes state and Ollama models. The default Compose command starts only the web service; `--profile bot` explicitly starts Hermes and the Gemma gate too, and `--profile public` adds an HTTPS reverse proxy for a server. Starting containers does not move existing runtime state. Exa and NVIDIA remain external API services.
+
+## Automatic deployment
+
+Every push to `main` that passes CI is deployed to the production server by [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Merging a pull request is a push to `main`. Vercel keeps deploying `main` on its own as before.
+
+How it works:
+
+1. The workflow runs when the CI workflow succeeds for a push to `main`. Deploys run one at a time, in order.
+2. It sends the exact commit to the server as a git bundle over SSH. The server has no GitHub access.
+3. On the server, the deploy key can only run [`scripts/deploy/server-deploy.sh`](../scripts/deploy/server-deploy.sh), installed as `/usr/local/sbin/kaveri-deploy`. It checks out the commit, builds, and restarts only the containers whose image or settings changed. A change outside `hermes/` and `containers/hermes/` does not restart the bot.
+4. The deploy passes when `/api/health` reports the new commit and the bot stays up for 30 seconds. Otherwise the previous commit is deployed again and the workflow run fails. Bot memory, reminders, Cases and models are in volumes and survive either way.
+5. The workflow then checks the public site reports the new commit.
+
+To redeploy `main` by hand: GitHub, **Actions**, **Deploy**, **Run workflow** on `main`. The run's log shows the server output. A deploy takes about 1 to 2 minutes, and a failed one about 5, including the rollback.
+
+### One-time setup (repository owner)
+
+Only the owner of this personal repository can add secrets. The key is created on the owner's machine and never shared:
+
+1. GitHub, **Settings**, **Environments**, **New environment** named `production`. Under **Deployment branches and tags**, choose **Selected branches and tags** and add `main`. This keeps the key away from workflows on other branches.
+2. Create the key and store it in that environment, then delete the private key file:
+
+   ```bash
+   ssh-keygen -t ed25519 -N '' -C kaveri-deploy -f kaveri-deploy
+   gh secret set DEPLOY_SSH_KEY --env production -R zacharyb1/junction-2026 < kaveri-deploy
+   rm kaveri-deploy
+   ```
+
+3. Send `kaveri-deploy.pub` (the public key, safe to share) to whoever has server access. They add it to `/root/.ssh/authorized_keys` on the server as one line, so the key can only run the deploy script:
+
+   ```text
+   command="/usr/local/sbin/kaveri-deploy",restrict ssh-ed25519 AAAA... kaveri-deploy
+   ```
+
+4. Run the Deploy workflow by hand once and check it is green.
+
+When `scripts/deploy/server-deploy.sh` changes, copy it to `/usr/local/sbin/kaveri-deploy` on the server by hand. The deploy uses the installed copy, not the one in the commit it deploys.
 
 ## Deploying the web app
 
@@ -77,7 +116,7 @@ The installer is pinned and uses `.hermes-local/`; it does not depend on a teamm
 
 **Shared-key helper caveat:** `hermes/secrets.sh` copies the shared `TELEGRAM_BOT_TOKEN` and other values on each run. It can overwrite a locally entered test token. The independent setup above uses a local env file deliberately. Re-running the shared helper is not a harmless refresh for a test bot. The helper can also offer to write missing values back to the shared private keys repo.
 
-The bot host must stay awake and online. `start.sh` backgrounds processes; this project does not install a reboot/restart supervisor. A server can use the team's existing service manager, with only one active gateway for the token. Closing a coding-agent session is not a controlled runtime shutdown.
+The bot host must stay awake and online. `start.sh` backgrounds processes; the native setup does not install a reboot/restart supervisor. The container setup can restart itself on a dedicated server with `KAVERI_RESTART=unless-stopped` (see [CONTAINERS.md](CONTAINERS.md#updates-stopping-and-duplicate-bots)). A server can use the team's existing service manager, with only one active gateway for the token. Closing a coding-agent session is not a controlled runtime shutdown.
 
 ### The shared bot and duplicate prevention
 

@@ -1,0 +1,77 @@
+name: Deploy
+
+# Deploys main to the production server after CI passes on main. Run it by hand from the Actions tab
+# to redeploy main. See docs/DEPLOYMENT.md#automatic-deployment.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time, in order. A newer one waits instead of cancelling a deploy halfway.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # DEPLOY_SSH_KEY lives in this environment, which only main may use, so a workflow on another
+    # branch cannot read the key.
+    environment:
+      name: production
+      url: https://86.38.238.136.sslip.io
+    env:
+      DEPLOY_HOST: 86.38.238.136
+      # The server's public host key, so the job only ever talks to that machine.
+      DEPLOY_HOST_KEY: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEGdEEP52TPHRu1F7dCjeubUQcvblGBNiA2paEyDitvR
+      PUBLIC_URL: https://86.38.238.136.sslip.io
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Check the deploy key is configured
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "::error::DEPLOY_SSH_KEY is missing from the production environment. See docs/DEPLOYMENT.md#automatic-deployment."
+            exit 1
+          fi
+
+      - name: Send the commit to the server and deploy it
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          sha=$(git rev-parse HEAD)
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s %s\n' "$DEPLOY_HOST" "$DEPLOY_HOST_KEY" > ~/.ssh/known_hosts
+          # The server has no GitHub access: it receives the commit as a git bundle on stdin.
+          git branch -f deploy "$sha"
+          git bundle create "$RUNNER_TEMP/deploy.bundle" deploy
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 "root@$DEPLOY_HOST" "deploy $sha" < "$RUNNER_TEMP/deploy.bundle"
+
+      - name: Check the public site serves the new commit
+        run: |
+          want=$(git rev-parse --short=7 HEAD)
+          curl -fsS -m 20 "$PUBLIC_URL/api/health" | tee /dev/stderr | grep -q "\"commit\":\"$want\""
+          echo "Deployed $want to $PUBLIC_URL"
+
+      - name: Remove the key from the runner
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
