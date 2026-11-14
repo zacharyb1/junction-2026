@@ -21,7 +21,7 @@ bash hermes/setup-local.sh
 
 # 2. Secrets. Clone the team's private keys repo next to this checkout once, then:
 git clone https://github.com/kapuchai/junction-2026-keys.git ../junction-2026-keys
-bash hermes/secrets.sh                  # production engine (needs CASEFILE_SECRET in the keys repo)
+bash hermes/secrets.sh --production     # production engine (needs CASEFILE_SECRET in the keys repo)
 bash hermes/secrets.sh --local-engine   # or: engine on this machine, case links open only here
 
 # 3. Model, Part 1 of the config, persona and skills
@@ -73,6 +73,8 @@ Tool names as the model sees them (`mcp-config-reference.md:302-321`):
 `mcp__casefile__research_case`, `mcp__casefile__case_update`, `mcp__casefile__case_get`, `mcp__casefile__case_recheck`, `mcp__casefile__case_publish`, `mcp__exa__web_search_advanced_exa`, `mcp__exa__web_fetch_exa`, plus the built-ins `clarify`, `memory`, `cronjob_manage`, `vision_analyze`.
 
 ## Runbook
+
+The manual installation/configuration steps below are reference for understanding settings. The repo-local quick start above is the supported team setup; its scripts replace steps 1, 2, 5–8 and 12. Do not run the global installer or overwrite a configured local home while following that path.
 
 ### 0. Prerequisites
 
@@ -134,7 +136,7 @@ Expect: `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ALLOWED_USERS` in `~/.hermes/.env` (`
 hermes config env-path          # prints the .env location
 ```
 
-Open that file (`cli-commands.md:1378`) and add the three lines from `hermes/env.example`: `EXA_API_KEY`, `CASEFILE_URL`, `CASEFILE_SECRET`. The last two are in `.env.bot` in the repo root, which is not committed: get it from whoever deployed the web app. `CASEFILE_URL` is `https://junction-2026.vercel.app/api/mcp`. Secrets belong in `.env`, not in `config.yaml` (`configuration.md:67`). `CASEFILE_SECRET` must be identical to the value in the Vercel project.
+For the repo-local installation, use `bash hermes/secrets.sh --production` (production) or `bash hermes/secrets.sh --local-engine` instead of manually editing a global Hermes home. The team values come from `bot.env` and `app.env` in the separate private keys repo. For a manual installation, open the file above (`cli-commands.md:1378`) and set the three names from `hermes/env.example`: `EXA_API_KEY`, `CASEFILE_URL`, `CASEFILE_SECRET`; obtain matching production values from the Engine owner. `CASEFILE_URL` is `https://junction-2026.vercel.app/api/mcp`. Secrets belong in `.env`, not in `config.yaml` (`configuration.md:67`). `CASEFILE_SECRET` must be identical to the value in the Vercel project.
 
 ### 7. Install the persona
 

@@ -10,13 +10,15 @@ node eval/mock-server.mjs --port 4010 &
 node eval/run.mjs --base http://localhost:4010 --label mock --no-scorecard
 
 # Local dev
-CASEFILE_SECRET=... node eval/run.mjs --base http://localhost:3000 --label local
+CASEFILE_SECRET=... node eval/run.mjs --base http://localhost:3000 --label local --concurrency 2 --no-scorecard
 
 # Production
-CASEFILE_SECRET=... node eval/run.mjs --base https://junction-2026.vercel.app --label "run 1"
+CASEFILE_SECRET=... node eval/run.mjs --base https://junction-2026.vercel.app --label "run 1" --concurrency 2
 ```
 
-Options: `--only id1,id2`, `--group finland`, `--concurrency 3`, `--depth fast|deep`, `--timeout 240`, `--no-scorecard`.
+Options: `--only id1,id2`, `--group finland`, `--concurrency 2`, `--depth fast|deep`, `--timeout 240`, `--no-scorecard`.
+
+Live runs use shared API credit; coordinate them around demos and keep concurrency at 2. Use `--no-scorecard` for experiments. That prevents replacement of `src/data/scorecard.json`; timestamped result files and `eval/results/latest.md` are still written. Link a timestamped result when citing a historical run.
 
 Set `CASEFILE_SECRET`: calls without a bearer token are rate limited (HTTP 429). `DEMO_ACCESS_CODE` goes out as `x-demo-code`.
 

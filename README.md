@@ -1,90 +1,166 @@
 # Kaveri
 
-> The butler that lives in your family group chat. It overhears a life event, researches official sources on the live web with Exa, and comes back with a plan where every line is backed by a quote it has checked.
+A butler in a family's Telegram group. It notices a life event or an official letter, researches the live web with Exa, and returns a short plan with checked quotes and a case file the family can inspect.
 
-**Challenge:** Exa, "The Internet Butler / Your Personal Assistant" · **Demo:** https://junction-2026.vercel.app · **Video:** TBD · **Team:** TBD
+Built for international families in Finland at Junction 2026, Espoo, 13–15 November. The main challenge is **Exa — The Internet Butler / Your Personal Assistant**. [Web demo](https://junction-2026.vercel.app) · [Challenge brief](docs/CHALLENGE.md) · [Submission checklist](docs/SUBMISSION_CHECKLIST.md) · [MIT license](LICENSE)
 
-Built at [Junction 2026](https://2026.hackjunction.com/) (theme: European Tech Renaissance), 13 to 15 November 2026, Espoo.
+## Start here
 
-## What it does
+This is the **Saturday 14 November morning handover**, on the Hermes bot branch. It describes work available for review, not a claim that every feature is deployed. Check current branches and PRs before integrating.
 
-Someone in the family chat writes "I'm pregnant", or drops a photo of a rent-increase letter. Nobody asks the bot anything. Kaveri:
+| Workstream | Where we left off | Next owner/action |
+|---|---|---|
+| Shared Engine and web app | `main` contains research, verification, case pages, browser demo and the optional Oxylabs reader. | Zachary owns Engine and production integration. |
+| Hermes bot | [Draft PR #6](https://github.com/zacharyb1/junction-2026/pull/6): local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows worked against a local Engine. | Vlad; evidence and outstanding checks in [Hermes handover](docs/HERMES_HANDOVER.md). |
+| Verifier review | [Draft PR #7](https://github.com/zacharyb1/junction-2026/pull/7): require an individual page reading to verify a quote; withhold unsupported money items. Separate from #6. | Zachary reviews the trade-off and persistence impact before merging. |
+| Alternate bot | Milan's `scaffold/milestone-1-2` is a separate Hono/Mastra track; this handover does not certify it. | Team compares concrete scenarios at the planned Saturday 10:30 bake-off. |
+| Landing design | Separate `vlad/landing-redesign` workstream. | Coordinate with its owner; no design changes are part of this handover. |
 
-1. Pins the question to the family's country and city, and searches that country's official sites with Exa.
-2. Pulls out what to do, by when, and what they are entitled to, each with the sentence it came from.
-3. Opens every cited page again, by its own request and through Exa, and keeps only claims it can point at.
-4. Posts a short plan in the chat and a link to the case file with every quote.
-5. Never sends, files, books or pays. What needs a decision waits for the family.
+No PR was merged by this continuation. Merging `main` deploys to production. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`. Their owners can close the redundant drafts after checking.
 
-Anything it could not confirm is listed as such. It is research with sources, not legal advice.
+## Goal and core concepts
 
-## Why you can check it
+The demo should complete a few chosen scenarios reliably: notice the event, acknowledge it, return a sourced plan, open its case file, and carry out an approved follow-up such as saving a draft. The team will choose those scenarios together. Unscripted messages should produce useful sourced research, a clear limitation, or group silence. We are not trying to cover every possible family situation before submission.
 
-- **The page's own words.** A quote is shown only as it stands on the page. A model quote that merely resembles the page is replaced by the real sentence, or the step is dropped.
-- **No number without a sentence.** A deadline or amount needs one sentence on the page it came from, with every number matched as a whole number. A figure in a title, detail or summary that is on no cited page is removed.
-- **Disagreement is shown.** When two sources give different figures for one step, both appear with their sources.
-- **Each source says how it was checked:** found on the live page by our own request, on a live read through Oxylabs, or in Exa's copy of the page.
-- **One tap to the sentence.** Every verified source links to the official page with the quoted sentence highlighted.
-- **Gaps are listed.** What could not be confirmed is on the case page, not hidden.
-- **Nothing to research, nothing invented.** Small talk or gibberish gets a plain answer instead of a made-up plan.
+| Concept | Meaning |
+|---|---|
+| **Trigger** | A life event, tedious task, official document, direct address, or due reminder that makes Kaveri act. |
+| **Case** | One event or task taken up for a family. |
+| **Plan** | The short list posted to chat; each line carries a numbered source. |
+| **Case file** | The page containing the case's timeline, money, evidence, drafts and uncertainties. |
+| **Verified quote** | A sentence found when the cited page was opened again. Verification is evidence of a match, not proof that a rule applies to this family. |
+| **Approval** | A family member's yes to a next step, such as drafting a letter or setting a reminder. The bot never sends, files, books or pays. |
 
-## Scorecard
+The [glossary](GLOSSARY.md) defines the shared language. English is primary; Finnish answers and case labels are supported. This is research with sources, not legal advice.
 
-`eval/run.mjs` runs 19 everyday scenarios through the live engine and scores each case. The latest run is on the landing page and in `eval/results/latest.md`. Friday night, after the review fixes: 19 of 19 scenarios passed, 123 of 123 quotes found on their pages, median 6.0 seconds, about 2 cents of search per case. A pass means every line shown has a real sentence behind it. It does not mean the plan is complete.
+## Architecture
 
-## How it is built
+The **Engine** researches and checks evidence. The **bot runtime** handles conversation, the silence rule, approvals, drafts and reminders. A runtime calls `research_case` and posts the returned plan; the browser demo and scorecard call the same Engine.
 
+```mermaid
+flowchart TD
+    Telegram[Telegram group or DM] --> Gate[Local gate: rules, patterns, Gemma]
+    Gate --> Bot[Hermes runtime / Nemotron]
+    Bot -->|MCP tools| App[Next.js Engine and Case operations]
+    Browser[Browser demo /try] -->|REST| App
+    Eval[Scorecard runner] -->|REST| App
+    App --> Search[Exa structured search]
+    App --> Verify[Quote verification and grounding]
+    Verify --> Readers[Direct fetch / Exa Contents / optional Oxylabs]
+    App --> Store[Vercel Blob or local Case JSON]
+    Store --> Page[Case file /c/id]
+    Bot --> Followup[Approved drafts and Hermes reminders]
 ```
-Telegram bot (Hermes Agent, or a Hono server with a Mastra agent)
-        |  one tool call: research_case
-        v
-Next.js on Vercel
-  research engine   Exa structured search x3 in parallel, official domains first
-  verifier          each cited page read twice: live request + Exa Contents
-  case store        Vercel Blob
-  pages             /c/[id] case file, /try browser demo, / landing page
-```
 
-A case takes about 6 seconds and three Exa searches.
+The gate filters group text before a cloud call. Direct messages, addressed messages and media take rule-based wake paths; an active conversation also has a three-minute open window. This means neither all small talk nor all photos stay local. The measured limits are in the handover.
 
-## Run locally
+| Part / tool | Role and code |
+|---|---|
+| Next.js, React, TypeScript | Web app and Engine in one deployment. Routes in [`src/app/`](src/app/), research in [`src/lib/engine/`](src/lib/engine/). |
+| Exa (`exa-js`) | Finds sources and returns structured research; Contents supplies a second reading. Exa remains the only finder. |
+| Verifier and grounding | [`verify.ts`](src/lib/verify.ts), [`ground.ts`](src/lib/engine/ground.ts), [`text.ts`](src/lib/text.ts): match quotes, ground numbers and expose uncertainty. |
+| Case module | [`case.ts`](src/lib/case.ts) defines the data, [`cases.ts`](src/lib/cases.ts) publishes/updates/rechecks, [`store.ts`](src/lib/store.ts) persists it. |
+| MCP and REST | [`docs/CONTRACTS.md`](docs/CONTRACTS.md) defines auth, tools and responses shared by both bot tracks and the web demo. |
+| Hermes + NVIDIA Nemotron | Repo-local pinned runtime, conversation and native letter-photo reading. Persona and product skills in [`hermes/`](hermes/). |
+| Ollama + Gemma | Local group-message gate, launched with Podman or Docker. Plugin in [`hermes/plugins/kaveri-gate/`](hermes/plugins/kaveri-gate/). |
+| Vercel + Blob | Web hosting and production Case storage. Without a Blob token, Cases live in `.data/cases` under the Engine's working directory. |
+| Tailwind + shadcn/Base UI | Interface components; [`package.json`](package.json) and the lockfile are authoritative for versions. |
+| pnpm + GitHub Actions | Reproducible install and checks in [CI](.github/workflows/ci.yml). |
+
+The scaffold's `/chat` and `src/lib/ai.ts` remain in the repository but are not the Kaveri research path. Sponsor tools proposed for later are listed separately below.
+
+## Main decisions and why
+
+These summarize the [append-only decision log](docs/DECISIONS.md); its dated entries retain the original reasoning and any pending team confirmation.
+
+| Decision | Reason / consequence |
+|---|---|
+| Research lives in the web app, behind one shared contract. | Parallel searches, one implementation for Telegram and `/try`, and independent work on two bot runtimes. Search output still varies between runs. |
+| Exa is the finder and structured research provider. | It is central to the main challenge; a separate chat-model research pipeline would duplicate work. |
+| Plans need fetched-page evidence. | Quotes use the page's words; numbers must be supported on the cited page. Failed claims are withheld or exposed as unconfirmed. PR #7 tightens the remaining verifier and money-item gaps. |
+| Rules and benefits start with official sources for the family's jurisdiction. | Avoid advice for the wrong country. Open-web choices use the Engine's separate scope. Country/language expansion is a team decision. |
+| Conversation and approved follow-ups stay in the bot runtime. | Runtime replacement should not change the Engine or turn the web app into a Telegram bot. |
+| Hermes is pinned and installed inside the checkout. | Teammates can reproduce and remove it. One process may poll the shared bot token at a time. |
+| Gate order is rules, wake patterns, then local Gemma. | Patterns and the model caught different triggers in the labelled set. An uncertain model wakes the bot; an unavailable gate falls back to patterns. Media bypass and shared-profile memory remain limits for the team to assess. |
+| Preserve local Cases before changing Engine directories. | An earlier directory switch broke case and reminder links. Startup/shutdown now snapshot and migrate data; backup conflicts require inspection. |
+
+## Challenges we are pursuing
+
+**Exa is the main submission.** Nemotron and Gemma have demonstrated roles on the Hermes track. Oxylabs has reader code but still needs a real API run; ElevenLabs has generated video voiceover, while bot voice is deferred. Gemini currently has no demonstrated Hermes job because Nemotron read the letter photo. Context.dev readers/monitors and an Aiven citation index are proposals, not working components.
+
+The [tech-challenge status](docs/TECH_CHALLENGES.md) is authoritative for each role, evidence, remaining work and submission conditions. Platform selections have not been rechecked in this handover. Only claim technology that the final demo actually uses; the second Context.dev submission and Hostinger idea remain conditional.
+
+## What the evidence establishes
+
+- **Engine:** the committed [Run 6 result](eval/results/2026-11-13T22-23-23-270Z.json) records 19/19 scored cases and 133/133 matched quotes. The later [PR #7 comparison](https://github.com/zacharyb1/junction-2026/blob/b35abc9/docs/research/VERIFIER_COMPARISON.md) passed 18/19 in both runs, with 128/128 and 133/133 quotes; the lost-passport case lacked a deadline/amount. Across 261 paired quote observations, none required joined readings. Oxylabs was not exercised. These are dated samples, not a guarantee of correctness or completeness.
+- **Telegram:** selected group research, letter-photo reading, silence, and a fresh DM plan with an approved saved draft worked against the local Engine. Full bot replies took longer than Engine-only timings. Some acknowledgements missed the five-second target.
+- **Gate:** the 60-message development set had 0/20 missed triggers and 4/40 false wakes. In the small live sample, 6/7 small-talk messages stopped locally. A live Gemma-only trigger outside the open window remains unmeasured.
+- **Recovery and reminders:** missing-case refusal, fresh research after a stale link, working case pages, and reminder creation/deduplication passed local CLI rehearsals. Reminder delivery and catch-up were not tested. No daily watch is enabled.
+
+See [Hermes handover](docs/HERMES_HANDOVER.md) for timings, field-reading limitations, repairs and evidence files. The [scorecard harness](eval/README.md) has 21 scenarios: 19 scored Engine cases and two manual silence checks. CLI rehearsal, Engine scoring and Telegram delivery are different checks.
+
+## Run the web app
+
+Use Node 22+ and the pnpm version in `package.json`. From the repository root:
 
 ```bash
-pnpm install
-cp .env.example .env.local   # set EXA_API_KEY, CASEFILE_SECRET, DEMO_ACCESS_CODE
-pnpm dev                     # http://localhost:3000
+pnpm install --frozen-lockfile
+cp .env.example .env.local  # first setup only; fill in the values locally
+pnpm dev                  # http://localhost:3000
 ```
 
-- Browser demo: `http://localhost:3000/try?code=<DEMO_ACCESS_CODE>`
-- Sample case: `CASEFILE_SECRET=... node scripts/seed-sample.mjs`
-- Scorecard: `CASEFILE_SECRET=... node eval/run.mjs --base http://localhost:3000 --concurrency 2`
-- Checks: `pnpm lint`, `pnpm typecheck`, `pnpm build`
+Set `EXA_API_KEY`, `CASEFILE_SECRET` and `DEMO_ACCESS_CODE` in `.env.local`; open `/try?code=<your demo code>`. Leave `BLOB_READ_WRITE_TOKEN` empty for isolated local data. Keep an existing `.env.local` rather than replacing it. The [.env.example](.env.example) and [contract](docs/CONTRACTS.md) explain the remaining settings.
 
-## Repo map
+The team's secrets live in the separate private `kapuchai/junction-2026-keys` repository, in `app.env` and `bot.env`. Get access through the team. Never paste values into chat or commit them here.
 
-| Path | What |
+## Run the bot
+
+Follow the [Hermes handover's fresh-clone steps](docs/HERMES_HANDOVER.md#run-from-a-fresh-clone), then the [runbook](hermes/README.md#quick-start-the-repo-local-install). They cover the pinned install, secrets, configuration, gate, group setup and expected checks. Coordinate with the current operator before starting the shared token.
+
+The tested bot uses a **local Engine**. Its localhost links do not open on teammates' phones. Production integration needs the deployed URL, matching secret and an end-to-end check with Zachary; public web pages being reachable does not establish that integration.
+
+## Validate a change
+
+The required branch checks are in [CI](.github/workflows/ci.yml):
+
+```bash
+node --test hermes/preserve-cases.test.mjs
+python3 -m unittest discover -s eval/bot -p 'test_*.py'
+pnpm lint
+pnpm typecheck
+pnpm build
+```
+
+Use an isolated checkout/copy for builds while the shared demo Engine is running; builds and type generation write `.next`. Live scorecards incur API usage and write result files: follow [eval/README.md](eval/README.md), explicitly use `--concurrency 2`, and use `--no-scorecard` for experiments that should not replace the published scorecard. Bot rehearsals are described in the runbook and do not prove Telegram delivery.
+
+## Next work for the team
+
+1. **Choose and rehearse the demo scenarios.** Compare the two bot tracks, inspect the plan wording and verify fresh case links from another device. Include a due reminder only if it is in the chosen demo.
+2. **Review integration.** Zachary reviews #7's verification/persistence trade-off and #6's runtime handover, then coordinates production credentials and deployment. Keep the two reviews separate.
+3. **Finish the submission evidence.** Refresh pitch numbers from the chosen build, record the ≤2-minute video and backup demo, confirm challenge selections and organizer source access. The existing pitch/voiceover contains earlier measurements.
+4. **Take optional work only after the core path is ready.** Decide whether to prove Oxylabs, add voice, or build the change watch. The watch still needs an alert rule, chat ownership and a controllable demo page before Context.dev/Aiven become demonstrable roles.
+
+Planned milestones, all Helsinki time: bot choice Saturday 10:30; feature freeze Saturday 20:00; final submission Sunday 15 November 10:00; peer review Sunday 10:30–13:00. [Submission checklist](docs/SUBMISSION_CHECKLIST.md) carries the final requirements.
+
+For later architecture work, the first candidate is to give bot configuration one executable source: `configure.sh`, the YAML snippet and manual setup currently overlap. A shared policy for projecting stored Cases into Plans is a separate candidate after #7. These are recommendations, not approved implementation changes.
+
+## Working with coding agents
+
+Start an agent at the repository root and have it read [AGENTS.md](AGENTS.md). Give it the intended outcome, branch and relevant workstream. That file routes it to the contracts, decision history, task-specific checks and runtime precautions. [CLAUDE.md](CLAUDE.md) points to the same rules and adds Claude-specific helpers; there is no second copy of the project policy.
+
+Use a separate branch/worktree per workstream, agree who owns any shared running service, and hand back the commit, checks, evidence and unresolved limitations. Agent or CLI output is not itself evidence that a message reached Telegram or a change reached production.
+
+| Document | Read it when… |
 |---|---|
-| `src/lib/engine/` | Research engine: jurisdiction lock, Exa search, grounding |
-| `src/lib/verify.ts` | Quote verifier |
-| `src/lib/case.ts`, `src/lib/cases.ts`, `src/lib/store.ts` | Case contract, operations, storage |
-| `src/app/api/research`, `src/app/api/cases`, `src/app/api/mcp` | REST API and MCP server |
-| `src/app/c/[id]`, `src/app/try`, `src/app/page.tsx` | Case file, browser demo, landing page |
-| `src/data/` | Official source lists per country, sample case, scorecard |
-| `hermes/` | Bot setup for Hermes Agent: persona, config, skills, runbook |
-| `eval/` | 21 scenarios and the scorecard runner |
-| `docs/PLAN.md` | Implementation plan, milestones, what is blocked |
-| `docs/CONTRACTS.md` | API and tool contracts, how any bot calls the engine |
-| `docs/RESEARCH.md`, `docs/research/` | Feature research, competitors, Exa notes, data sources |
-| `docs/CHALLENGE.md`, `docs/DECISIONS.md` | The challenge and the decision log |
-| `docs/PITCH.md`, `docs/pitch/` | Pitch kit: story, numbers, video script, demo script, rendered voiceover |
-| `docs/OXYLABS_NOTE.md` | Which Oxylabs endpoint we use and why |
-| `docs/PLAYBOOK.md`, `docs/PITCH_TEMPLATE.md`, `docs/SUBMISSION_CHECKLIST.md` | Hackathon schedule, pitch template, Sunday checklist |
-| `.claude/` | Slash commands and skills for Claude Code |
-
-## Stack
-
-Next.js 16 · React 19 · TypeScript · Tailwind 4 · shadcn/ui · Exa (`exa-js`) · MCP (`mcp-handler`) · Vercel Blob · Vercel
-
-## License
-
-MIT, see `LICENSE`. All Junction submissions are MIT licensed per event rules.
+| [GLOSSARY.md](GLOSSARY.md) | Naming concepts or describing product behavior. |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | Understanding why a choice was made or proposing to change it. |
+| [docs/CONTRACTS.md](docs/CONTRACTS.md) | Changing the Engine, Case schema, transport or bot integration. |
+| [docs/HERMES_HANDOVER.md](docs/HERMES_HANDOVER.md) | Picking up the bot: current evidence, repairs, limitations and next checks. |
+| [hermes/README.md](hermes/README.md), [CHECKS.md](hermes/CHECKS.md) | Installing/operating Hermes or checking a configuration assumption. |
+| [docs/TECH_CHALLENGES.md](docs/TECH_CHALLENGES.md) | Choosing sponsor work or preparing its submission note. |
+| [docs/PLAN.md](docs/PLAN.md) | Reading the original product design, proposed demo and milestone rationale; dated status is historical. |
+| [eval/README.md](eval/README.md), [eval/results/](eval/results/) | Running or interpreting measurements. |
+| [docs/PITCH.md](docs/PITCH.md), [docs/pitch/](docs/pitch/) | Preparing the story, script and voiceover; refresh dated claims before recording. |
+| [docs/RESEARCH.md](docs/RESEARCH.md), [docs/research/](docs/research/) | Finding prior research and historical plans. |
+| [docs/PLAYBOOK.md](docs/PLAYBOOK.md) | Checking event rules and logistics before submission. |
+| [docs/STARTERS.md](docs/STARTERS.md) | Consulting the pre-product template catalogue; it is not the current architecture. |
