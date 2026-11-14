@@ -77,6 +77,7 @@ export function approveAction(log: CaseAction[] | undefined, index: number): Cas
   const action = log?.[index];
   if (!log || !action || action.kind !== "irreversible" || action.status !== "waiting") return null;
   const next = [...log];
-  next[index] = { ...action, status: "approved", approvedAt: new Date().toISOString() };
+  const summary = action.summary.replace(/: waits for your click$/, ": approved: you send it");
+  next[index] = { ...action, status: "approved", approvedAt: new Date().toISOString(), summary };
   return next;
 }

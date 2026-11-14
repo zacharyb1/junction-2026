@@ -68,6 +68,8 @@ describe("approveAction", () => {
     const next = approveAction(waiting, 1);
     expect(next?.[1]).toMatchObject({ kind: "irreversible", status: "approved" });
     expect(next?.[1].approvedAt).toBeTruthy();
+    expect(next?.[1].summary).not.toMatch(/waits for your click/);
+    expect(next?.[1].summary).toMatch(/approved: you send it/i);
     expect(waiting[1].status).toBe("waiting"); // pure: the input is not changed
   });
 
