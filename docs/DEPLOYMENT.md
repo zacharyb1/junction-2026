@@ -57,7 +57,7 @@ When `scripts/deploy/server-deploy.sh` changes, copy it to `/usr/local/sbin/kave
 
 ### The web chat (`/chat`)
 
-`hermes-web` serves the `/chat` page: the same AIDaddy, web-only, with memory and reminders off and only the `research_case` and `case_get` Engine tools. It needs, on the server:
+`hermes-web` serves the `/chat` page: the same AIDaddy, web-only, with memory and reminders off and only the `research_case`, `case_get` and `find_gifts` Engine tools. It needs, on the server:
 
 - `.env.local`: `UKK_API_URL=http://hermes-web:8642` and `UKK_API_KEY` (a long random value; Compose passes it to `hermes-web` as `API_SERVER_KEY`).
 - `.env.web`: only `NVIDIA_API_KEY` (template `containers/hermes/env.web.example`). Never the Telegram token; the web instance refuses to start with it.

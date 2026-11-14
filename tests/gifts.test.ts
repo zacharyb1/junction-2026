@@ -1,5 +1,36 @@
 import { describe, expect, it } from "vitest";
-import { addDays, deliveryDays, GiftInput, giftQueries, groundIdea, MAX_ATTEMPTS, priceValue } from "@/lib/engine/gifts";
+import { addDays, deliveryDays, GiftInput, giftQueries, groundIdea, MAX_ATTEMPTS, metaImage, priceValue, productPicture } from "@/lib/engine/gifts";
+
+describe("productPicture", () => {
+  it("keeps product photos", () => {
+    expect(productPicture("https://pelipeikko.fi/9925-product_zoom/worms.jpg")).toBe(true);
+    expect(productPicture("https://cdn.s-cloud.fi/v1/w1200_q60/assets/dam-id/59asQ.png")).toBe(true);
+  });
+
+  it("drops shop icons and logos", () => {
+    expect(productPicture("https://www.proshop.fi/mstile-310x310.png")).toBe(false);
+    expect(productPicture("https://lautapelit.poromagia.com/static/favicon-256.png")).toBe(false);
+    expect(productPicture("https://shop.example/img/logo.svg")).toBe(false);
+  });
+});
+
+describe("metaImage", () => {
+  it("takes the page's og:image and makes it absolute", () => {
+    expect(metaImage('<head><meta property="og:image" content="/img/bag.jpg?w=600&amp;h=600"></head>', "https://shop.example/p/1")).toBe(
+      "https://shop.example/img/bag.jpg?w=600&h=600",
+    );
+  });
+
+  it("falls back to twitter:image and ignores plain http", () => {
+    expect(
+      metaImage('<meta property="og:image" content="http://shop.example/a.jpg"><meta name="twitter:image" content="https://cdn.example/b.jpg">', "https://shop.example/"),
+    ).toBe("https://cdn.example/b.jpg");
+  });
+
+  it("is undefined when the page names no image", () => {
+    expect(metaImage("<html><head><title>Bag</title></head></html>", "https://shop.example/")).toBeUndefined();
+  });
+});
 
 describe("priceValue", () => {
   it("reads European and English prices", () => {
