@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TryForm } from "@/components/try-form";
 
-const title = "Try Kaveri in the browser";
+const title = "Try AIDaddy in the browser";
 const description =
   "Describe a life event, pick your country, and watch the butler research it on official sources with Exa.";
 
 export const metadata: Metadata = {
   title,
   description,
-  openGraph: { title, description, siteName: "Kaveri", type: "website" },
+  openGraph: { title, description, siteName: "AIDaddy", type: "website" },
   twitter: { card: "summary_large_image", title, description },
 };
 
@@ -20,7 +20,7 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-8 sm:py-12">
       <header className="flex flex-col gap-2">
         <Link href="/" className="self-start py-0.5 text-sm text-muted-foreground hover:underline">
-          Kaveri
+          AIDaddy
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Try it on your own life</h1>
         <p className="text-muted-foreground">

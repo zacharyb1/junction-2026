@@ -1,5 +1,5 @@
 ---
-name: Kaveri — Family reading table
+name: AIDaddy — Family reading table
 description: An annotated ivory reading surface for a family plan and its official evidence.
 colors:
   cranberry: '#98112c'
@@ -164,7 +164,7 @@ components:
     padding: 1rem 1.25rem
 ---
 
-# Design System: Kaveri
+# Design System: AIDaddy
 
 ## Overview
 
@@ -172,7 +172,7 @@ components:
 
 Family reading table is a warm, literary surface: substantial book serif, italic prose, plain factual labels and cranberry handwritten annotations. The plan and its official sentence share the page, like a document a family has read and marked together. The emphasis belongs to useful words and evidence.
 
-This system applies only to the landing route `/`, implemented in `src/app/page.tsx` and `src/components/landing/`. Its five core color variables and four font variables live on the landing wrapper. `/try` and `/c/[id]` retain their existing shared application design; this document does not authorize restyling them. This replaces the former station-sign landing system. The reading world uses ink marks, soft marker pigment and paper texture rather than transit signage.
+This system applies only to the reading-table page, which moved from `/` to `/reading` on 14 November (see docs/DECISIONS.md, Sat 08:57). It is implemented in `src/app/reading/page.tsx` and `src/components/landing/`. The front page `/` now uses a separate dark look, defined in `src/components/hud/hud.css` and described in docs/FRONT_PAGE_PLAN.md. Its five core color variables and four font variables live on the landing wrapper. `/try` and `/c/[id]` retain their existing shared application design; this document does not authorize restyling them. This replaces the former station-sign landing system. The reading world uses ink marks, soft marker pigment and paper texture rather than transit signage.
 
 **Key Characteristics:**
 - One continuous ivory reading surface with calm rules and occasional inset specimens.

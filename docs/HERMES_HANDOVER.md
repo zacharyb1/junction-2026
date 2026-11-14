@@ -82,7 +82,7 @@ Private keys repo: `bot.env` and `app.env`. Local copies: `.hermes-local/home/.e
 - The change-watch alert rule, chat ownership policy and controllable demo page are not settled. The second Context.dev submission remains conditional on a working production watch.
 - Oxylabs has an account/credit-card dependency and no recorded real API use. The Hostinger scam-check idea remains exploratory.
 - Nemotron has the demonstrated letter-reading role. Gemini has no demonstrated Hermes role; another bot track's use and the platform's challenge selections have not been checked here.
-- The repository name is Kaveri. The prior supervisor recorded renaming the platform draft to Kaveri; current platform state has not been rechecked.
+- The repository name is AIDaddy. The prior supervisor recorded renaming the platform draft to AIDaddy; current platform state has not been rechecked.
 - Open DMs, shared profile memory, slash-command restrictions and media bypass are documented in `docs/DECISIONS.md`, including entries still marked for team confirmation.
 
 ## Merge risk

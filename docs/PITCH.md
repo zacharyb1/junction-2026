@@ -1,4 +1,6 @@
-# Pitch kit: Kaveri
+# Pitch kit: AIDaddy
+
+**Newer run of show:** [DEMO_PLAN.md](DEMO_PLAN.md) (Saturday 09:05) uses the new front page and the run 12 numbers. Its table replaces the two-minute video table below. The story, the criteria table and the judge answers here still hold.
 
 **Before using this kit:** this script and the generated voiceover contain earlier scorecard measurements and proposed demo beats. Reconcile them with [the current handover](../README.md#what-the-evidence-establishes) and [challenge status](TECH_CHALLENGES.md) for the selected build before recording or submitting.
 
@@ -44,17 +46,17 @@ Do not say "100% accurate". Say: "every line shown is backed by a sentence on a 
 | Time | Picture | Words |
 |---|---|---|
 | 0:00 | Family chat. "I'm pregnant" | "Good news starts a list of deadlines. In a country whose language you do not read." |
-| 0:12 | The plan appears in the chat, numbers after each line | "Kaveri reads along and says nothing, until life happens. Then it researches the live web with Exa." |
+| 0:12 | The plan appears in the chat, numbers after each line | "AIDaddy reads along and says nothing, until life happens. Then it researches the live web with Exa." |
 | 0:30 | Open the case file on a phone | "Each line has the sentence it came from. Our server opened that page again and found the sentence." |
 | 0:45 | Tap a number, the Kela page opens with the sentence highlighted | "Tap a number. The official page opens at that sentence." |
 | 1:00 | Rent letter in Finnish pasted in `/try`, live progress | "A letter in Finnish. Three Exa searches on official sites, every cited page read twice." |
 | 1:20 | Renovation case with "Two figures found" | "When two sources disagree, it shows both. It does not pick one in silence." |
 | 1:35 | Scorecard on the landing page | "19 scenarios, 123 quotes, all found on their pages. Six seconds, two cents." |
-| 1:50 | QR code | "Kaveri. Research with sources, in your family chat." |
+| 1:50 | QR code | "AIDaddy. Research with sources, in your family chat." |
 
 ### Voiceover files
 
-Each line of the table is rendered as its own file in `docs/pitch/voiceover/` with ElevenLabs (voice George, model `eleven_v4`), about 50 seconds of speech in total, so each can be placed on the video timeline. The words were checked by transcribing the files back to text. Nobody has listened to them yet: check by ear how the name "Kaveri" is said. Lines 02 and 08 also exist as a second take with the name spelled the way it sounds in Finnish (`02b`, `08b`).
+Each line of the table is rendered as its own file in `docs/pitch/voiceover/` with ElevenLabs (voice George, model `eleven_v4`), about 50 seconds of speech in total, so each can be placed on the video timeline. The words were checked by transcribing the files back to text. Nobody has listened to them yet. Lines 02 and 08 say the product name; their text spells it "A.I. Daddy" so the voice reads it as two words. Line 07 no longer quotes a quote count, because that number moves with every scorecard run.
 
 Line 07 holds the scorecard numbers. If Saturday's run gives other numbers, change the text in `docs/pitch/voiceover.json` and run `node scripts/voiceover.mjs --only 07-numbers` (needs `ELEVENLABS_API_KEY`; in a Claude cloud session run it with `NODE_USE_ENV_PROXY=1` and no key).
 

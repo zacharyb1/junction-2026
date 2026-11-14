@@ -2,7 +2,7 @@
 name: deadline-keeper
 description: "Case deadlines: reminders and the daily source re-check"
 version: 1.0.0
-author: Kaveri team
+author: AIDaddy team
 license: MIT
 metadata:
   hermes:

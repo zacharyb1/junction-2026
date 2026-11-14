@@ -284,7 +284,7 @@ export function icsFor({ title, date, description, url, uid, now = new Date() }:
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Kaveri//Case file deadline//EN",
+    "PRODID:-//AIDaddy//Case file deadline//EN",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     `UID:${escapeText(uid ?? `${compact(date)}-${hash(`${title}|${url ?? ""}`)}@kaveri`)}`,

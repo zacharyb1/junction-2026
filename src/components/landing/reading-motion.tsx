@@ -132,7 +132,7 @@ export function ReadingMotion({ children }: { children: ReactNode }) {
 
   return (
     <div ref={frameRef} className="reading-frame">
-      <p className="r-wordmark">Kaveri</p>
+      <p className="r-wordmark">AIDaddy</p>
       {canReplay && <button type="button" className="r-replay" onClick={() => replayRef.current()}>
         <RotateCcw aria-hidden="true" />Replay annotations
       </button>}

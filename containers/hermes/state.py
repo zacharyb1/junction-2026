@@ -120,5 +120,5 @@ if __name__ == "__main__":
         else:
             raise ValueError("Unknown container state operation")
     except (ValueError, AssertionError, OSError, KeyError) as exc:
-        print(f"Kaveri container: {exc}", file=sys.stderr)
+        print(f"AIDaddy container: {exc}", file=sys.stderr)
         sys.exit(1)

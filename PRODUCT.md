@@ -15,13 +15,13 @@ web
 
 ## Product Purpose
 
-Kaveri (Finnish for "buddy") is a butler in a family's group chat. It reads along and stays silent until someone mentions a life event or shares an official letter. Then it researches official sources on the live web with Exa and posts a short plan: what to do, by when, and what the family is entitled to. A link opens the case file with every step, deadline and source.
+AIDaddy is a butler in a family's group chat. It reads along and stays silent until someone mentions a life event or shares an official letter. Then it researches official sources on the live web with Exa and posts a short plan: what to do, by when, and what the family is entitled to. A link opens the case file with every step, deadline and source.
 
 Success for a family: an evening of reading official pages becomes a plan they can check in a minute. Success at the hackathon: a judge runs their own case in the browser demo and believes what the case file shows.
 
 ## Positioning
 
-It checks itself: no sentence, no claim. Every line of a plan carries a sentence from a page, and Kaveri's own server opens that page again, by its own request and through Exa, and looks for the sentence. A step whose sentence is not on the page is left out, a figure without a sentence is removed, and what could not be confirmed is listed as unverified. A chat assistant's answer is a claim; this is a list of sentences you can open at the source.
+It checks itself: no sentence, no claim. Every line of a plan carries a sentence from a page, and AIDaddy's own server opens that page again, by its own request and through Exa, and looks for the sentence. A step whose sentence is not on the page is left out, a figure without a sentence is removed, and what could not be confirmed is listed as unverified. A chat assistant's answer is a claim; this is a list of sentences you can open at the source.
 
 In a family group it is ambient: a life event can trigger research without a direct request, while small talk gets no reply. Direct-message behavior belongs to the bot runtime documented in `docs/HERMES_HANDOVER.md`.
 
@@ -47,7 +47,7 @@ In a family group it is ambient: a life event can trigger research without a dir
 
 ## Brand Commitments
 
-- Name: Kaveri. Gloss: Finnish for "buddy". Role: a butler.
+- Name: AIDaddy. Role: a butler.
 - Voice: plain, short sentences, concrete. It says what it could not confirm.
 - No inherited logo or photographs. The product's own interface (the chat, the case file, the scorecard) is the picture material; the selected design adds local paper and annotation assets recorded in `DESIGN.md`.
 - Independent hackathon project. Not affiliated with Kela, Vero or Telegram, and must not look as if it were.
@@ -65,7 +65,7 @@ In a family group it is ambient: a life event can trigger research without a dir
 1. No sentence, no claim. Proof sits next to the statement it supports.
 2. Say what is missing. Gaps and disagreements are shown, never smoothed over.
 3. Silent until it matters.
-4. The person decides. Kaveri researches and prepares.
+4. The person decides. AIDaddy researches and prepares.
 5. Show real runs, failures included.
 
 ## Accessibility & Inclusion

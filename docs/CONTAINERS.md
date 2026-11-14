@@ -1,6 +1,6 @@
-# Running Kaveri in Docker
+# Running AIDaddy in Docker
 
-Docker Compose can run the whole Kaveri runtime: the website and Engine, Hermes, and Ollama with the Gemma gate. On a Mac, Docker Desktop supplies the Linux environment and language runtimes. Teammates need no host Node, Python, pnpm, Hermes or Orca installation; they can keep using Claude Code and their usual editor.
+Docker Compose can run the whole AIDaddy runtime: the website and Engine, Hermes, and Ollama with the Gemma gate. On a Mac, Docker Desktop supplies the Linux environment and language runtimes. Teammates need no host Node, Python, pnpm, Hermes or Orca installation; they can keep using Claude Code and their usual editor.
 
 The default command starts only the website. Adding `--profile bot` starts the Telegram bot and local model too. Exa research and NVIDIA Nemotron still use their cloud APIs; this is not an offline setup.
 

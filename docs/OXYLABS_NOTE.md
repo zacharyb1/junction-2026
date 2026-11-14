@@ -14,7 +14,7 @@ We do not use the search endpoint. Exa is the only finder in this project. Oxyla
 
 ## Where it sits
 
-Kaveri answers a family's life event with a plan in which every line carries a sentence from an official page. After the search, our server opens every cited page again and checks that the sentence is really there (`src/lib/verify.ts`). Three readers can open a page:
+AIDaddy answers a family's life event with a plan in which every line carries a sentence from an official page. After the search, our server opens every cited page again and checks that the sentence is really there (`src/lib/verify.ts`). Three readers can open a page:
 
 1. Our own live request. Free, and the truest check.
 2. Exa Contents. Reads PDFs and pages that build their text with JavaScript.

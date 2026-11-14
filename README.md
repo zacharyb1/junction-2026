@@ -1,4 +1,4 @@
-# Kaveri
+# AIDaddy
 
 A butler in a family's Telegram group. It notices a life event or an official letter, researches the live web with Exa, and returns a short plan with checked quotes and a case file the family can inspect.
 
@@ -29,7 +29,7 @@ The demo should complete a few chosen scenarios reliably: notice the event, ackn
 
 | Concept | Meaning |
 |---|---|
-| **Trigger** | A life event, tedious task, official document, direct address, or due reminder that makes Kaveri act. |
+| **Trigger** | A life event, tedious task, official document, direct address, or due reminder that makes AIDaddy act. |
 | **Case** | One event or task taken up for a family. |
 | **Plan** | The short list posted to chat; each line carries a numbered source. |
 | **Case file** | The page containing the case's timeline, money, evidence, drafts and uncertainties. |
@@ -72,7 +72,7 @@ The gate filters group text before a cloud call. Direct messages, addressed mess
 | Tailwind + shadcn/Base UI | Interface components; [`package.json`](package.json) and the lockfile are authoritative for versions. |
 | pnpm + GitHub Actions | Reproducible install and checks in [CI](.github/workflows/ci.yml). |
 
-The scaffold's `/chat` and `src/lib/ai.ts` remain in the repository but are not the Kaveri research path. Sponsor tools proposed for later are listed separately below.
+The scaffold's `/chat` and `src/lib/ai.ts` remain in the repository but are not the AIDaddy research path. Sponsor tools proposed for later are listed separately below.
 
 ## Main decisions and why
 
@@ -170,6 +170,8 @@ This handover records implemented behavior, tests, limitations and earlier decis
 | [docs/PLAN.md](docs/PLAN.md) | Reading the historical product design and proposed demo; its milestones are not current assignments. |
 | [eval/README.md](eval/README.md), [eval/results/](eval/results/) | Running or interpreting measurements. |
 | [docs/PITCH.md](docs/PITCH.md), [docs/pitch/](docs/pitch/) | Preparing the story, script and voiceover; refresh dated claims before recording. |
+| [docs/DEMO_PLAN.md](docs/DEMO_PLAN.md), [docs/BOT_PLAN.md](docs/BOT_PLAN.md) | Proposals of Saturday 09:05: the run of show on the new front page, and the order of bot work before the freeze. |
+| [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The dark front page on `/`: what each section shows and which data file it reads. The reading-table page is at `/reading`. |
 | [docs/RESEARCH.md](docs/RESEARCH.md), [docs/research/](docs/research/) | Finding prior research and historical plans. |
 | [docs/PLAYBOOK.md](docs/PLAYBOOK.md) | Checking event rules and logistics before submission. |
 | [docs/STARTERS.md](docs/STARTERS.md) | Consulting the pre-product template catalogue; it is not the current architecture. |

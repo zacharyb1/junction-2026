@@ -1,4 +1,4 @@
-# Kaveri: the keys we set in ~/.hermes/config.yaml. Everything else in your config stays as it is.
+# AIDaddy: the keys we set in ~/.hermes/config.yaml. Everything else in your config stays as it is.
 #
 # How to apply: README.md step 8 (Part 1) and step 12 (Part 2).
 #   - Never leave two copies of a top-level key (agent:, display:, skills:, ...) in config.yaml.
@@ -119,7 +119,7 @@ telegram:
   #B reactions: true
   #B mention_patterns:
   #B   # the bot's name at the start of a message
-  #B   - "^\\s*(hey\\s+|hei\\s+)?kaveri\\b"
+  #B   - "^\\s*(hey\\s+|hei\\s+)?(ai\\s?daddy|kaveri)\\b"
   #B   # English: family, home and work, letters and money, travel and consumer
   #B   - "\\b(pregnan\\w*|expecting (a|our|another) (baby|child)|having a baby|due date|gave birth|giving birth|newborn|maternity|paternity|parental leave|daycare|(kid|child|son|daughter|baby) (is|has|got) (sick|ill|a fever))\\b"
   #B   - "\\b(moving (out|in|house|home|to)|we are moving|new (flat|apartment|lease)|change of address|landlord|rent (increase|rise|hike)|rais\\w+ (the|our) rent|evict\\w*|laid off|layoffs?|made redundant|redundancy|got fired|lost my job|losing my job|new job|job offer|unemploy\\w*|resign\\w*)\\b"

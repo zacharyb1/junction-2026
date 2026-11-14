@@ -15,7 +15,7 @@ Snapshot: Saturday 14 November 2026, on `vlad/hermes-bot` ([PR #6](https://githu
 | **ElevenLabs** | Pitch voiceover files have been rendered and transcribed back to text. Bot voice input/output has no live test evidence. | The audio contains earlier scorecard figures. Its inclusion in the final video and eligibility as the selected challenge use are not confirmed; bot voice is not demonstrated. |
 | **Gemini API** | No demonstrated role on the Hermes track. The earlier letter-reader fallback was not used: Nemotron read the test photo. No comparative Gemini test was run. | Another bot track may use Gemini, but this document does not establish that role. The platform selection has not been rechecked. |
 | **Context.dev** | Proposed extra verifier reader and monitors for cited pages. No implementation or live test is present on this branch. | The alert rule, chat ownership and controllable demo page are unresolved. A second submission under its main challenge remains conditional on a working production change watch. |
-| **Aiven** | Proposed Postgres index from cited pages to affected Cases; Cases would remain in Blob. No integration is present on this branch. | This is an unconfirmed proposal associated with the change watch. No database migration is currently required to run Kaveri. |
+| **Aiven** | Proposed Postgres index from cited pages to affected Cases; Cases would remain in Blob. No integration is present on this branch. | This is an unconfirmed proposal associated with the change watch. No database migration is currently required to run AIDaddy. |
 
 Hostinger's scam-check idea is exploratory and is not part of the implemented demo. Beyond the Clinic, Meta glasses, MariaDB's main challenge and Cloudinary remain parked. See the original rationale in the [Friday plan](research/tech-challenges-2026-11-13.md).
 
@@ -37,7 +37,7 @@ Hostinger's scam-check idea is exploratory and is not part of the implemented de
 - Production Engine credentials and the full Telegram-to-public-Case flow have not been validated here. The tested local Case links used localhost.
 - Oxylabs has an account requirement and no recorded real API result.
 - The change-watch alert rule, Case/chat scope and demo page are unsettled. Existing `case_recheck` and a watch template do not demonstrate the proposed Context.dev/Aiven integration; no live daily watch is enabled.
-- The platform's challenge selections have not been rechecked. The prior supervisor recorded renaming the draft to Kaveri; this document does not verify that platform state.
+- The platform's challenge selections have not been rechecked. The prior supervisor recorded renaming the draft to AIDaddy; this document does not verify that platform state.
 
 ## Submission and claim rules
 

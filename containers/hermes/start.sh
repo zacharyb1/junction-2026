@@ -12,7 +12,7 @@ bash hermes/install-gate.sh
 hermes/bin/hermes config check
 /opt/hermes/.venv/bin/python containers/hermes/state.py verify
 if [ "${1:-check}" = check ]; then
-  echo "Kaveri configuration passed. No gateway, scheduler or provider call was started."
+  echo "AIDaddy configuration passed. No gateway, scheduler or provider call was started."
   exit 0
 fi
 exec /opt/hermes/bin/hermes gateway run --no-supervise

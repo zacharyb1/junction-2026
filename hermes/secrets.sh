@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: fill the git-ignored env files from the team's private keys repo.
+# AIDaddy: fill the git-ignored env files from the team's private keys repo.
 # Values are never printed, logged, passed on a command line or written into this repository's history.
 #
 #   bash hermes/secrets.sh                  pull the keys repo, copy its values, offer to enter missing ones

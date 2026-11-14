@@ -1,4 +1,4 @@
-# Reverse proxy for running Kaveri on a server (compose profile "public").
+# Reverse proxy for running AIDaddy on a server (compose profile "public").
 # KAVERI_DOMAIN is the public hostname, e.g. kaveri.example.org or <server-ip>.sslip.io.
 # Caddy obtains and renews its HTTPS certificate automatically.
 {$KAVERI_DOMAIN} {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: write our settings into the repo-local Hermes home. Safe to run again.
+# AIDaddy: write our settings into the repo-local Hermes home. Safe to run again.
 #
 #   bash hermes/configure.sh                     the model, Part 1 of config.snippet.yaml, persona, skills
 #   bash hermes/configure.sh --group <CHAT_ID>   Part 2: limit the bot to the family group (ID from /sethome)

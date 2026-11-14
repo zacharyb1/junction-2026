@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: install Hermes Agent inside this repository, pinned, with nothing global.
+# AIDaddy: install Hermes Agent inside this repository, pinned, with nothing global.
 #
 # Everything lands in .hermes-local/ (git-ignored):
 #   .hermes-local/agent/           Hermes source and its Python environment
