@@ -51,6 +51,8 @@ export interface Manifest {
   activities: Record<Activity, { pose: PoseId; loops: string[] }>;
   /** True when the clips are generated test cards, not a rendered person. */
   placeholder?: boolean;
+  /** Provenance of the visible person; illustrated clips are locally rendered, not AI video. */
+  medium?: "illustrated" | "generated";
 }
 
 /**

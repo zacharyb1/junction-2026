@@ -4,6 +4,8 @@ Develop the full asset pipeline without a model dependency first, then connect G
 
 ## What is ready
 
+The main proof-of-concept page now also has two locally rendered illustrated people, prepared with `node scripts/avatar/make-illustrated-clips.mjs`. Their assets live in `public/avatar/ari/` and `public/avatar/noor/`, with `medium: "illustrated"`. They demonstrate body actions and appearance choices before purchasing media access; they are original vector animation rendered into MP4, not Gemini output. See [the demonstration guide](AVATAR_CONCEPT.md). The fixture pipeline below remains available for testing media preparation/publication.
+
 - `public/avatar/test/manifest.json`: eight local H.264 clips, two poses (`front`, `desk`), poster, explicit `placeholder: true`.
 - `node scripts/avatar/make-test-clips.mjs`: regenerates those assets with an existing `ffmpeg`; no service call or package install.
 - `node scripts/avatar/generate.mjs --help`: the shared asset workflow. Its default renderer is local fixtures; every provider defaults to dry run.
@@ -76,7 +78,7 @@ The player can then use `/avatar/default/manifest.json` instead of `/avatar/test
 
 ## Remaining evidence
 
-Paid API requests, actual generated faces/acting, visual seam quality, and voice integration remain unverified. Test cards demonstrate scheduling and decoding only. No Gemini challenge claim should describe these local fixtures as model-generated media or describe asset preparation as a runtime Gemini integration.
+Paid API requests, model-generated faces/acting, generated-video seam quality, and dynamic ElevenLabs integration remain unverified. Recorded audio playback is verified separately. Test cards demonstrate scheduling and decoding only. No Gemini challenge claim should describe local fixtures or illustrated clips as model-generated media or describe asset preparation as a runtime Gemini integration.
 
 ## Free-tier access check, 14 November
 

@@ -16,7 +16,9 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
   const first = useRef<HTMLVideoElement>(null);
   const second = useRef<HTMLVideoElement>(null);
   const desired = useRef(activity);
+  const pauseRequested = useRef(paused);
   const refresh = useRef<(() => void) | null>(null);
+  const updatePlayback = useRef<(() => void) | null>(null);
   const [snapshot, setSnapshot] = useState({ clip: "poster", pose: manifest.restPose });
   const [failure, setFailure] = useState("");
   const reduced = useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => true);
@@ -27,8 +29,13 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
   }, [activity]);
 
   useEffect(() => {
+    pauseRequested.current = paused;
+    updatePlayback.current?.();
+  }, [paused]);
+
+  useEffect(() => {
     const videos = [first.current!, second.current!];
-    if (paused || reduced) return;
+    if (reduced) return;
     let disposed = false;
     let failed = false;
     let active = -1;
@@ -38,15 +45,35 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
     let count = 0;
     let swapping = false;
     let pendingVideo: HTMLVideoElement | null = null;
+    let pendingReveal: (() => void) | null = null;
+    let frameDecoded = false;
+    let interruptions = 0;
     let frameId: number | undefined;
     let frameVideo: HTMLVideoElement | undefined;
     let watchdog: ReturnType<typeof setTimeout> | undefined;
+    const suspended = () => pauseRequested.current || document.hidden;
 
     const fail = () => {
       if (disposed) return;
       failed = true;
       videos.forEach((video) => video.pause());
       setFailure("This clip could not play. The conversation still works. Reload to retry.");
+    };
+    const play = async (video: HTMLVideoElement) => {
+      const interruption = interruptions;
+      try {
+        await video.play();
+        if (disposed || suspended()) { video.pause(); return; }
+        if (video === pendingVideo && (frameDecoded || !("requestVideoFrameCallback" in video))) {
+          pendingReveal?.();
+        }
+      } catch (error) {
+        // Pause/visibility may abort play(), even if Resume already happened by
+        // the time its promise rejects. The next play keeps the same clip/time.
+        if (error instanceof DOMException && error.name === "AbortError" &&
+          (suspended() || interruption !== interruptions)) return;
+        if (!disposed) fail();
+      }
     };
     const prepare = () => {
       if (disposed || failed || swapping) return;
@@ -60,7 +87,7 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
       video.load();
     };
     const swap = async () => {
-      if (disposed || failed || swapping || document.hidden) return;
+      if (disposed || failed || swapping || suspended()) return;
       prepare();
       if (!prepared) return;
       const incoming = videos[active === 0 ? 1 : 0];
@@ -72,10 +99,11 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
       clearTimeout(watchdog);
       swapping = true;
       pendingVideo = incoming;
+      frameDecoded = false;
       const token = serial;
       const clip = prepared;
       const reveal = () => {
-        if (disposed || token !== serial || failed) return;
+        if (disposed || token !== serial || failed || suspended()) return;
         if (active >= 0) {
           videos[active].pause();
           videos[active].classList.remove("avatar-visible");
@@ -87,32 +115,34 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
         count++;
         swapping = false;
         pendingVideo = null;
+        pendingReveal = null;
         setFailure("");
         setSnapshot({ clip: clip.id, pose: clip.from });
         prepare();
       };
-      try {
-        incoming.currentTime = 0;
-        if ("requestVideoFrameCallback" in incoming) {
-          frameVideo = incoming;
-          frameId = incoming.requestVideoFrameCallback(reveal);
-        }
-        await incoming.play();
-        if (disposed) { incoming.pause(); return; }
-        if (!("requestVideoFrameCallback" in incoming)) reveal();
-      } catch (error) {
-        // A hidden tab pauses both videos, which can reject a pending play().
-        // Keep its decoded-frame callback: visibility resumes the same incoming clip.
-        if (error instanceof DOMException && error.name === "AbortError" && document.hidden) return;
-        if (!disposed) fail();
+      pendingReveal = reveal;
+      incoming.currentTime = 0;
+      if ("requestVideoFrameCallback" in incoming) {
+        frameVideo = incoming;
+        frameId = incoming.requestVideoFrameCallback(() => {
+          frameId = undefined;
+          frameDecoded = true;
+          reveal();
+        });
       }
+      await play(incoming);
     };
     const ready = () => { if (active < 0 || videos[active].ended) void swap(); };
     const visibility = () => {
-      if (document.hidden) videos.forEach((video) => video.pause());
-      else if (pendingVideo) void pendingVideo.play().catch(fail);
+      if (disposed || failed) return;
+      if (suspended()) {
+        interruptions++;
+        clearTimeout(watchdog);
+        videos.forEach((video) => video.pause());
+      }
+      else if (pendingVideo) void play(pendingVideo);
       else if (active < 0 || videos[active].ended) void swap();
-      else void videos[active].play().catch(fail);
+      else void play(videos[active]);
     };
     videos.forEach((video) => {
       video.addEventListener("canplay", ready);
@@ -121,12 +151,14 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
     });
     document.addEventListener("visibilitychange", visibility);
     refresh.current = prepare;
+    updatePlayback.current = visibility;
     prepare();
-    watchdog = setTimeout(() => { if (active < 0) fail(); }, 15_000);
+    if (!suspended()) watchdog = setTimeout(() => { if (active < 0) fail(); }, 15_000);
     return () => {
       disposed = true;
       serial++;
       refresh.current = null;
+      updatePlayback.current = null;
       clearTimeout(watchdog);
       if (frameId !== undefined) frameVideo?.cancelVideoFrameCallback(frameId);
       document.removeEventListener("visibilitychange", visibility);
@@ -140,11 +172,11 @@ export function AvatarStage({ manifest, activity, paused }: { manifest: Manifest
         video.load();
       });
     };
-  }, [manifest, paused, reduced]);
+  }, [manifest, reduced]);
 
   return (
     <div>
-      <div className="avatar-stage" data-clip={paused || reduced ? "poster" : snapshot.clip} data-pose={snapshot.pose} data-activity={activity}>
+      <div className="avatar-stage" data-clip={reduced ? "poster" : snapshot.clip} data-pose={snapshot.pose} data-activity={activity} data-paused={paused}>
         {/* Local profile artwork; its dimensions are supplied by the manifest. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={manifest.poster} alt={manifest.placeholder ? "Test scene for checking avatar transitions" : manifest.label} width={manifest.width} height={manifest.height} />

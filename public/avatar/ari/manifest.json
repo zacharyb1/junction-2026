@@ -1,0 +1,109 @@
+{
+  "profile": "ari",
+  "label": "Ari · home office",
+  "width": 800,
+  "height": 450,
+  "poster": "/avatar/ari/poster.svg",
+  "restPose": "front",
+  "placeholder": false,
+  "clips": [
+    {
+      "id": "idle",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 1500,
+      "file": "/avatar/ari/idle.mp4"
+    },
+    {
+      "id": "listening",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2500,
+      "file": "/avatar/ari/listening.mp4"
+    },
+    {
+      "id": "thinking",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2500,
+      "file": "/avatar/ari/thinking.mp4"
+    },
+    {
+      "id": "speaking",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 3000,
+      "file": "/avatar/ari/speaking.mp4"
+    },
+    {
+      "id": "to-desk",
+      "from": "front",
+      "to": "desk",
+      "kind": "transition",
+      "durationMs": 1000,
+      "file": "/avatar/ari/to-desk.mp4"
+    },
+    {
+      "id": "working-a",
+      "from": "desk",
+      "to": "desk",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/ari/working-a.mp4"
+    },
+    {
+      "id": "working-b",
+      "from": "desk",
+      "to": "desk",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/ari/working-b.mp4"
+    },
+    {
+      "id": "to-front",
+      "from": "desk",
+      "to": "front",
+      "kind": "transition",
+      "durationMs": 1000,
+      "file": "/avatar/ari/to-front.mp4"
+    }
+  ],
+  "activities": {
+    "idle": {
+      "pose": "front",
+      "loops": [
+        "idle"
+      ]
+    },
+    "listening": {
+      "pose": "front",
+      "loops": [
+        "listening"
+      ]
+    },
+    "thinking": {
+      "pose": "front",
+      "loops": [
+        "thinking"
+      ]
+    },
+    "speaking": {
+      "pose": "front",
+      "loops": [
+        "speaking"
+      ]
+    },
+    "working": {
+      "pose": "desk",
+      "loops": [
+        "working-a",
+        "working-b"
+      ]
+    }
+  },
+  "medium": "illustrated"
+}

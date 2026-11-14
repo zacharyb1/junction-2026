@@ -24,4 +24,9 @@
 .avatar-concept details { border-top: 1px solid var(--border); margin-top: 1.5rem; padding-top: 1rem; font-size: .875rem; }
 .avatar-concept summary { cursor: pointer; min-height: 44px; }
 .avatar-event-list { max-height: 12rem; overflow: auto; font-family: var(--font-geist-mono), monospace; font-size: .75rem; line-height: 1.6; }
+.avatar-concept .avatar-checkbox { display: flex; align-items: center; gap: .5rem; min-height: 44px; }
+.avatar-concept .avatar-checkbox input { width: 1.125rem; height: 1.125rem; accent-color: var(--primary); }
+.avatar-sources { font-size: .875rem; overflow-wrap: anywhere; }
+.avatar-sources ul { display: grid; gap: .375rem; margin-top: .5rem; }
+.avatar-sources a { color: var(--primary); text-decoration: underline; text-underline-offset: .2em; }
 @media (max-width: 760px) { .avatar-layout { grid-template-columns: 1fr; } .avatar-concept { padding-top: 1.5rem; } }
