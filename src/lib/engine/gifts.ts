@@ -13,6 +13,7 @@ import { pageNumbers, snapQuote } from "@/lib/engine/ground";
 import { resolveJurisdiction } from "@/lib/engine/jurisdiction";
 import { EngineError } from "@/lib/engine/research";
 import { numbersIn } from "@/lib/text";
+import { isPublicUrl } from "@/lib/verify";
 
 export const GiftInput = z
   .object({
@@ -54,6 +55,8 @@ export type GiftIdea = {
   delivery?: string;
   /** Latest arrival worked out from `delivery`, YYYY-MM-DD. */
   arrivesBy?: string;
+  /** The product page's own preview image, as Exa read it. Absent when the page has none. */
+  image?: string;
   /** True when `arrivesBy` falls after the occasion. Absent when either date is unknown. */
   late?: boolean;
 };
@@ -161,6 +164,91 @@ export function groundIdea(
   return out;
 }
 
+// ---- Product images ----------------------------------------------------------
+
+/**
+ * Images of products the search found, by product URL, so the /ukk chat can show a picture next to a product link
+ * whatever the model wrote. In memory only: a restart forgets them, and the chat then shows the link alone.
+ */
+// One map per server process. On globalThis because the MCP route and the image route can each load their own copy of
+// this module (always in development, after any edit), and they must see the same pictures.
+const shared = globalThis as typeof globalThis & { __giftImages?: Map<string, string> };
+const IMAGES = (shared.__giftImages ??= new Map<string, string>());
+const MAX_IMAGES = 1000;
+
+// A shop's icon or logo stands in for a product photo on many pages. It shows the shop, not the gift.
+const NOT_A_PRODUCT = /favicon|mstile|apple-touch|logo|[/_-]icons?[/_.-]|sprite|placeholder|no[-_]?image/i;
+
+/** True for an image that can be a photo of the product, false for a shop's icon or logo. */
+export const productPicture = (image: string) => !NOT_A_PRODUCT.test(new URL(image).pathname);
+
+function rememberImage(url: string, image: string) {
+  if (!productPicture(image)) return;
+  IMAGES.delete(url);
+  IMAGES.set(url, image);
+  // The oldest entry goes first.
+  if (IMAGES.size > MAX_IMAGES) IMAGES.delete(IMAGES.keys().next().value!);
+}
+
+/** The image of a product the search found, or undefined for any other URL. */
+export const imageFor = (url: string) => IMAGES.get(url);
+
+/** The preview image a page names in its head (`og:image`, then `twitter:image`), as an absolute https URL. */
+export function metaImage(html: string, base: string): string | undefined {
+  for (const name of ["og:image", "og:image:url", "og:image:secure_url", "twitter:image"]) {
+    const tag = html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${name}["'][^>]*>`, "i"))?.[0];
+    const content = tag?.match(/content=["']([^"']+)["']/i)?.[1];
+    if (!content) continue;
+    try {
+      const url = new URL(content.replace(/&amp;/g, "&"), base);
+      if (url.protocol === "https:") return url.toString();
+    } catch {
+      // A broken URL in the page: try the next tag.
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Reads the product page's own preview image when Exa returned none. Only public addresses, redirects followed by
+ * hand so each hop is checked, the first 300 KB only (the head is at the top), 5 seconds in all.
+ */
+async function pageImage(url: string): Promise<string | undefined> {
+  try {
+    const signal = AbortSignal.timeout(5000);
+    let target = url;
+    for (let hop = 0; hop < 5; hop++) {
+      if (!(await isPublicUrl(target))) return undefined;
+      const res = await fetch(target, {
+        signal,
+        redirect: "manual",
+        headers: { "user-agent": "Mozilla/5.0 (compatible; casefile-verifier/1.0)", accept: "text/html" },
+      });
+      const location = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null;
+      if (location) {
+        await res.body?.cancel().catch(() => {});
+        target = new URL(location, target).toString();
+        continue;
+      }
+      if (!res.ok || !res.body || !/html/.test(res.headers.get("content-type") ?? "")) return undefined;
+      const reader = res.body.getReader();
+      const chunks: Uint8Array[] = [];
+      let size = 0;
+      while (size < 300_000) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        size += value.length;
+      }
+      await reader.cancel().catch(() => {});
+      return metaImage(new TextDecoder().decode(Buffer.concat(chunks)), target);
+    }
+  } catch {
+    // A page that does not answer in time simply has no picture.
+  }
+  return undefined;
+}
+
 // ---- Search ------------------------------------------------------------------
 
 // Eight properties, nesting depth two: inside Exa's limits for structured search output.
@@ -188,7 +276,7 @@ const OUTPUT_SCHEMA = {
 };
 
 type SearchResponse = {
-  results?: { url: string; text?: string | null }[];
+  results?: { url: string; text?: string | null; image?: string | null }[];
   output?: { content?: unknown };
   costDollars?: { total?: number };
 };
@@ -255,14 +343,33 @@ export async function findGifts(raw: GiftInput, today = new Date().toISOString()
     cost += res.costDollars?.total ?? 0;
 
     const pages = new Map((res.results ?? []).map((r) => [r.url, r.text ?? ""]));
+    // Only an https image from the same search result: a picture of exactly the page we checked.
+    const images = new Map((res.results ?? []).flatMap((r) => (r.image && /^https:\/\//.test(r.image) ? [[r.url, r.image] as const] : [])));
     for (const idea of parse(res.output?.content)?.ideas ?? []) {
       if (idea.url) seen.add(idea.url);
       const kept = groundIdea(idea, idea.url ? pages.get(idea.url) : undefined, today, input.occasion, input.budget);
       if (!kept) dropped++;
-      else if (!ideas.some((i) => i.url === kept.url)) ideas.push(kept);
+      else if (!ideas.some((i) => i.url === kept.url)) {
+        const image = images.get(kept.url);
+        ideas.push(image ? { ...kept, image } : kept);
+      }
     }
     if (ideas.length >= ENOUGH_IDEAS) break;
   }
+
+  // A product without Exa's image gets the one its own page names, read in parallel. Then the chat can show each one.
+  await Promise.all(
+    ideas.map(async (idea, i) => {
+      const exa = idea.image && productPicture(idea.image) ? idea.image : undefined;
+      const image = exa ?? (await pageImage(idea.url));
+      if (!image || !productPicture(image)) {
+        if (idea.image) ideas[i] = { ...idea, image: undefined };
+        return;
+      }
+      ideas[i] = { ...idea, image };
+      rememberImage(idea.url, image);
+    }),
+  );
 
   // Products that arrive in time come first; the late ones stay visible, marked, so the family sees why.
   ideas.sort((a, b) => Number(Boolean(a.late)) - Number(Boolean(b.late)));

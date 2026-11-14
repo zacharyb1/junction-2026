@@ -207,7 +207,8 @@ Response `200`:
       "shop": "shop.example",
       "delivery": "Toimitus 1-3 arkipäivässä.",
       "arrivesBy": "2026-11-18",
-      "late": false
+      "late": false,
+      "image": "https://shop.example/images/mojo.jpg"
     }
   ],
   "dropped": 2,
@@ -220,6 +221,7 @@ Response `200`:
 - Each Exa search has a structured output that proposes products. A product is kept only when its price's figures are on its own page and `priceQuote` is the page's own sentence; `dropped` counts the rest.
 - Fewer than 3 kept products after a search: it searches again with a different query (a prompt as written, then as a shop search, then for product pages with a price; clues all together, then one at a time) and skips pages it already returned, at most 3 searches. `attempts` says how many it took.
 - `delivery` is the page's own sentence. `arrivesBy` is worked out from it (working days skip weekends) and is absent when the sentence gives no number of days. `late` is absent when either date is unknown.
+- `image` is the product page's own preview image from the same Exa result (https only), absent when the page has none. `GET /api/gifts/image?url=<product url>` returns it for a product the search found (no access code: it only reads what the search stored, in memory until a restart); the /ukk chat shows it above that product link.
 - Products that arrive in time come first. The bot never orders or pays: `url` is for the person to open.
 
 ## Case tools
