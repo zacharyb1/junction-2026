@@ -2,7 +2,7 @@
 
 **Before using this kit:** this script and the generated voiceover contain earlier scorecard measurements and proposed demo beats. Reconcile them with [the current handover](../README.md#what-the-evidence-establishes) and [challenge status](TECH_CHALLENGES.md) for the selected build before recording or submitting.
 
-Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 5 (Fri 23:42). Re-run the scorecard on Saturday evening and update them before recording.
+Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard runs 8 and 9 (Sat 06:30 to 06:40). Re-run the scorecard on Saturday evening and update them before recording.
 
 ## The story
 
@@ -19,10 +19,12 @@ Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 5 (Fri 2
 | Fact | Value | Where it comes from |
 |---|---|---|
 | Scenarios passed | 19 of 19 (expect 18 or 19 on any run) | `eval/results/latest.md` |
-| Quotes found on their pages | 123 of 123 | same |
-| Median time per case | 6.0 s, slowest tenth within 8.3 s | same |
-| Exa searches per case | 3, in parallel | research trail on every case page |
-| Search cost per case | about $0.021 | Exa's `costDollars` in the response |
+| Quotes found on their pages | 119 of 119 in run 8, 127 of 127 in run 9 | same |
+| Median time per case | 6.2 s in run 8, 7.1 s in run 9 | same |
+| Messages with nothing to research that were refused | 6 of 6 | `eval/results/latest.md`, section Refusals |
+| Unit tests on the grounding code | 70, in CI | `pnpm test` |
+| Exa searches per case | 3 structured searches in parallel, plus 1 for recent official pages | research trail on every case page |
+| Search cost per case | about $0.028 | Exa's `costDollars` in the response |
 | Official sites mapped | 12 countries, about 650 hosts, 87 for Finland | `src/data/official-sources.json` |
 
 Do not say "100% accurate". Say: "every line shown is backed by a sentence on a page we opened. What we could not confirm is listed."
@@ -55,6 +57,18 @@ Do not say "100% accurate". Say: "every line shown is backed by a sentence on a 
 Each line of the table is rendered as its own file in `docs/pitch/voiceover/` with ElevenLabs (voice George, model `eleven_v4`), about 50 seconds of speech in total, so each can be placed on the video timeline. The words were checked by transcribing the files back to text. Nobody has listened to them yet: check by ear how the name "Kaveri" is said. Lines 02 and 08 also exist as a second take with the name spelled the way it sounds in Finnish (`02b`, `08b`).
 
 Line 07 holds the scorecard numbers. If Saturday's run gives other numbers, change the text in `docs/pitch/voiceover.json` and run `node scripts/voiceover.mjs --only 07-numbers` (needs `ELEVENLABS_API_KEY`; in a Claude cloud session run it with `NODE_USE_ENV_PROXY=1` and no key).
+
+## What was added on Friday night
+
+Each is on main and can be shown. Say only what you have seen work yourself.
+
+- **New on official sites.** A case lists up to three pages the official sites published in the last four months on its topic, for example "Government proposes an increase to the maternity grant" (Kela, August 2026). This is the clearest answer to "what could a model not know from training".
+- **Live progress in `/try`.** Searches and pages appear as they finish, and each plan line shows its quoted sentence.
+- **Work out the date.** A deadline such as "two months before the start of the leave" becomes a date and a calendar file.
+- **Sources are read again.** A daily job and a button on the case page re-read the cited pages and flag a quote that is gone.
+- **Listen to the plan.** ElevenLabs reads the plan aloud. Hidden until `ELEVENLABS_API_KEY` is set on Vercel.
+- **Link previews.** A case link pasted into a chat shows "10 of 10 quotes found on their pages".
+- **A safety net for the demo.** When live research is down, `/try` offers real cases researched earlier, labelled with their date.
 
 ## Live demo, three minutes
 

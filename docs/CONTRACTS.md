@@ -80,11 +80,17 @@ Response `200`:
   "openQuestions": ["…"],
   "ms": 8122,
   "timings": { "searchMs": 5866, "readMs": 1620, "verifyMs": 149 },
-  "exa": { "searches": 3, "contents": 5, "costDollars": 0.021 },
+  "exa": { "searches": 4, "contents": 5, "costDollars": 0.028 },
   "readers": { "live": 4, "exa": 5, "oxylabs": 0 },
-  "jurisdiction": { "country": "Finland", "region": "Espoo", "officialDomains": 29 }
+  "jurisdiction": { "country": "Finland", "region": "Espoo", "officialDomains": 29 },
+  "news": [
+    { "url": "https://www.kela.fi/news/...", "title": "Government proposes an increase to the maternity grant", "date": "2026-08-21", "publisher": "Kela" }
+  ]
 }
 ```
+
+- `news`: up to three pages the official sites published or updated in the last four months on the case topic, found by one more Exa search. They are pointers for the family to read, stored on the case and shown on the case page under "New on official sites". They are not checked sentence by sentence and never feed the plan. Empty for choice questions and when nothing matched.
+- A message with nothing to research (small talk, gibberish) answers `422` with a sentence a person can act on. An unknown country answers `400`. Neither creates a case.
 
 - `plan`: at most 5 short lines, ready to paste into a chat message. Numbers in brackets are citation numbers on the case page.
 - Lines whose quote failed verification are not in `plan`. They appear under `unverified`.
