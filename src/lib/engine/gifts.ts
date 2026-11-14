@@ -132,6 +132,9 @@ export function priceValue(price: string): number | null {
 // Words of a line about what delivery or pickup costs, in English, Finnish, Swedish and German.
 const SHIPPING = /deliver|shipping|postage|pickup|pick-up|toimitus|nouto|postikulu|frakt|leverans|versand|lieferung/i;
 
+// How a pharmacy page marks a medicine that needs a prescription, in Finnish, Swedish and English.
+const PRESCRIPTION = /reseptilääke|vaatii reseptin|reseptivalmiste|receptbelagd|kräver recept|prescription[- ]only|prescription required|requires a prescription/i;
+
 // Path parts of pages that list or write about many products: a guide, a blog, a category, a search.
 const NOT_ONE_PRODUCT = /\/(blogs?|news|articles?|guides?|gift-guides?|collections?|categor(y|ies)|catalogue|catalog|sets|select|shopping|search|tag|tags|c|kategoria|tuoteryhma)(\/|$)/i;
 
@@ -174,6 +177,8 @@ export function groundIdea(
   if (!quote || !figures.every((f) => numbersIn(quote.quote).includes(f))) return null;
   // "Pickup 4,90 €" is on the page too, but it is what delivery costs, not what the product costs.
   if (SHIPPING.test(quote.quote)) return null;
+  // A prescription-only medicine cannot be bought from the link, so it is never offered.
+  if (PRESCRIPTION.test(page)) return null;
   const delivery = idea.delivery ? snapQuote(idea.delivery, page) : null;
   if (delivery && SHIPPING.test(delivery.quote) && figures.every((f) => numbersIn(delivery.quote).includes(f))) return null;
 

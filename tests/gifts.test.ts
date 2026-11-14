@@ -182,6 +182,14 @@ Lue pakkausseloste ennen käyttöä.`;
     expect(groundIdea({ ...base, price: "6,95 €", priceQuote: "Ibuxin Rapid hinta 6,95 € sis. alv." }, page, "2026-11-14")?.price).toBe("6,95 €");
   });
 
+  it("drops a prescription-only medicine", () => {
+    const page = `Ibuxin 800 mg tabletti 30 fol.
+Ibuxin 800 mg hinta 5,24 € sis. alv.
+Reseptilääke: tilaus vaatii reseptin.`;
+    const idea = { name: "Ibuxin 800 mg", why: "headache", price: "5,24 €", priceQuote: "Ibuxin 800 mg hinta 5,24 € sis. alv.", url: "https://www.apteekki.example/ibuxin-800-mg-30" };
+    expect(groundIdea(idea, page, "2026-11-14")).toBeNull();
+  });
+
   it("drops a product over the budget", () => {
     expect(groundIdea(idea, PAGE, "2026-11-14", undefined, 20)).toBeNull();
     expect(groundIdea(idea, PAGE, "2026-11-14", undefined, 25)?.price).toBe("24,90 €");
