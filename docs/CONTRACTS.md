@@ -60,6 +60,17 @@ Response `200`:
     "Book the maternity clinic check-up before the end of month 4 [1]",
     "Apply for the maternity grant 2 months before the due date [3]"
   ],
+  "evidence": [
+    {
+      "n": 1,
+      "url": "https://www.espoo.fi/en/hello-espoo-welcome-espoo/pregnancy-and-life-baby",
+      "title": "Pregnancy and life with a baby | City of Espoo",
+      "quote": "When the pregnancy is confirmed, please book an appointment at a maternity clinic.",
+      "sourceType": "official",
+      "verification": "verified",
+      "checkedVia": "live"
+    }
+  ],
   "evidenceTotal": 6,
   "evidenceVerified": 6,
   "unverified": ["…"],
@@ -74,11 +85,24 @@ Response `200`:
 
 - `plan`: at most 5 short lines, ready to paste into a chat message. Numbers in brackets are citation numbers on the case page.
 - Lines whose quote failed verification are not in `plan`. They appear under `unverified`.
+- `evidence`: the sentence behind every citation number of the case, so a client can show the quote under the plan line
+  it supports without loading the case. `quote` is the stored sentence, in the page's own words. `sourceType` is `official`
+  or `secondary`. `verification` and `checkedVia` are the marks described under "Case tools"; `checkedVia` is absent
+  unless the quote was verified.
 - Errors: `400` invalid input, `401` missing or wrong credentials, `429` rate limited, `502` Exa failed, each with `{ "error": "…" }`.
 
-Streaming for the `/try` page: send `Accept: text/event-stream`. Events, each with a JSON `data` line:
-`stage` `{ "name": "plan" | "search" | "read" | "verify" | "publish", "detail": "…" }`,
-`source` `{ "url": "…", "title": "…" }`, then `done` with the response object above, or `error`.
+Streaming for the `/try` page: send `Accept: text/event-stream`. Each event has a JSON `data` line that repeats the event
+name as `type`. `ms` is the time since the research started.
+
+| Event | Data | Sent |
+|---|---|---|
+| `stage` | `{ "name": "plan" \| "search" \| "read" \| "verify" \| "publish", "detail": "…", "ms": 2 }` | when a stage starts; the same lines are stored as the research trail |
+| `search` | `{ "focus": "money and entitlements", "web": "official" \| "open", "status": "running" \| "done" \| "failed", "steps": 5, "pages": 4, "tookMs": 6118, "ms": 6130 }` | when one Exa search starts, and again when it returns or fails: `steps` it proposed, distinct `pages` those steps cite, and how long it took. The counts are 0 unless the status is `done` |
+| `page` | `{ "url": "…", "title": "…", "official": true, "via": "live" \| "oxylabs" \| "exa" \| "none", "ms": 7185 }` | once per cited page, as soon as it has been read. `via` is the most direct reader that opened it: our own request, a live read through Oxylabs, Exa's copy, or `none` when nothing could open it |
+| `source` | `{ "url": "…", "title": "…", "official": true }` | once per cited page after all pages are read (kept for older clients; `page` says more) |
+| `verified` | `{ "verified": 6, "total": 6, "ms": 8884 }` | once the case is stored: how many quotes were confirmed on their pages |
+| `done` | the response object above | last event of a successful run |
+| `error` | `{ "error": "…" }` | last event of a failed run |
 
 ## Calling the engine from any bot (Hono, Mastra, anything)
 

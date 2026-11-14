@@ -210,21 +210,47 @@ export type ReadOptions = {
   recheck?: boolean;
 };
 
+/** The most direct reader that opened a page: our own request, a live read through Oxylabs, Exa's copy, or none. */
+export type PageReader = "live" | "oxylabs" | "exa" | "none";
+
 /**
  * Read every URL two ways at once: our own live request, and Exa Contents.
  * Pages our own request could not open get a third, live reading through Oxylabs when a key is set.
  * Repeated URLs are fetched once.
+ * `onPage` is called once per page, as soon as it is known which reader opened it.
  */
-export async function fetchPages(urls: string[], options: ReadOptions = {}): Promise<Map<string, FetchedPage>> {
+export async function fetchPages(
+  urls: string[],
+  options: ReadOptions = {},
+  onPage?: (url: string, reader: PageReader) => void,
+): Promise<Map<string, FetchedPage>> {
   const unique = [...new Set(urls)];
-  const [direct, exa] = await Promise.all([Promise.all(unique.map((u) => fetchDirect(u))), fetchViaExa(unique)]);
-  const exaFor = (url: string) => exa.get(url) ?? exa.get(url.replace(/\/$/, "")) ?? null;
+  const exaRead = fetchViaExa(unique);
+  const copyIn = (copies: Map<string, string>, url: string) => copies.get(url) ?? copies.get(url.replace(/\/$/, "")) ?? null;
+  const direct = await Promise.all(
+    unique.map(async (url) => {
+      const text = await fetchDirect(url);
+      if (text) onPage?.(url, "live");
+      // Refused, but Exa has a copy and no Oxylabs read will follow: that copy is this page's reading.
+      else if (options.oxylabs !== "blocked" && copyIn(await exaRead, url)) onPage?.(url, "exa");
+      return text;
+    }),
+  );
+  const exa = await exaRead;
+  const exaFor = (url: string) => copyIn(exa, url);
 
-  const wanted = unique
-    .filter((url, i) => !direct[i] && (options.oxylabs === "blocked" || !exaFor(url)))
-    .slice(0, OXYLABS_MAX_PAGES);
+  // Every page not reported above. The first few get an Oxylabs read, the rest are settled now.
+  const unsettled = unique.filter((url, i) => !direct[i] && (options.oxylabs === "blocked" || !exaFor(url)));
+  const wanted = unsettled.slice(0, OXYLABS_MAX_PAGES);
+  for (const url of unsettled.slice(OXYLABS_MAX_PAGES)) onPage?.(url, exaFor(url) ? "exa" : "none");
   const oxylabs = new Map<string, string | null>(
-    await Promise.all(wanted.map(async (url) => [url, await fetchViaOxylabs(url)] as [string, string | null])),
+    await Promise.all(
+      wanted.map(async (url) => {
+        const text = await fetchViaOxylabs(url);
+        onPage?.(url, text ? "oxylabs" : exaFor(url) ? "exa" : "none");
+        return [url, text] as [string, string | null];
+      }),
+    ),
   );
 
   return new Map(

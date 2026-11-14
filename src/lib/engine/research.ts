@@ -1,6 +1,6 @@
 import Exa from "exa-js";
 import { z } from "zod";
-import { type CaseInput, type EvidenceInput, LIMITS } from "@/lib/case";
+import { type CaseInput, type Evidence, type EvidenceInput, LIMITS } from "@/lib/case";
 import { publishCase } from "@/lib/cases";
 import {
   bestSupport,
@@ -14,7 +14,7 @@ import {
 } from "@/lib/engine/ground";
 import { hostOf, isOfficial, type Jurisdiction, publisherOf, resolveJurisdiction } from "@/lib/engine/jurisdiction";
 import { figuresIn, numbersIn, tokens } from "@/lib/text";
-import { type FetchedPage, fetchPages, readerCounts } from "@/lib/verify";
+import { type FetchedPage, fetchPages, judge, type PageReader, readerCounts } from "@/lib/verify";
 
 /**
  * The research engine.
@@ -47,15 +47,38 @@ export const ResearchInput = z.object({
 });
 export type ResearchInput = z.infer<typeof ResearchInput>;
 
+/** `ms` is always the time since the research started. */
 export type EngineEvent =
   | { type: "stage"; name: "plan" | "search" | "read" | "verify" | "publish"; detail: string; ms: number }
-  | { type: "source"; url: string; title: string; official: boolean };
+  | { type: "source"; url: string; title: string; official: boolean }
+  /** One Exa search: sent when it starts, and again when it returns or fails. Counts are zero until it is done. */
+  | {
+      type: "search";
+      focus: string;
+      web: "official" | "open";
+      status: "running" | "done" | "failed";
+      /** Steps this search proposed, and the distinct pages those steps cite. */
+      steps: number;
+      pages: number;
+      /** How long this one search took. */
+      tookMs: number;
+      ms: number;
+    }
+  /** One cited page, as soon as it has been read. `via` is the most direct reader that opened it. */
+  | { type: "page"; url: string; title: string; official: boolean; via: PageReader; ms: number }
+  /** Sent once the case is stored: how many quoted sentences were confirmed on their pages. */
+  | { type: "verified"; verified: number; total: number; ms: number };
+
+/** The sentence behind one citation number, as stored on the case. */
+export type ResultEvidence = Pick<Evidence, "n" | "url" | "title" | "quote" | "sourceType" | "verification" | "checkedVia">;
 
 export type ResearchResult = {
   id: string;
   url: string;
   title: string;
   plan: string[];
+  /** Every citation number used in the case, so a client can show the quote under the line it supports. */
+  evidence: ResultEvidence[];
   evidenceTotal: number;
   evidenceVerified: number;
   unverified: string[];
@@ -468,6 +491,19 @@ export async function researchCase(
   async function search(focus: Focus, restrict: boolean): Promise<Candidate[]> {
     stage("search", `Exa search on ${restrict && official.length ? "official sites" : "the open web"}: ${focus.name}`);
     usage.searches++;
+    const began = Date.now();
+    const report = (status: "running" | "done" | "failed", steps = 0, pages = 0) =>
+      emit({
+        type: "search",
+        focus: focus.name,
+        web: restrict && official.length ? "official" : "open",
+        status,
+        steps,
+        pages,
+        tookMs: Date.now() - began,
+        ms: since(),
+      });
+    report("running");
     const deep = input.depth === "deep";
     const options = {
       type: deep ? "deep" : "auto",
@@ -485,7 +521,10 @@ export async function researchCase(
     const query = `${clip(input.situation, 300)} ${where}: ${focus.keywords}`;
     const res = (await withRetry(() =>
       exa.search(query, options as never, { timeout: deep ? 120_000 : 45_000 } as never),
-    )) as unknown as ExaSearchResponse;
+    ).catch((error: unknown) => {
+      report("failed");
+      throw error;
+    })) as unknown as ExaSearchResponse;
     usage.costDollars += res.costDollars?.total ?? 0;
     for (const r of res.results ?? []) if (r.title) titles.set(r.url, r.title);
     for (const g of res.output?.grounding ?? []) {
@@ -502,7 +541,7 @@ export async function researchCase(
         graded.set(Number(m[1]), g.confidence);
       }
     }
-    return (out?.steps ?? [])
+    const proposed = (out?.steps ?? [])
       .map((s, index) => ({ ...s, confidence: graded.get(index) }))
       .filter((s) => s.title && s.quote && s.sourceUrl && /^https?:\/\//.test(s.sourceUrl) && !JUNK.test(s.title))
       .map((s) => {
@@ -525,6 +564,8 @@ export async function researchCase(
           official: isOfficial(url, j),
         };
       });
+    report("done", proposed.length, new Set(proposed.map((c) => c.url)).size);
+    return proposed;
   }
 
   // One failed search must not sink the case: the others still carry it.
@@ -626,7 +667,9 @@ export async function researchCase(
   const urls = [...new Set(merged.flatMap((c) => [c.url, ...c.facts.map((f) => f.url)]))];
   stage("read", `Opening ${urls.length} cited pages: our own live request plus Exa Contents`);
   // Fast mode spends an Oxylabs read only on pages nothing else could open. Deep mode reads every blocked page live.
-  const pages = await fetchPages(urls, { oxylabs: input.depth === "deep" ? "blocked" : "unread" });
+  const pages = await fetchPages(urls, { oxylabs: input.depth === "deep" ? "blocked" : "unread" }, (url, via) =>
+    emit({ type: "page", url, title: titles.get(url) ?? hostOf(url), official: isOfficial(url, j), via, ms: since() }),
+  );
   const readers = readerCounts(pages);
   if (readers.oxylabs) stage("read", `Read ${readers.oxylabs} blocked pages live through the Oxylabs Web API`);
   for (const url of urls) emit({ type: "source", url, title: titles.get(url) ?? hostOf(url), official: isOfficial(url, j) });
@@ -924,7 +967,8 @@ export async function researchCase(
   );
   const shared = (text: string) => [...stems(text)].filter((t) => topic.has(t)).length;
   const citedUrls = new Set(evidence.map((e) => e.url.replace(/\/$/, "")));
-  const news = (await freshPages)
+  // The plan never waits long for this: pointers are a bonus, and a slow search just means none are shown.
+  const news = (await Promise.race([freshPages, new Promise<Fresh[]>((resolve) => setTimeout(() => resolve([]), 1200))]))
     .filter((n) => !citedUrls.has(n.url.replace(/\/$/, "")) && shared(n.title) >= 1 && shared(n.text) >= 2)
     .filter((n, i, all) => all.findIndex((o) => o.url === n.url || key(o.title) === key(n.title)) === i)
     .sort((a, b) => shared(b.text) - shared(a.text) || b.date.localeCompare(a.date))
@@ -968,10 +1012,11 @@ export async function researchCase(
     readers,
     events: trailEvents.slice(0, 20),
   });
+  emit({ type: "verified", verified: published.evidenceVerified, total: published.evidenceTotal, ms: since() });
 
   // Chat-ready lines. Only lines whose every citation was confirmed on the page,
   // and the numbers after a line point at the sentences that carry its deadline and amount.
-  const failed = new Set(published.failed.map((f) => f.n));
+  const failed = new Map(published.failed.map((f) => [f.n, f.reason]));
   const confirmed = (refs: number[]) => refs.length > 0 && refs.every((n) => !failed.has(n));
   const plan = steps
     .filter((s) => confirmed(s.evidence))
@@ -984,11 +1029,23 @@ export async function researchCase(
       return `${s.title}${fact} ${refs.map((n) => `[${n}]`).join("")}`;
     });
 
+  // The verdict is the stored one. Which reading carried the quote is judged the way the store judged it.
+  const sentences: ResultEvidence[] = evidence.map((e) => ({
+    n: e.n,
+    url: e.url,
+    title: e.title,
+    quote: e.quote,
+    sourceType: e.sourceType,
+    verification: failed.get(e.n) ?? "verified",
+    checkedVia: failed.has(e.n) ? undefined : judge(e.quote, pages.get(e.url) ?? null).checkedVia,
+  }));
+
   return {
     id: published.id,
     url: published.url,
     title,
     plan,
+    evidence: sentences,
     evidenceTotal: published.evidenceTotal,
     evidenceVerified: published.evidenceVerified,
     unverified: caseInput.unverified,
