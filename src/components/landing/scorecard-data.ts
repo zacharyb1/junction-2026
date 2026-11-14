@@ -41,6 +41,8 @@ const ScorecardFile = z.object({
     medianMs: z.number().nullish().catch(null),
     p90Ms: z.number().nullish().catch(null),
   }),
+  /** Messages with nothing to research that the engine turned down. Older scorecards do not have it. */
+  refusals: z.object({ passed: z.number(), total: z.number() }).nullish().catch(null),
   rows: z.array(Row),
 });
 

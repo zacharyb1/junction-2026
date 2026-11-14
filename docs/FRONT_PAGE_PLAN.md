@@ -1,6 +1,8 @@
 # Front page plan: AIDaddy as the family's JARVIS
 
-Written Saturday 14 November, about 09:00 Helsinki, at Zachary's request. Feature freeze is 20:00 today. This is a plan, not yet a decision: the team approves it before anyone builds.
+Written Saturday 14 November, about 08:36 Helsinki, at Zachary's request. Feature freeze is 20:00 today.
+
+**Status, Sat 08:57:** Zachary approved the direction and the page is built and live on `/`. Shipped: boot and core (3.1), quiet days (3.2), the research replay (3.3), the plan (3.4), proof (3.6), under the hood (3.7), add it (3.8). Not built: the voice button (3.5). The reading-table page is at `/reading`. The headline is "Silent until it matters." and the page does not name the film character.
 
 ## 1. The idea in one line
 

@@ -41,7 +41,7 @@ export const planLines: PlanLine[] = SHOWN_SOURCES.flatMap((n) => {
   ];
 });
 
-function hostOf(url: string): string {
+export function hostOf(url: string): string {
   try {
     return new URL(url).hostname.replace(/^www\./, "");
   } catch {
@@ -53,7 +53,7 @@ function hostOf(url: string): string {
  * Link to the page with the quoted sentence highlighted, using a text fragment (`#:~:text=start,end`).
  * Same rule as `highlightUrl` on the case page, src/app/c/[id]/page.tsx. Keep the two alike.
  */
-function highlightUrl(url: string, quote: string): string | null {
+export function highlightUrl(url: string, quote: string): string | null {
   if (url.includes("#") || /\.pdf($|\?)/i.test(url)) return null;
   const words = quote.replace(/\s+/g, " ").trim().split(" ");
   if (words.length < 3) return null;
