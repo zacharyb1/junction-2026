@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
 import http from "node:http";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { checkCaseLinks, recordedCaseIds } from "./check-recorded-cases.mjs";
 
 test("recorded inventory covers the landing, examples, scorecard, and four video demos", async () => {
   const ids = await recordedCaseIds();
-  assert.ok(ids.includes("IRZUhuWnAtPEZVHw"));
+  const replay = JSON.parse(await readFile(new URL("../src/data/replay.json", import.meta.url), "utf8"));
+  const examples = JSON.parse(await readFile(new URL("../src/data/example-cases.json", import.meta.url), "utf8"));
+  for (const id of [replay.result.id, ...examples.cases.map((entry) => entry.id)]) assert.ok(ids.includes(id));
   for (const id of ["8bfhhPMjACQTVb3z", "VmOaZsrU6ej6MtdN", "awE0ewNWNgPE_nmE", "zPi7P2DsH3CBC7ua"]) assert.ok(ids.includes(id));
-  assert.ok(ids.length >= 24);
+  assert.equal(ids.length, 29);
 });
 
 test("the link check fails on missing or wrong cases and passes after exact restoration", async (t) => {

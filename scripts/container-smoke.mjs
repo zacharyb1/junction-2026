@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 
 const engine = process.argv[2] ?? "docker";
@@ -11,6 +12,9 @@ const image = process.argv[3] ?? "kaveri-web:check";
 const name = `kaveri-smoke-${randomUUID()}`;
 const volume = `${name}-cases`;
 const secret = randomUUID();
+const archivedRun = JSON.parse(await readFile(new URL("../eval/results/2026-11-14T05-01-11-265Z.json", import.meta.url), "utf8"));
+const archivedCase = archivedRun.results[0].case;
+const freshCases = JSON.parse(await readFile(new URL("../src/data/demo-case-seeds.json", import.meta.url), "utf8")).cases;
 let volumeCreated = false;
 
 function cli(...args) {
@@ -51,7 +55,7 @@ try {
   assert.notEqual(cli("exec", name, "id", "-u"), "0", "Server must run without root");
   cli("exec", name, "node", "-e", `
     const fs = require('node:fs');
-    for (const path of ['/app/.env.local', '/app/.git', '/app/.hermes-local']) {
+    for (const path of ['/app/.env.local', '/app/.git', '/app/.hermes-local', '/app/eval']) {
       if (fs.existsSync(path)) throw new Error('Private build input found: ' + path);
     }
   `);
@@ -60,6 +64,26 @@ try {
   const asset = html.match(/(?:src|href)="([^"\s]*\/_next\/static\/[^"\s]+)"/)?.[1];
   assert.ok(asset, "Landing page must contain a static asset");
   assert.equal((await fetch(new URL(asset, origin))).status, 200, "Static asset must be served");
+
+  const seeded = await fetch(`${origin}/api/cases/${archivedCase.id}`);
+  assert.equal(seeded.status, 200, "Recorded scorecard case must be seeded on startup");
+  assert.deepEqual(await seeded.json(), archivedCase, "Archived case content and IDs must be unchanged");
+  for (const recorded of [...archivedRun.results.map((row) => row.case), ...freshCases]) {
+    const api = await fetch(`${origin}/api/cases/${recorded.id}`);
+    assert.equal(api.status, 200, `Recorded API ${recorded.id} must resolve`);
+    assert.deepEqual(await api.json(), recorded, "Every packaged case must retain the captured object");
+    const page = await fetch(`${origin}/c/${recorded.id}`);
+    assert.equal(page.status, 200, `Recorded page ${recorded.id} must render`);
+    await page.body?.cancel();
+  }
+  const seedEdit = await fetch(`${origin}/api/cases/${archivedCase.id}`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json", authorization: `Bearer ${secret}` },
+    body: JSON.stringify({ summary: "A newer case update must survive the next seed import." }),
+  });
+  assert.equal(seedEdit.status, 200, "Existing case must remain editable after recovery");
+  const editedSeed = await (await fetch(`${origin}/api/cases/${archivedCase.id}`)).json();
+  assert.equal(editedSeed.summary, "A newer case update must survive the next seed import.");
 
   const fixture = {
     title: "Container persistence check",
@@ -80,13 +104,16 @@ try {
 
   stop();
   origin = await start();
+  const retainedSeed = await fetch(`${origin}/api/cases/${archivedCase.id}`);
+  assert.equal(retainedSeed.status, 200);
+  assert.deepEqual(await retainedSeed.json(), editedSeed, "Restart must not overwrite a newer archived case with its seed");
   const restored = await fetch(`${origin}/api/cases/${published.id}`);
   assert.equal(restored.status, 200, "Case must survive container replacement");
   assert.deepEqual(await restored.json(), before);
   const page = await fetch(`${origin}/c/${published.id}`);
   assert.equal(page.status, 200, "Persisted Case page must render");
   assert.ok((await page.text()).includes(fixture.title));
-  console.log("Passed: non-root server, clean image, static assets, write authentication, Case links and persistence across container replacement.");
+  console.log("Passed: non-root server, clean image, static assets, exact recorded seed, newer case preservation, write authentication and persistence across container replacement.");
 } finally {
   spawnSync(engine, ["rm", "--force", name], { stdio: "ignore", timeout: 30_000 });
   if (volumeCreated) cli("volume", "rm", volume);

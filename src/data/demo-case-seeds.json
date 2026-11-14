@@ -1,0 +1,1237 @@
+{
+  "generatedAt": "2026-11-14T23:20:57.820308+00:00",
+  "purpose": "Synthetic demo cases from genuine fresh Engine research for the landing replay and five saved examples. Original IDs, timestamps and verified evidence retained.",
+  "cases": [
+    {
+      "title": "Pregnancy Checklist for Families",
+      "event": "pregnancy_checklist_for_families",
+      "language": "en",
+      "jurisdiction": {
+        "country": "Finland",
+        "region": "Espoo"
+      },
+      "summary": "To manage your pregnancy in Espoo, you must schedule appointments at your local maternity clinic and submit required applications to Kela for the maternity grant and pregnancy allowance. You are also responsible for notifying your employer of your upcoming pregnancy leave in writing.",
+      "steps": [
+        {
+          "title": "Book appointment at Espoo maternity clinic",
+          "detail": "Contact a maternity clinic in your area in Espoo to book your first appointment.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            1
+          ],
+          "id": "book-appointment-at-espoo-ma-1"
+        },
+        {
+          "title": "Apply for maternity grant from Kela",
+          "detail": "Apply for the maternity grant from Kela at least two months before your estimated due date.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            2,
+            3,
+            4
+          ],
+          "due": "at least two months before the child’s due date",
+          "id": "apply-for-maternity-grant-fr-2"
+        },
+        {
+          "title": "Notify employer of pregnancy leave",
+          "detail": "Give your employer written notice of your pregnancy leave at least two months before the leave starts.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            5,
+            6,
+            7
+          ],
+          "due": "no later than two months before the start of your leave",
+          "id": "notify-employer-of-pregnancy-3"
+        },
+        {
+          "title": "Apply for pregnancy allowance from Kela",
+          "detail": "Apply for pregnancy allowance from Kela after your pregnancy has reached 154 days, no later than two months after the leave starts.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            8
+          ],
+          "due": "no later than two months after your pregnancy allowance period starts",
+          "id": "apply-for-pregnancy-allowanc-4"
+        }
+      ],
+      "money": [
+        {
+          "label": "“The length of the pregnancy leave is 40 working days.”",
+          "amount": "40 working days",
+          "evidence": [
+            9
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "n": 1,
+          "url": "https://www.espoo.fi/en/hello-espoo-welcome-espoo/pregnancy-and-life-baby",
+          "title": "espoo.fi",
+          "publisher": "City of Espoo",
+          "quote": "When the pregnancy is confirmed, please book an appointment at a maternity clinic.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 2,
+          "url": "https://infofinland.fi/health/pregnancy-and-childbirth",
+          "title": "InfoFinland - Pregnancy and childbirth",
+          "publisher": "InfoFinland",
+          "quote": "Apply for a maternity grant from Kela at least two months before the child’s due date.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 3,
+          "url": "https://infofinland.fi/family/financial-support-for-families/support-during-pregnancy",
+          "title": "InfoFinland - Support during pregnancy",
+          "publisher": "InfoFinland",
+          "quote": "Apply for maternity grant from Kela at least two months before the due date.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 4,
+          "url": "https://www.kela.fi/maternity-package-or-cash-benefit",
+          "title": "Maternity package or cash benefit | Our Services | Kela",
+          "publisher": "Kela",
+          "quote": "You should apply for the maternity grant no later than two months before the expected date of birth of the child.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 5,
+          "url": "https://infofinland.fi/health/pregnancy-and-childbirth",
+          "title": "InfoFinland - Pregnancy and childbirth",
+          "publisher": "InfoFinland",
+          "quote": "If you have a job, give your employer written notification at least two months before you begin your pregnancy leave.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 6,
+          "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
+          "title": "suomi.fi",
+          "publisher": "Suomi.fi",
+          "quote": "Agree with your employer on the start date of your pregnancy leave no later than two months before it is set to begin.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 7,
+          "url": "https://www.kela.fi/during-pregnancy",
+          "title": "During pregnancy | Our Services | Kela",
+          "publisher": "Kela",
+          "quote": "If you are working, you must inform your employer of your pregnancy leave no later than two months before the start of your leave.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 8,
+          "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
+          "title": "suomi.fi",
+          "publisher": "Suomi.fi",
+          "quote": "You must apply for your pregnancy allowance within two months of the start of your pregnancy leave at the latest.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 9,
+          "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
+          "title": "suomi.fi",
+          "publisher": "Suomi.fi",
+          "quote": "The length of the pregnancy leave is 40 working days.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:09.142Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        }
+      ],
+      "drafts": [],
+      "unverified": [],
+      "openQuestions": [
+        "Do you need a medical examination by the end of your fourth month of pregnancy for the maternity grant?",
+        "Does your employer pay salary during pregnancy leave?",
+        "Do you have the pregnancy certificate from your clinic yet?"
+      ],
+      "id": "wksufX66aFxP-8m2",
+      "createdAt": "2026-11-14T23:20:09.140Z",
+      "updatedAt": "2026-11-14T23:20:09.140Z",
+      "trail": {
+        "ms": 9713,
+        "searches": 4,
+        "pagesRead": 6,
+        "costDollars": 0.028,
+        "officialDomains": 87,
+        "readers": {
+          "live": 6,
+          "exa": 6,
+          "oxylabs": 0
+        },
+        "events": [
+          {
+            "ms": 1,
+            "detail": "Pinned to Finland. Searching 87 official sites first."
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: actions and deadlines"
+          },
+          {
+            "ms": 5,
+            "detail": "Exa search on official sites: money and entitlements"
+          },
+          {
+            "ms": 5,
+            "detail": "Exa search on official sites: how and where to apply"
+          },
+          {
+            "ms": 6264,
+            "detail": "Exa search on official sites: pages published in the last four months"
+          },
+          {
+            "ms": 6265,
+            "detail": "Opening 6 cited pages: our own live request plus Exa Contents"
+          },
+          {
+            "ms": 8186,
+            "detail": "Checking every quote, amount and deadline against the page text"
+          },
+          {
+            "ms": 9713,
+            "detail": "Building the case file"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "at": "2026-11-14T23:20:09.140Z",
+          "kind": "read",
+          "trigger": "message",
+          "status": "done",
+          "summary": "Researched official sources: 4 searches, 6 pages read"
+        }
+      ]
+    },
+    {
+      "title": "Checklist for Pregnancy",
+      "event": "checklist_for_pregnancy",
+      "language": "en",
+      "jurisdiction": {
+        "country": "Finland",
+        "region": "Espoo"
+      },
+      "summary": "You need to contact your local maternity clinic for monitoring, notify your employer of your pregnancy leave, and apply for maternity grant and pregnancy allowance through Kela after your pregnancy has lasted at least 154 days. Employers must be notified of leaves well in advance, and Kela applications have specific deadlines tied to your pregnancy progress.",
+      "steps": [
+        {
+          "title": "Notify employer of pregnancy leave",
+          "detail": "Notify your employer of your upcoming pregnancy leave no later than two months before it begins. Check your industry's collective agreement for specific notification requirements.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            1,
+            2
+          ],
+          "due": "no later than two months before the start of your leave",
+          "id": "notify-employer-of-pregnancy-1"
+        },
+        {
+          "title": "Apply for maternity grant from Kela",
+          "detail": "Apply for the maternity grant through Kela after your pregnancy has lasted 154 days and you have received a pregnancy certificate.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            3
+          ],
+          "due": "no later than two months before the expected date of birth of the child",
+          "id": "apply-for-maternity-grant-fr-2"
+        },
+        {
+          "title": "Apply for pregnancy allowance from Kela",
+          "detail": "Apply for pregnancy allowance through Kela once you have reached 154 days of pregnancy and have your pregnancy certificate. The allowance is paid for 40 working days.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            4,
+            6
+          ],
+          "due": "within 2 months of the start of your pregnancy leave at the latest",
+          "id": "apply-for-pregnancy-allowanc-3"
+        },
+        {
+          "title": "Notify employer of work risk factors",
+          "detail": "If your work involves substances or conditions that endanger the pregnancy, inform your employer immediately to arrange safer work or take special pregnancy leave.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            7
+          ],
+          "id": "notify-employer-of-work-risk-4"
+        }
+      ],
+      "money": [
+        {
+          "label": "“As a rule, the employer must be notified of a pregnancy leave, parental leave or…”",
+          "amount": "no later than two months before the start of the leave",
+          "evidence": [
+            1
+          ]
+        },
+        {
+          "label": "“Kela pays pregnancy allowance for 40 working days regardless of the actual date of birth…”",
+          "amount": "40 working days",
+          "evidence": [
+            5
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "n": 1,
+          "url": "https://tem.fi/en/pregnancy-parental-childcare-leave",
+          "title": "Pregnancy leave, parental leave and childcare leave - Ministry of Economic Affairs and Employment",
+          "publisher": "tem.fi",
+          "quote": "As a rule, the employer must be notified of a pregnancy leave, parental leave or childcare leave no later than two months before the start of the leave.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:11.390Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 2,
+          "url": "https://www.kela.fi/during-pregnancy",
+          "title": "During pregnancy | Our Services | Kela",
+          "publisher": "Kela",
+          "quote": "If you are working, you must inform your employer of your pregnancy leave no later than two months before the start of your leave.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:11.390Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 3,
+          "url": "https://www.kela.fi/maternity-package-or-cash-benefit",
+          "title": "Maternity package or cash benefit | Our Services | Kela",
+          "publisher": "Kela",
+          "quote": "You should apply for the maternity grant no later than two months before the expected date of birth of the child.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:11.390Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 4,
+          "url": "https://www.kela.fi/during-pregnancy",
+          "title": "During pregnancy | Our Services | Kela",
+          "publisher": "Kela",
+          "quote": "Apply for the allowance within 2 months of the start of your pregnancy leave at the latest.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:11.390Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 5,
+          "url": "https://www.kela.fi/during-pregnancy",
+          "title": "During pregnancy | Our Services | Kela",
+          "publisher": "Kela",
+          "quote": "Kela pays pregnancy allowance for 40 working days regardless of the actual date of birth of the baby.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:11.390Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 6,
+          "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
+          "title": "suomi.fi",
+          "publisher": "Suomi.fi",
+          "quote": "You must apply for your pregnancy allowance within two months of the start of your pregnancy leave at the latest.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:11.390Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 7,
+          "url": "https://www.suomi.fi/guides/having-a-child/child-on-the-way/pregnancy",
+          "title": "Pregnancy - Having a child – Guide for those wishing for a child - Suomi.fi",
+          "publisher": "Suomi.fi",
+          "quote": "If your work includes factors that may pose a risk to your pregnancy or the development of the foetus, inform your employer of your pregnancy as soon as possible.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:11.390Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        }
+      ],
+      "drafts": [],
+      "unverified": [
+        "Contact maternity and child health clinic in Espoo: the cited page could not be opened (suomi.fi)."
+      ],
+      "openQuestions": [
+        "Do you need to identify any specific chemical, radiation, or other hazards at your workplace that require early notification for special pregnancy leave?",
+        "Have you already decided whether you intend to apply for the maternity package or the cash benefit from Kela?",
+        "What is the expected due date of the baby?"
+      ],
+      "id": "YFIVlk7ZbgdkHg9j",
+      "createdAt": "2026-11-14T23:20:11.390Z",
+      "updatedAt": "2026-11-14T23:20:11.390Z",
+      "trail": {
+        "ms": 9132,
+        "searches": 4,
+        "pagesRead": 7,
+        "costDollars": 0.028,
+        "officialDomains": 87,
+        "readers": {
+          "live": 6,
+          "exa": 6,
+          "oxylabs": 0
+        },
+        "events": [
+          {
+            "ms": 0,
+            "detail": "Pinned to Finland. Searching 87 official sites first."
+          },
+          {
+            "ms": 0,
+            "detail": "Exa search on official sites: actions and deadlines"
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: money and entitlements"
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: how and where to apply"
+          },
+          {
+            "ms": 6208,
+            "detail": "Exa search on official sites: pages published in the last four months"
+          },
+          {
+            "ms": 6208,
+            "detail": "Opening 7 cited pages: our own live request plus Exa Contents"
+          },
+          {
+            "ms": 7848,
+            "detail": "Checking every quote, amount and deadline against the page text"
+          },
+          {
+            "ms": 9132,
+            "detail": "Building the case file"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "at": "2026-11-14T23:20:11.390Z",
+          "kind": "read",
+          "trigger": "message",
+          "status": "done",
+          "summary": "Researched official sources: 4 searches, 7 pages read"
+        }
+      ]
+    },
+    {
+      "title": "Handling an Unilateral Rent Increase",
+      "event": "handling_an_unilateral_rent",
+      "language": "en",
+      "jurisdiction": {
+        "country": "Finland",
+        "region": "Espoo"
+      },
+      "summary": "A landlord cannot unilaterally increase your rent unless your tenancy agreement includes a specific, pre-agreed clause for doing so. If they attempt to increase it, they are required to provide notice, and you have the right to dispute the increase in writing if it does not follow the terms of your contract.",
+      "steps": [
+        {
+          "title": "Check the required notice period for rent increases",
+          "detail": "The landlord must notify you of a rent increase two months in advance.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            1
+          ],
+          "id": "check-the-required-notice-pe-1"
+        },
+        {
+          "title": "Verify the rent increase clause in your agreement",
+          "detail": "A landlord cannot unilaterally raise the rent unless it was previously agreed upon in your tenancy agreement with a precise, unambiguous basis for the increase.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            2
+          ],
+          "id": "verify-the-rent-increase-cla-2"
+        },
+        {
+          "title": "Submit a written complaint to your landlord",
+          "detail": "If the increase is unjustified, submit a written complaint to your landlord immediately. You can use the Consumer and Market Authority's Complaint Assistant tool to draft this letter.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            3
+          ],
+          "id": "submit-a-written-complaint-t-3"
+        },
+        {
+          "title": "Seek external dispute resolution if necessary",
+          "detail": "If the dispute remains unresolved, you can seek advice from Consumer Advisory Services or refer the matter to the Consumer Disputes Board.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            4
+          ],
+          "id": "seek-external-dispute-resolu-4"
+        }
+      ],
+      "money": [
+        {
+          "label": "Check the required notice period for rent increases",
+          "amount": "two months' notice",
+          "evidence": [
+            1
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "n": 1,
+          "url": "https://www.oikeus.fi/en/themes/civil-cases-and-petitionary-matters/examples-of-civil-cases-and-petitionary-matters/housing/",
+          "title": "Housing - Oikeus.fi",
+          "publisher": "oikeus.fi",
+          "quote": "The lessee must always be notified of a rent increase two months in advance.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:18.617Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 2,
+          "url": "https://www.kkv.fi/en/consumer-affairs/housing/rental-apartments/paying-the-rent-and-rent-raise/",
+          "title": "Paying the rent and rent raise - KKV",
+          "publisher": "Finnish Competition and Consumer Authority",
+          "quote": "The landlord does not have the right to increase the rent unilaterally during the tenancy.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:18.617Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 3,
+          "url": "https://www.kkv.fi/en/consumer-affairs/housing/rental-apartments/paying-the-rent-and-rent-raise/",
+          "title": "Paying the rent and rent raise - KKV",
+          "publisher": "Finnish Competition and Consumer Authority",
+          "quote": "Claims should be submitted in written to the landlord.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:18.617Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 4,
+          "url": "https://www.kkv.fi/en/consumer-affairs/housing/rental-apartments/paying-the-rent-and-rent-raise/",
+          "title": "Paying the rent and rent raise - KKV",
+          "publisher": "Finnish Competition and Consumer Authority",
+          "quote": "Consumers and private individuals acting as landlords may also refer the matter to the Consumer Disputes Board for assessment.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:18.617Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        }
+      ],
+      "drafts": [],
+      "unverified": [],
+      "openQuestions": [
+        "Does your tenancy agreement contain a specific rent increase clause?",
+        "Is the landlord a private person or a company?",
+        "Was your tenancy agreement concluded on or after 1 October 2026?"
+      ],
+      "id": "k8MqZRTgt_iTjzRU",
+      "createdAt": "2026-11-14T23:20:18.617Z",
+      "updatedAt": "2026-11-14T23:20:18.617Z",
+      "trail": {
+        "ms": 6774,
+        "searches": 4,
+        "pagesRead": 2,
+        "costDollars": 0.028,
+        "officialDomains": 87,
+        "readers": {
+          "live": 2,
+          "exa": 2,
+          "oxylabs": 0
+        },
+        "events": [
+          {
+            "ms": 0,
+            "detail": "Pinned to Finland. Searching 87 official sites first."
+          },
+          {
+            "ms": 0,
+            "detail": "Exa search on official sites: actions and deadlines"
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: money and entitlements"
+          },
+          {
+            "ms": 2,
+            "detail": "Exa search on official sites: how and where to apply"
+          },
+          {
+            "ms": 5071,
+            "detail": "Exa search on official sites: pages published in the last four months"
+          },
+          {
+            "ms": 5071,
+            "detail": "Opening 2 cited pages: our own live request plus Exa Contents"
+          },
+          {
+            "ms": 6752,
+            "detail": "Checking every quote, amount and deadline against the page text"
+          },
+          {
+            "ms": 6774,
+            "detail": "Building the case file"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "at": "2026-11-14T23:20:18.617Z",
+          "kind": "read",
+          "trigger": "message",
+          "status": "done",
+          "summary": "Researched official sources: 4 searches, 2 pages read"
+        }
+      ]
+    },
+    {
+      "title": "Flight Cancellation Rights for Families",
+      "event": "flight_cancellation_rights_for",
+      "language": "en",
+      "jurisdiction": {
+        "country": "Finland",
+        "region": "Espoo"
+      },
+      "summary": "A family of three whose flight is cancelled is entitled to choose between a refund or re-routing and to receive care during the waiting period. You should request these options from the airline immediately and file a written complaint to seek potential standard compensation.",
+      "steps": [
+        {
+          "title": "Request refund or re-routing from airline",
+          "detail": "You must notify the airline if you choose to have your ticket refunded or re-routed instead of flying.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            1
+          ],
+          "due": "within seven days",
+          "id": "request-refund-or-re-routing-1"
+        },
+        {
+          "title": "Claim right to care during wait",
+          "detail": "The airline is obligated to provide care while you wait for your replacement flight.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            2
+          ],
+          "id": "claim-right-to-care-during-w-2"
+        },
+        {
+          "title": "Claim standard compensation from airline",
+          "detail": "You may be entitled to standard compensation depending on flight distance and re-routing delay, unless the cancellation was due to extraordinary circumstances.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            3
+          ],
+          "id": "claim-standard-compensation--3"
+        },
+        {
+          "title": "File written complaint with airline",
+          "detail": "Submit a written complaint to the operating airline using their website contact form and include copies of your ticket and receipts.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            5
+          ],
+          "id": "file-written-complaint-with--4"
+        },
+        {
+          "title": "Request refund within seven days if applicable",
+          "detail": "If you choose to receive a refund for your ticket, the airline is required to pay it within seven days.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            6
+          ],
+          "id": "request-refund-within-seven--5"
+        },
+        {
+          "title": "Choose between ticket refund or re-routing",
+          "detail": "You can choose to either receive a ticket refund within seven days or accept an alternative re-routed flight to your destination.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            7
+          ],
+          "id": "choose-between-ticket-refund-6"
+        }
+      ],
+      "money": [
+        {
+          "label": "“Standard compensation amounts vary from EUR 250 to EUR 600”",
+          "amount": "EUR 250 to EUR 600",
+          "evidence": [
+            4
+          ]
+        },
+        {
+          "label": "“If you choose to have the ticket price refunded, the airline must refund you within seven…”",
+          "amount": "seven days",
+          "evidence": [
+            6,
+            7
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "n": 1,
+          "url": "https://www.suomi.fi/citizen/moving-and-traveling/travel/guide/passenger-rights/passenger-rights-in-problem-situations",
+          "title": "Passenger rights in problem situations - Moving and travelling - Suomi.fi",
+          "publisher": "Suomi.fi",
+          "quote": "If the airline cancels your flight, you can demand rerouting or a refund of the price of your ticket within seven days.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:25.662Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 2,
+          "url": "https://www.kkv.fi/en/consumer-affairs/travel-and-accommodation/flights/flight-cancellation/",
+          "title": "Flight cancellation",
+          "publisher": "Finnish Competition and Consumer Authority",
+          "quote": "The airline must provide care for you while you are waiting for the re-routed trip.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:25.662Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 3,
+          "url": "https://www.kkv.fi/en/consumer-affairs/travel-and-accommodation/flights/flight-cancellation/",
+          "title": "Flight cancellation",
+          "publisher": "Finnish Competition and Consumer Authority",
+          "quote": "If the airline cancels your flight, you may have the right to standard compensation as set out in the Table below.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:25.662Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 4,
+          "url": "https://www.kkv.fi/en/consumer-affairs/travel-and-accommodation/flights/flight-cancellation/",
+          "title": "Flight cancellation",
+          "publisher": "Finnish Competition and Consumer Authority",
+          "quote": "Standard compensation amounts vary from EUR 250 to EUR 600",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:25.662Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 5,
+          "url": "https://www.ecc.fi/en/themes/travelling/air-travel/complaint-to-the-airline/",
+          "title": "Complaint to the airline - European Consumer Centre Finland",
+          "publisher": "ecc.fi",
+          "quote": "If the matter is not resolved on the spot, file a written complaint with the airline responsible for the flight, i.e., the airline operating the flight, as soon as possible.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:25.662Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 6,
+          "url": "https://www.kkv.fi/en/consumer-affairs/travel-and-accommodation/flights/flight-cancellation/",
+          "title": "Flight cancellation",
+          "publisher": "Finnish Competition and Consumer Authority",
+          "quote": "If you choose to have the ticket price refunded, the airline must refund you within seven days.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:25.662Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 7,
+          "url": "https://eur-lex.europa.eu/EN/legal-content/summary/eu-air-passenger-rights-in-case-of-denied-boarding-a-delayed-flight-or-a-cancelled-flight.html",
+          "title": "eur-lex.europa.eu",
+          "publisher": "European Union",
+          "quote": "reimbursement of the cost of the ticket within seven days or a return flight to the first point of departure or re-routing to their final destination;",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:25.662Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "exa"
+        }
+      ],
+      "drafts": [],
+      "unverified": [
+        "Claim standard compensation from airline: \"EUR 125 to EUR 600\" could not be matched to a sentence on the cited page (kkv.fi), so it is left out.",
+        "File written complaint with airline: \"approximately six weeks\" is on the cited page (ecc.fi), but not in a sentence about this step, so it is not shown with it."
+      ],
+      "openQuestions": [
+        "What is the operating airline's name?",
+        "What is the booking or flight reference number?",
+        "Did the airline inform you of the cancellation due to extraordinary circumstances?"
+      ],
+      "id": "y6YYq4bUCdm1Imo7",
+      "createdAt": "2026-11-14T23:20:25.662Z",
+      "updatedAt": "2026-11-14T23:20:25.662Z",
+      "trail": {
+        "ms": 7031,
+        "searches": 4,
+        "pagesRead": 5,
+        "costDollars": 0.028,
+        "officialDomains": 87,
+        "readers": {
+          "live": 4,
+          "exa": 5,
+          "oxylabs": 0
+        },
+        "events": [
+          {
+            "ms": 0,
+            "detail": "Pinned to Finland. Searching 87 official sites first."
+          },
+          {
+            "ms": 0,
+            "detail": "Exa search on official sites: actions and deadlines"
+          },
+          {
+            "ms": 0,
+            "detail": "Exa search on official sites: money and entitlements"
+          },
+          {
+            "ms": 0,
+            "detail": "Exa search on official sites: how and where to apply"
+          },
+          {
+            "ms": 5335,
+            "detail": "Exa search on official sites: pages published in the last four months"
+          },
+          {
+            "ms": 5335,
+            "detail": "Opening 5 cited pages: our own live request plus Exa Contents"
+          },
+          {
+            "ms": 6037,
+            "detail": "Checking every quote, amount and deadline against the page text"
+          },
+          {
+            "ms": 7030,
+            "detail": "Building the case file"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "at": "2026-11-14T23:20:25.662Z",
+          "kind": "read",
+          "trigger": "message",
+          "status": "done",
+          "summary": "Researched official sources: 4 searches, 5 pages read"
+        }
+      ]
+    },
+    {
+      "title": "Registering for unemployment",
+      "event": "registering_for_unemployment",
+      "language": "en",
+      "jurisdiction": {
+        "country": "Finland",
+        "region": "Espoo"
+      },
+      "summary": "You must register as a jobseeker with your municipal employment services no later than your first day of unemployment to qualify for benefits. Once registered, apply for unemployment benefits from your fund or Kela after at least two weeks of unemployment.",
+      "steps": [
+        {
+          "title": "Register as a jobseeker",
+          "detail": "Register as a jobseeker through the Job Market Finland E-services. If you cannot use the online service or do not have a Finnish personal identity code, visit an Espoo Employment Services office in person.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            1,
+            2,
+            3
+          ],
+          "due": "no later than your first day of unemployment",
+          "id": "register-as-a-jobseeker-1"
+        },
+        {
+          "title": "Apply for unemployment benefits",
+          "detail": "Apply for unemployment benefit from your unemployment fund if you are a member, or from Kela if you are not. You can submit the application after you have been unemployed for at least two weeks.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            4
+          ],
+          "due": "after you have been unemployed for at least two weeks",
+          "id": "apply-for-unemployment-benef-2"
+        }
+      ],
+      "money": [
+        {
+          "label": "“You can get general social security benefit from Kela after you have been registered as…”",
+          "amount": "7 working days",
+          "evidence": [
+            5
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "n": 1,
+          "url": "https://tyomarkkinatori.fi/en/instructions-and-support/personal-customers/instructions-for-the-e-services-at-job-market-finland/start-of-job-search",
+          "title": "tyomarkkinatori.fi",
+          "publisher": "tyomarkkinatori.fi",
+          "quote": "You can register as a job seeker before your unemployment or lay-off begins, but do so no later than on your first day of unemployment, because you can only receive unemployment benefits from the registration date.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:34.228Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 2,
+          "url": "https://tyomarkkinatori.fi/en/personal-customers/information-about-working-life/situations/i-have-been-laid-off",
+          "title": "I have been laid off - Situation-based information - Job Market Finland",
+          "publisher": "tyomarkkinatori.fi",
+          "quote": "If you are laid off, register as a job seeker in the E-services at Job Market Finland no later than the first day of your lay-off period.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:34.228Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 3,
+          "url": "https://www.espoo.fi/en/services/registering-jobseeker",
+          "title": "Registering as a jobseeker | City of Espoo",
+          "publisher": "City of Espoo",
+          "quote": "Remember to register as a jobseeker no later than your first day of unemployment, as unemployment benefits can only be paid from the date of registration onwards.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:34.228Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 4,
+          "url": "https://infofinland.fi/work-and-enterprise/if-you-become-unemployed",
+          "title": "If you become unemployed",
+          "publisher": "InfoFinland",
+          "quote": "Apply for unemployment benefit from the unemployment fund or Kela after you have been unemployed for at least two weeks.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:34.228Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 5,
+          "url": "https://www.kela.fi/if-you-become-unemployed",
+          "title": "If you become unemployed | Our Services | Kela",
+          "publisher": "Kela",
+          "quote": "You can get general social security benefit from Kela after you have been registered as an unemployed jobseeker with the employment services for at least 7 working days.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:34.228Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        }
+      ],
+      "drafts": [],
+      "unverified": [],
+      "openQuestions": [
+        "Were you dismissed for financial or production-related reasons, or laid off?",
+        "Are you 55 years of age or older?",
+        "Are you a member of an unemployment fund?"
+      ],
+      "id": "hEPWCj8qzJJerciH",
+      "createdAt": "2026-11-14T23:20:34.228Z",
+      "updatedAt": "2026-11-14T23:20:34.228Z",
+      "trail": {
+        "ms": 8553,
+        "searches": 4,
+        "pagesRead": 5,
+        "costDollars": 0.028,
+        "officialDomains": 87,
+        "readers": {
+          "live": 5,
+          "exa": 5,
+          "oxylabs": 0
+        },
+        "events": [
+          {
+            "ms": 0,
+            "detail": "Pinned to Finland. Searching 87 official sites first."
+          },
+          {
+            "ms": 0,
+            "detail": "Exa search on official sites: actions and deadlines"
+          },
+          {
+            "ms": 0,
+            "detail": "Exa search on official sites: money and entitlements"
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: how and where to apply"
+          },
+          {
+            "ms": 6831,
+            "detail": "Exa search on official sites: pages published in the last four months"
+          },
+          {
+            "ms": 6831,
+            "detail": "Opening 5 cited pages: our own live request plus Exa Contents"
+          },
+          {
+            "ms": 8370,
+            "detail": "Checking every quote, amount and deadline against the page text"
+          },
+          {
+            "ms": 8553,
+            "detail": "Building the case file"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "at": "2026-11-14T23:20:34.228Z",
+          "kind": "read",
+          "trigger": "message",
+          "status": "done",
+          "summary": "Researched official sources: 4 searches, 5 pages read"
+        }
+      ]
+    },
+    {
+      "title": "Moving house in Espoo checklist",
+      "event": "moving_house_in_espoo",
+      "language": "en",
+      "jurisdiction": {
+        "country": "Finland",
+        "region": "Espoo"
+      },
+      "summary": "Moving within Finland requires submitting an official change-of-address notification to the Digital and Population Data Services Agency and Posti. You must also terminate your current rental and utility agreements and notify your house manager if applicable. All notifications should be made well before your move date to ensure services transition correctly.",
+      "steps": [
+        {
+          "title": "Submit notification of move to DVV and Posti",
+          "detail": "You must notify the Digital and Population Data Services Agency (DVV) and Posti of your new address to ensure your information is updated in the Population Information System and your mail is delivered correctly.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            1
+          ],
+          "due": "within a week of your move at the latest",
+          "id": "submit-notification-of-move--1"
+        },
+        {
+          "title": "Terminate your current rental agreement",
+          "detail": "If you live in a rental dwelling, you must terminate your lease agreement in writing well in advance, usually giving one month's notice.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            2
+          ],
+          "id": "terminate-your-current-renta-2"
+        },
+        {
+          "title": "Notify the house manager of your move",
+          "detail": "If you live in a block of flats or a terraced house, notify the house manager of your move so they can update your name on the door and resident list.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            3
+          ],
+          "id": "notify-the-house-manager-of--3"
+        },
+        {
+          "title": "Handle electricity contract for your move",
+          "detail": "Contact your energy company to terminate your old electricity contract and arrange a new one for your new address.",
+          "status": "todo",
+          "confidence": "high",
+          "evidence": [
+            4
+          ],
+          "due": "before you move",
+          "id": "handle-electricity-contract--4"
+        }
+      ],
+      "money": [],
+      "evidence": [
+        {
+          "n": 1,
+          "url": "https://www.suomi.fi/citizen/moving-and-traveling/migration/guide/notification-of-move/how-to-submit-a-notification-of-move",
+          "title": "How to submit a notification of move - Moving and travelling - Suomi.fi",
+          "publisher": "Suomi.fi",
+          "quote": "However you must take care of that the notification has been received by the Digital and Population Data Services Agency within a week of your move at the latest.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:46.751Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 2,
+          "url": "https://infofinland.fi/housing/moving-house",
+          "title": "InfoFinland - Moving house",
+          "publisher": "InfoFinland",
+          "quote": "If you live in a rental dwelling, remember to give notice well in advance.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:46.751Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 3,
+          "url": "https://infofinland.fi/housing/moving-house",
+          "title": "InfoFinland - Moving house",
+          "publisher": "InfoFinland",
+          "quote": "If you live in a block of flats or in a terraced house, always remember to also notify the house manager (isännöitsijä) about your move.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:46.751Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        },
+        {
+          "n": 4,
+          "url": "https://infofinland.fi/housing/moving-house",
+          "title": "InfoFinland - Moving house",
+          "publisher": "InfoFinland",
+          "quote": "Terminate your old electricity contract before you move and make a new one.",
+          "sourceType": "official",
+          "fetchedAt": "2026-11-14T23:20:46.751Z",
+          "verification": "verified",
+          "match": 1,
+          "checkedVia": "live"
+        }
+      ],
+      "drafts": [],
+      "unverified": [],
+      "openQuestions": [
+        "Are you moving from a rental dwelling?",
+        "Do you live in a block of flats or terraced house?",
+        "Are you receiving any benefits from Kela, such as housing allowance or unemployment benefits?"
+      ],
+      "id": "UZd1CN9xIJWK7zz-",
+      "createdAt": "2026-11-14T23:20:46.751Z",
+      "updatedAt": "2026-11-14T23:20:46.751Z",
+      "trail": {
+        "ms": 12501,
+        "searches": 4,
+        "pagesRead": 4,
+        "costDollars": 0.028,
+        "officialDomains": 87,
+        "readers": {
+          "live": 4,
+          "exa": 4,
+          "oxylabs": 0
+        },
+        "events": [
+          {
+            "ms": 1,
+            "detail": "Pinned to Finland. Searching 87 official sites first."
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: actions and deadlines"
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: money and entitlements"
+          },
+          {
+            "ms": 1,
+            "detail": "Exa search on official sites: how and where to apply"
+          },
+          {
+            "ms": 7754,
+            "detail": "Exa search on official sites: pages published in the last four months"
+          },
+          {
+            "ms": 7755,
+            "detail": "Opening 4 cited pages: our own live request plus Exa Contents"
+          },
+          {
+            "ms": 12476,
+            "detail": "Checking every quote, amount and deadline against the page text"
+          },
+          {
+            "ms": 12501,
+            "detail": "Building the case file"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "at": "2026-11-14T23:20:46.751Z",
+          "kind": "read",
+          "trigger": "message",
+          "status": "done",
+          "summary": "Researched official sources: 4 searches, 4 pages read"
+        }
+      ]
+    }
+  ]
+}

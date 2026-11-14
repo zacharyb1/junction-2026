@@ -21,7 +21,7 @@ jobs:
       - run: python3 -m unittest discover -s hermes -p 'test_*.py'
       - run: python3 -m unittest discover -s containers/hermes -p 'test_*.py'
       - run: python3 -m unittest discover -s containers/gate -p 'test_*.py'
-      - run: node --test scripts/verify.test.mjs scripts/cases.test.mjs scripts/restore-cases.test.mjs scripts/check-recorded-cases.test.mjs
+      - run: node --test scripts/verify.test.mjs scripts/cases.test.mjs scripts/restore-cases.test.mjs scripts/check-recorded-cases.test.mjs scripts/recorded-seed.test.mjs
       - run: pnpm test
       - run: pnpm lint
       - run: pnpm typecheck
