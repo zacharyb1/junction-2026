@@ -61,6 +61,10 @@ function PlanRow({ line }: { line: PlanLine }) {
           <span className="l-num">
             <span className="sr-only">source </span>
             {source.n}
+            <svg className="l-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path className="l-expand-vertical" d="M12 5v14" />
+            </svg>
           </span>
         </summary>
         <div className="l-quote">

@@ -1,11 +1,13 @@
 import { Arrow } from "@/components/landing/glyphs";
 import { TryLink } from "@/components/landing/try-link";
+import { InkReveal } from "@/components/landing/reading-motion";
+import { ReadingPlate } from "@/components/landing/reading-plates";
 
 export function SiteFooter({ repoUrl }: { repoUrl: string | null }) {
   return (
     <footer className="l-footer">
       <div className="l-wrap">
-        <p className="l-footer-title">A next step you can check.</p>
+        <p className="l-footer-title">A next step you can <span className="l-footer-mark">check.<InkReveal className="l-footer-ink"><ReadingPlate name="next-underline" className="reading-ink-inner" /></InkReveal></span></p>
         <TryLink className="l-action l-action--primary">Try it in the browser <Arrow /></TryLink>
         <div className="l-footer-row">
           <p>Built at Junction 2026 for the Exa challenge.</p>

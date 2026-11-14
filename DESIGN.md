@@ -126,6 +126,10 @@ components:
   button-hover:
     backgroundColor: '{colors.cranberry-hover}'
     textColor: '{colors.paper}'
+  annotation-replay:
+    backgroundColor: transparent
+    textColor: '{colors.cranberry}'
+    padding: .4rem 0 .4rem .5rem
   hero-primary:
     backgroundColor: '{colors.cranberry}'
     textColor: '{colors.paper}'
@@ -174,7 +178,7 @@ This system applies only to the landing route `/`, implemented in `src/app/page.
 - One continuous ivory reading surface with calm rules and occasional inset specimens.
 - Dark literary headings, readable prose, sans factual metadata and handwritten marginal notes.
 - A plan and its exact source sentence remain visibly paired.
-- A single ink trace follows the plan-to-source relationship; the words remain immediately readable.
+- An ink sequence follows the headline, case, plan and source; the words remain immediately readable.
 - Real local paper and ink plates; all words, controls and table data are semantic HTML.
 
 ## Colors
@@ -237,7 +241,7 @@ The paper asset is a clean 55 × 150 sample from the approved composition, mirro
 
 The reading surface and rules are square and open. Trust specimens have the small `specimen` radius. Lower actions have the `action` radius; hero actions use a container-relative radius in portrait and `hero-action-wide` in the spread. The soft circle, bracket and arrows are physical artwork with irregular edges, not generic geometric decoration. Source numerals are plain cranberry text, not checkbox states.
 
-Interface icons use Lucide SVG geometry: navigation arrows, calendar, location, check, cross and attention. Lower-page icon strokes are 1.75 units; hero location and calendar strokes are 2. These icons support adjacent words and are hidden from assistive technology when decorative.
+Interface icons use Lucide SVG geometry: navigation arrows, replay, calendar, location, check, cross and attention. Source rows use a simple two-stroke SVG expansion sign, with its vertical stroke collapsing in the open state. Lower-page icon strokes are 1.75 units; hero location and calendar strokes are 2. These icons support adjacent words and are hidden from assistive technology when decorative.
 
 ## Components
 
@@ -245,8 +249,10 @@ Interface icons use Lucide SVG geometry: navigation arrows, calendar, location, 
 Substantial serif links with softened corners.
 - **Primary:** cranberry fill and paper text. **Secondary:** transparent paper ground, cranberry text and a cranberry border. Lower actions use the frontmatter padding and a minimum height of 48px; hero actions fill their positioned region with a minimum height of 44px.
 - **Hover:** both variants use deep cranberry with paper text. With no reduced-motion preference, colors transition over 160ms; action arrows move 3px toward their destination over 180ms using `cubic-bezier(.16,1,.3,1)` on hover or keyboard focus. The hero source-link arrow shares that movement. Reduced motion keeps the color feedback immediate and the arrows still. The controls themselves do not move.
-- **Focus:** links and summaries receive a 3px cranberry outline with a 5px offset. Preserve this visible state on both action variants.
+- **Focus:** links, buttons and summaries receive a 3px cranberry outline with a 5px offset. Preserve this visible state on both action variants.
 - **Routing:** browser actions use `TryLink`, preserving an incoming access-code query value. With no configured sample route, the secondary hero action links to the on-page sample plan and names that destination truthfully.
+
+**Replay annotations** is a quiet, underlined Inter button at .75rem and weight 500 beside the wordmark, with a 44px minimum target and a 15px replay icon. It appears only after the required browser APIs, fonts and five hero plates are ready, and only without a reduced-motion preference. Clicking restarts the annotation sequence from the beginning; repeated clicks cancel the previous run safely. Its icon rotates -45 degrees over 250ms on hover or keyboard focus, while its text and target stay still.
 
 ### Navigation
 Underlined cranberry links in Inter sit after the conversation. Their flex row wraps, with 1.5rem gaps and 44px minimum link height. There is no fixed or overlay navigation. Ordinary source links also stay underlined; hover increases underline thickness. External links announce a new tab in accessible text.
@@ -260,9 +266,11 @@ Trust specimens use inset paper, small corners and 1.5rem padding. An opened sou
 ### Source disclosures
 A plan row is a native `details`/`summary`, with the plan text and timing on the left and source number plus expansion sign on the right. The shared disclosure name allows one open row; source 5 starts open. Hover underlines the plan in cranberry. An open row keeps its title cranberry and its source numeral at weight 700. The opened quote has an inset paper ground and a 1px cranberry rule, its publisher and host, and a link to the exact source. The hero's source-5 quote is always visible rather than an expandable control.
 
-With no reduced-motion preference, opening a quote runs a sharp 240ms reveal using `cubic-bezier(.16,1,.3,1)`, settling from a -2px vertical offset while its lower 14% is briefly clipped. Reduced motion omits that animation and keeps the open-state color and inset. Expansion signs are supplemental affordances; native semantics carry the open state.
+With no reduced-motion preference, browsers supporting `interpolate-size:allow-keywords` and `details::details-content` expand and collapse the native content block over 320ms using `cubic-bezier(.16,1,.3,1)`. Other browsers retain a sharp 240ms opening reveal, settling from a -2px vertical offset while its lower 14% is briefly clipped. The SVG expansion sign's vertical stroke collapses over 280ms, and the plan title's color changes over 180ms. Reduced motion makes these state changes immediate while keeping the open-state color and inset. Expansion signs are supplemental affordances; native semantics carry the open state and work without JavaScript.
 
-The hero has one progressive decorative sequence in `ReadingMotion`: the plan highlight draws across, the supporting bracket draws down, then the quote highlight draws across. Its overlapping strokes finish within 720ms using the same ease. It starts once when at least 45% of the quote is visible and the relevant plates and fonts are ready; a 200ms readiness budget skips playback when assets or fonts are still loading. Text and controls never wait on this sequence. The server-rendered marks are complete by default; missing browser APIs, failed or slow assets, no JavaScript and reduced motion all preserve that static view. Preference changes cancel playback and restore the finished marks. There is no loop, scroll scrubbing or replay control.
+The hero has one progressive decorative sequence in `ReadingMotion`: the headline highlight draws across (0–500ms), the sample-case circle follows (350–850ms), then the plan highlight (750–1150ms), the supporting bracket downward (1000–1500ms) and the quote highlight (1350–1800ms). Its overlapping strokes use `cubic-bezier(.16,1,.3,1)`. Automatic playback happens once when at least 45% of the quote is visible and the relevant plates and fonts are ready; a 1500ms readiness limit from the first eligible view skips late automatic playback. The explicit replay button remains available after slow assets finish loading. Text and controls never wait on this sequence. The server-rendered marks are complete by default; missing browser APIs, failed assets, no JavaScript and reduced motion all preserve that static view. Leaving the hero, hiding the document or enabling reduced motion cancels playback and restores the finished marks. There is no loop or scroll scrubbing.
+
+The next-chapter underline and the underline beneath the closing word “check.” each use `InkReveal`: a single 650ms stroke across when at least 45% of the mark reaches the reading area, inset 64px from the viewport bottom. They reuse the existing underline plate without changing its geometry. Each requires ready artwork and fonts within the same 1500ms limit; it cancels on leaving the reading area, document hiding or reduced motion. Completed marks stay visible and do not replay on scrolling back.
 
 ### Conversation and evidence table
 The conversation is readable prose with named speakers, a handwritten stage direction and a cranberry bot reply. Its caption explicitly identifies an example. The plan and quotes come from `src/data/sample-case.json`; decorative marks do not change their meaning.
