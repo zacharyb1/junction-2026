@@ -12,7 +12,7 @@ ARG NEXT_PUBLIC_BOT_USERNAME=""
 ARG NEXT_PUBLIC_SAMPLE_CASE_ID=""
 ARG NEXT_PUBLIC_REPO_URL=""
 ENV KAVERI_STANDALONE=1
-RUN pnpm lint && pnpm typecheck && pnpm build
+RUN node scripts/prepare-recorded-seed.mjs && pnpm lint && pnpm typecheck && pnpm build
 
 FROM docker.io/library/node:22-bookworm-slim AS runtime
 WORKDIR /app
@@ -20,10 +20,12 @@ ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0 PORT=3000
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 COPY --from=build --chown=node:node /app/public ./public
+COPY --from=build --chown=node:node /app/recorded-case-seed ./recorded-case-seed
+COPY --from=build --chown=node:node /app/scripts/restore-cases.mjs /app/scripts/restore-recorded-seed.mjs ./scripts/
 # A new named volume inherits this directory's ownership, allowing non-root writes.
 RUN mkdir -p .data/cases && chown -R node:node .data
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "node scripts/restore-recorded-seed.mjs && exec node server.js"]
