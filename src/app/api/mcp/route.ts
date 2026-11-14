@@ -4,6 +4,7 @@ import { CaseInput, CasePatch } from "@/lib/case";
 import { baseUrl, isAuthorised, loadCase, publishCase, recheckCase, updateCase } from "@/lib/cases";
 import { findGifts, GiftInput } from "@/lib/engine/gifts";
 import { EngineError, ResearchInput, researchCase } from "@/lib/engine/research";
+import { DemoCallInput, getDemoCall, prepareDemoCall, startDemoCall } from "@/lib/demo-calls";
 
 export const maxDuration = 300;
 
@@ -18,6 +19,47 @@ const text = (value: unknown) => ({
  */
 function handlerFor(origin: string) {
   return createMcpHandler((server) => {
+    server.registerTool(
+      "prepare_demo_call",
+      {
+        title: "Prepare a demo phone call",
+        description: "Prepare a real phone call to the operator's configured test recipient, for any everyday task or important update. " +
+          "Purchases, bookings and payments are role-play. Pass relevant preferences from this chat's memory or conversation. " +
+          "This does not dial. Show the returned proposal and wait for the person's next reply confirming it; do not start in the same turn. " +
+          "If unavailable, report the missing configuration instead of pretending to call.",
+        inputSchema: DemoCallInput,
+      },
+      async (input) => text(await prepareDemoCall(input)),
+    );
+    server.registerTool(
+      "start_demo_call",
+      {
+        title: "Start the confirmed demo call",
+        description: "Use only after the person has replied Yes to the exact prepare_demo_call proposal in a subsequent turn. " +
+          "An initial request to call is not confirmation. For changes, prepare and confirm a new proposal. " +
+          "Dials only the configured test phone; purchases/payments remain simulated. Never retry an unknown result with a new proposal.",
+        inputSchema: z.object({ id: z.string(), confirmed: z.boolean().describe("True only after the person confirmed this exact proposal in their next reply.") }),
+      },
+      async ({ id, confirmed }) => text(await startDemoCall(id, confirmed)),
+    );
+    server.registerTool(
+      "get_demo_call",
+      {
+        title: "Read a demo call result",
+        description: "Read the real calling provider's status and conversation summary. After starting, acknowledge dialing then call this with wait_seconds=60. " +
+          "Report finished only when returned; always explain that any purchase or payment was simulated. If still in progress, offer to check again.",
+        inputSchema: z.object({ id: z.string(), wait_seconds: z.number().int().min(0).max(60).default(0) }),
+      },
+      async ({ id, wait_seconds }) => {
+        const until = Date.now() + wait_seconds * 1000;
+        let result = await getDemoCall(id);
+        while (result.status === "in_progress" && Date.now() + 3000 < until) {
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          result = await getDemoCall(id);
+        }
+        return text(result);
+      },
+    );
     server.registerTool(
       "research_case",
       {

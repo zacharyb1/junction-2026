@@ -225,6 +225,18 @@ Response `200`:
 - `image` is the product page's own preview image from the same Exa result (https only), absent when the page has none. `GET /api/gifts/image?url=<product url>` returns it for a product the search found (no access code: it only reads what the search stored, in memory until a restart); the `/chat` page shows it above that product link.
 - Products that arrive in time come first. The bot never orders or pays: `url` is for the person to open.
 
+## Demo phone tools
+
+These authenticated MCP tools call one operator-configured test phone through ElevenLabs/Twilio. They do not place real orders or move money. [Setup and rehearsal](DEMO_CALLS.md).
+
+| Tool | Input | Returns |
+|---|---|---|
+| `prepare_demo_call` | `{ task, preferences? }`; task max 1,200 characters, preferences max 800 | A persisted `proposed` call with id, exact task/preferences, recipient label, phone ending and demo notice; or `unavailable` with missing configuration. Does not dial. |
+| `start_demo_call` | `{ id, confirmed }` | Starts only a confirmed proposal for the currently configured test number. Returns `in_progress`, `failed` or `unknown`; may return `needs_confirmation`, `needs_new_proposal`, `not_found`, `already_started` or `unavailable`. |
+| `get_demo_call` | `{ id, wait_seconds? }`; 0–60, default 0 | Stored status, optionally waiting for the provider's summary. Terminal states are `finished` or `failed`, with provider `outcome` (`success`, `failure`, `unknown`) and summary when available. A finished call is not proof of a real purchase. |
+
+Confirmation is conversational: the runtime must show the exact proposal and wait for a new Yes before passing `confirmed: true`. It is not an independently authenticated human approval endpoint. The full phone number and provider conversation ID stay in private `.data/demo-calls`. An exclusive persisted claim prevents dialing the same proposal twice; an uncertain provider response is never automatically redialed. Setup remains opt-in, and web tools require the additional `KAVERI_DEMO_CALLS=1` setting.
+
 ## Case tools
 
 MCP tools on the same server, REST equivalents in brackets:
