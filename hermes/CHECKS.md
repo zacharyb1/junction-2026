@@ -13,28 +13,40 @@ Hermes v0.23.1 (commit `3b421578`), installed by `hermes/setup-local.sh`. Model 
 | U1 release versus docs | v0.23.1 has `allow_silence`, `pre_gateway_dispatch`, `clarify_timeout`, `channel_overrides`, `skills.auto_load`, `tools.tool_search`. No key from the snippet was refused. |
 | U2 tool prefix | Double underscore, as the runbook says: `mcp__casefile__research_case` registered and called. |
 | U3 `allow_silence` in a Telegram group | Works. Before Part 2: `silence marker rejected on a user turn` and a Hermes notice in the chat. After: `Suppressing intentional silence marker`, nothing sent. |
-| U4 acknowledgement | Nemotron writes it when told to in `SOUL.md`. 12 of 12 rehearsal runs opened with "On it, ...". In the group one first line was a question. Not timed against the 5-second target: the first model call took 2 to 12 s. |
+| U4 acknowledgement | 12 of 12 CLI rehearsal runs opened with "On it, ...". In the live group, stored timestamps show acknowledgements after 3 s for streaming price and 4 s for laid off; the latter also asked a question. Photo acknowledgement took 12 s. The text samples meet the 5-second target; the photo sample does not. Telegram delivery latency was not measured independently. |
 | U7 Exa MCP server | `hermes mcp test exa` lists `web_search_advanced_exa` and `web_fetch_exa` (and four resource and prompt helpers). Never called in a turn: `research_case` did not fail. |
 | U8 `hermes config set` | Every command in `hermes/configure.sh` was accepted. `telegram.allowed_chats` is stored as a string holding a JSON list, which the adapter decodes. The group flow works with it. |
 | U10 slash commands | `allow_admin_from` works: `/sethome` from a non-admin was refused with a visible line. |
 | `clarify` buttons in a group | Work: country question and next-step buttons were answered by tapping. |
-| Letter photo | Works with Nemotron: `Image routing: native (model supports vision)`, one photo, all fields read, two street names misspelt. |
-| `pre_gateway_dispatch` | Works: the gate skipped four small-talk messages in the live group with no model call. |
+| Letter photo | Works with Nemotron: `Image routing: native (model supports vision)`, one photo, all six field categories covered, two street names misspelt. Plan appeared 33 s after the stored incoming message. This does not establish exact transcription accuracy. |
+| `pre_gateway_dispatch` | At 02:20–02:30 the gate skipped 6 of 7 small-talk messages before a cloud call (2.9–4.1 s each). One false wake reached Nemotron, which stayed silent. The next three triggers used the 180-second open window, so they do not measure independent classification. Photo and reminder requests exercised the media and addressed rules. |
 | A second profile (`hermes profile create X --clone`) | Copies `.env` with the bot token. The running gateway then serves it too. `eval/bot/rehearse.py` strips the `TELEGRAM_` lines. |
 
 Not run: U5 (guest mode), U6 (the consent note was not looked for), reminder delivery and catch-up after sleep (U11), the daily change watch, Mode B in a live chat, PDFs (U13), `scope` (U14), a direct message from an account outside `TELEGRAM_ALLOWED_USERS`, voice.
 
-## Continuation checks, Sat 02:37
+## Continuation checks, Sat 02:37–02:42
 
 - Gateway and repository-root engine processes are alive; localhost returns HTTP 200.
-- Prior session deleted the isolated engine and its local cases during the switch to the root engine. The 02:30 reminder was created after two failed case updates (`No case with id …`); its link is broken. Reminder delivery was not tested.
+- Prior session deleted the isolated engine and its local cases during the switch to the root engine. The 02:30 reminder was created after two failed case updates (`No case with id …`); its link was broken at this checkpoint. Later recovery is recorded below. Reminder delivery was not tested.
 - The 02:36 washing-machine message arrived in the **group**, reused an earlier plan without `research_case`, and linked to a case whose API returns HTTP 404. This does not pass the DM milestone.
-- The full 20-message silence check (at least five questions) and three consecutive pregnancy triggers remain unconfirmed.
+- At 02:36:26 the gate used `patterns:trigger` for the washing-machine message. A Gemma-only trigger outside the open window remains unmeasured live.
+- Vlad replaced tonight's broad 20-message silence run and repeated pregnancy triggers with a focus on repeatable selected scenarios. The team will choose concrete demo scenarios later. The larger live set is not a remaining requirement tonight.
 - At 02:42 the private Helsinki-to-Tampere move turn called `research_case`: all four plan lines, the 5/5 evidence count and URL match the Telegram reply. Both the case page and API returned HTTP 200. The approved draft was saved through `case_update` and confirmed in the stored case. DM milestone passes against the local engine.
 - DM timing from database timestamps: acknowledgement 12.4 s, plan 32.1 s, draft completion 49.2 s including approval. The five-second acknowledgement target failed.
 - See `docs/HERMES_HANDOVER.md` for the current state, commands and outstanding checks.
 
-## UNVERIFIED: test these first
+## Local recovery and follow-up checks
+
+- Restored the exact rent-letter case from a complete recorded `case_get` response, retaining its six steps and evidence. Page and API both changed from HTTP 404 to HTTP 200. Four other missing cases had only summary responses; they were not reconstructed.
+- Saved `2026-11-30` on the existing “Submit a written objection” step through the authenticated local API and read it back. Retained the existing reminder for 28 November at 09:00 with its delivery destination and `catch_up` setting unchanged; the job name now carries the case ID. The link works. No message was delivered; reminder delivery and catch-up remain untested.
+- Missing-case reminder rehearsal: 7.8 s in an isolated CLI profile; only `case_get` was called, and no cron job was created.
+- Stale-case follow-up rehearsal: 30.5 s in an isolated CLI profile; `case_get` found the missing case, `research_case` created a fresh case, and its page and API returned HTTP 200. The original missing case was not falsely reused.
+- Case preservation: `node --test hermes/preserve-cases.test.mjs` passed all eight tests. The fixtures cover engine-directory migration, exact backups, repeated startup, conflicting versions, and recovery from a unique archive after the old engine is deleted. Current files are not overwritten; ambiguous recovery stops for manual selection.
+- Adopted the chat-scoped daily-watch template in the skill and runbook. No live daily watch was enabled or tested.
+
+## Original documentation checklist
+
+This table records the questions and suggested checks from the initial documentation review. The live results above supersede its original "not run" or "not in the snippet" descriptions; it is not a fresh list of mandatory tests tonight.
 
 | # | Item | Why it is not confirmed | What to test |
 |---|---|---|---|
@@ -179,3 +191,9 @@ Not run: U5 (guest mode), U6 (the consent note was not looked for), reminder del
 | `vision_analyze` | `reference/tools-reference.md:302`, `user-guide/features/vision.md:222` |
 
 `research_case` input fields (`situation`, `country`, `region`, `language`, `household`, `document`, `depth`, `scope`) and limits were read from `src/lib/engine/research.ts`. Draft and step fields (`title`, `kind`, `body`, `owner`, `due`, `status`) were read from `src/lib/case.ts`.
+
+Current isolated repair rehearsals: missing-case reminder 7.8 s, only `case_get`, no cron job; stale-case recovery 30.5 s and two fresh repetitions 31.6/28.2 s, all case API/page checks passed. Exa total $0.063. See `eval/results/rehearse-hardening-20261114T*.json`. This was not a Telegram delivery test; one reply added an extra summary after its plan.
+
+Current implementation validation: lint, type checking, production build, eight storage-preservation tests and four rehearsal-link tests passed in an isolated copy; the running engine build was left untouched. CI now runs both regression suites.
+
+Isolated reminder creation/duplicate check: one job created (38.0 s), repeat reused it without creation (15.8 s). Test job removed; no delivery performed. Missing approver name correctly delayed scheduling. ID-only fixture did not establish reminder link formatting.

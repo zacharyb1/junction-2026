@@ -34,16 +34,16 @@ bash hermes/stop.sh
 
 Then follow the runbook from step 10 (direct message test). After `/sethome` in the family group, step 12 is one command: `bash hermes/configure.sh --group <CHAT_ID>`, then stop and start.
 
-- **Local case data:** preserve `.data/cases` in the engine working directory when moving the engine or deleting an isolated checkout. Earlier test cases were lost during such a switch; see `docs/HERMES_HANDOVER.md`.
+- **Local case data:** startup migrates missing cases from an old engine and keeps exact backups in `.hermes-local/case-backups/`; shutdown snapshots after stopping the engine. Existing cases are never overwritten. Conflicting versions are preserved and reported; an ambiguous recovery stops for inspection. Keep this backup directory when moving the bot. Earlier test cases were lost during an engine switch; see `docs/HERMES_HANDOVER.md`.
 - **One poller per bot token.** The keys repo shares one `TELEGRAM_BOT_TOKEN`. Before you start, make sure nobody else's copy is running, or one of the two fails with `Telegram polling conflict`.
 - **Secrets** live only in `.hermes-local/home/.env` and `.env.local`, both git-ignored. `bash hermes/secrets.sh --status` shows which names are set and never prints values. A value entered there goes through the keys repo's `./put` (hidden input) and is pushed to the team.
 - **If the install is interrupted**, run `bash hermes/setup-local.sh` again. It continues from the stage that failed.
 - **Do not move or rename the repository folder** after installing: Hermes' launcher stores absolute paths. Move it, then delete `.hermes-local/agent` and install again.
-- **Remove everything:** `bash hermes/stop.sh && rm -rf .hermes-local .env.local`. The gate's container image is the only thing stored elsewhere: `podman rmi docker.io/ollama/ollama:0.40.16`.
+- **Remove the runtime:** first run `bash hermes/stop.sh` and copy `.hermes-local/case-backups/` somewhere outside the checkout. Then remove `.hermes-local` and `.env.local`. Keep `.data/cases` if you need existing case links. The gate's container image is stored separately (`podman rmi docker.io/ollama/ollama:0.40.16`).
 
 The gate (a small local Gemma that drops small talk before any cloud call) has its own section below.
 
-**Rehearse a scenario without Telegram:** `python3 eval/bot/rehearse.py "I'm pregnant, due in May."` runs the message three times through the same agent, in a Hermes profile of its own, and prints time, tools called and the first line of each reply. `-f eval/bot/scenarios.txt` runs the four messages that are known to work. It is a direct chat, so it does not test silence or the gate.
+**Rehearse a scenario without Telegram:** `python3 eval/bot/rehearse.py "I'm pregnant, due in May."` runs the message three times through the same agent, in a Hermes profile of its own, and prints time, tools called and the first line of each reply. Each case link is checked against both its stored-case API and page; broken links fail the run. `-f eval/bot/scenarios.txt` runs the four previously rehearsed messages. It is a direct chat, so it does not test silence or the gate.
 
 **What differs from the long runbook below**
 - Steps 1, 2, 5 to 8 and 12 are done by `setup-local.sh`, `secrets.sh` and `configure.sh`. There is no `hermes model` or `hermes gateway setup` step.
@@ -269,29 +269,37 @@ In the group:
 3. On the laptop: `cat ~/.hermes/memories/MEMORY.md`. Expect the household entry and the consent entry (`memory.md:20`, `:71-78`).
 4. Send `/new --yes`. Memory is put into the prompt only when a session starts (`memory.md:57`).
 
-### 14. Test Mode A, then decide
+### 14. Rehearse selected scenarios
 
 Mode A is what Part 1 and Part 2 give you: every group message reaches the model and it answers `[SILENT]` unless a trigger applies (`telegram.md:722-735`).
 
-1. From the second account send 20 ordinary messages. Make at least five of them questions (`what's for dinner?`, `did you buy milk?`, `who picks up the kids?`). Expect: nothing from the bot. Not a notice, not a reaction.
-2. Send `I'm pregnant`. Expect the acknowledgement within 5 seconds and the plan within about 30 seconds.
+1. Select the demo scenarios with the team. Tonight's broad 20-message silence run was cancelled in favour of repeatable selected scenarios. Existing live evidence and its limits are in `docs/HERMES_HANDOVER.md`.
+2. Start a fresh conversation and send the selected trigger. Expect an acknowledgement, then a sourced plan. About 5 seconds to acknowledge remains a target, not a proven guarantee. For independent gate-path checks, leave more than 180 seconds without messages after the previous wake.
 3. Open the link, then tap **Draft the notice**. Expect the draft in the chat and on the case page. Tap **Set reminders**. Expect a one-line confirmation, and `hermes cron list` shows the reminder jobs (`cron.md:293`).
 4. Send a photo of an official letter. Expect four lines of explanation, then a plan.
 
-Decide: zero unwanted messages in test 1 means stay on Mode A. If the bot posts `The model returned only a silence marker...`, answers small talk, or costs too much, switch to Mode B below. Record the decision in `docs/DECISIONS.md`.
+Record the actual gate decisions and replies for each selected message. If the bot posts `The model returned only a silence marker...`, answers small talk, or costs too much, switch to Mode B below. Record the decision in `docs/DECISIONS.md`.
 
 ### 15. Create the daily change watch
 
+Optional: the team has deferred enabling this job until the alert rule is agreed. This is a scoped template, not a completed live watch test.
+
+Use the numeric chat ID from step 11 in both the prompt and delivery target. Open-case memory entries must carry that exact chat ID; ambiguous or unlabelled entries are skipped. Create a separate job for each chat whose cases should be watched.
+
 ```bash
+(
+KAVERI_WATCH_CHAT_ID="-100FAMILYCHATID" # replace with the numeric ID from step 11
+[[ "$KAVERI_WATCH_CHAT_ID" =~ ^-?[0-9]+$ ]] || { echo "Set the numeric chat ID first" >&2; exit 1; }
 hermes cron create "0 8 * * *" \
-  "Daily change watch. For every 'Open case' entry in your memory, call mcp__casefile__case_recheck with that case id. If every changed list is empty, reply with exactly [SILENT]. Otherwise post one short line per changed case with its url. Follow the deadline-keeper skill." \
-  --skill deadline-keeper --name "Kaveri change watch" --deliver telegram
+  "Daily change watch for Telegram chat ID ${KAVERI_WATCH_CHAT_ID}, delivery target telegram:${KAVERI_WATCH_CHAT_ID}. Follow the deadline-keeper skill. Check only open cases explicitly labelled with this exact chat ID. Skip other chats and unlabelled or ambiguous entries. If none qualify or nothing changed, reply exactly [SILENT]." \
+  --skill deadline-keeper --name "Kaveri change watch ${KAVERI_WATCH_CHAT_ID}" --deliver "telegram:${KAVERI_WATCH_CHAT_ID}"
 hermes cron list
-hermes cron run "Kaveri change watch"
+hermes cron run "Kaveri change watch ${KAVERI_WATCH_CHAT_ID}"
 hermes cron runs
+)
 ```
 
-`--deliver telegram` means the home channel from step 11 (`cron.md:653`, `:997`). A reply of `[SILENT]` sends nothing (`cron.md:908`). `cron run` queues the job for the next scheduler tick, so wait about a minute (`cli-commands.md:795`). Expect a completed run in `hermes cron runs` and no message in the group while nothing has changed. Jobs only run while the gateway is running (`cron.md:423`).
+`--deliver telegram:<chat_id>` pins delivery to that chat (`cron.md:654`), even if the home channel changes later. Remove any old unscoped "Kaveri change watch" job before creating the scoped replacement. A reply of `[SILENT]` sends nothing (`cron.md:908`). `cron run` queues the job for the next scheduler tick, so wait about a minute (`cli-commands.md:795`). Expect a completed run in `hermes cron runs` and no message in the group while nothing has changed. Jobs only run while the gateway is running (`cron.md:423`).
 
 ## Mode B: wake patterns
 

@@ -1,0 +1,80 @@
+[
+  {
+    "message": "The washing machine just died. It is 18 months old and the shop says the 12-month warranty is over so it is our problem. What can we do?",
+    "seconds": 31.6,
+    "researchCase": true,
+    "tools": [
+      "mcp__casefile__research_case",
+      "memory"
+    ],
+    "planLines": 5,
+    "caseLink": true,
+    "caseLinkChecks": [
+      {
+        "url": "http://localhost:3000/c/xk4q6Pyq94CocggF",
+        "ok": true,
+        "error": "",
+        "apiStatus": 200,
+        "pageStatus": 200,
+        "evidenceVerified": 7,
+        "evidenceTotal": 7,
+        "exaCostDollars": 0.021
+      }
+    ],
+    "offersToSend": false,
+    "reply": "Here's what I found for a defective washing machine past the warranty in Finland:\n\n1. File a written complaint with the seller: a reasonable time period (at least two months) [1]\n2. Invoke statutory 2-year EU guarantee rights [2]\n3. Claim liability for defect after warranty expires [3]\n4. Demand repair or replacement: reasonable time [4][5]\n5. Contact consumer advisory services for mediation [6]\n\n7 of 7 quotes checked on their pages.\n\nI could not verify: Submit a case to the Consumer Disputes Board: the cited page could not be opened (suomi.fi).\n\nCase file: http://localhost:3000/c/xk4q6Pyq94CocggF\n\nOpen questions from the research:\n- Was the washing machine purchased from a private individual or a professional trader?\n- What is the specific date of purchase for the washing machine?\n- Do you have a receipt or other proof of the purchase date?\n\nNext actions:\n- Draft the notice (letter to the shop) — I prepare it, you send it\n- Set reminders\n- Why I spoke\n- Not now\n\nWhat would you like to do?",
+    "error": "",
+    "scenario": "fresh_washing_machine",
+    "run": 1,
+    "trace": [
+      {
+        "tool": "mcp__casefile__research_case",
+        "elapsedSeconds": 16.9
+      },
+      {
+        "tool": "memory",
+        "elapsedSeconds": 27.3
+      }
+    ],
+    "checkedAt": "2026-11-14T02:47:45.631868+02:00"
+  },
+  {
+    "message": "The washing machine just died. It is 18 months old and the shop says the 12-month warranty is over so it is our problem. What can we do?",
+    "seconds": 28.2,
+    "researchCase": true,
+    "tools": [
+      "mcp__casefile__research_case",
+      "memory"
+    ],
+    "planLines": 5,
+    "caseLink": true,
+    "caseLinkChecks": [
+      {
+        "url": "http://localhost:3000/c/9BLvh_ju_h1KUMnV",
+        "ok": true,
+        "error": "",
+        "apiStatus": 200,
+        "pageStatus": 200,
+        "evidenceVerified": 9,
+        "evidenceTotal": 9,
+        "exaCostDollars": 0.021
+      }
+    ],
+    "offersToSend": false,
+    "reply": "On it, checking official sources for Finland.\n\nAssert your 2-year EU consumer guarantee rights [1]\nFile a formal written complaint with the seller: at least two months [2]\nCreate a complaint letter using the KKV assistant [3]\nAssert your statutory rights for defects [4]\nSeek help from Consumer Advisory Services [5]\n\n9 of 9 quotes checked on their pages.\n\nCase: http://localhost:3000/c/9BLvh_ju_h1KUMnV\n\nNext steps: Draft the notice, Set reminders, Why I spoke, Not now — just say which.\n\nDone — the plan is posted and the case is saved. Waiting on which next step you'd like.",
+    "error": "",
+    "scenario": "fresh_washing_machine",
+    "run": 2,
+    "trace": [
+      {
+        "tool": "mcp__casefile__research_case",
+        "elapsedSeconds": 13.4
+      },
+      {
+        "tool": "memory",
+        "elapsedSeconds": 26.1
+      }
+    ],
+    "checkedAt": "2026-11-14T02:48:13.845795+02:00"
+  }
+]

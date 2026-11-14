@@ -23,4 +23,14 @@ stop_one() {
 
 stop_one gateway
 stop_one engine
-[ "${1:-}" = "--keep-gate" ] || bash "$ROOT/hermes/gate.sh" stop
+# Snapshot after the writer stops, before an operator moves or removes its checkout.
+ENGINE_DIR="${KAVERI_ENGINE_DIR:-$ROOT}"
+[ ! -f "$RUN/engine-dir" ] || ENGINE_DIR="$(cat "$RUN/engine-dir")"
+stop_failed=0
+if [ -f "$RUN/engine-dir" ] || [ -d "$ENGINE_DIR/.data/cases" ] || [ -d "$ROOT/.data/cases" ] || [ -d "$LOCAL/engine/.data/cases" ]; then
+  node "$ROOT/hermes/preserve-cases.mjs" backup "$ROOT" "$LOCAL" "$ENGINE_DIR" || stop_failed=1
+fi
+if [ "${1:-}" != "--keep-gate" ]; then
+  bash "$ROOT/hermes/gate.sh" stop || stop_failed=1
+fi
+exit "$stop_failed"

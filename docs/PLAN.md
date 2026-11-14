@@ -8,6 +8,8 @@ English is the main language for the product, the code and the docs. Finnish is 
 Revised Fri 13 Nov, about 21:45, after competitor research, an Exa API deep dive and the first live runs.
 The earlier version of this plan had the chat model do the research itself. That changed, see section 3.
 
+**Saturday night scope update from Vlad:** focus on repeatable selected scenarios and polite handling of other messages. The broad 20-message live silence run and repeated pregnancy triggers are not required tonight. The team will choose concrete demo scenarios later. Current Hermes evidence and limitations are in `docs/HERMES_HANDOVER.md`; the demo script below is a proposal, not a claim that every step passed.
+
 ## 1. Product in one paragraph
 
 A bot sits in a family's Telegram group. It reads along and says nothing, until someone mentions a life event or shares an official letter. Then it researches the live web with Exa, pinned to the family's country and city, and posts a short plan: what to do, by when, what they are entitled to. Every line carries a numbered source. A link opens the case file: timeline, money, the quoted sentence behind every claim, drafts. Each cited page is opened again to check the quote is really there. Next steps need a one-tap approval, deadlines become reminders, and a daily job re-checks the sources.
@@ -30,8 +32,8 @@ First audience: international families in Finland, who deal with Kela, Vero, Mig
 | Review fixes | Done Fri night: stricter grounding, conflict labels, safe page fetch, country names, demo limits, accurate page copy. See section 4 and `docs/DECISIONS.md`. | pull request 5 |
 | Highlight links | Each verified source links to the official page with the quoted sentence highlighted (text fragment, works in Chrome, Edge, Safari). | `src/app/c/[id]/page.tsx` |
 | Pitch kit | Story, numbers, criteria table, two-minute video script, demo script, judge questions. | `docs/PITCH.md` |
-| Bot on Hermes | Runs on Vlad's laptop from a pinned repo-local install (`hermes/setup-local.sh`, release v0.23.1) with NVIDIA Nemotron and a local engine. Checked Sat night: one-shot chat answers; `research_case` is called and a plan with a case link comes back from the command line. DM plan, case link and approved draft passed at 02:42; group research and photo flow observed. Full group-silence acceptance remains unconfirmed. Old local test cases were deleted during an engine-directory switch; see `docs/HERMES_HANDOVER.md` and draft PR #6. | `hermes/` |
-| Gate (local Gemma) | Hermes plugin on `pre_gateway_dispatch`: rules, wake patterns, then `gemma3:1b` through Ollama. On 60 labelled messages: 0 of 20 triggers missed, 4 of 40 false wakes. Model alone: 3 missed. Live hook skipped four small-talk messages; the full Telegram acceptance set remains unconfirmed. | `hermes/plugins/kaveri-gate/`, `eval/gate/` |
+| Bot on Hermes | Runs on Vlad's laptop from a pinned repo-local install (`hermes/setup-local.sh`, release v0.23.1) with NVIDIA Nemotron and a local engine. DM plan, case link and approved draft passed at 02:42; group research and photo flow observed. Selected live chatter stayed silent, with one false gate wake. Recovered the exact deleted rent-letter case and repaired its stored deadline/reminder link; four other old cases require fresh research. Local missing-case and stale-follow-up rehearsals passed; reminder delivery remains untested. See `docs/HERMES_HANDOVER.md` and draft PR #6. | `hermes/` |
+| Gate (local Gemma) | Hermes plugin on `pre_gateway_dispatch`: rules, wake patterns, then `gemma3:1b` through Ollama. On 60 labelled messages: 0 of 20 triggers missed, 4 of 40 false wakes. Model alone: 3 missed. Live sample: 6/7 small-talk messages stopped locally; one false wake reached the cloud and stayed silent. Media, addressed and pattern paths observed; a Gemma-only trigger outside the open window is not yet measured live. | `hermes/plugins/kaveri-gate/`, `eval/gate/` |
 | GitHub | Private repo `zacharyb1/junction-2026`, `main` pushed. Vercel deploys from it. | github.com |
 | Production | **Live** at https://junction-2026.vercel.app: landing, `/try`, case pages, API, MCP. Research itself waits for the Exa key, see section 9. | Vercel project `junction-2026` |
 
@@ -148,7 +150,7 @@ Full notes: `docs/research/COMPETITORS.md`, `docs/research/EXA_NOTES.md`, `docs/
 
 **Track B, Hono + Mastra (Milan).** Telegram webhook on the Hono server, a Mastra agent with one tool that calls `POST /api/research`. Request and response are in `docs/CONTRACTS.md`, with a copy-paste fetch example. Exa's own SDK is not needed in the bot for case research, only if the bot should also answer small questions directly.
 
-Decision Sat 10:30: whichever track runs the pregnancy script three times in a row becomes the demo bot. The other stops.
+Bot-track decision remains scheduled for Sat 10:30. The original proposal used three consecutive pregnancy runs; the team will choose the concrete scenario and repeatability check before the bake-off. This is not a request for more pregnancy messages tonight.
 
 ## 7. Demo script (the only path that must be flawless)
 
@@ -170,7 +172,7 @@ If Telegram or the laptop fails, the same story runs from `/try` on a phone. Rec
 |---|---|---|---|---|
 | M0 | Fri, tonight | Engine live in production | Zachary, Claude Code | Exa key set on Vercel. `/try` returns a plan on the public URL. |
 | M0 | Fri, tonight | A bot answers | Vlad or Milan | DM to the bot returns a plan and a case link. Challenge pre-submitted before 23:59. |
-| M1 | Sat 09:00 to 11:30 | Butler in the group | bot owner | Silence works on 20 small-talk messages. Pregnancy script runs 3 times in a row. Bot track chosen at 10:30. |
+| M1 | Sat 09:00 to 11:30 | Butler in the group | bot owner | Team chooses a concrete scenario and repeatability check; selected chatter stays silent, a fresh case link opens, and the scenario completes. Bot track chosen at 10:30. |
 | M2 | Sat 11:30 to 15:00 | Follow-through | bot owner, Claude Code | Approval buttons, drafts attached to the case, reminders firing. Draft submission created at 12:00. |
 | M3 | Sat 15:00 to 18:00 | Second act and judge mode | all | Letter photo flow on 2 printed letters. QR on the table. Scorecard run on production. One person at the Exa workshop 16:30 in the Loft. |
 | M4 | Sat 18:00 to 20:00 | Fix and freeze | all | Top 3 scorecard failures fixed. **Freeze 20:00.** |
@@ -237,23 +239,25 @@ What that number means and does not mean:
 - Behind at M2: skip reminders, keep approvals and drafts.
 - Behind at M3: skip the letter photo, demo the letter by pasting text into `/try`.
 - Behind at M4: demo from `/try` only, bot shown as a recorded clip.
-- Never cut: numbered sources with verified quotes, the case page, one flawless pregnancy run, the 2:00 video.
+- Never cut: numbered sources with verified quotes, the case page, one flawless run of the selected scenario, the 2:00 video.
 
 ## 13. Submission items (Sun 10:00)
 
 Name, punchline, description, challenge, technologies, video up to 2:00, demo link, source link, deck PDF, phone numbers, Discord names. Details in `docs/SUBMISSION_CHECKLIST.md`. The repo is private while we build. Organizers must be able to read it at submission.
 
-## 14. Tech challenges we also enter
+## 14. Tech challenge roles and candidates
 
-Decided Fri about 22:00. The main challenge stays Exa. The same repo and demo also go to four tech challenges. Detail, requirements, owners and cut lines are in `docs/TECH_CHALLENGES.md`.
+The main challenge stays Exa. The Friday 22:00 four-challenge plan was revised in the dated update in `docs/TECH_CHALLENGES.md` and by the live Hermes tests. Enter a tech challenge only for a demonstrated role. The platform's current selections have not been rechecked here.
 
 | Challenge | Our use | Where | When |
 |---|---|---|---|
-| Gemini API | The bot's model: reads letter photos, decides when to speak, writes drafts | Bot runtime | Model choice tonight, shown in M3 |
-| ElevenLabs | Voice note in, spoken plan out, voiceover for the 2:00 video | Bot runtime, video | Voiceover in M5, bot voice in M3 |
-| Oxylabs Web API | Third reader in the quote verifier and the recheck | `src/lib/verify.ts` | M2, dropped if not merged by Sat 15:00 |
-| Gemma | Local privacy gate, so small talk never leaves the laptop | Bot runtime | After M1 is green, first to cut |
+| Nemotron | Hermes chat, tool calls and letter-photo reading observed | Bot runtime | Evidence in `docs/HERMES_HANDOVER.md`; candidate if Hermes is selected |
+| Gemma | Local gate; 6/7 small-talk messages stayed local in the live sample | Bot runtime | Enabled and measured, with false wakes and an open-window bypass |
+| Gemini API | No demonstrated role on the Hermes track after the successful Nemotron letter test | Other track or a future distinct role | Do not claim without a demonstrated use |
+| ElevenLabs | Voiceover files exist; bot voice remains deferred | Video, possible bot runtime | Team decides after core scenario work |
+| Oxylabs Web API | Third reader is merged; live API use unconfirmed | `src/lib/verify.ts` | Team confirms credentials and a live run |
+| Context.dev / Aiven | Proposed page reader, change watch and page-to-case index | Engine | Deferred to the team |
 
-Rules: Exa stays the only finder. None of these tools may add a claim to a plan. Six hours in total for all four. Claim a challenge only if its part runs in the demo.
+Rules: Exa stays the only finder. None of these tools may add an unsupported claim to a plan. The original extra-integration budget was six hours in total. Claim a challenge only if its part runs in the demo.
 
-New items blocked on a human: a Gemini key and an ElevenLabs key on the bot machine, an Oxylabs key on Vercel, and Vlad and Milan agreeing tonight that the bot's model is Gemini.
+Current Hermes dependency: matching production engine URL and secret from Zachary, followed by a production case-link check. Extra integrations and submission selections stay with the team; a Gemini key is not required for the current Hermes letter flow.

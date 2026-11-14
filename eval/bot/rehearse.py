@@ -32,6 +32,9 @@ import sqlite3
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -47,6 +50,41 @@ DEFAULT_MEMORY = (
 PROFILE = "rehearse"
 PROFILE_HOME = HOME / "profiles" / PROFILE
 WRAPPER = ROOT / "hermes" / "bin" / "hermes"
+
+
+def check_case_links(reply: str) -> list[dict]:
+    """Check both the stored case and its page, only on the configured engine."""
+    urls = list(dict.fromkeys(re.findall(r"https?://[^\s<>\[\]()]+/c/[\w-]+", reply)))
+    if not urls:
+        return []
+    configured = next((line.split('=', 1)[1].strip().strip('\"\'')
+                       for line in (PROFILE_HOME / '.env').read_text().splitlines()
+                       if line.startswith('CASEFILE_URL=')), '')
+    engine = urllib.parse.urlsplit(configured)
+    checks = []
+    for url in urls:
+        link = urllib.parse.urlsplit(url)
+        result = {"url": url, "ok": False, "error": ""}
+        checks.append(result)
+        if not engine.netloc or (link.scheme, link.netloc) != (engine.scheme, engine.netloc):
+            result['error'] = 'case link does not match the configured engine'
+            continue
+        case_id = link.path.rsplit('/', 1)[-1]
+        origin = f'{engine.scheme}://{engine.netloc}'
+        try:
+            with urllib.request.urlopen(f'{origin}/api/cases/{case_id}', timeout=10) as response:
+                stored = json.load(response)
+            if not isinstance(stored, dict) or stored.get('id') != case_id:
+                raise ValueError('case API returned a different case')
+            with urllib.request.urlopen(url, timeout=10) as response:
+                if response.status != 200:
+                    raise ValueError(f'case page returned HTTP {response.status}')
+            result['ok'] = True
+        except (urllib.error.URLError, ValueError, OSError) as exc:
+            result['error'] = str(exc)
+            if isinstance(exc, urllib.error.HTTPError):
+                exc.close()
+    return checks
 
 
 def prepare_profile() -> None:
@@ -98,6 +136,10 @@ def run_once(message: str, memory: str, timeout: int) -> dict:
     elif not error:
         error = "no session id in the output"
 
+    checks = check_case_links(reply)
+    failures = [check['error'] for check in checks if not check['ok']]
+    if failures:
+        error = error or 'case link check failed: ' + '; '.join(failures)
     result = {
         "message": message,
         "seconds": seconds,
@@ -105,6 +147,7 @@ def run_once(message: str, memory: str, timeout: int) -> dict:
         "tools": tools,
         "planLines": len(re.findall(r"\[\d+\]\s*$", reply, flags=re.M)),
         "caseLink": bool(re.search(r"https?://\S+/c/[\w-]+", reply)),
+        "caseLinkChecks": checks,
         "offersToSend": bool(re.search(r"\b(send (it|the \w+) for you|shall i send|want me to send|send the (letter|notice|email)\b(?! yoursel))", reply, flags=re.I)),
         "reply": reply,
         "error": error,
@@ -155,7 +198,7 @@ def main() -> int:
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"\nwrote {out.relative_to(ROOT)}")
-    return 0
+    return 1 if any(r['error'] or r['offersToSend'] for r in results) else 0
 
 
 if __name__ == "__main__":

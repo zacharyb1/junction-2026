@@ -53,3 +53,7 @@ Append-only. One line per decision: `[Fri 20:14] Decision — why — who`.
 [Sat 01:05] In a direct chat the bot always answers and never replies [SILENT]. Reason: Nemotron answered [SILENT] to "hey there" in a DM and Hermes replaced it with its own notice, which reads as broken to a first-time judge — Vlad's session.
 
 [Sat 02:39] Preserve and migrate .data/cases before deleting or changing a local engine directory. Reason: the 02:29 switch deleted prior test cases; a reused plan and a scheduled reminder now carry broken links. This is an operational correction, not a change to the engine storage contract — Vlad's continuation session.
+
+[Sat 02:48] Tonight follows Vlad's selected-scenario scope: the broad 20-message silence run and repeated pregnancy triggers were cancelled after the live gate/letter pass. Preserve actual evidence and rehearse chosen paths; do not turn the old checklist into a new user obligation.
+[Sat 02:48] Reuse an old case only after case_get succeeds; create reminders only after successful case/date reads and updates. Reason: an old plan was served with a 404 link and a reminder was created after two failed updates. Restored the exact rent case from a stored full tool response and saved its already-approved date; other deleted cases require fresh research.
+[Sat 02:48] Adopt review-watch-template cd8c82a into the bot track: watch prompts, delivery and open-case labels must use the same numeric Telegram chat ID. Reason: profile memory is shared across chats. No daily watch is enabled; the team still owns its alert rule.

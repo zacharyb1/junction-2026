@@ -1,0 +1,24 @@
+{
+  "message": "Please set a reminder for case missingCase1234. The deadline to object in writing is 2026-11-30.",
+  "seconds": 7.8,
+  "researchCase": false,
+  "tools": [
+    "mcp__casefile__case_get"
+  ],
+  "planLines": 0,
+  "caseLink": false,
+  "caseLinkChecks": [],
+  "offersToSend": false,
+  "reply": "The case `missingCase1234` doesn't exist in the case file, so I can't set a reminder for it — no reminders were created.\n\nIf you have a case link from a previous research result, paste it here and I'll look it up.",
+  "error": "",
+  "scenario": "missing_case_reminder",
+  "trace": [
+    {
+      "tool": "mcp__casefile__case_get",
+      "elapsedSeconds": 4.8,
+      "caseMissing": true
+    }
+  ],
+  "profileJobsAfter": 0,
+  "checkedAt": "2026-11-14T02:46:01.891173+02:00"
+}

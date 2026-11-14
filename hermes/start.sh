@@ -25,6 +25,9 @@ grep -Eq '^TELEGRAM_BOT_TOKEN=[^[:space:]#]' "$BOT_ENV" 2>/dev/null || { echo "N
 
 # 1. Engine, only when CASEFILE_URL points at this machine.
 if grep -Eq '^CASEFILE_URL=http://(localhost|127\.0\.0\.1)' "$BOT_ENV"; then
+  # The engine stores cases relative to its working directory. Preserve the old
+  # engine's files before a directory switch, even when a service is already up.
+  node "$ROOT/hermes/preserve-cases.mjs" prepare "$ROOT" "$LOCAL" "$ENGINE_DIR"
   if alive engine; then
     echo "engine: already running (pid $(cat "$RUN/engine.pid"))"
   else
@@ -42,6 +45,7 @@ if grep -Eq '^CASEFILE_URL=http://(localhost|127\.0\.0\.1)' "$BOT_ENV"; then
     echo $! > "$RUN/engine.pid"
     for _ in $(seq 1 30); do curl -fsS -o /dev/null --max-time 2 "http://localhost:$ENGINE_PORT/" 2>/dev/null && break; sleep 1; done
     curl -fsS -o /dev/null --max-time 5 "http://localhost:$ENGINE_PORT/" || { echo "engine did not start, see $RUN/engine.log" >&2; exit 1; }
+    printf '%s\n' "$(cd "$ENGINE_DIR" && pwd -P)" > "$RUN/engine-dir"
     echo "engine: http://localhost:$ENGINE_PORT (pid $(cat "$RUN/engine.pid"), log $RUN/engine.log)"
   fi
 else

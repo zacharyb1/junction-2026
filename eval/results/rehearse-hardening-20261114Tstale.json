@@ -1,0 +1,46 @@
+{
+  "message": "Can you check our washing-machine case again? It is 18 months old and the shop says the 12-month warranty is over. What can we do?",
+  "seconds": 30.5,
+  "researchCase": true,
+  "tools": [
+    "mcp__casefile__case_get",
+    "mcp__casefile__research_case",
+    "memory"
+  ],
+  "planLines": 3,
+  "caseLink": true,
+  "caseLinkChecks": [
+    {
+      "url": "http://localhost:3000/c/_StnK8gm39mXyzmx",
+      "ok": true,
+      "error": "",
+      "apiStatus": 200,
+      "pageStatus": 200,
+      "evidenceVerified": 6,
+      "evidenceTotal": 6,
+      "exaCostDollars": 0.021
+    }
+  ],
+  "offersToSend": false,
+  "reply": "On it, checking official sources for Finland.\n\nThe saved case is gone, so I'll research this fresh from official Finnish sources.\n\nAll six quotes checked out. Here is the case file:\n\nFile a written complaint with the seller: at least two months from the defect being noticed [1][2][3]\nDemand repair or replacement from the seller: within a reasonable time [4][5]\nRefer the issue to the Consumer Disputes Board [6]\n\n6 of 6 quotes checked on their pages.\nI could not verify: Seek assistance from consumer advisory services: the cited page could not be opened (suomi.fi).\nCase file: http://localhost:3000/c/_StnK8gm39mXyzmx\n\nNext steps — reply with your pick:\n- Draft the notice\n- Set reminders\n- Why I spoke\n- Not now\n\nDone. The case file is saved and linked above — the warranty expiry doesn't end your rights; the complaint window starts from when you noticed the defect. Pick a next step whenever you're ready.",
+  "error": "",
+  "scenario": "stale_case_followup",
+  "trace": [
+    {
+      "tool": "mcp__casefile__case_get",
+      "elapsedSeconds": 6.8,
+      "caseMissing": true
+    },
+    {
+      "tool": "mcp__casefile__research_case",
+      "elapsedSeconds": 17.0,
+      "caseMissing": false
+    },
+    {
+      "tool": "memory",
+      "elapsedSeconds": 28.0,
+      "caseMissing": false
+    }
+  ],
+  "checkedAt": "2026-11-14T02:46:52.892037+02:00"
+}

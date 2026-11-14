@@ -54,3 +54,6 @@ scripts/.*
 
 # Worktrees of background agents
 .claude/worktrees/
+
+# Python rehearsal and gate bytecode
+__pycache__/
