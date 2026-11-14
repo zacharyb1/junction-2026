@@ -32,7 +32,7 @@ Someone states a life event or life-admin task. For a shared letter use `letter-
 
 ## If research_case fails or times out
 
-0. If the failure says there was nothing to research in the message, the message was not a life event after all: reply exactly `[SILENT]` and stop. If it says the country is unknown, ask which country the family lives in and stop.
+0. If the failure says there was nothing to research in the message, stop research. In a group reply exactly `[SILENT]`; in a direct chat say briefly that there was no clear life-admin task and ask what they need help with. If it says the country is unknown, ask which country the family lives in and stop.
 1. Otherwise say so in one line.
 2. Search with `mcp__exa__web_search_advanced_exa`, limited to official domains (Finland: kela.fi, vero.fi, migri.fi, kkv.fi). Read pages with `mcp__exa__web_fetch_exa` and copy each supporting sentence word for word.
 3. Publish with `mcp__casefile__case_publish`; drop claims whose citation number is in `failed`.
