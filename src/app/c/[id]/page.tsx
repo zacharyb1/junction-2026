@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: PageProps<"/c/[id]">): Promis
     description,
     robots: { index: false },
     // The image comes from opengraph-image.tsx in this folder.
-    openGraph: { title, description, siteName: "Kaveri", type: "website" },
+    openGraph: { title, description, siteName: "AIDaddy", type: "website" },
     twitter: { card: "summary_large_image", title, description },
   };
 }

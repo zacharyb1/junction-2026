@@ -1,4 +1,4 @@
-"""Kaveri gate, the Hermes side: a pre_gateway_dispatch hook around gate.decide().
+"""AIDaddy gate, the Hermes side: a pre_gateway_dispatch hook around gate.decide().
 
 Group messages only. Direct messages always reach the bot. Install with hermes/install-gate.sh.
 

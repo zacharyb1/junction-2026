@@ -2,7 +2,7 @@
 name: letter-decoder
 description: "Official letter as photo or PDF: explain, verify, reply"
 version: 1.0.0
-author: Kaveri team
+author: AIDaddy team
 license: MIT
 metadata:
   hermes:

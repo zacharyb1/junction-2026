@@ -2,7 +2,7 @@
 name: life-event-butler
 description: "Life event or life-admin task in chat: plan with sources"
 version: 1.0.0
-author: Kaveri team
+author: AIDaddy team
 license: MIT
 metadata:
   hermes:

@@ -13,7 +13,7 @@ export function SiteFooter({ repoUrl }: { repoUrl: string | null }) {
           <p>Built at Junction 2026 for the Exa challenge.</p>
           {repoUrl && <a href={repoUrl} target="_blank" rel="noreferrer" className="l-link">Source code <Arrow dir="up-right" /><span className="sr-only"> (opens in a new tab)</span></a>}
         </div>
-        <small>Kaveri is Finnish for “buddy”. Kaveri is an independent hackathon project. It is not affiliated with Kela, Vero or Telegram.</small>
+        <small>AIDaddy is an independent hackathon project. It is not affiliated with Kela, Vero or Telegram.</small>
       </div>
     </footer>
   );

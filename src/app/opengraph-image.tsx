@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { loadScorecard, seconds } from "@/components/landing/scorecard-data";
 import { heading, PreviewCard, tone } from "@/lib/preview-card";
 
-export const alt = "Kaveri: the butler in your family group chat, with a source on every line";
+export const alt = "AIDaddy: the butler in your family group chat, with a source on every line";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

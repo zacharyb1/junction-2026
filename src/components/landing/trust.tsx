@@ -56,7 +56,7 @@ export function Trust() {
     <Section
       id="trust"
       title="Why you can trust it"
-      hint="A language model can sound sure and still be wrong. So Kaveri shows where every line comes from, and says what it could not confirm. The sample case and an explicitly labelled illustration show how this works."
+      hint="A language model can sound sure and still be wrong. So AIDaddy shows where every line comes from, and says what it could not confirm. The sample case and an explicitly labelled illustration show how this works."
     >
       <ul>
         <Claim
@@ -124,7 +124,7 @@ export function Trust() {
 
         <Claim
           title="Nothing is sent without you"
-          text="Kaveri researches and prepares. It never sends, files, books or pays on its own. A step that needs your decision is marked and waits for you."
+          text="AIDaddy researches and prepares. It never sends, files, books or pays on its own. A step that needs your decision is marked and waits for you."
         >
           <Status tone="attention" strong>
             {approvalStep}

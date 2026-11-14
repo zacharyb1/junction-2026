@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: start the bot. One command, everything in the background, logs in .hermes-local/run/.
+# AIDaddy: start the bot. One command, everything in the background, logs in .hermes-local/run/.
 #
 #   bash hermes/start.sh     engine (only when the bot is pointed at localhost), gate model (only when
 #                            the gate plugin is installed), then the Hermes gateway

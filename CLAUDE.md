@@ -1,4 +1,4 @@
-# Kaveri project context
+# AIDaddy project context
 
 The team uses Claude Code with its own workflows and tools. This repository does not require Orca, a specific agent layout, or any globally installed skill, plugin or MCP server. `.claude/commands/` and `.claude/skills/` are optional helpers. The product's Hermes runtime and its `hermes/skills/butler/` instructions are separate from the coding environment.
 

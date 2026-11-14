@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: the local model behind the gate. Ollama in a container, model data inside .hermes-local/.
+# AIDaddy: the local model behind the gate. Ollama in a container, model data inside .hermes-local/.
 #
 #   bash hermes/gate.sh start    start Ollama (podman or docker), download the model once, warm it up
 #   bash hermes/gate.sh stop     stop the container

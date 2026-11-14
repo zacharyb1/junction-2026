@@ -5,7 +5,7 @@ import { loadCase } from "@/lib/store";
 
 // Read from storage on every request, like the case page: a recheck changes the numbers.
 export const dynamic = "force-dynamic";
-export const alt = "Kaveri case file: how many of its quotes were found on their pages";
+export const alt = "AIDaddy case file: how many of its quotes were found on their pages";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -119,7 +119,7 @@ function CaseCard({ c }: { c: Case }) {
 function GenericCard() {
   return (
     <PreviewCard>
-      <Title>A Kaveri case file</Title>
+      <Title>A AIDaddy case file</Title>
       <span style={{ fontSize: 42, letterSpacing: "-0.01em" }}>Every line carries a quote checked on its page.</span>
     </PreviewCard>
   );

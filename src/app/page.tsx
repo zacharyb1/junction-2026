@@ -14,9 +14,9 @@ import { loadScorecard } from "@/components/landing/scorecard-data";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { Trust } from "@/components/landing/trust";
 
-const title = "Kaveri: the butler in your family group chat";
+const title = "AIDaddy: the butler in your family group chat";
 const description = "A butler in your family group chat. Silent until a life event comes up, then it researches the live web with Exa and posts a plan with a source on every line.";
-export const metadata: Metadata = { title, description, openGraph: { title, description, siteName: "Kaveri", type: "website" }, twitter: { card: "summary_large_image", title, description } };
+export const metadata: Metadata = { title, description, openGraph: { title, description, siteName: "AIDaddy", type: "website" }, twitter: { card: "summary_large_image", title, description } };
 export const viewport: Viewport = { themeColor: "#fffaf1" };
 /** Landing-only typography and material never escape this wrapper. */
 export default async function Home() {
@@ -34,7 +34,7 @@ export default async function Home() {
               <p>Twelve countries have a checked list of official sites. Elsewhere it searches the open web and labels every source.</p>
             </div>
             <ChatIllustration caseHref={sampleCaseHref} />
-            <nav className="l-contents" aria-label="Explore Kaveri">
+            <nav className="l-contents" aria-label="Explore AIDaddy">
               <a href="#how-it-works">How it works</a><a href="#trust">Why trust it</a><a href="#scorecard">Scorecard</a><a href="#privacy">Privacy & limits</a>
             </nav>
           </div>

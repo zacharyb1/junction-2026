@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: run the repo-local Hermes (installed by hermes/setup-local.sh) with its repo-local home.
+# AIDaddy: run the repo-local Hermes (installed by hermes/setup-local.sh) with its repo-local home.
 # To use the plain `hermes` commands from the runbook in a terminal:
 #   export PATH="$PWD/hermes/bin:$PATH"
 set -euo pipefail

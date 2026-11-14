@@ -66,7 +66,7 @@ function Wordmark() {
           <path d="M10 4h4" />
         </svg>
       </div>
-      <span style={{ fontSize: 44, letterSpacing: "-0.02em" }}>Kaveri</span>
+      <span style={{ fontSize: 44, letterSpacing: "-0.02em" }}>AIDaddy</span>
     </div>
   );
 }

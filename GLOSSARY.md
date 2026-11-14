@@ -1,6 +1,6 @@
-# Kaveri
+# AIDaddy
 
-Kaveri is a butler that sits in a family's group chat, notices a life event or an official letter, and comes back with a sourced plan. These are the words this repository's docs and code use for it.
+AIDaddy is a butler that sits in a family's group chat, notices a life event or an official letter, and comes back with a sourced plan. These are the words this repository's docs and code use for it.
 
 ## Language
 
@@ -21,19 +21,19 @@ _Avoid_: Project (the platform's word), entry
 ### The product
 
 **Family**:
-The group of people who share one chat with Kaveri and whose cases it keeps.
+The group of people who share one chat with AIDaddy and whose cases it keeps.
 _Avoid_: User, household (a household is the facts about a family, such as children and income), customer
 
 **Trigger**:
-A message that makes Kaveri act: a stated life event or tedious task, a shared official document, a message addressed to it, or a reminder falling due.
+A message that makes AIDaddy act: a stated life event or tedious task, a shared official document, a message addressed to it, or a reminder falling due.
 _Avoid_: Prompt, query, command, request
 
 **Silence rule**:
-Kaveri says nothing in the chat unless there is a trigger.
+AIDaddy says nothing in the chat unless there is a trigger.
 _Avoid_: Ambient mode (one way of applying the rule), quiet mode
 
 **Case**:
-One life event or task Kaveri has taken up for a family, from the trigger until the family is done with it.
+One life event or task AIDaddy has taken up for a family, from the trigger until the family is done with it.
 _Avoid_: Errand, task, ticket, request, conversation
 
 **Plan**:
@@ -49,13 +49,13 @@ A sentence that was found on the cited page when that page was opened again. A c
 _Avoid_: Citation, source (a source is the page; the quote is the sentence), grounded claim
 
 **Approval**:
-A family member's one-tap yes to a next step, such as drafting a letter or setting reminders. Kaveri never sends, files, books or pays.
+A family member's one-tap yes to a next step, such as drafting a letter or setting reminders. AIDaddy never sends, files, books or pays.
 _Avoid_: Confirmation, sign-off
 
 ### The parts
 
 **Engine**:
-The part that researches a case and verifies its quotes. It is the same for every way of reaching Kaveri.
+The part that researches a case and verifies its quotes. It is the same for every way of reaching AIDaddy.
 _Avoid_: Backend, agent, research agent
 
 **Bot runtime**:

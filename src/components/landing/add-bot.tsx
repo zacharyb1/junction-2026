@@ -65,7 +65,7 @@ export function AddBot({ username }: { username: string | null }) {
     <Section
       id="add-the-bot"
       title="Add the bot"
-      hint="Kaveri lives in Telegram, next to the people you already talk to."
+      hint="AIDaddy lives in Telegram, next to the people you already talk to."
     >
       {username ? <BotCard username={username} /> : <ComingSoon />}
     </Section>

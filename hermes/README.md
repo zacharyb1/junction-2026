@@ -1,4 +1,4 @@
-# Kaveri on Hermes Agent: runbook
+# AIDaddy on Hermes Agent: runbook
 
 From an empty laptop to "the bot answers in the family group". Follow the steps in order. Each step gives the exact command or setting, what you should see, and the Hermes doc line it was checked against.
 
@@ -119,7 +119,7 @@ Expect: `ready`. If your release does not know `--oneshot` (it arrived with 0.21
 
 In Telegram, talk to @BotFather:
 
-1. `/newbot`, display name `Kaveri`, a username ending in `bot`. Copy the token (`telegram.md:34`).
+1. `/newbot`, display name `AIDaddy`, a username ending in `bot`. Copy the token (`telegram.md:34`).
 2. `/mybots`, your bot, **Bot Settings, Group Privacy, Turn off** (`telegram.md:270`).
 
 Do this before the bot joins any group. If it is already in a group, remove it and add it again, otherwise Telegram keeps the old setting (`telegram.md:273`). Do not use the "make it admin" alternative (`telegram.md:277`): see the note on pinning in `CHECKS.md`, U9.
@@ -229,7 +229,7 @@ It runs in the foreground and logs to this terminal (`cli-commands.md:319`, `tea
 
 In Telegram, open a DM with the bot and send, one at a time:
 
-1. `hello`. Expect a short answer in the Kaveri voice.
+1. `hello`. Expect a short answer in the AIDaddy voice.
 2. `List the exact names of every tool you can call whose name starts with mcp`. Expect the seven `mcp__...` names listed above. If they come back with single underscores (`mcp_casefile_research_case`), your release uses the older prefix: see `CHECKS.md`, U2, for the one-line fix.
 3. `We live in Espoo, Finland. I'm pregnant, due in May. We both work full time.` Expect, in this order: one acknowledgement line within about 5 seconds, then one message with at most five plan lines carrying `[1]`-style numbers, a line "N of M quotes checked on their pages", the case URL, and the buttons Draft the notice, Set reminders, Why I spoke, Not now. The engine itself answers in about 6 to 12 seconds in fast mode.
 
@@ -272,8 +272,8 @@ What Part 2 does: `allowed_chats` limits the bot to this group, `group_allowed_c
 
 In the group:
 
-1. Send any message, for example `hello everyone`. Expect one short note: what Kaveri reads, what it keeps, and that "forget everything" wipes its memory of the household. This is posted on the first message the bot handles in a group. Hermes does not wake the agent when the bot is added (`CHECKS.md`, U6).
-2. Send `Kaveri, remember for this household: we live in Espoo, Finland. Anna and Mikko, both employees, both residents of Finland.` Expect a one-line confirmation.
+1. Send any message, for example `hello everyone`. Expect one short note: what AIDaddy reads, what it keeps, and that "forget everything" wipes its memory of the household. This is posted on the first message the bot handles in a group. Hermes does not wake the agent when the bot is added (`CHECKS.md`, U6).
+2. Send `AIDaddy, remember for this household: we live in Espoo, Finland. Anna and Mikko, both employees, both residents of Finland.` Expect a one-line confirmation.
 3. On the laptop: `cat ~/.hermes/memories/MEMORY.md`. Expect the household entry and the consent entry (`memory.md:20`, `:71-78`).
 4. Send `/new --yes`. Memory is put into the prompt only when a session starts (`memory.md:57`).
 
@@ -300,14 +300,14 @@ KAVERI_WATCH_CHAT_ID="-100FAMILYCHATID" # replace with the numeric ID from step 
 [[ "$KAVERI_WATCH_CHAT_ID" =~ ^-?[0-9]+$ ]] || { echo "Set the numeric chat ID first" >&2; exit 1; }
 hermes cron create "0 8 * * *" \
   "Daily change watch for Telegram chat ID ${KAVERI_WATCH_CHAT_ID}, delivery target telegram:${KAVERI_WATCH_CHAT_ID}. Follow the deadline-keeper skill. Check only open cases explicitly labelled with this exact chat ID. Skip other chats and unlabelled or ambiguous entries. If none qualify or nothing changed, reply exactly [SILENT]." \
-  --skill deadline-keeper --name "Kaveri change watch ${KAVERI_WATCH_CHAT_ID}" --deliver "telegram:${KAVERI_WATCH_CHAT_ID}"
+  --skill deadline-keeper --name "AIDaddy change watch ${KAVERI_WATCH_CHAT_ID}" --deliver "telegram:${KAVERI_WATCH_CHAT_ID}"
 hermes cron list
-hermes cron run "Kaveri change watch ${KAVERI_WATCH_CHAT_ID}"
+hermes cron run "AIDaddy change watch ${KAVERI_WATCH_CHAT_ID}"
 hermes cron runs
 )
 ```
 
-`--deliver telegram:<chat_id>` pins delivery to that chat (`cron.md:654`), even if the home channel changes later. Remove any old unscoped "Kaveri change watch" job before creating the scoped replacement. A reply of `[SILENT]` sends nothing (`cron.md:908`). `cron run` queues the job for the next scheduler tick, so wait about a minute (`cli-commands.md:795`). Expect a completed run in `hermes cron runs` and no message in the group while nothing has changed. Jobs only run while the gateway is running (`cron.md:423`).
+`--deliver telegram:<chat_id>` pins delivery to that chat (`cron.md:654`), even if the home channel changes later. Remove any old unscoped "AIDaddy change watch" job before creating the scoped replacement. A reply of `[SILENT]` sends nothing (`cron.md:908`). `cron run` queues the job for the next scheduler tick, so wait about a minute (`cli-commands.md:795`). Expect a completed run in `hermes cron runs` and no message in the group while nothing has changed. Jobs only run while the gateway is running (`cron.md:423`).
 
 ## Mode B: wake patterns
 
@@ -340,7 +340,7 @@ A Hermes plugin on the `pre_gateway_dispatch` hook decides, on this machine, whe
 
 Order of the decision (`hermes/plugins/kaveri-gate/gate.py`):
 
-1. **Rules, no model.** Wake when the message names Kaveri, replies to the bot, is a slash command, or carries a photo or file (it may be an official letter, and the text-only gate cannot look).
+1. **Rules, no model.** Wake when the message names AIDaddy, replies to the bot, is a slash command, or carries a photo or file (it may be an official letter, and the text-only gate cannot look).
 2. **Wake patterns.** The nine Mode B patterns from `config.snippet.yaml`. A hit is a sure trigger: wake at once.
 3. **Local Gemma** (`gemma3:1b` through Ollama, JSON-schema output) labels the rest `trigger`, `small_talk` or `unsure`. Only `small_talk` is dropped. Unsure wakes the bot.
 4. **Gate down or slower than 8 seconds:** the wake patterns alone have decided. Never "let everything through".
@@ -387,7 +387,7 @@ Access and state:
 These are operating system commands, not Hermes features.
 
 - macOS: `caffeinate -is hermes gateway run`, with the charger connected and the lid open. Closing the lid still puts a MacBook to sleep.
-- Linux: `systemd-inhibit --what=sleep:idle:handle-lid-switch --why="Kaveri bot" hermes gateway run`
+- Linux: `systemd-inhibit --what=sleep:idle:handle-lid-switch --why="AIDaddy bot" hermes gateway run`
 
 When the laptop was asleep or offline:
 

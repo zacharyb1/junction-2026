@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: stop the gateway, the local engine and the gate model started by hermes/start.sh.
+# AIDaddy: stop the gateway, the local engine and the gate model started by hermes/start.sh.
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 LOCAL="${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}"

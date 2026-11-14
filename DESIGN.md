@@ -1,5 +1,5 @@
 ---
-name: Kaveri — Family reading table
+name: AIDaddy — Family reading table
 description: An annotated ivory reading surface for a family plan and its official evidence.
 colors:
   cranberry: '#98112c'
@@ -164,7 +164,7 @@ components:
     padding: 1rem 1.25rem
 ---
 
-# Design System: Kaveri
+# Design System: AIDaddy
 
 ## Overview
 

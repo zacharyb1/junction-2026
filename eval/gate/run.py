@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the labelled message set through the Kaveri gate and report counts.
+"""Run the labelled message set through the AIDaddy gate and report counts.
 
     python3 eval/gate/run.py                    # the gate as the bot uses it: wake patterns, then Gemma
     python3 eval/gate/run.py --model-only       # Gemma alone, to see what the model adds or costs

@@ -28,12 +28,12 @@ function siteUrl(): URL {
 
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
-  title: { default: "Kaveri", template: "%s · Kaveri" },
+  title: { default: "AIDaddy", template: "%s · AIDaddy" },
   description,
   // A page below the landing page that sets its own openGraph replaces this one as a whole, image included:
   // it repeats siteName and brings an opengraph-image file of its own (see src/app/try).
-  openGraph: { title: "Kaveri", description, siteName: "Kaveri", type: "website" },
-  twitter: { card: "summary_large_image", title: "Kaveri", description },
+  openGraph: { title: "AIDaddy", description, siteName: "AIDaddy", type: "website" },
+  twitter: { card: "summary_large_image", title: "AIDaddy", description },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

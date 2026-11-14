@@ -97,7 +97,7 @@ export function ChatIllustration({ caseHref, className }: { caseHref: string | n
         <div className="l-thread-head">
           <p>
             <b>Family</b>
-            <span>Anna, Mikko and Kaveri</span>
+            <span>Anna, Mikko and AIDaddy</span>
           </p>
           <span className="l-tag">Example</span>
         </div>
@@ -110,21 +110,21 @@ export function ChatIllustration({ caseHref, className }: { caseHref: string | n
             <Message from="Anna" kind="self" smallTalk>
               No rush. I&apos;ll start dinner.
             </Message>
-            <Note>Small talk. Kaveri stays silent.</Note>
+            <Note>Small talk. AIDaddy stays silent.</Note>
 
             <Message from="Anna" kind="self">
               I&apos;m pregnant!
             </Message>
-            <Note>A life event. Kaveri steps in.</Note>
+            <Note>A life event. AIDaddy steps in.</Note>
 
-            <Message from="Kaveri" kind="bot">
+            <Message from="AIDaddy" kind="bot">
               On it, checking official sources for Finland.
             </Message>
           </ol>
 
-          {/* Kaveri's second message. It sits beside the chat on a wide screen and under it on a phone. */}
+          {/* AIDaddy's second message. It sits beside the chat on a wide screen and under it on a phone. */}
           <div className="l-board">
-            <p className="sr-only">Kaveri</p>
+            <p className="sr-only">AIDaddy</p>
             <div className="l-board-head">
               <p className="l-board-title">{planTitle}</p>
               {/* Names the number column for the eye. Each number already announces itself as a source. */}

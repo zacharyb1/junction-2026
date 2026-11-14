@@ -1,4 +1,4 @@
-"""Kaveri gate: decide on this machine whether a family-group message may wake the cloud model.
+"""AIDaddy gate: decide on this machine whether a family-group message may wake the cloud model.
 
 A small local Gemma (through Ollama) labels each message. Small talk is dropped here and never
 leaves the laptop. Decided behaviour (docs/DECISIONS.md, Fri 23:15):
@@ -56,7 +56,8 @@ SHOTS = [
     ("Migristä tuli päätös", "trigger"),
 ]
 
-BOT_NAME = re.compile(r"(?<!\w)kaveri(?!\w)", re.IGNORECASE)
+# The bot's name, as people type it. "AIDaddy", its earlier name, still wakes it.
+BOT_NAME = re.compile(r"(?<!\w)(ai ?daddy|kaveri)(?!\w)", re.IGNORECASE)
 
 
 @dataclass

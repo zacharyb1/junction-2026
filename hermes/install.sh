@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: install the persona into the Hermes home and print what to do next.
+# AIDaddy: install the persona into the Hermes home and print what to do next.
 #
 # Safe to run again. This script
 #   - copies SOUL.md into the Hermes home (the old one is kept as SOUL.md.bak-<timestamp>),

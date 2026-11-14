@@ -22,7 +22,7 @@ Vlad's view is given where he has one. None of these is settled.
 | Operator: who runs the Bot runtime during the demo and peer review | Not Vlad. Otherwise open. | Reminders, memory and the Telegram token belong to one machine at a time. See [Deployment](DEPLOYMENT.md#hermes-and-telegram) before moving the shared token. |
 | Where the Engine runs for the demo | Open | Judges open Case links and `/try` on their own phones. That needs a public Engine: production once Vercel is unblocked, or a tunnel to a laptop. |
 | Which scenarios must not fail | Open | The move from Helsinki to Tampere has the cleanest recorded run. The rent-increase letter is the only Case with a saved deadline and a reminder, and its rule changed on 1 October 2026. Pregnancy was the original script and has no recent run. |
-| Gemini | Open suggestion, see below | Its challenge pays €4,000, €2,000 and €1,000 in cash, more than any other prize we can reach. Today Gemini has no job in Kaveri. |
+| Gemini | Open suggestion, see below | Its challenge pays €4,000, €2,000 and €1,000 in cash, more than any other prize we can reach. Today Gemini has no job in AIDaddy. |
 | How much new product work before the freeze | Presentation comes first | Vlad asked that the team coordinate so the demo and the pitch reach the best condition in time, ahead of new features. |
 
 ## Suggested work, roughly in order of what a judge sees

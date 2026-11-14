@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaveri: install the gate plugin into the Hermes home and enable it.
+# AIDaddy: install the gate plugin into the Hermes home and enable it.
 # Hermes' gateway does not load plugins from a project folder, so the source in
 # hermes/plugins/kaveri-gate/ is copied to <HERMES_HOME>/plugins/kaveri-gate/.
 # The fallback wake patterns are taken from hermes/config.snippet.yaml (the "#B   - " lines).
