@@ -49,3 +49,4 @@ Reply with the text from the job prompt and nothing else.
 
 - `clarify` does not exist inside scheduled jobs: state, never ask.
 - Before creating reminders, `list` existing jobs to avoid duplicates.
+- A case tool that fails (for example "No case with id") is reported in one line. Never confirm an update that did not happen.
