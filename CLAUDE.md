@@ -4,6 +4,7 @@ The team uses Claude Code with its own workflows and tools. This repository does
 
 ## Context by task
 
+- [docs/NEXT.md](docs/NEXT.md): open team decisions and suggested work after the Saturday morning handover. Show it to your person before starting other work on 14 or 15 November. It contains suggestions, not assignments.
 - [README.md](README.md): product concepts, architecture, current branch state and evidence. Inspect the actual branch and files before relying on a dated status report.
 - [GLOSSARY.md](GLOSSARY.md) and [docs/DECISIONS.md](docs/DECISIONS.md): terminology, choices and their reasons. `docs/PLAN.md` and archived research preserve history, not a current roadmap or work allocation.
 - [docs/CONTRACTS.md](docs/CONTRACTS.md): Engine, Case schema, REST/MCP tools and auth. Contract changes belong with their implementation.

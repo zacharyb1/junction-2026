@@ -61,3 +61,7 @@ _Avoid_: Backend, agent, research agent
 **Bot runtime**:
 The part that sits in the chat: it applies the silence rule, hands a trigger to the engine, posts the plan and offers approvals.
 _Avoid_: Backend, agent, bot (the bot is what the family sees; the runtime is what runs it)
+
+**Operator**:
+The person whose machine runs the bot runtime for a demo. There is one at a time, because one Telegram token allows one running bot.
+_Avoid_: Owner (the owner builds a part; the operator runs it), host
