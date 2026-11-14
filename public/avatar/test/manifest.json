@@ -1,0 +1,108 @@
+{
+  "profile": "test",
+  "label": "Playback test",
+  "width": 640,
+  "height": 360,
+  "poster": "/avatar/test/poster.svg",
+  "restPose": "front",
+  "placeholder": true,
+  "clips": [
+    {
+      "id": "idle",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/test/idle.mp4"
+    },
+    {
+      "id": "listening",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/test/listening.mp4"
+    },
+    {
+      "id": "thinking",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/test/thinking.mp4"
+    },
+    {
+      "id": "speaking",
+      "from": "front",
+      "to": "front",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/test/speaking.mp4"
+    },
+    {
+      "id": "to-desk",
+      "from": "front",
+      "to": "desk",
+      "kind": "transition",
+      "durationMs": 1000,
+      "file": "/avatar/test/to-desk.mp4"
+    },
+    {
+      "id": "working-a",
+      "from": "desk",
+      "to": "desk",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/test/working-a.mp4"
+    },
+    {
+      "id": "working-b",
+      "from": "desk",
+      "to": "desk",
+      "kind": "loop",
+      "durationMs": 2000,
+      "file": "/avatar/test/working-b.mp4"
+    },
+    {
+      "id": "to-front",
+      "from": "desk",
+      "to": "front",
+      "kind": "transition",
+      "durationMs": 1000,
+      "file": "/avatar/test/to-front.mp4"
+    }
+  ],
+  "activities": {
+    "idle": {
+      "pose": "front",
+      "loops": [
+        "idle"
+      ]
+    },
+    "listening": {
+      "pose": "front",
+      "loops": [
+        "listening"
+      ]
+    },
+    "thinking": {
+      "pose": "front",
+      "loops": [
+        "thinking"
+      ]
+    },
+    "speaking": {
+      "pose": "front",
+      "loops": [
+        "speaking"
+      ]
+    },
+    "working": {
+      "pose": "desk",
+      "loops": [
+        "working-a",
+        "working-b"
+      ]
+    }
+  }
+}
