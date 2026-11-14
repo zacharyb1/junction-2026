@@ -1,0 +1,21 @@
+# Web only: this never starts a Telegram poller or copies a Hermes home.
+services:
+  web:
+    build:
+      context: .
+      args:
+        PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:3000}
+        NEXT_PUBLIC_BOT_USERNAME: ${NEXT_PUBLIC_BOT_USERNAME:-}
+        NEXT_PUBLIC_SAMPLE_CASE_ID: ${NEXT_PUBLIC_SAMPLE_CASE_ID:-}
+        NEXT_PUBLIC_REPO_URL: ${NEXT_PUBLIC_REPO_URL:-}
+    env_file:
+      - .env.local
+    ports:
+      - "127.0.0.1:${KAVERI_HTTP_PORT:-3000}:3000"
+    volumes:
+      - case-data:/app/.data
+    init: true
+    stop_grace_period: 30s
+
+volumes:
+  case-data:

@@ -14,6 +14,8 @@ This is an operational reference for the current implementation, not a roadmap o
 
 The bot configuration still targets a local Engine. Earlier Telegram tests used localhost links; production bot integration and reminder delivery are unverified. Detailed evidence is in [HERMES_HANDOVER.md](HERMES_HANDOVER.md).
 
+The web app and Engine can also run together in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac setup, persistent Case storage and connecting a native Hermes process. The Compose setup starts only the web service; it does not start Telegram or move existing runtime state.
+
 ## Deploying the web app
 
 The existing Git-connected Vercel project is the normal shared deployment. A teammate needs access to that Vercel project as well as the GitHub repository; GitHub access alone does not grant environment/storage administration.
@@ -24,7 +26,7 @@ The existing Git-connected Vercel project is the normal shared deployment. A tea
 4. Deploy the intended revision through the team's usual Vercel/Git workflow. On the existing integration, production-branch pushes deploy production and other branches create previews. Environment changes require a new deployment. [Vercel Git deployments](https://vercel.com/docs/git) and [environment guidance](https://vercel.com/docs/deployments/environments) describe those behaviors.
 5. Open `/try?code=<the environment's demo code>`, run one test situation, and open its returned `/c/<id>` page from another device. Confirm the stored Case is readable at `/api/cases/<id>`. An authenticated bot/MCP call needs a separate check; a public landing page or passing CI does not establish that path.
 
-For a separate deployment, import the repository into a new Vercel project with the same root/framework settings and configure its own values. As of this handover, the Hermes scripts/docs are on `vlad/hermes-bot` in PR #6; the independent verifier changes are on `review-grounding` in draft #7. Deploying a branch includes only that branch's code.
+For a separate deployment, import the repository into a new Vercel project with the same root/framework settings and configure its own values. The Hermes scripts/docs merged into `main` through PR #6 (`318f760`); the independent verifier changes remain on `review-grounding` in draft #7. GitHub CI passed for the merge, but its Vercel deployment was blocked by project access. Repository access and successful checks do not establish a successful production deployment.
 
 | Variable | Required role |
 |---|---|
@@ -51,7 +53,7 @@ Installing or editing the repository does not require starting the shared bot. W
 For a bot host, the tested installer needs macOS/Linux, Git and curl; a local Engine also needs Node 22+ with npx, and the gate needs Podman/Docker or an existing local Ollama. Fedora was tested; macOS was not. Windows-native operation is not established by this handover.
 
 ```bash
-git clone --branch vlad/hermes-bot https://github.com/zacharyb1/junction-2026.git
+git clone https://github.com/zacharyb1/junction-2026.git
 cd junction-2026
 bash hermes/setup-local.sh
 ```
@@ -62,7 +64,7 @@ The installer is pinned and uses `.hermes-local/`; it does not depend on a teamm
 
 1. Create a different bot in BotFather and a separate test group. Use a **fresh** `.hermes-local/home`; cloning the source gives this, copying the live home does not.
 2. Populate `.hermes-local/home/.env` from [hermes/env.example](../hermes/env.example) in your editor. Set your own `TELEGRAM_BOT_TOKEN`, numeric `TELEGRAM_ALLOWED_USERS`, provider key and Exa key. Set `CASEFILE_URL` to the chosen Engine's **full `/api/mcp` URL** and `CASEFILE_SECRET` to that Engine's secret. Keep the test token local; do not replace the shared keys repo's `bot.env`.
-3. For a local Engine, also fill the root `.env.local` from `.env.example`, omit Blob for isolated data, and make the two `CASEFILE_SECRET` values match. The default Engine port is 3000. `start.sh` starts the local Engine itself when the MCP URL is localhost; do not also run `pnpm dev` on that port. For a remote preview, complete its deployment/auth checks first.
+3. For a local Engine, also fill the root `.env.local` from `.env.example`, omit Blob for isolated data, and make the two `CASEFILE_SECRET` values match. The default Engine port is 3000. `start.sh` starts the local Engine itself when the MCP URL is localhost; do not also run `pnpm dev` on that port. For an Engine already running in Docker, use the [foreground gateway procedure](CONTAINERS.md#connecting-hermes) instead of `start.sh`. For a remote preview, complete its deployment/auth checks first.
 4. Configure the runtime and install the gate, if used:
 
    ```bash

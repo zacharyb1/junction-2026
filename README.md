@@ -6,17 +6,17 @@ Built for international families in Finland at Junction 2026, Espoo, 13–15 Nov
 
 ## Start here
 
-This is the **Saturday 14 November morning handover**, on the Hermes bot branch. It describes work available for review, not a claim that every feature is deployed. Check current branches and PRs before integrating.
+This is the **Saturday 14 November morning handover**, updated after the Hermes work merged into `main`. Source integration and deployment are separate: check the current branch, PRs and running services before relying on a dated status report.
 
 | Workstream | State at handover |
 |---|---|
 | Shared Engine and web app | `main` contains research, verification, case pages, browser demo and the optional Oxylabs reader. |
-| Hermes bot | [PR #6](https://github.com/zacharyb1/junction-2026/pull/6): local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows passed against a local Engine. Detailed evidence is in [Hermes handover](docs/HERMES_HANDOVER.md). |
+| Hermes bot | [PR #6](https://github.com/zacharyb1/junction-2026/pull/6) merged into `main`: local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows passed against a local Engine. Detailed evidence is in [Hermes handover](docs/HERMES_HANDOVER.md). |
 | Verifier review | [Draft PR #7](https://github.com/zacharyb1/junction-2026/pull/7): independent-reading verification and withholding unsupported money items. Separate from #6 and not merged. |
 | Alternate bot | `scaffold/milestone-1-2` is the separate Hono/Mastra track; this handover does not certify it. |
 | Landing design | Separate `vlad/landing-redesign` branch; outside this handover's changes. |
 
-This snapshot was prepared while PRs #6 and #7 were drafts; their links show the current merge status. The existing Vercel project deploys `main`. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`.
+PR #6 merged as `318f760` and its GitHub CI passed. The Vercel deployment for that merge was blocked by project access; merging did not establish a successful production update. PR #7 remains a separate draft. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`.
 
 **Runtime snapshot, Saturday morning:** the local Engine process is running and five Case files are present. No running Hermes gateway was found during the latest process check. Its configuration still targets the local Engine; the gate plugin is installed. The successful Telegram tests below are earlier evidence, not a claim that the bot is online now. No service was started or stopped during this documentation pass.
 
@@ -103,6 +103,8 @@ See [Hermes handover](docs/HERMES_HANDOVER.md) for timings, field-reading limita
 
 ## Run the web app
 
+On a Mac, the [Docker setup](docs/CONTAINERS.md) builds and runs the web app and Engine without installing Node or pnpm on the host. It starts no Telegram bot. The native setup below provides live reload while editing code; the container setup requires a rebuild after code changes.
+
 Use Node 22+ and the pnpm version in `package.json`. From the repository root:
 
 ```bash
@@ -117,7 +119,7 @@ The team's secrets live in the separate private `kapuchai/junction-2026-keys` re
 
 ## Deployment and Telegram operation
 
-There are **two separate running parts**: the Next.js app on Vercel, and Hermes on an awake laptop/server. Orca and Claude Code are development tools; neither is needed to keep the product running. Deploying the web app does not start a Telegram bot.
+There are **two separate running parts**: the Next.js app on Vercel or in a container, and Hermes on an awake laptop/server. Orca and Claude Code are development tools; neither is needed to keep the product running. Deploying the web app does not start a Telegram bot.
 
 [Deployment and runtime state](docs/DEPLOYMENT.md) describes the existing Vercel connection, required environment variables and Blob storage, plus the two supported operational choices for Telegram:
 
@@ -159,6 +161,7 @@ This handover records implemented behavior, tests, limitations and earlier decis
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | Changing the Engine, Case schema, transport or bot integration. |
 | [docs/HERMES_HANDOVER.md](docs/HERMES_HANDOVER.md) | Reading bot evidence, repairs and limitations. |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deploying the app, setting up an independent bot or transferring the shared runtime. |
+| [docs/CONTAINERS.md](docs/CONTAINERS.md) | Running the web app in Docker on a Mac or Linux host, retaining its data, or connecting native Hermes. |
 | [hermes/README.md](hermes/README.md), [CHECKS.md](hermes/CHECKS.md) | Installing/operating Hermes or checking a configuration assumption. |
 | [docs/TECH_CHALLENGES.md](docs/TECH_CHALLENGES.md) | Choosing sponsor work or preparing its submission note. |
 | [docs/PLAN.md](docs/PLAN.md) | Reading the historical product design and proposed demo; its milestones are not current assignments. |
