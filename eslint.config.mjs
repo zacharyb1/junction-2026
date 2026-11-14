@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     ".claude/worktrees/**",
     // Generated design review snapshots include compiled third-party runtime code.
     ".impeccable/**",
+    // Private runtime data and local media experiments include third-party packages.
+    ".data/**",
   ]),
 ]);
 

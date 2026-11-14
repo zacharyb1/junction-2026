@@ -4,8 +4,10 @@ import { useEffect, useRef, useState, type SetStateAction } from "react";
 import { cancelAgentState, initialAgentState, readAvatarStream, reduceAgentEvent, replayRun } from "@/lib/avatar/events";
 import { playAvatarAudio } from "@/lib/avatar/play-voice";
 import { RECORDED_EXAMPLE } from "@/lib/avatar/recorded-example";
+import { PREPARED_SCENES, type PreparedMedia, type PreparedSceneId } from "@/lib/avatar/prepared-scenes";
 import { speakOnDevice } from "@/lib/avatar/voice";
 import type { AgentEvent } from "@/lib/avatar/types";
+import { usePerformanceSpeech } from "./use-performance-speech";
 
 export interface CompanionSettings {
   name: string;
@@ -18,13 +20,16 @@ export interface ConversationTurn {
   role: "user" | "assistant";
   text: string;
   source: "live" | "recorded";
+  scene?: PreparedSceneId;
   sources?: { n: number; label: string; url: string; quote: string }[];
   status: "streaming" | "complete" | "cancelled" | "error";
 }
 
-export function useAvatarConversation({ code, liveConfigured, voiceConfigured, settings }: {
+export function useAvatarConversation({ code, liveConfigured, voiceConfigured, settings, preparedMedia = {} }: {
   code: string; liveConfigured: boolean; voiceConfigured: boolean; settings: CompanionSettings;
+  preparedMedia?: PreparedMedia;
 }) {
+  const performance = usePerformanceSpeech();
   const [agent, setAgent] = useState(initialAgentState);
   const [turns, setTurns] = useState<ConversationTurn[]>([]);
   const [busy, setBusy] = useState(false);
@@ -59,7 +64,9 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     const value = typeof next === "function" ? next(voicePreference.current) : next;
     voicePreference.current = value;
     setVoice(value);
-    if (!value) { activeVoice.current?.abort(); setVoiceNote(""); }
+    // A prepared video owns its soundtrack. Muting it must not restart or skip
+    // its performance; the stage receives the new mute preference directly.
+    if (!value && !performance.request) { activeVoice.current?.abort(); setVoiceNote(""); }
   }
   useEffect(() => () => {
     const task = active.current;
@@ -79,7 +86,14 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     };
     let objectUrl: string | undefined;
     try {
-      if (turn.source === "recorded") {
+      const prepared = turn.scene ? preparedMedia[turn.scene] : undefined;
+      if (prepared) {
+        setVoiceNote("Prepared performance · Gemini voice");
+        await performance.play(prepared.video, { signal, onSpeech });
+      } else if (turn.source === "recorded" && turn.scene) {
+        setVoiceNote("Prepared spoken summary · Gemini voice");
+        await playAvatarAudio(`/avatar/office/speech/${turn.scene}.mp3`, { signal, onSpeech });
+      } else if (turn.source === "recorded") {
         setVoiceNote("Recorded voice for this example");
         await playAvatarAudio(RECORDED_EXAMPLE.audio, { signal, onSpeech });
       } else if (voiceConfigured) {
@@ -106,7 +120,7 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     }
   }
 
-  async function run(message: string, source: "live" | "recorded") {
+  async function run(message: string, source: "live" | "recorded", scene?: PreparedSceneId) {
     if (active.current) return;
     const value = message.trim();
     if (!value) return;
@@ -118,8 +132,9 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     active.current = task;
     const userId = `turn-${++sequence.current}`;
     const id = `turn-${++sequence.current}`;
-    const reply: ConversationTurn = { id, role: "assistant", text: "", source, status: "streaming", ...(source === "recorded" ? { sources: RECORDED_EXAMPLE.sources } : {}) };
-    setTurns((list) => [...list, { id: userId, role: "user", text: value, source, status: "complete" }, reply]);
+    const scenario = scene ? PREPARED_SCENES[scene] : undefined;
+    const reply: ConversationTurn = { id, role: "assistant", text: "", source, scene, status: "streaming", ...(scenario ? { sources: [...scenario.sources] } : source === "recorded" ? { sources: RECORDED_EXAMPLE.sources } : {}) };
+    setTurns((list) => [...list, { id: userId, role: "user", text: value, source, scene, status: "complete" }, reply]);
     setBusy(true);
     setMode(source);
     setVoiceNote("");
@@ -135,7 +150,15 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
       if (event.type === "error") { reportedError = true; patch(id, { status: "error" }); }
     };
     try {
-      if (source === "recorded") await replayRun(RECORDED_EXAMPLE.run, receive, { signal: task.signal });
+      if (source === "recorded") {
+        if (!scene || scene === "pregnancy") await replayRun(RECORDED_EXAMPLE.run, receive, { signal: task.signal });
+        else {
+          // A source inspection is immediate; do not stage a search that never ran.
+          receive({ type: "request-sent" });
+          receive({ type: "text", delta: PREPARED_SCENES[scene].text });
+          receive({ type: "reply-done" });
+        }
+      }
       else {
         receive({ type: "request-sent" });
         const response = await fetch("/api/avatar/chat", {
@@ -150,7 +173,7 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
       }
       if (!current(task) || reportedError) return;
       if (!replyComplete || !text.trim()) throw new Error("The assistant returned an incomplete reply. Please try again.");
-      if (voicePreference.current) await playVoice({ ...reply, text, status: "complete" }, task);
+      if (voicePreference.current || (scene && preparedMedia[scene])) await playVoice({ ...reply, text, status: "complete" }, task);
     } catch (error) {
       if (current(task) && !reportedError) receive({ type: "error", message: error instanceof Error ? error.message : "The connection was interrupted." });
     } finally {
@@ -186,6 +209,6 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
   }
 
   return { agent, turns, busy, voiceEnabled, setVoiceEnabled, voiceNote, error: agent.error, mode,
-    runLive: (message: string) => run(message, "live"), runExample: () => run(RECORDED_EXAMPLE.run.message, "recorded"),
-    speak, stop, clear, log };
+    runLive: (message: string) => run(message, "live"), runExample: (scene: PreparedSceneId = "pregnancy") => run(PREPARED_SCENES[scene].question, "recorded", scene),
+    speak, stop, clear, log, performance: performance.request, onPerformanceEvent: performance.onEvent };
 }

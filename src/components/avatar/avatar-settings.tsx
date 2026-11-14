@@ -25,13 +25,13 @@ export function AvatarSettings({ profiles, initial, onSave, onClose }: {
         {/* Local media assets keep all preview choices available without a provider. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={profile.poster} alt="" width={160} height={100} />
-        <span>{profile.profile === "studio" ? "Natural" : profile.label.split(" · ")[0]}</span>
+        <span>{profile.profile === "office" ? "Office" : profile.label.split(" · ")[0]}</span>
         {draft.profile === profile.profile && <Check size={16} aria-hidden="true" />}
       </button>)}</div><p className="studio-help">Ready-made looks for this prototype.</p></fieldset>
       <label htmlFor="companion-name">What should I call myself?<input id="companion-name" maxLength={32} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} autoComplete="off" /></label>
       <fieldset><legend>What can I help with?</legend><div className="studio-focus-options">{(Object.keys(ROLE_LABELS) as (keyof typeof ROLE_LABELS)[]).map((role) => <button type="button" key={role} aria-pressed={draft.role === role} onClick={() => setDraft({ ...draft, role })}><span>{ROLE_LABELS[role]}</span>{draft.role === role && <Check size={17} />}</button>)}</div></fieldset>
       <fieldset><legend>How should I respond?</legend><div className="studio-tone-options">{(Object.keys(TONE_LABELS) as (keyof typeof TONE_LABELS)[]).map((tone) => <button type="button" key={tone} aria-pressed={draft.tone === tone} onClick={() => setDraft({ ...draft, tone })}>{TONE_LABELS[tone]}</button>)}</div></fieldset>
-      <p className="studio-help">Your name, focus and tone apply to your next message. Preferences stay in this browser.</p>
+      <p className="studio-help">Your name, focus and tone apply to your next live message. The room and prepared scenes stay the same. Preferences stay in this browser.</p>
       {error && <p className="studio-error" role="alert">{error}</p>}
       <button className="studio-primary" type="submit">Save companion <Check size={17} /></button>
     </form>

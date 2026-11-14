@@ -19,7 +19,7 @@ const subscribe = (notify: () => void) => {
 };
 const snapshot = () => { try { return localStorage.getItem(KEY) ?? memory; } catch { return memory; } };
 const defaults = (profiles: Manifest[]): AvatarPreferences => ({
-  profile: profiles[0].profile, name: profiles[0].profile === "studio" ? "Alex" : profiles[0].label.split(" · ")[0], role: "everyday", tone: "calm",
+  profile: profiles[0].profile, name: profiles[0].profile === "office" ? "Alex" : profiles[0].label.split(" · ")[0], role: "everyday", tone: "calm",
 });
 
 export function useAvatarPreferences(profiles: Manifest[]) {
@@ -28,7 +28,10 @@ export function useAvatarPreferences(profiles: Manifest[]) {
     const base = defaults(profiles);
     try {
       const saved = JSON.parse(raw ?? "null");
-      if (!saved || !profiles.some((p) => p.profile === saved.profile)) return base;
+      if (!saved) return base;
+      // Retire the former office-with-coworkers look while preserving the user's name and focus.
+      if (saved.profile === "studio" && profiles.some((p) => p.profile === "office")) saved.profile = "office";
+      if (!profiles.some((p) => p.profile === saved.profile)) return base;
       if (typeof saved.name !== "string" || !/^[\p{L}\p{M}\p{N}][\p{L}\p{M}\p{N} '\u2019-]{0,31}$/u.test(saved.name.trim())) return base;
       if (!["everyday", "paperwork", "shopping"].includes(saved.role) || !["calm", "direct", "warm"].includes(saved.tone)) return base;
       return { profile: saved.profile, name: saved.name.trim(), role: saved.role, tone: saved.tone } as AvatarPreferences;
