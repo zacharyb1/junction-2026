@@ -44,9 +44,21 @@ typography:
     lineHeight: 1.5
   lead:
     fontFamily: Lora, serif
-    fontSize: 1.15rem
+    fontSize: 1.05rem
     fontWeight: 400
     lineHeight: 1.8
+  statement:
+    fontFamily: Chiron Sung HK, serif
+    fontSize: clamp(1.5rem, 2.4vw, 2rem)
+    fontWeight: 700
+    lineHeight: 1.35
+    letterSpacing: -0.02em
+  evidence-figure:
+    fontFamily: Chiron Sung HK, serif
+    fontSize: clamp(2rem, 3.4vw, 2.75rem)
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: -0.02em
   hint:
     fontFamily: Lora, serif
     fontSize: 1.05rem
@@ -142,9 +154,10 @@ components:
     typography: '{typography.plan-title}'
     padding: 1.1rem 0
   source-quote:
+    backgroundColor: '{colors.specimen}'
     textColor: '{colors.ink}'
     typography: '{typography.quote}'
-    padding: .25rem 0 .25rem 1rem
+    padding: 1rem 1.25rem
 ---
 
 # Design System: Kaveri
@@ -161,6 +174,7 @@ This system applies only to the landing route `/`, implemented in `src/app/page.
 - One continuous ivory reading surface with calm rules and occasional inset specimens.
 - Dark literary headings, readable prose, sans factual metadata and handwritten marginal notes.
 - A plan and its exact source sentence remain visibly paired.
+- A single ink trace follows the plan-to-source relationship; the words remain immediately readable.
 - Real local paper and ink plates; all words, controls and table data are semantic HTML.
 
 ## Colors
@@ -168,13 +182,13 @@ This system applies only to the landing route `/`, implemented in `src/app/page.
 Warm neutrals carry the reading; cranberry supplies the purposeful emphasis and interaction.
 
 ### Primary
-- **Cranberry ink** (`cranberry`): actions, source links, annotations, process titles, status symbols, scorecard figures and focus outlines. **Deep cranberry** (`cranberry-hover`) fills hovered primary and secondary actions.
+- **Cranberry ink** (`cranberry`): actions, source links, annotations, process titles, open plan titles and quote rules, status symbols, scorecard figures and focus outlines. **Deep cranberry** (`cranberry-hover`) fills hovered primary and secondary actions.
 
 ### Neutral
 - **Ivory paper** (`paper`): the continuous page ground and reversed action text; the browser theme color follows it. The raster paper texture adds material variation.
 - **Book ink** (`ink`): primary text. **Warm secondary ink** (`muted`): captions, factual metadata and hints.
-- **Paper rule** (`rule`): chapter and table dividers, quote borders. **Source rule** (`source-rule`): the hero's warm vertical rule.
-- **Inset paper** (`specimen`): factual examples in the trust section, without a raised card effect.
+- **Paper rule** (`rule`): chapter, plan-row and table dividers. **Source rule** (`source-rule`): the hero's warm vertical rule.
+- **Inset paper** (`specimen`): opened source quotes, factual examples in the trust section and a table row under hover or case-link focus, without a raised card effect.
 - **Selection pink** (`selection`): selected text. Pink and cream marker plates also carry their own pigment; these raster colors are not interchangeable solid-fill UI tokens.
 - **QR white** (`qr-white`): the small QR backing only.
 
@@ -189,9 +203,9 @@ The four fonts load through `next/font/google` in `fonts.ts` and are applied onl
 
 ### Hierarchy
 - **Display:** the portrait hero uses the `display` token relative to its query container. The desktop spread switches to `display-wide`. Wordmark, case title and next-chapter title share its weight and tight tracking, at different optical sizes.
-- **Headline / title:** lower chapter headings use the fluid `headline` token and balanced wrapping; subsection titles use `title`.
-- **Body / lead / hint:** the base reading voice uses `body`; the opening paragraphs use `lead`. Running paragraphs often expand to line-height 1.8, while `hint` supplies the softer section introduction. The reading measure is capped at 68ch.
-- **Label / navigation:** Inter sets captions, sources, dates, navigation and tabular evidence. Captions use `label`; navigation uses `navigation`. Table figures use tabular numerals.
+- **Headline / title:** lower chapter headings use the fluid `headline` token and balanced wrapping; subsection titles use `title`. The closing statement grows from 2.5rem to 4.5rem, capped at 17ch, using the same display voice and headline line height.
+- **Body / statement / lead / hint:** the base reading voice uses `body`; the audience sentence uses the stronger `statement` token, followed by opening paragraphs in `lead`. Running paragraphs often expand to line-height 1.8, while `hint` supplies the softer section introduction. Main reading copy is capped at 68ch.
+- **Label / navigation / evidence figure:** Inter sets captions, sources, dates, navigation and tabular evidence. Captions use `label`; navigation uses `navigation`. The verified-quotes total uses `evidence-figure`, while the other totals remain 1.65rem. Totals use lining and tabular numerals; table figures use tabular numerals.
 - **Note:** short marginal or conversational notes use `note`. Hero annotations scale in container units and rotate slightly, while the role line uses Lora italic.
 - **Action / plan / quote:** `action` sets lower-page actions; `plan-title` and `quote` keep the expandable evidence readable. Hero actions and quotes use Chiron and a separate container-scaled treatment.
 
@@ -208,9 +222,11 @@ Below 360px, action height, source-link size, marginal labels and the next chapt
 
 At 768px, the conversation and plan become an `.8fr / 1.2fr` split; process and trust content become two columns, the bot section places its QR beside the text, and privacy becomes three columns. Gaps range from 2.5rem to 4rem. Scorecard totals change from two columns to four. Below 768px, country, quote count and time fold beneath the scenario name; the table retains result, scenario and case-link columns. Navigation wraps in normal document flow.
 
+At 1000px, the opening audience statement and its supporting paragraphs form an `.8fr / 1.2fr` spread with a 4rem gap. Each lower chapter also pairs its heading on the left with its introduction on the right using that split. Smaller widths retain the reading sequence in one column; the hero geometry and primary-action placement stay unchanged.
+
 ## Elevation & Depth
 
-The surface has no panel shadows. Depth comes from the tiled paper grain, translucent pigment in local raster marks and the warmer specimen inset. Hairline rules organize text without enclosing each item. There is no persistent glass or backdrop blur. The only blur is a brief source-opening animation, removed by the reduced-motion branch.
+The surface has no panel shadows. Depth comes from the tiled paper grain, translucent pigment in local raster marks and the warmer specimen inset. Hairline rules organize text without enclosing each item. Text stays sharp during source opening; there is no glass or blur effect.
 
 The paper asset is a clean 55 × 150 sample from the approved composition, mirror-tiled 4 × 4 into a 220 × 600 texture. Fourteen separate transparent ink/marker assets provide the wordmark underline, headline/plan/source highlights, intro and case underlines, sample circle, proof bracket, bracket underline, two arrows, publisher highlight, divider and next-chapter underline. `reading-plates.tsx` imports them from `assets/plates/`; the paper is the wrapper background and the remaining plates are decorative images. Each of the fifteen PNGs contains its exact provenance in the `impeccable:prompt` text chunk; some also have JSON sidecars. Preserve the embedded record rather than inferring origin from filenames or treating a missing sidecar as missing provenance.
 
@@ -228,7 +244,7 @@ Interface icons use Lucide SVG geometry: navigation arrows, calendar, location, 
 ### Buttons
 Substantial serif links with softened corners.
 - **Primary:** cranberry fill and paper text. **Secondary:** transparent paper ground, cranberry text and a cranberry border. Lower actions use the frontmatter padding and a minimum height of 48px; hero actions fill their positioned region with a minimum height of 44px.
-- **Hover:** both variants use deep cranberry with paper text. The change is immediate; there is no ornamental hover motion or authored press transform.
+- **Hover:** both variants use deep cranberry with paper text. With no reduced-motion preference, colors transition over 160ms; action arrows move 3px toward their destination over 180ms using `cubic-bezier(.16,1,.3,1)` on hover or keyboard focus. The hero source-link arrow shares that movement. Reduced motion keeps the color feedback immediate and the arrows still. The controls themselves do not move.
 - **Focus:** links and summaries receive a 3px cranberry outline with a 5px offset. Preserve this visible state on both action variants.
 - **Routing:** browser actions use `TryLink`, preserving an incoming access-code query value. With no configured sample route, the secondary hero action links to the on-page sample plan and names that destination truthfully.
 
@@ -239,17 +255,21 @@ Underlined cranberry links in Inter sit after the conversation. Their flex row w
 The decision chip is a quiet cranberry text label in Inter at .8rem and weight 500. It has no filled pill or enclosing border. Handwritten “Example” and “Illustrative example” labels mark the nature of material; they are not navigational badges.
 
 ### Cards / Containers
-Trust specimens use inset paper, small corners and 1.5rem padding. Conversations, plan rows and the scorecard remain open documents on the main paper, divided by rules. They do not inherit a generic card shadow or padded dashboard shell.
+Trust specimens use inset paper, small corners and 1.5rem padding. An opened source quote uses the same paper inset, square corners and the `source-quote` padding. Conversations, plan rows and the scorecard remain open documents on the main paper, divided by rules. They do not inherit a generic card shadow or padded dashboard shell.
 
 ### Source disclosures
-A plan row is a native `details`/`summary`, with the plan text and timing on the left and source number plus expansion sign on the right. The shared disclosure name allows one open row; source 5 starts open. Hover underlines the plan in cranberry. The opened quote has an inset rule, its publisher and host, and a link to the exact source. The hero's source-5 quote is always visible rather than an expandable control.
+A plan row is a native `details`/`summary`, with the plan text and timing on the left and source number plus expansion sign on the right. The shared disclosure name allows one open row; source 5 starts open. Hover underlines the plan in cranberry. An open row keeps its title cranberry and its source numeral at weight 700. The opened quote has an inset paper ground and a 1px cranberry rule, its publisher and host, and a link to the exact source. The hero's source-5 quote is always visible rather than an expandable control.
 
-With no reduced-motion preference, opening a quote runs a 350ms animation using `cubic-bezier(.16,1,.3,1)`, settling from a -3px vertical offset and .8px blur. Reduced motion omits that animation. All content is present without scroll-triggered reveals. Expansion signs are supplemental affordances; native semantics carry the open state.
+With no reduced-motion preference, opening a quote runs a sharp 240ms reveal using `cubic-bezier(.16,1,.3,1)`, settling from a -2px vertical offset while its lower 14% is briefly clipped. Reduced motion omits that animation and keeps the open-state color and inset. Expansion signs are supplemental affordances; native semantics carry the open state.
+
+The hero has one progressive decorative sequence in `ReadingMotion`: the plan highlight draws across, the supporting bracket draws down, then the quote highlight draws across. Its overlapping strokes finish within 720ms using the same ease. It starts once when at least 45% of the quote is visible and the relevant plates and fonts are ready; a 200ms readiness budget skips playback when assets or fonts are still loading. Text and controls never wait on this sequence. The server-rendered marks are complete by default; missing browser APIs, failed or slow assets, no JavaScript and reduced motion all preserve that static view. Preference changes cancel playback and restore the finished marks. There is no loop, scroll scrubbing or replay control.
 
 ### Conversation and evidence table
 The conversation is readable prose with named speakers, a handwritten stage direction and a cranberry bot reply. Its caption explicitly identifies an example. The plan and quotes come from `src/data/sample-case.json`; decorative marks do not change their meaning.
 
 The scorecard is a real table with scoped headers, a screen-reader caption, full scenario rows, explicit Pass/Fail words and accompanying SVG symbols. Both results use cranberry; meaning never depends on green/red recognition. Run provenance and time sit above the totals. The adjacent hint states that a pass checks source grounding rather than completeness. Keep failures, error text and missing-case states visible. Data comes from `src/data/scorecard.json`; do not turn table examples in the sidecar into production metrics.
+
+The verified-quotes total leads by type size and a darker, stronger label; all four totals keep their original labels, order and values. Hovering a table row or focusing its case link applies the inset-paper ground to help track that row without adding a panel or changing its result.
 
 ### Configuration and limits
 The Telegram section shows a working action and QR only when configured; otherwise it explains availability and offers the browser demo. Privacy and limits remain readable paragraphs on the same paper. The landing has no input-field design to inherit; `/try` retains its own form system.

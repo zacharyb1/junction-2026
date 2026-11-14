@@ -18,7 +18,7 @@ function Totals({ card }: { card: ScorecardData }) {
   const p90 = seconds(totals.p90Ms);
   const items = [
     { label: "scenarios passed", value: `${totals.passed}/${totals.scenarios}` },
-    { label: "quotes verified", value: `${totals.verifiedQuotes}/${totals.totalQuotes}` },
+    { label: "quotes verified", value: `${totals.verifiedQuotes}/${totals.totalQuotes}`, emphasis: true },
     {
       label: totals.unsourcedClaims === 1 ? "plan line without a source" : "plan lines without a source",
       value: String(totals.unsourcedClaims),
@@ -29,7 +29,7 @@ function Totals({ card }: { card: ScorecardData }) {
     <dl className="l-totals">
       {items.map((item) => (
         // The label comes first for screen readers, the number comes first for the eye.
-        <div key={item.label} className="l-total">
+        <div key={item.label} className={item.emphasis ? "l-total l-total--evidence" : "l-total"}>
           <dt>
             {item.label}
             {item.note && <span className="l-total-note">{item.note}</span>}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarDays, MapPin, ArrowRight } from "lucide-react";
 import { ReadingPlate } from "@/components/landing/reading-plates";
+import { ReadingMotion } from "@/components/landing/reading-motion";
 import { planLines } from "@/components/landing/sample";
 import { TryLink } from "@/components/landing/try-link";
 
@@ -11,7 +12,7 @@ export function Hero({ sampleCaseHref }: { sampleCaseHref: string | null }) {
   const line = planLines.find(item => item.source.n === 5)!;
   return (
     <section className="reading-hero" aria-labelledby="hero-title">
-      <div className="reading-frame">
+      <ReadingMotion>
         {INK.map(name => <ReadingPlate key={name} name={name} />)}
         <p className="r-wordmark">Kaveri</p>
         <h1 id="hero-title" className="r-headline">Your family’s next<br />step, sourced.</h1>
@@ -35,7 +36,7 @@ export function Hero({ sampleCaseHref }: { sampleCaseHref: string | null }) {
         <div className="r-sample-link">{sampleCaseHref ? <Link className="reading-action reading-action--secondary" href={sampleCaseHref}>View sample case</Link> : <a className="reading-action reading-action--secondary" href="#sample-plan">View sample plan</a>}</div>
         <h2 id="silent-title" className="r-next-title">Silent until it matters.</h2>
         <p className="r-next-intro">A life event. Live research. A sourced plan.</p>
-      </div>
+      </ReadingMotion>
     </section>
   );
 }
