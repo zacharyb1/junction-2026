@@ -378,6 +378,24 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
         </Section>
       )}
 
+      {c.news && c.news.length > 0 && (
+        <Section title={t.news} hint={t.newsHint}>
+          <ul className="flex flex-col gap-2">
+            {c.news.map((n) => (
+              <li key={n.url} className="rounded-xl border bg-card p-3 text-sm">
+                <a href={n.url} target="_blank" rel="noreferrer" className="inline-flex items-start gap-1 font-medium leading-snug hover:underline">
+                  {n.title} <ExternalLink className="mt-0.5 size-3.5 shrink-0" />
+                </a>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {due(n.date, t)} · {n.publisher && n.publisher !== host(n.url) ? `${n.publisher} · ` : ""}
+                  {host(n.url)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+
       {c.trail && (
         <Section title={t.researched}>
           <details className="rounded-xl border bg-card p-4 text-sm">

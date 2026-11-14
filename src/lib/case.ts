@@ -74,6 +74,13 @@ export const DraftInput = z.object({
   body: z.string().min(1).max(6000),
 });
 
+export const NewsInput = z.object({
+  url: z.url({ protocol: /^https?$/ }),
+  title: z.string().min(1).max(200),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe("Publication date as Exa reports it, YYYY-MM-DD."),
+  publisher: z.string().max(120).optional(),
+});
+
 export const CaseInput = z.object({
   title: z.string().min(1).max(140),
   event: z.string().min(1).max(60).describe("Short slug, e.g. pregnancy, rent_increase_letter."),
@@ -93,6 +100,11 @@ export const CaseInput = z.object({
     .default([])
     .describe("Claims the agent could not back with a source."),
   openQuestions: z.array(z.string().max(300)).max(10).default([]),
+  news: z
+    .array(NewsInput)
+    .max(4)
+    .optional()
+    .describe("Recent pages on official sites about the same topic. Pointers only: not part of the checked plan."),
 });
 
 // Patch items carry no defaults: a field that is left out keeps its stored value.
