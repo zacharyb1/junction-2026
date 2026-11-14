@@ -57,8 +57,8 @@ describe("messages", () => {
       exceptions: "exceptions and missed deadlines",
       options: "options that fit",
       details: "practical details",
-      conditions: "limits, permits and penalties",
       rule: "what the law or customs rule says",
+      conditions: "limits, permits and penalties",
     });
     expect(m.pinnedOpen(finland)).toBe(
       "Pinned to Espoo, Finland. This is a choice, not a rule, so searching the open web and labelling each source.",
