@@ -3,6 +3,7 @@ import { z } from "zod";
 import { CaseInput, CasePatch } from "@/lib/case";
 import { baseUrl, isAuthorised, loadCase, publishCase, recheckCase, updateCase } from "@/lib/cases";
 import { findGifts, GiftInput } from "@/lib/engine/gifts";
+import { findOpportunities, HouseholdProfile } from "@/lib/engine/opportunities";
 import { EngineError, ResearchInput, researchCase } from "@/lib/engine/research";
 
 export const maxDuration = 300;
@@ -61,6 +62,28 @@ function handlerFor(origin: string) {
         } catch (error) {
           const message = error instanceof Error ? error.message : "product search failed";
           return { ...text(`find_products failed: ${message}. Tell the user you could not find products right now.`), isError: true };
+        }
+      },
+    );
+
+    server.registerTool(
+      "find_opportunities",
+      {
+        title: "Find hidden opportunities for a household",
+        description:
+          "Find money, support, free tickets, events and discounts a household did not think to look for, from what is " +
+          "known about it: `city`, `members` (one line each, with ages), `situation` (what is going on: a lost job, a " +
+          "baby on the way, renting) and `interests` (jazz, bouldering). Runs several searches at once and keeps only " +
+          "findings whose sentence is on the page it cites. Returns title, value, why it fits, deadline, the quoted " +
+          "sentence and the URL. Typically 10 to 30 seconds. Use it when the household changes, or to check in unasked.",
+        inputSchema: HouseholdProfile,
+      },
+      async (input) => {
+        try {
+          return text(await findOpportunities(input));
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "opportunity scan failed";
+          return { ...text(`find_opportunities failed: ${message}.`), isError: true };
         }
       },
     );
