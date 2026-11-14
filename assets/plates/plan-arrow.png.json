@@ -1,8 +1,0 @@
-{
-  "prompt": "Edit this transparent cranberry pen-arrow asset. Preserve exactly its single curve, lower-left pointing direction, small open two-line arrowhead, canvas dimensions and placement. The stroke currently disappears when reduced to a 41 by 30 pixel annotation box. Increase its uniform flat ink stroke width to about 2.5 times its current width, including both arrowhead strokes, so it remains a delicate but clearly visible approximately 0.8 to 1 pixel line at that small display size. Keep the same matte cranberry #98112c, hand-drawn pen character and native transparency. Absolutely no shading, bevel, highlight, embossing, ribbon form, shadow or 3D depth. No words, marks or new objects. The entire stroke must have one flat ink colour with clean antialiased alpha edges.",
-  "tool": "image_gen.imagegen",
-  "region": "plan-arrow",
-  "revision": "Thin flat cranberry ink; second edit improves small-scale legibility",
-  "previousPrompt": ".impeccable/build/asset-prompts/plan-arrow-revision-exact.txt",
-  "approved": false
-}

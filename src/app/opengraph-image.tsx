@@ -7,8 +7,8 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /**
- * Preview for the landing page and every page without an image of its own.
- * Built once per deploy, like the landing page, so the numbers are those of the committed scorecard.
+ * Preview for the front page and every page without an image of its own.
+ * Built once per deploy, like the front page, so the numbers are those of the committed scorecard.
  * Without a scorecard the tiles are left out.
  */
 export default async function Image() {
@@ -16,8 +16,8 @@ export default async function Image() {
   const median = card && seconds(card.totals.medianMs);
   const tiles = card
     ? [
-        { value: `${card.totals.verifiedQuotes} of ${card.totals.totalQuotes}`, label: "quotes found on their pages" },
-        { value: `${card.totals.passed} of ${card.totals.scenarios}`, label: "live scenarios passed" },
+        { value: `${card.totals.verifiedQuotes}/${card.totals.totalQuotes}`, label: "quotes found on their pages" },
+        { value: `${card.totals.passed}/${card.totals.scenarios}`, label: "live scenarios passed" },
         ...(median ? [{ value: median, label: "median research time" }] : []),
       ]
     : [];
@@ -43,13 +43,16 @@ export default async function Image() {
                   display: "flex",
                   flexDirection: "column",
                   flexGrow: 1,
-                  padding: "14px 26px 18px",
-                  borderRadius: 24,
+                  flexBasis: 0,
+                  padding: "14px 22px 18px",
+                  borderRadius: 6,
                   border: `2px solid ${tone.border}`,
                 }}
               >
                 <span style={{ fontSize: 50, letterSpacing: "-0.03em" }}>{tile.value}</span>
-                <span style={{ fontSize: 26, color: tone.soft }}>{tile.label}</span>
+                <span style={{ fontSize: 18, letterSpacing: "0.1em", textTransform: "uppercase", color: tone.soft }}>
+                  {tile.label}
+                </span>
               </div>
             ))}
           </div>

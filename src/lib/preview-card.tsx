@@ -39,37 +39,27 @@ const NO_GLYPH =
  */
 export const printable = (text: string) => text.normalize("NFC").replace(NO_GLYPH, " ").replace(/\s+/g, " ").trim();
 
-/** Lucide's concierge bell on a cyan tile, then the name with "AI" in the accent colour, as in the site's header. */
+/**
+ * The small mark of DESIGN.md, AIDaddy's face for small sizes (the same drawing as src/app/icon.svg): one broken ring,
+ * a soft heart and a white centre on the ground. Passed as an image, so the renderer draws the gradient as it is.
+ */
+const MARK = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+    '<defs><radialGradient id="g"><stop offset="0" stop-color="#e6f9ff"/><stop offset="0.35" stop-color="#4fd8ff"/>' +
+    '<stop offset="1" stop-color="#4fd8ff" stop-opacity="0"/></radialGradient></defs>' +
+    '<rect width="32" height="32" rx="3" fill="#05080d"/>' +
+    '<circle cx="16" cy="16" r="11.5" fill="none" stroke="#4fd8ff" stroke-width="2.6" stroke-dasharray="39 7.5 17 8.76" transform="rotate(-62 16 16)"/>' +
+    '<circle cx="16" cy="16" r="7" fill="url(#g)"/>' +
+    '<circle cx="16" cy="16" r="2.6" fill="#f2fcff"/>' +
+    "</svg>",
+)}`;
+
+/** The small mark at 60px, then the name with "AI" in the accent colour, as in the site's header. */
 function Wordmark() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 60,
-          height: 60,
-          borderRadius: 16,
-          background: tone.primary,
-        }}
-      >
-        <svg
-          width="34"
-          height="34"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke={tone.primaryForeground}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z" />
-          <path d="M20 16a8 8 0 1 0-16 0" />
-          <path d="M12 4v4" />
-          <path d="M10 4h4" />
-        </svg>
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element -- drawn by next/og, not a page */}
+      <img src={MARK} width={60} height={60} alt="" />
       <div style={{ display: "flex", fontSize: 44, letterSpacing: "-0.02em" }}>
         <span style={{ color: tone.primary }}>AI</span>
         <span>Daddy</span>

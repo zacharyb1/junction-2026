@@ -76,7 +76,7 @@ The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are 
 
 ### The site, page by page
 
-AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page except `/reading` is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try it live, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
+AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try it live, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
 
 | Page | What a visitor gets | What it is |
 |---|---|---|
@@ -88,7 +88,7 @@ AIDaddy is both the product and the butler, one thing with one name. It sits in 
 | `/demo` | The list of replays. | Index page. |
 | `/demo/chat`, `/demo/browser`, `/demo/talk`, `/demo/calendar` | Scripted replays built from real case files. Add `?loop=1` to repeat one without the site's header and footer on the screen at the table, or `?bare=1` to play it once that way for a recording. | Scripted replays. The browser, kitchen-table and calendar scenes show concepts. |
 | `/autopilot` | A fixed script of specialist agents with one live check through the Engine. | Scripted demo. |
-| `/reading` | The reading-table edition of the front page, in its own paper design ([DESIGN.md](DESIGN.md)). | Live page, outside the shared frame on purpose. |
+| `/scorecard` | Every scenario of the latest scorecard run, with its result and its case file, and how a quote is checked. | Live page; the rows link to case files on the production server. |
 
 ## Main decisions and why
 
@@ -188,7 +188,7 @@ This handover records implemented behavior, tests, limitations and earlier decis
 | [docs/PITCH.md](docs/PITCH.md), [docs/pitch/](docs/pitch/) | Preparing the story, script and voiceover; refresh dated claims before recording. |
 | [docs/CHALLENGES_TO_SELECT.md](docs/CHALLENGES_TO_SELECT.md), [docs/VERDA.md](docs/VERDA.md) | Filling in the submission form: which challenges to select, the note to paste for each, and the process summary the Verda challenge asks for. |
 | [docs/DEMO_PLAN.md](docs/DEMO_PLAN.md), [docs/BOT_PLAN.md](docs/BOT_PLAN.md) | Proposals of Saturday 09:05: the run of show on the new front page, and the order of bot work before the freeze. |
-| [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The dark front page on `/`: what each section shows and which data file it reads. The reading-table page is at `/reading`. |
+| [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The dark front page on `/`: what each section shows and which data file it reads. |
 | [docs/RESEARCH.md](docs/RESEARCH.md), [docs/research/](docs/research/) | Finding prior research and historical plans. |
 | [docs/PLAYBOOK.md](docs/PLAYBOOK.md) | Checking event rules and logistics before submission. |
 | [docs/STARTERS.md](docs/STARTERS.md) | Consulting the pre-product template catalogue; it is not the current architecture. |
