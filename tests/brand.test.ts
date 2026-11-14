@@ -16,16 +16,16 @@ const SELF = path.relative(ROOT, fileURLToPath(import.meta.url)).split(path.sep)
 
 /**
  * The name as a name, not as letters inside a word. Finnish has many words with these letters in them (ukko,
- * Ukkonen, aukkoja, joulupukki, kukka). In every one of them a letter stands before the three letters or a vowel
- * follows them. So the name is the three letters at the start of a word with no vowel after them.
+ * Ukkonen, aukkoja, joulupukki, kukka). In each of them a letter stands before the three letters, or the word goes
+ * on with o, i or eli (ukko, ukki, ukkeli). Anywhere else the three letters are the name.
  */
 const RETIRED = [
   // UKK, UKK's, UKK:lta, UKK_VOICE, FROM_UKK, UKKGate. Not KUKKA, and not UKKONEN in a headline.
-  /(?<!\p{Lu})UKK(?![AEIOUYÄÖÅ](?!\p{Ll}))/u,
-  // UkkGate, UkkChat, askUkk(). Not Ukko or Ukkonen.
-  /Ukk(?![aeiouyäöå])/u,
+  /(?<!\p{Lu})UKK(?!(?:O|I|ELI)(?!\p{Ll}))/u,
+  // UkkGate, UkkChat, askUkk(). Not Ukko, Ukki or Ukkonen.
+  /Ukk(?!o|i|eli)/u,
   // ukk, /ukk, ukk-chat.tsx, ukk_session, ukk:research, __ukkLoaded, ukkConfigured. Not ukko, kukka or /ukkonen.
-  /(?<!\p{L})ukk(?![aeiouyäöå])/u,
+  /(?<!\p{L})ukk(?!o|i|eli)/u,
   // The president the character was named after, in every case form: Kekkonen, Kekkosen, Kekkoselle.
   /kekko(?:nen|s)/iu,
 ];
@@ -38,8 +38,9 @@ const spans = (pattern: RegExp, text: string): Span[] =>
     end: match.index + match[0].length,
   }));
 
-/** Where the retired name stands in a piece of text. */
-const retiredIn = (text: string): Span[] => RETIRED.flatMap((pattern) => spans(pattern, text));
+/** Where the retired name stands in a piece of text, from left to right. */
+const retiredIn = (text: string): Span[] =>
+  RETIRED.flatMap((pattern) => spans(pattern, text)).sort((a, b) => a.start - b.start);
 
 // ---- The names that stay ----------------------------------------------------------------------------------------
 
@@ -54,7 +55,11 @@ type Allowed = { file: string; pattern: RegExp; why: string };
 const SERVER_VARIABLES =
   /\b(?:UKK_API_URL|UKK_API_KEY|NEXT_PUBLIC_UKK_CHAT_URL)\b|\bUKK_\*?(?= (?:variable names|names|variables)\b)/;
 
-/** Everything that may still carry the retired name. Nothing else is tolerated, and an entry that excuses nothing fails. */
+/**
+ * Everything that may still carry the retired name. Nothing else is tolerated, and an entry that excuses nothing fails.
+ * The words and addresses of a fetched page are never changed to pass this test: they get an entry when they arrive.
+ * Finnish sites call their FAQ "UKK", and vero.fi has /ukk/ in its addresses.
+ */
 const ALLOWLIST: Allowed[] = [
   {
     file: "compose.yaml",
@@ -116,11 +121,11 @@ const ALLOWLIST: Allowed[] = [
     pattern: /your earlier names "UKK" and "Kaveri"/,
     why: "the persona line that tells the bot which earlier names are still addressed to it",
   },
-  // Recorded before the rename. Whoever re-records a video replaces the file and deletes its entry here.
-  { file: "docs/pitch/ukk-browser-demo.mp4", pattern: /^ukk-browser-demo\.mp4$/, why: "a recorded demo that is not re-recorded yet" },
-  { file: "docs/pitch/ukk-calendar-demo.mp4", pattern: /^ukk-calendar-demo\.mp4$/, why: "a recorded demo that is not re-recorded yet" },
-  { file: "docs/pitch/ukk-talk-demo.mp4", pattern: /^ukk-talk-demo\.mp4$/, why: "a recorded demo that is not re-recorded yet" },
-  { file: "docs/pitch/ukk-telegram-demo.mp4", pattern: /^ukk-telegram-demo\.mp4$/, why: "a recorded demo that is not re-recorded yet" },
+  // The four demo videos, by name. Whoever re-records one removes the old file and deletes its entry here.
+  { file: "docs/pitch/ukk-browser-demo.mp4", pattern: /^ukk-browser-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
+  { file: "docs/pitch/ukk-calendar-demo.mp4", pattern: /^ukk-calendar-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
+  { file: "docs/pitch/ukk-talk-demo.mp4", pattern: /^ukk-talk-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
+  { file: "docs/pitch/ukk-telegram-demo.mp4", pattern: /^ukk-telegram-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
 ];
 
 // ---- What is read -----------------------------------------------------------------------------------------------
@@ -175,7 +180,7 @@ function inFolder(folder: string, deep: boolean): Place[] {
     .sort((a, b) => (a.name < b.name ? -1 : 1))
     .flatMap((entry) => {
       const file = `${folder}/${entry.name}`;
-      // Hidden files are editor, cache and private env files, all ignored by Git here: not source that people see,
+      // Hidden files and folders are editor, cache and private env files: none of them is source that people see,
       // and a line of a private env file must never be printed by a failing test.
       if (entry.name.startsWith(".") || NOT_SOURCE.includes(entry.name)) return [];
       if (HISTORY.includes(file) || file === SELF) return [];
@@ -184,9 +189,10 @@ function inFolder(folder: string, deep: boolean): Place[] {
     });
 }
 
+/** Everything the guard reads. A listed folder or file that is gone fails loudly, so the lists cannot go stale either. */
 function everyPlace(): Place[] {
   const gone = [...FOLDERS, ...FLAT_FOLDERS, ...ROOT_FILES].filter((listed) => !existsSync(path.join(ROOT, listed)));
-  if (gone.length > 0) throw new Error(`${SELF} reads ${gone.join(", ")}, which is not on disk: update its lists.`);
+  if (gone.length > 0) throw new Error(`${SELF} lists what is not on disk: ${gone.join(", ")}. Update its lists.`);
   return [
     ...FOLDERS.flatMap((folder) => inFolder(folder, true)),
     ...FLAT_FOLDERS.flatMap((folder) => inFolder(folder, false)),
@@ -227,7 +233,9 @@ function shown({ file, line, text, hits }: Offence): string {
   return `${file}:${line}: ${whole.length <= 160 ? whole : around.join(" ")}`;
 }
 
-const ADVICE = `The brand is AIDaddy (decision of Sat 14 Nov 2026): rename it, or, if another machine depends on the name, add it to ALLOWLIST in ${SELF} with the reason.`;
+const ADVICE =
+  "The brand is AIDaddy (decision of Sat 14 Nov 2026): rename it, or, if another machine depends on the name, " +
+  `add it to ALLOWLIST in ${SELF} with the reason.`;
 
 describe("the brand guard", () => {
   let checked: ReturnType<typeof audit> | undefined;
@@ -235,14 +243,19 @@ describe("the brand guard", () => {
 
   it("finds the retired name UKK nowhere in the source that people see", () => {
     const { offences } = tree();
+    const count = `${offences.length} place${offences.length === 1 ? "" : "s"}`;
     const list = offences.map((offence) => `  ${shown(offence)}`).join("\n");
-    assert(offences.length === 0, `The retired name is back in ${offences.length} place(s):\n\n${list}\n\n${ADVICE}`);
+    assert(offences.length === 0, `The retired name is back in ${count}:\n\n${list}\n\n${ADVICE}`);
   });
 
   it("has no allowlist entry that excuses nothing, so the list cannot outlive what it protects", () => {
     const { unused } = tree();
     const list = unused.map((entry) => `  ${entry.file}  ${entry.pattern}  (${entry.why})`).join("\n");
-    assert(unused.length === 0, `These entries of ALLOWLIST in ${SELF} excuse nothing any more. Delete them:\n\n${list}`);
+    assert(
+      unused.length === 0,
+      `These entries of ALLOWLIST in ${SELF} excuse nothing any more. Delete each one, or bring its pattern up to date ` +
+        `if the text it excused was only reworded:\n\n${list}`,
+    );
   });
 });
 
@@ -257,7 +270,6 @@ describe("the brand guard's matcher", () => {
       "hei ukk",
       "kysyin UKK:lta",
       "UKK:n suunnitelma",
-      "UKK-instituutti",
       // In code.
       "UKK_VOICE",
       "UKK_OFFICIAL_HOSTS",
@@ -276,6 +288,7 @@ describe("the brand guard's matcher", () => {
       '"ukk:research"',
       ".ukk {",
       "#ukk-root",
+      "ukkbot",
       // In addresses and in the names of files and folders.
       "/ukk",
       "/api/ukk/speak",
@@ -288,26 +301,32 @@ describe("the brand guard's matcher", () => {
       "UkkChat.tsx",
       // The president the character was named after.
       "Kekkonen",
-      "Urho Kekkosen katu",
+      "Kekkosen tapaan",
       "kekkonen.jpg",
     ];
     for (const text of names) expect(retiredIn(text), text).not.toEqual([]);
   });
 
-  it("leaves alone the Finnish words that only contain the letters", () => {
+  it("leaves alone the Finnish words that only contain the letters, and the new name", () => {
     const words = [
+      // Words that start with the letters and go on.
       "ukko",
       "Ukko",
       "ukko tulee kotiin",
       "ukkonen",
+      "Ukkonen",
       "Ukkonen soitti",
       "UKKONEN",
       "ukkosmyrsky",
       "ukki",
       "Ukki",
+      "ukkeli",
+      "Ukko-Pekka",
+      // Words with the letters inside them.
       "aukkoja",
       "Listattu, jotta tiedät, missä on aukkoja.",
       "joulupukki",
+      "lumiukko",
       "kukka",
       "KUKKA",
       "Kukkonen",
@@ -316,15 +335,20 @@ describe("the brand guard's matcher", () => {
       "lukko",
       "tukku",
       "bukk",
+      // The same words in an address and in the name of a file.
       "https://www.ilmatieteenlaitos.fi/ukkonen",
       "sukka.png",
+      // The new name.
       "AIDaddy",
+      "AIDaddyn",
       "aidaddy_session",
     ];
     for (const text of words) expect(retiredIn(text), text).toEqual([]);
   });
+});
 
-  it("excuses only what an allowlist entry names, in its own file, and reports an entry that excuses nothing", () => {
+describe("the brand guard's allowlist", () => {
+  it("excuses only what an entry names, in its own file, and reports an entry that excuses nothing", () => {
     const allowlist: Allowed[] = [
       { file: "a.ts", pattern: /UKK_API_URL/, why: "another machine sets it" },
       { file: "a.ts", pattern: /"ukk"/, why: "nothing in the file needs it" },
