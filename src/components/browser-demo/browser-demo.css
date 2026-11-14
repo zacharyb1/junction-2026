@@ -1,0 +1,331 @@
+/* /demo/browser (issue #34): a scripted browser replay. Original styling, scoped to .bdemo-stage. */
+.bdemo-stage {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: #14202c;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.bdemo {
+  position: relative;
+  width: min(1180px, 100%);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f5f6f8;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  color: #1b2430;
+}
+.bdemo-chrome {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: #dfe3e8;
+  font-size: 0.85rem;
+}
+.bdemo-dots {
+  display: flex;
+  gap: 6px;
+}
+.bdemo-dots i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f26b5b;
+}
+.bdemo-dots i:nth-child(2) {
+  background: #f6c14b;
+}
+.bdemo-dots i:nth-child(3) {
+  background: #5ec46b;
+}
+.bdemo-tab {
+  padding: 0.35rem 0.9rem;
+  border-radius: 8px 8px 0 0;
+  background: #f5f6f8;
+  font-weight: 500;
+}
+.bdemo-url {
+  flex: 1;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: #fff;
+  color: #5b6672;
+}
+.bdemo-body {
+  display: flex;
+  height: calc(100% - 46px);
+}
+.bdemo-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 2.2rem 3rem;
+}
+.bdemo-step {
+  color: #5b6672;
+  font-size: 0.85rem;
+}
+.bdemo-h {
+  font-size: 1.6rem;
+  font-weight: 650;
+}
+.bdemo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 460px;
+  font-size: 0.85rem;
+  color: #3b4652;
+}
+.bdemo-field output {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.8rem;
+  border: 1px solid #c3cad2;
+  border-radius: 8px;
+  background: #fff;
+  color: #1b2430;
+  font-size: 1rem;
+  transition: border-color 0.4s, background 0.4s;
+}
+.bdemo-field.is-stuck output {
+  border-color: #e3a13a;
+  background: #fff8ec;
+}
+.bdemo-field.is-fixed output {
+  border-color: #2e9e5b;
+  background: #eefaf2;
+}
+.bdemo-field em {
+  color: #2e7d4f;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 600;
+}
+.bdemo-caret {
+  width: 2px;
+  height: 1.2em;
+  margin-left: 2px;
+  background: #1b2430;
+  animation: bdemo-blink 1s steps(1) infinite;
+}
+.bdemo-stuck {
+  color: #a8650b;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.bdemo-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: auto;
+}
+.bdemo-back,
+.bdemo-submit {
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.bdemo-back {
+  border: 1px solid #c3cad2;
+  background: #fff;
+}
+.bdemo-submit {
+  background: #2a5c8a;
+  color: #fff;
+}
+.bdemo-submit.is-waiting {
+  box-shadow: 0 0 0 4px rgb(227 161 58 / 0.6);
+}
+.bdemo-wait {
+  color: #a8650b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.bdemo-panel {
+  display: flex;
+  width: 0;
+  flex-direction: column;
+  gap: 0.8rem;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  border-left: 1px solid #d5dbe1;
+  background: #fff;
+  transition: width 0.6s ease, padding 0.6s ease;
+}
+.bdemo-panel.is-open {
+  width: 360px;
+  padding: 1.5rem 1.3rem;
+}
+.bdemo-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.bdemo-panel-head img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.bdemo-panel-name {
+  font-weight: 650;
+}
+.bdemo-panel-sub {
+  color: #5b6672;
+  font-size: 0.8rem;
+}
+.bdemo-msg,
+.bdemo-rule {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  animation: bdemo-in 0.4s ease-out;
+}
+.bdemo-rule {
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid #2a5c8a;
+  border-radius: 4px;
+  background: #f1f5f9;
+}
+.bdemo-rule sup {
+  color: #2a5c8a;
+  font-weight: 600;
+}
+.bdemo-fix {
+  align-self: flex-start;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  background: #2e9e5b;
+  color: #fff;
+  font-weight: 600;
+  animation: bdemo-in 0.4s ease-out;
+}
+.bdemo-fix.is-pressed {
+  transform: scale(0.96);
+  filter: brightness(0.9);
+}
+.bdemo-call {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  width: 330px;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem 1.4rem 1.4rem;
+  border-radius: 28px;
+  background: rgb(18 26 36 / 0.96);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  color: #fff;
+  transform: translate(-50%, -50%);
+  animation: bdemo-in 0.4s ease-out;
+}
+.bdemo-call img {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.bdemo-call img.is-ringing {
+  animation: bdemo-ring 1s ease-in-out infinite;
+}
+.bdemo-call-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+.bdemo-call-state {
+  color: #a9b8c7;
+  font-size: 0.9rem;
+}
+.bdemo-captions {
+  display: flex;
+  min-height: 7.5rem;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  margin: 0.6rem 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  text-align: center;
+}
+.bdemo-captions p {
+  animation: bdemo-in 0.4s ease-out;
+}
+.bdemo-captions p:not(:last-child) {
+  opacity: 0.55;
+}
+.bdemo-call-buttons {
+  display: flex;
+  gap: 3.5rem;
+}
+.bdemo-call-buttons span {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.4rem;
+}
+.is-decline {
+  background: #e5484d;
+}
+.is-accept {
+  background: #30a46c;
+}
+.is-accept.is-pulse {
+  animation: bdemo-ring 1s ease-in-out infinite;
+}
+.bdemo-concept {
+  margin-top: 0.6rem;
+  color: #f6c14b;
+  font-size: 0.75rem;
+}
+.bdemo-caption {
+  max-width: 900px;
+  color: #c8d3de;
+  font-size: 0.82rem;
+  text-align: center;
+}
+.bdemo-caption a {
+  color: #8cc8ff;
+}
+@keyframes bdemo-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.bdemo-call {
+  animation-name: bdemo-pop;
+}
+@keyframes bdemo-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%);
+  }
+}
+@keyframes bdemo-ring {
+  50% {
+    transform: scale(1.06);
+  }
+}
+@keyframes bdemo-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bdemo-stage *,
+  .bdemo-stage *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
