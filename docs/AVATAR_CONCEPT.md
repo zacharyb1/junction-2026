@@ -29,7 +29,7 @@ The test profile has eight small local video files. The appearance template is s
 
 ## Still needed for the intended concept
 
-- A Gemini key with model access and an agreed spending limit; no paid generation has run.
+- Paid image/video access and an agreed spending limit. A free-tier Gemini key is configured locally; no paid generation has run.
 - Generate and inspect a natural human avatar, especially its hands, identity and the first/last-frame joins.
 - Try ElevenLabs playback with a configured key. Lip synchronization is not implemented.
 - Decide with the team whether to include this and how Gemini should participate at runtime. The current runtime uses a deterministic controller, not Gemini; no sponsor claim should imply otherwise.

@@ -61,3 +61,11 @@ The player can then use `/avatar/default/manifest.json` instead of `/avatar/test
 ## Remaining evidence
 
 Paid API requests, actual generated faces/acting, visual seam quality, and voice integration remain unverified. Test cards demonstrate scheduling and decoding only. No Gemini challenge claim should describe these local fixtures as model-generated media or describe asset preparation as a runtime Gemini integration.
+
+## Free-tier access check, 14 November
+
+The user supplied a free-tier key locally after the hackathon credit giveaway ran out. An authenticated model-catalogue request succeeded; catalogue presence alone does not establish generation entitlement. No image/video request was made. The planned Omni and Nano Banana models have no free tier according to [Google pricing](https://aistudio.google.com/docs/pricing).
+
+One synthetic text-only call to `gemini-3.5-flash-lite` via Interactions returned HTTP 200, completed in 1,756 ms, using 50 input and 30 output tokens. The prompt asked for a single spoken sentence preserving uncertainty about an unconfirmed deadline. Output: “I found a source for you, but I couldn't confirm the deadline, so you'll want to read through it before taking any action.” This is a successful API smoke check, not a quality evaluation or an implemented runtime narration feature. Raw probe evidence stays in ignored `.data/avatar-generation/free-text-probe.json`; no key is recorded there.
+
+Flash-Lite text input/output has a free tier; project quotas still apply. It is a candidate for preparing short spoken replies or appearance specifications. It does not create the avatar images or video. Selecting a sponsor challenge and the final runtime role remain team decisions.
