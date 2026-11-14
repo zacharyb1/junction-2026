@@ -21,19 +21,73 @@ const BUBBLE = "rounded-lg border text-sm leading-relaxed whitespace-pre-wrap";
 const FROM_UKK = `${BUBBLE} max-w-[92%] self-start bg-card p-3`;
 const FROM_YOU = `${BUBBLE} max-w-[85%] self-end border-primary/40 bg-primary/10 px-3 py-2`;
 
-/** Reply text with its URLs as links (case files and official pages). */
+// Pictures already asked for, by link, so a reply that re-renders while it streams asks the server once per link.
+const PICTURES = new Map<string, Promise<string | null>>();
+
+function pictureFor(url: string): Promise<string | null> {
+  let found = PICTURES.get(url);
+  if (!found) {
+    found = fetch(`/api/gifts/image?url=${encodeURIComponent(url)}`)
+      .then((res) => (res.ok ? (res.json() as Promise<{ image?: string }>) : null))
+      .then((body) => body?.image ?? null)
+      .catch(() => null);
+    PICTURES.set(url, found);
+  }
+  return found;
+}
+
+/**
+ * A link in UKK's reply, with the product's picture above it when the link is a product the gift search found, so a
+ * gift is seen as well as named. The server knows the picture; the model only has to post the link.
+ */
+function ReplyLink({ url }: { url: string }) {
+  const [picture, setPicture] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    // A link that is still streaming in grows for a moment: ask once it has stopped changing.
+    const wait = setTimeout(() => void pictureFor(url).then((p) => live && setPicture(p)), 400);
+    return () => {
+      live = false;
+      clearTimeout(wait);
+    };
+  }, [url]);
+  return (
+    <>
+      {picture && (
+        // A shop's own image on its own host: next/image would need every shop listed in the config.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={picture}
+          alt=""
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          // A shop with no product photo offers its logo or a banner instead: much wider than tall, so it is hidden.
+          onLoad={(e) => {
+            const img = e.currentTarget;
+            if (img.naturalWidth > img.naturalHeight * 2) setPicture(null);
+          }}
+          onError={() => setPicture(null)}
+          className="my-1 block size-32 rounded-md border bg-white object-contain"
+        />
+      )}
+      <a href={url} target="_blank" rel="noreferrer" className="break-all text-primary underline underline-offset-2">
+        {url}
+      </a>
+    </>
+  );
+}
+
+// A markdown image the model sometimes writes anyway. The picture comes from the product link, so the line is dropped.
+const MARKDOWN_IMAGE = /!\[[^\]\n]*\]\(https?:\/\/[^\s)]*\)?\n?/g;
+
+/** Reply text with its URLs as links (case files, official pages and shops). */
 function Linked({ text }: { text: string }) {
   return (
     <>
-      {text.split(LINK).map((part, i) =>
-        i % 2 === 1 ? (
-          <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all text-primary underline underline-offset-2">
-            {part}
-          </a>
-        ) : (
-          <span key={i}>{part}</span>
-        ),
-      )}
+      {text
+        .replace(MARKDOWN_IMAGE, "")
+        .split(LINK)
+        .map((part, i) => (i % 2 === 1 ? <ReplyLink key={i} url={part} /> : <span key={i}>{part}</span>))}
     </>
   );
 }
@@ -204,8 +258,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
           <li key={i} className={turn.from === "you" ? FROM_YOU : FROM_UKK}>
             {turn.from === "ukk" && !turn.text ? (
               <span className="inline-flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> UKK is consulting the official
-                sources
+                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> UKK is working on it
               </span>
             ) : (
               <Linked text={turn.text} />
