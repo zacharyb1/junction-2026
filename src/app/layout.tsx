@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { baseUrl } from "@/lib/cases";
 import "./globals.css";
@@ -30,11 +30,16 @@ export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: { default: "AIDaddy", template: "%s · AIDaddy" },
   description,
+  applicationName: "AIDaddy",
+  appleWebApp: { capable: true, title: "AIDaddy", statusBarStyle: "default" },
+  icons: { apple: { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" } },
   // A page below the landing page that sets its own openGraph replaces this one as a whole, image included:
   // it repeats siteName and brings an opengraph-image file of its own (see src/app/try).
   openGraph: { title: "AIDaddy", description, siteName: "AIDaddy", type: "website" },
   twitter: { card: "summary_large_image", title: "AIDaddy", description },
 };
+
+export const viewport: Viewport = { themeColor: "#05080d" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
