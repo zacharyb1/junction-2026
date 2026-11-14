@@ -65,7 +65,7 @@ export const REPLAYS: Record<SceneSlug, Scene> = {
     place: "In the calendar",
     title: "AIDaddy in the calendar",
     story: "A 60th birthday is two weeks away. AIDaddy finds three options, drafts the invitation and books nothing.",
-    real: "Concept: AIDaddy cannot read or write a calendar yet. In Telegram you tell it the birthdays. The three options and their facts come from a real run.",
+    real: "Concept: AIDaddy cannot read or write a calendar yet. In Telegram you tell AIDaddy the birthdays. The three options and their facts come from a real run.",
     tag: "Concept",
     tone: "concept",
     seconds: 31,

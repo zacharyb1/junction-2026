@@ -165,8 +165,8 @@ const RULES = [
     text: "When two official pages give different figures, the case file shows both with their sources. It does not pick one for you in silence.",
   },
   {
-    title: "It never acts for you",
-    text: "AIDaddy researches and prepares. It never sends, files, books or pays. It may write a draft ahead of time, but nothing is sent and no reminder is set until the family says yes.",
+    title: "AIDaddy never acts for you",
+    text: "It researches and prepares. It never sends, files, books or pays. It may write a draft ahead of time, but nothing is sent and no reminder is set until the family says yes.",
   },
 ];
 

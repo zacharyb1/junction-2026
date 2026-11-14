@@ -24,7 +24,7 @@ export const PEOPLE: Record<Speaker, { name: string; color: string; initials?: s
 export const SCRIPT: Beat[] = [
   { kind: "message", from: "mikko", text: "who's picking up groceries tonight?", at: 600 },
   { kind: "message", from: "aino", text: "me, after yoga 🧘", at: 2200 },
-  { kind: "note", text: "AIDaddy reads along. Small talk stays on our server, and it stays silent.", at: 3600 },
+  { kind: "note", text: "AIDaddy reads along. Small talk stays on our server, and AIDaddy stays silent.", at: 3600 },
   { kind: "message", from: "aino", text: "ok big news… we're expecting!! due in May 🥹", at: 6200 },
   { kind: "message", from: "mikko", text: "WHAT 😭❤️❤️", at: 7600 },
   {

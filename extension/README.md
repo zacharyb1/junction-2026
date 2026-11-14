@@ -11,7 +11,7 @@ A Chrome extension. It looks at the page you have open and, when the page is abo
 
 That is the only permission question. From then on AIDaddy looks at every page you open.
 
-Already installed? After the files in this folder change, click the reload arrow on the extension's card in `chrome://extensions`. Your yes, the access code and what you saved are kept. Without the reload Chrome keeps running the old background worker. When that worker no longer answers, the corner pill says "AIDaddy needs a reload" instead of going quiet.
+Already installed? After the files in this folder change, click the reload arrow on the extension's card in `chrome://extensions`, then refresh the pages that are already open: they keep the old copy until then. Your yes, the access code and what you saved are kept. Without the reload Chrome keeps running the old background worker. When that worker no longer answers, the corner pill says "AIDaddy needs a reload" instead of going quiet.
 
 ## What it does, exactly
 

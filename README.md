@@ -2,7 +2,7 @@
 
 A butler in a family's Telegram group. It notices a life event or an official letter, researches the live web with Exa, and returns a short plan with checked quotes and a case file the family can inspect.
 
-Built for international families in Finland at Junction 2026, Espoo, 13–15 November. The main challenge is **Exa — The Internet Butler / Your Personal Assistant**. [Web demo](https://junction-2026.vercel.app) · [Challenge brief](docs/CHALLENGE.md) · [Submission checklist](docs/SUBMISSION_CHECKLIST.md) · [MIT license](LICENSE)
+Built for international families in Finland at Junction 2026, Espoo, 13–15 November. The main challenge is **Exa — The Internet Butler / Your Personal Assistant**. [Web demo](https://86.38.238.136.sslip.io) · [Challenge brief](docs/CHALLENGE.md) · [Submission checklist](docs/SUBMISSION_CHECKLIST.md) · [MIT license](LICENSE)
 
 ## Start here
 
@@ -72,7 +72,7 @@ The gate filters group text before a cloud call. Direct messages, addressed mess
 | Tailwind + shadcn/Base UI | Interface components; [`package.json`](package.json) and the lockfile are authoritative for versions. |
 | pnpm + GitHub Actions | Reproducible install and checks in [CI](.github/workflows/ci.yml). |
 
-The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are not the AIDaddy research path. Its `/chat` page is removed. `/chat` is now the chat with AIDaddy: it calls `/api/aidaddy`, not the scaffold's endpoint, and the chat's earlier address redirects to it (`next.config.ts`). Sponsor tools proposed for later are listed separately below.
+The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are not the AIDaddy research path; the scaffold's own chat page is removed. `/chat` is the chat with AIDaddy: it calls `/api/aidaddy`, not the scaffold's endpoint, and the chat's earlier address redirects to it (`next.config.ts`). Sponsor tools proposed for later are listed separately below.
 
 ### The site, page by page
 

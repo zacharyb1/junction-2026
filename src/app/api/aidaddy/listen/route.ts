@@ -1,6 +1,6 @@
 import { mayResearch } from "@/lib/cases";
 import { allow } from "@/lib/rate-limit";
-import { transcribe } from "@/lib/speech";
+import { spellName, transcribe } from "@/lib/speech";
 
 export const maxDuration = 45;
 
@@ -24,7 +24,8 @@ export async function POST(req: Request) {
   if (!audio || !audio.size) return json({ error: "The voice note was empty." }, 400);
   if (audio.size > MAX_AUDIO_BYTES) return json({ error: "That voice note is too long." }, 413);
   try {
-    const text = await transcribe(new Blob([audio], { type }));
+    // Speech to text writes the name as two words ("AI Daddy"). In the message box it is spelled like everywhere else.
+    const text = spellName(await transcribe(new Blob([audio], { type })));
     if (!text) return json({ error: "AIDaddy did not catch any words. Try again a little closer." }, 422);
     return json({ text }, 200);
   } catch (error) {

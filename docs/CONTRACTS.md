@@ -371,7 +371,7 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `DEMO_RATE_TOTAL_PER_MINUTE` | Vercel, optional | all public requests per minute, default 40 |
 | `OXYLABS_API_KEY` | Vercel, optional | third page reader for sites that refuse our request |
 | `ELEVENLABS_API_KEY` | Vercel, optional | turns on the spoken plan: `GET /api/cases/:id/audio` and the button on the case page |
-| `ELEVENLABS_VOICE_ID` | Vercel, optional | voice for the spoken plan, default `JBFqnCBsd6RMkjVDRZzb` (George) |
+| `ELEVENLABS_VOICE_ID` | Vercel, optional | voice for everything the app speaks: the spoken plan and AIDaddy's replies on `/chat`. Default `UWUOFJTWwuSmZFHzbMpM`, AIDaddy's own designed voice, which lives in the team's ElevenLabs account: set it when the key belongs to another account |
 | `BLOB_READ_WRITE_TOKEN` | Vercel, set by the Blob store | case storage |
 | `PUBLIC_BASE_URL` | Vercel, optional | overrides the origin used in case links |
 | `NEXT_PUBLIC_BOT_USERNAME` | Vercel | QR code and links to the Telegram bot |

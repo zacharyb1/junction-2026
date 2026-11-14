@@ -124,3 +124,21 @@ export async function transcribe(audio: Blob): Promise<string> {
   const body = (await res.json()) as { text?: string };
   return (body.text ?? "").trim();
 }
+
+/** The Finnish case endings and the one particle people write straight after the name, as the gate accepts them. */
+const NAME_ENDING = "(?:n|a|ä|lle|lla|llä|lta|ltä|ssa|ssä|sta|stä|yn|na|nä|ksi)?(?:kin|kaan|kään|han|hän|ko|kö|pa|pä)?";
+
+/** The name as speech to text writes it down: "AI Daddy", "Ai daddy", "AI-Daddy", "A.I. Daddy", with or without an ending. */
+const NAME_AS_HEARD = new RegExp(
+  `(?<![\\p{L}\\p{N}_])(?:ai|a\\.\\s?i\\.?)[ \\u00a0\\u2010\\u2011-]?daddy(${NAME_ENDING})(?![\\p{L}\\p{N}_])`,
+  "giu",
+);
+
+/**
+ * A transcript with the name spelled the way the product spells it. Speech to text hears "AIDaddy" as two words,
+ * and the transcript goes into the visitor's message box. Only the name changes, and an ending written straight
+ * after it stays ("AI Daddyn" becomes "AIDaddyn"): "daddy" alone, "AI" alone and every other word are left as heard.
+ */
+export function spellName(transcript: string): string {
+  return transcript.replace(NAME_AS_HEARD, "AIDaddy$1");
+}

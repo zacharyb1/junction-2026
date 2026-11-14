@@ -57,7 +57,7 @@ export default async function Home() {
             index="02"
             label="The moment that matters"
             title="Then it goes to work."
-            lede="Three Exa searches at once on the official sites of the right country, then a fourth for pages published in the last four months. Every page it wants to cite is opened again, and every quote is looked up on that page before it may stay."
+            lede="Three Exa searches at once on the official sites of the right country, then a fourth for pages published in the last four months. Every page AIDaddy wants to cite is opened again, and every quote is looked up on that page before it may stay."
           >
             <ResearchReplay data={replay}>
               <SiteLink href="/try" className="hud-btn hud-btn--primary">

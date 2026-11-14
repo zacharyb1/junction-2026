@@ -225,7 +225,11 @@
           state: "off",
           pill: "AIDaddy needs a reload",
           title: "The extension was updated",
-          body: [el("p", { text: "Open chrome://extensions and press the reload arrow on AIDaddy. Your settings stay as they are." })],
+          body: [
+            el("p", {
+              text: "Open chrome://extensions and press the reload arrow on this extension's card, then refresh this page. Your settings stay as they are.",
+            }),
+          ],
         });
       }
       return;
