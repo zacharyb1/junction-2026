@@ -8,6 +8,8 @@ Measured state is in the [README](../README.md#start-here) and the [Hermes hando
 
 ## Three facts that shape the day
 
+> **Update 09:05:** everything now runs on a Verda server at <https://86.38.238.136.sslip.io>, including the bot with the shared token. Case links open on any phone. `"provider":"none"` in `/api/health` does not mean research is off; see the decision log. Do not start the shared token anywhere else. Details in [Deployment](DEPLOYMENT.md#what-runs-where).
+
 - **Production is stale.** `https://junction-2026.vercel.app/api/health` answered with commit `ef53df2` and `"provider":"none"` at 05:38. Vercel blocks newer deployments by project access. Until that changes, the public site does not run the current Engine.
 - **The bot's Case links open only on Vlad's laptop.** The Bot runtime points at a local Engine, so every link it posts starts with localhost.
 - **Nobody has run the bot on a Mac.** The native setup was tested on Fedora only. The containers pass on Linux amd64 and Linux ARM64 in CI, which is not the same as Docker Desktop on macOS.

@@ -4,6 +4,8 @@ This is an operational reference for the current implementation, not a roadmap o
 
 ## What runs where
 
+**Production since Saturday 14 November, 09:00 Helsinki:** the whole runtime runs on one Verda CPU server with Compose from `/opt/kaveri` (branch `ops/server-compose`): the web app and Engine at <https://86.38.238.136.sslip.io>, Hermes with the shared token, and the Gemma gate. Services restart after a crash or reboot. **The shared Telegram token is in use there; do not start it on another machine.** Ask in the team chat for SSH access. The table below describes the parts in general.
+
 | Part | Current implementation / recorded state |
 |---|---|
 | Web app and Engine | Next.js on the existing Vercel project `junction-2026`, at `https://junction-2026.vercel.app`. The Git integration uses `main`; GitHub CI checks code but does not perform the deployment. This handover has not inspected current Vercel environment settings. |
