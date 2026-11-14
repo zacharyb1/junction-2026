@@ -175,6 +175,6 @@ docker build --file containers/hermes/Dockerfile --tag kaveri-hermes:check .
 node scripts/hermes-container-smoke.mjs docker kaveri-hermes:check kaveri-web:check
 ```
 
-The smoke-check runners need host Node 22+, unlike normal Compose startup. GitHub CI builds both images, validates both Compose modes and runs the isolated checks. The pinned upstream Hermes image emits a bundled-pnpm advisory during configuration; the configured gateway does not use pnpm, and these checks succeeded without installing additional tools.
+The smoke-check runners need host Node 22+, unlike normal Compose startup. GitHub CI builds both images, validates both Compose modes and runs the isolated checks on Linux amd64 and native ARM64 runners; the [latest run](https://github.com/zacharyb1/junction-2026/actions/workflows/ci.yml) records their results. ARM64 covers the container architecture used by Apple Silicon, not the macOS/Docker Desktop host. The pinned upstream Hermes image emits a bundled-pnpm advisory during configuration; the configured gateway does not use pnpm, and the local checks succeeded without installing additional tools.
 
-No Mac or arm64 execution, live Exa research, Telegram delivery or reminder delivery has been established by the container checks. Earlier native Telegram evidence remains separate in the [Hermes handover](HERMES_HANDOVER.md).
+Actual Mac execution, live Exa research, Telegram delivery and reminder delivery remain outside these container checks. Earlier native Telegram evidence remains separate in the [Hermes handover](HERMES_HANDOVER.md).

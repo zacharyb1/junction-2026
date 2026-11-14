@@ -12,13 +12,14 @@ This is the **Saturday 14 November morning handover**, updated after the Hermes 
 |---|---|
 | Shared Engine and web app | `main` contains research, verification, case pages, browser demo and the optional Oxylabs reader. |
 | Hermes bot | [PR #6](https://github.com/zacharyb1/junction-2026/pull/6) merged into `main`: local install, Telegram flows, gate, rehearsal tooling and case-preservation repairs. Selected group/DM flows passed against a local Engine. Detailed evidence is in [Hermes handover](docs/HERMES_HANDOVER.md). |
+| Container runtime | [PR #8](https://github.com/zacharyb1/junction-2026/pull/8) merged as `f7b54b6`: web/Engine, Hermes and Ollama/Gemma, with separate persistent volumes. The post-merge Linux amd64 checks passed. See the [container guide](docs/CONTAINERS.md) for validation limits. |
 | Verifier review | [Draft PR #7](https://github.com/zacharyb1/junction-2026/pull/7): independent-reading verification and withholding unsupported money items. Separate from #6 and not merged. |
 | Alternate bot | `scaffold/milestone-1-2` is the separate Hono/Mastra track; this handover does not certify it. |
-| Landing design | Separate `vlad/landing-redesign` branch; outside this handover's changes. |
+| Landing design | [PR #9](https://github.com/zacharyb1/junction-2026/pull/9), `vlad/landing-redesign-v2`, is separate and open at this check; outside this handover's changes. |
 
-PR #6 merged as `318f760` and its GitHub CI passed. The Vercel deployment for that merge was blocked by project access; merging did not establish a successful production update. PR #7 remains a separate draft. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`.
+PRs #6 and #8 merged and their post-merge GitHub CI passed. Vercel blocked deployment by project access; the public health endpoint still reported `ef53df2` at 05:24 EET on 14 November. This establishes a serving revision, not working research credentials. PR #7 remains a separate draft. PR #2's original challenge plan is included in #6; #3's pnpm CI fix is already on `main`.
 
-**Runtime snapshot, Saturday morning:** the local Engine process is running and five Case files are present. No running Hermes gateway was found during the latest process check. Its configuration still targets the local Engine; the gate plugin is installed. The successful Telegram tests below are earlier evidence, not a claim that the bot is online now. No service was started or stopped during this documentation pass.
+**Runtime snapshot, 14 November at 05:24 EET:** the local Engine is running and all five stored Cases parse and return working API/page responses. No gateway or scheduler belonging to this Hermes installation is running. One enabled reminder remains saved locally, with no local runner to deliver it; a source clone or fresh container does not inherit it. The Ollama service is running with no model currently loaded. The successful Telegram tests below are earlier evidence, not a claim that the bot is online now. Another host using the shared token is outside this check. No service was started or stopped by this audit.
 
 ## Goal and core concepts
 
