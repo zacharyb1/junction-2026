@@ -47,6 +47,8 @@ const en = {
   memoryVsWeb: "Memory versus web",
   memoryExpected: "From memory the assistant expected:",
   memoryWins: "The live page says otherwise, so the page wins.",
+  news: "New on official sites",
+  newsHint: "Pages published or updated in the last four months on this topic. They are pointers to read, not part of the checked plan.",
   researched: "How this was researched",
   trail: (searches: number, pages: number, seconds: string) =>
     `${searches} Exa searches, ${pages} pages opened, ${seconds} seconds`,
@@ -104,6 +106,8 @@ const fi: Labels = {
   memoryVsWeb: "Muisti vastaan verkko",
   memoryExpected: "Avustaja oletti muistin perusteella:",
   memoryWins: "Sivu sanoo toisin, joten sivu ratkaisee.",
+  news: "Uutta virallisilla sivustoilla",
+  newsHint: "Aiheesta viimeisen neljän kuukauden aikana julkaistuja tai päivitettyjä sivuja. Ne ovat lukuvinkkejä, eivät osa tarkistettua suunnitelmaa.",
   researched: "Miten tämä selvitettiin",
   trail: (searches, pages, seconds) => `${searches} Exa-hakua, ${pages} sivua avattu, ${seconds} sekuntia`,
   trailNote: (domains, cost) =>

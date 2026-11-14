@@ -66,6 +66,8 @@ export type ResearchResult = {
   /** Pages opened by each reader: our own live request, Exa Contents, Oxylabs Web API. */
   readers: { live: number; exa: number; oxylabs: number };
   jurisdiction: { country: string; region?: string; officialDomains: number };
+  /** Recent pages on official sites about the same topic. Pointers, not checked claims. */
+  news: { url: string; title: string; date: string; publisher?: string }[];
 };
 
 export class EngineError extends Error {
@@ -81,7 +83,7 @@ export class EngineError extends Error {
 
 type RawStep = { title?: string; detail?: string; due?: string; amount?: string; quote?: string; sourceUrl?: string };
 type RawOutput = { title?: string; summary?: string; steps?: RawStep[]; questions?: string[] };
-type ExaResult = { url: string; title?: string | null };
+type ExaResult = { url: string; title?: string | null; publishedDate?: string | null; highlights?: string[] | null };
 type Grounding = { field: string; citations?: { url: string; title?: string }[]; confidence?: string };
 type ExaSearchResponse = {
   results?: ExaResult[];
@@ -339,6 +341,13 @@ function relatedTitles(a: string, b: string): boolean {
   return shared / Math.min(x.size, y.size) >= 0.5;
 }
 
+// Step titles open with the same few verbs whatever the topic. They say nothing about what a page is about.
+const ACTION_STEMS = new Set(
+  "apply check verify submit contact request notify register review confirm report claim obtain gather prepare ensure choose select visit book update steps guide handl deali proce infor requi".split(
+    " ",
+  ).map((w) => w.slice(0, 5)),
+);
+
 // A period taken from a quote means something only with its qualifier: "within 30 days", "two months in advance".
 const QUALIFIED = /^(within|at least|at most|up to|no later than|no earlier than|not more than|a maximum of|a minimum of|vähintään|enintään|viimeistään|högst|minst|senast)\b|in advance$/i;
 
@@ -531,6 +540,39 @@ export async function researchCase(
     return settled.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
   };
 
+  // What is new: one more search, limited to pages the official sites published in the last four months.
+  // This is where a model's memory has nothing to offer. It runs beside the other searches and can only add pointers.
+  const NEWS_DAYS = 120;
+  type Fresh = { url: string; title: string; date: string; text: string };
+  async function searchNews(topic: string): Promise<Fresh[]> {
+    if (scope !== "official" || !official.length) return [];
+    stage("search", "Exa search on official sites: pages published in the last four months");
+    usage.searches++;
+    const res = (await withRetry(() =>
+      exa.search(
+        // The plan's own step titles name the topic better than the family's message does.
+        `${clip(topic, 300)}. ${j.name}: news, changes, new rules`,
+        {
+          type: "auto",
+          numResults: 8,
+          includeDomains: official,
+          startPublishedDate: new Date(Date.now() - NEWS_DAYS * 86_400_000).toISOString(),
+          userLocation: j.code,
+          contents: { highlights: true },
+        } as never,
+        { timeout: 20_000 } as never,
+      ),
+    )) as unknown as ExaSearchResponse;
+    usage.costDollars += res.costDollars?.total ?? 0;
+    return (res.results ?? [])
+      .filter((r) => r.title && /^https?:\/\//.test(r.url) && /^\d{4}-\d{2}-\d{2}/.test(r.publishedDate ?? ""))
+      .map((r) => ({
+        url: r.url,
+        title: clip(r.title ?? "", 200),
+        date: (r.publishedDate ?? "").slice(0, 10),
+        text: `${r.title} ${(r.highlights ?? [])[0] ?? ""}`,
+      }));
+  }
   const asks = scope === "open" ? choiceFocuses() : focuses(input);
   let found = await run(asks, true);
   // Too little from official sites: widen to the open web once.
@@ -576,6 +618,9 @@ export async function researchCase(
       merged.push({ ...c, facts: [...c.facts] });
     }
   }
+
+  // Runs while the cited pages are being read, so it adds no waiting time.
+  const freshPages = searchNews(merged.slice(0, 5).map((c) => c.title).join(". ")).catch(() => [] as Fresh[]);
 
   // Open every cited page again, live.
   const urls = [...new Set(merged.flatMap((c) => [c.url, ...c.facts.map((f) => f.url)]))];
@@ -869,6 +914,23 @@ export async function researchCase(
   if (!steps.length) {
     throw new EngineError("Sources were found, but no claim could be confirmed on the cited pages.", 502);
   }
+
+  // A recent page is kept only when it is about this case: its title shares a word start with the step titles,
+  // and title plus first highlight share two. Place names do not count, or every local news item would match.
+  // Most related first, then newest. Never a page the plan already cites.
+  const places = stems(`${j.name} ${j.region ?? ""} ${where}`);
+  const topic = new Set(
+    [...stems(`${head.title ?? ""} ${steps.map((s) => s.title).join(" ")}`)].filter((t) => !places.has(t) && !ACTION_STEMS.has(t)),
+  );
+  const shared = (text: string) => [...stems(text)].filter((t) => topic.has(t)).length;
+  const citedUrls = new Set(evidence.map((e) => e.url.replace(/\/$/, "")));
+  const news = (await freshPages)
+    .filter((n) => !citedUrls.has(n.url.replace(/\/$/, "")) && shared(n.title) >= 1 && shared(n.text) >= 2)
+    .filter((n, i, all) => all.findIndex((o) => o.url === n.url || key(o.title) === key(n.title)) === i)
+    .sort((a, b) => shared(b.text) - shared(a.text) || b.date.localeCompare(a.date))
+    .slice(0, 3)
+    .map((n) => ({ url: n.url, title: n.title, date: n.date, publisher: publisherOf(n.url) }));
+  if (news.length) stage("verify", `Found ${news.length} recent official pages on this topic`);
   const verifyMs = since() - searchMs - readMs;
 
   // Title, summary and questions are the model's own prose. Any figure in them must be on a page we cite.
@@ -891,6 +953,7 @@ export async function researchCase(
     money,
     evidence,
     drafts: [],
+    news: news.length ? news : undefined,
     unverified: dedupe(unverified, 6).map((u) => u.slice(0, 300)),
     openQuestions: dedupe(questions.filter((q) => backed(q, cited) === q.trim()), 3).map((q) => q.slice(0, 300)),
   };
@@ -935,5 +998,6 @@ export async function researchCase(
     exa: { ...usage, costDollars: Math.round(usage.costDollars * 1000) / 1000 },
     readers,
     jurisdiction: { country: j.name, region: j.region, officialDomains: official.length },
+    news,
   };
 }
