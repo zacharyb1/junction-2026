@@ -19,12 +19,11 @@ const STEPS: { title: string; text: string }[] = [
   },
 ];
 
-/** The four steps as stops on a line map: the order is the route a message takes. */
+/** The four stages in the order a family message follows. */
 export function HowItWorks() {
   return (
     <Section
       id="how-it-works"
-      field="white"
       title="How it works"
       hint="From one message in the chat to a plan you can check."
     >

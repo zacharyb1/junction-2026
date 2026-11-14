@@ -64,7 +64,6 @@ export function AddBot({ username }: { username: string | null }) {
   return (
     <Section
       id="add-the-bot"
-      field="white"
       title="Add the bot"
       hint="Kaveri lives in Telegram, next to the people you already talk to."
     >

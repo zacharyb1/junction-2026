@@ -1,103 +1,40 @@
-import { ChatIllustration } from "@/components/landing/chat-illustration";
-import { Bell } from "@/components/landing/glyphs";
-import type { Scorecard } from "@/components/landing/scorecard-data";
+import Link from "next/link";
+import { CalendarDays, MapPin, ArrowRight } from "lucide-react";
+import { ReadingPlate } from "@/components/landing/reading-plates";
+import { planLines } from "@/components/landing/sample";
 import { TryLink } from "@/components/landing/try-link";
-import { Way, WayContent, wayClasses } from "@/components/landing/way";
 
-/** The sections further down, as listed on a wide screen. Keep the names equal to the section titles. */
-const DIRECTORY = [
-  { href: "#how-it-works", name: "How it works" },
-  { href: "#trust", name: "Why you can trust it" },
-  { href: "#add-the-bot", name: "Add the bot" },
-  { href: "#scorecard", name: "Scorecard" },
-  { href: "#privacy", name: "Privacy and limits" },
-];
+const INK = ["wordmark-ink", "headline-highlight", "intro-ink", "sample-circle", "case-underline", "plan-highlight", "proof-bracket", "bracket-underline", "plan-arrow", "publisher-highlight", "source-highlight", "source-arrow", "divider", "next-underline"] as const;
 
-/**
- * The overhead sign: name, promise and the ways in. Under it, the example chat, then who it is for
- * and the promise in full.
- * The sample case row hides when no sample case is configured, the scorecard row when there is no run yet.
- */
-export function Hero({
-  sampleCaseHref,
-  totals,
-}: {
-  sampleCaseHref: string | null;
-  totals: Scorecard["totals"] | null;
-}) {
+/** Source-first reading is real text. The marks never carry information alone. */
+export function Hero({ sampleCaseHref }: { sampleCaseHref: string | null }) {
+  const line = planLines.find(item => item.source.n === 5)!;
   return (
-    <section aria-labelledby="hero-title">
-      <div className="l-sign">
-        <div className="l-wrap">
-          <div className="l-id">
-            <p className="l-name">
-              <span className="l-mark">
-                <Bell />
-              </span>
-              Kaveri <span className="l-gloss">Finnish for “buddy”</span>
-            </p>
-            <nav aria-label="On this page" className="l-nav">
-              {DIRECTORY.map((item) => (
-                <a key={item.href} href={item.href}>
-                  {item.name}
-                </a>
-              ))}
-            </nav>
-          </div>
-
-          <h1 id="hero-title">The butler that lives in your family group chat.</h1>
-
-          <div className="l-sign-row">
-            {/* The page description's own sentence. The longer paragraph follows the example below. */}
-            <p className="l-lead">
-              <strong>Silent</strong> until a life event comes up, then it researches the live web with Exa and posts
-              a plan with <strong>a source on every line</strong>.
-            </p>
-            <ul className="l-ways">
-              <li>
-                <TryLink className={wayClasses({ tone: "primary" })}>
-                  <WayContent>Try it in the browser</WayContent>
-                </TryLink>
-              </li>
-              {sampleCaseHref && (
-                <li>
-                  <Way href={sampleCaseHref}>See a sample case file</Way>
-                </li>
-              )}
-              {totals && (
-                <li>
-                  <Way
-                    href="#scorecard"
-                    detail={`${totals.passed}/${totals.scenarios} scenarios passed · ${totals.verifiedQuotes}/${totals.totalQuotes} quotes verified`}
-                  >
-                    Scorecard
-                  </Way>
-                </li>
-              )}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="l-wrap l-hero-body">
-        <ChatIllustration caseHref={sampleCaseHref} />
-        <div className="l-pitch">
-          <p className="l-pitch-main">
-            Built first for international families in Finland, who deal with Kela, Vero and landlords in a language
-            they do not read.
-          </p>
-          <div className="l-pitch-for">
-            <p>
-              It reads along and <strong>says nothing</strong>, until someone mentions a life event. Then it
-              researches the live web with Exa and posts a short plan: what to do, by when, and what you are entitled
-              to. Every line carries <strong>a source you can check</strong>.
-            </p>
-            <p>
-              Twelve countries have a checked list of official sites. Elsewhere it searches the open web and labels
-              every source.
-            </p>
-          </div>
-        </div>
+    <section className="reading-hero" aria-labelledby="hero-title">
+      <div className="reading-frame">
+        {INK.map(name => <ReadingPlate key={name} name={name} />)}
+        <p className="r-wordmark">Kaveri</p>
+        <h1 id="hero-title" className="r-headline">Your family’s next<br />step, sourced.</h1>
+        <p className="r-intro">The butler in your family group chat.</p>
+        <p className="r-sample-label">Sample case</p>
+        <h2 className="r-case-title">Expecting a baby</h2>
+        <MapPin className="r-location-icon" aria-hidden="true" />
+        <p className="r-location">Espoo, Finland</p>
+        <h3 className="r-plan">{line.what}</h3>
+        <span className="r-task-notation" aria-label="Source 5">5</span>
+        <CalendarDays className="r-calendar" aria-hidden="true" />
+        <p className="r-deadline">{line.when}</p>
+        <span className="r-plan-label" aria-hidden="true">plan</span>
+        <span className="r-bracket-label" aria-hidden="true">supported<br />by</span>
+        <p className="r-publisher">5 · {line.source.publisher}</p>
+        <blockquote className="r-source" cite={line.source.href}>“{line.source.quote}”</blockquote>
+        <span className="r-source-label" aria-hidden="true">source</span>
+        <span className="r-source-rule" aria-hidden="true" />
+        <a className="r-source-link" href={line.source.href} target="_blank" rel="noreferrer">Read the source <ArrowRight aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
+        <div className="r-try"><TryLink className="reading-action">Try it in the browser <ArrowRight aria-hidden="true" /></TryLink></div>
+        <div className="r-sample-link">{sampleCaseHref ? <Link className="reading-action reading-action--secondary" href={sampleCaseHref}>View sample case</Link> : <a className="reading-action reading-action--secondary" href="#sample-plan">View sample plan</a>}</div>
+        <h2 id="silent-title" className="r-next-title">Silent until it matters.</h2>
+        <p className="r-next-intro">A life event. Live research. A sourced plan.</p>
       </div>
     </section>
   );

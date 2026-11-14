@@ -11,7 +11,7 @@ const POINTS: { title: string; text: string }[] = [
   },
   {
     title: "“Forget everything”",
-    text: "Say “forget everything” and it wipes what it remembers about your household and cancels its reminders. Published case files stay online, and so do logs on the machine that runs the bot.",
+    text: "Say “forget everything” and it wipes what it remembers about your household. Published case files stay online, and so do logs on the machine that runs the bot.",
   },
   {
     title: "Research, not legal advice",

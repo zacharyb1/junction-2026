@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Arrow } from "@/components/landing/glyphs";
 import { type PlanLine, planLines, planTitle } from "@/components/landing/sample";
 import { WayContent, wayClasses } from "@/components/landing/way";
@@ -50,10 +50,10 @@ function Note({ children }: { children: ReactNode }) {
  * One line of the plan. The whole row is the control: it opens the sentence the line is based on.
  * A native <details> needs no script, and the shared name lets one row be open at a time.
  */
-function PlanRow({ line, index }: { line: PlanLine; index: number }) {
+function PlanRow({ line }: { line: PlanLine }) {
   const { source } = line;
   return (
-    <li style={{ "--i": index } as CSSProperties}>
+    <li>
       <details name="kaveri-plan-source" open={source.n === OPEN_SOURCE}>
         <summary>
           <span className="l-plan-what">{line.what}</span>
@@ -129,8 +129,8 @@ export function ChatIllustration({ caseHref, className }: { caseHref: string | n
               </p>
             </div>
             <ol className="l-plan">
-              {planLines.map((line, i) => (
-                <PlanRow key={line.source.n} line={line} index={i} />
+              {planLines.map((line) => (
+                <PlanRow key={line.source.n} line={line} />
               ))}
             </ol>
             <p className="l-board-hint">Tap a line to read the sentence it is based on.</p>
@@ -140,9 +140,7 @@ export function ChatIllustration({ caseHref, className }: { caseHref: string | n
                   <WayContent>Open case file</WayContent>
                 </Link>
               ) : (
-                <p className={wayClasses({}, "l-way--static")}>
-                  <WayContent>Open case file</WayContent>
-                </p>
+                <p className="l-board-hint">The sample sources are available above.</p>
               )}
             </div>
           </div>

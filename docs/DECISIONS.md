@@ -65,3 +65,12 @@ Append-only. One line per decision: `[Fri 20:14] Decision — why — who`.
 [Sat 00:45] The example chat on the landing page reads its plan lines and quotes from `src/data/sample-case.json` (`src/components/landing/sample.ts`). Each line opens the quoted sentence and links to the source page at that sentence. Decided by the landing redesign session, waiting for Vlad.
 [Sat 00:45] The plan line open by default is source 5. Source 3's sentence sits inside a folded section of kela.fi, where a text-fragment link cannot scroll to it. Decided by the landing redesign session.
 [Sat 02:42] Keep the landing page restrained: soft grey and white fields, dark ink, small yellow cues and muted blue links. Preserve the plan board, line map and black scorecard; keep this look scoped to the landing page. Decided by Vlad.
+
+[Sat 03:10] Build the selected Family reading table landing direction: ivory paper, cranberry annotations and literary type, scoped to the landing page; preserve the station-sign option on its saved branch. Decided by Vlad.
+[Sat 03:10] Label the 35%/40% specimen “Illustrative example”, qualify the sample-case hint, replace “Approve in the chat” with “Needs your decision”, and remove “cancels its reminders” until runtime support is confirmed. Decided by Vlad.
+[Sat 03:28] Vlad delegated the material checkpoint; the coordinator accepted all 17 current material/semantic items and inventory in the review UI after the plan-arrow revision. This approves materials and implementation plan, not the assembled page. Decided by Vlad (delegation) and coordinator (review).
+
+
+## 2026-11-14T03:54+02:00 — Remaining internal design reviews
+
+Vlad delegated “Delegate remaining internal design reviews”. The coordinator accepted the corrected actual Next viewport; its exported review matched production at 390 and 852 pixels with zero differing pixels. The existing approved local-browser receipt was verified without duplicate submission; click identity is not asserted. Automated Next/artifact association remains unsupported: the documented exception permits continued implementation, preserving the accepted visual contract and truthful open native gate status. Final B/D choice and publication remain with Vlad. Decided by Vlad (delegation) and coordinator (review and internal workflow ruling).

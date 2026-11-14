@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 /** The marks below use the case page's own English labels, so the two pages cannot drift apart. */
 const t = labels("en");
 
-const LAMP = {
+const MARK = {
   /** The quote was found. */
   go: { className: "l-lamp--go", Glyph: Check },
   /** The quote was not found. */
@@ -20,9 +20,9 @@ const LAMP = {
 /** Keeps a figure and its unit on one line. The words are unchanged. */
 const NBSP = "\u00a0";
 
-/** A status line: a small square lamp with a glyph, then the words. Colour is never the only signal. */
-function Status({ tone, strong = false, children }: { tone: keyof typeof LAMP; strong?: boolean; children: ReactNode }) {
-  const { className, Glyph } = LAMP[tone];
+/** A status line: a verification glyph, then the words. Colour is never the only signal. */
+function Status({ tone, strong = false, children }: { tone: keyof typeof MARK; strong?: boolean; children: ReactNode }) {
+  const { className, Glyph } = MARK[tone];
   return (
     <span className={cn("l-status", strong && "l-status--strong")}>
       <span className={cn("l-lamp", className)}>
@@ -56,7 +56,7 @@ export function Trust() {
     <Section
       id="trust"
       title="Why you can trust it"
-      hint="A language model can sound sure and still be wrong. So Kaveri shows where every line comes from, and says what it could not confirm. The examples below are from our sample case."
+      hint="A language model can sound sure and still be wrong. So Kaveri shows where every line comes from, and says what it could not confirm. The sample case and an explicitly labelled illustration show how this works."
     >
       <ul>
         <Claim
@@ -98,6 +98,7 @@ export function Trust() {
           title="When sources disagree"
           text="Two pages can give different figures for the same step, for example last year's rate and this year's. The case file shows both with their sources. It does not pick one for you in silence."
         >
+          <p className="l-illustrative">Illustrative example</p>
           <dl className="l-fields">
             <div>
               <dt>Step</dt>
@@ -128,8 +129,8 @@ export function Trust() {
           <Status tone="attention" strong>
             {approvalStep}
           </Status>
-          <p className="mt-2 pl-7">
-            <span className="l-chip">{t.approveInChat}</span>
+          <p className="l-decision-note">
+            <span className="l-chip">Needs your decision</span>
           </p>
         </Claim>
       </ul>

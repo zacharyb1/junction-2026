@@ -12,7 +12,7 @@ import { Section } from "@/components/landing/section";
 
 const DASH = "–";
 
-/** The board's header line: each total is a figure with its label beside it, in one row of the board. */
+/** The complete live run totals, paired with their labels. */
 function Totals({ card }: { card: ScorecardData }) {
   const { totals } = card;
   const p90 = seconds(totals.p90Ms);
@@ -140,7 +140,7 @@ function Results({ card }: { card: ScorecardData }) {
   return (
     <div className="l-scoreboard">
       {(run || when) && (
-        // The board's top strip: which run this is, and when it ran.
+        // Run provenance and date.
         <p className="l-board-strip">
           <span>{run}</span>
           {when && <span className="l-board-clock">Ran {when}</span>}
@@ -165,16 +165,15 @@ function Coming() {
 }
 
 /**
- * The departure board: totals and one row per scenario from src/data/scorecard.json,
+ * The source-grounding ledger: totals and one row per scenario from src/data/scorecard.json,
  * or a placeholder until the first run. The page loads the file once and hands it in.
  */
 export function Scorecard({ card }: { card: ScorecardData | null }) {
   return (
     <Section
       id="scorecard"
-      field="black"
       title="Scorecard"
-      hint="We run a fixed set of everyday scenarios through the live engine and show what happened, failures included."
+      hint="We run a fixed set of everyday scenarios through the live engine and show what happened, failures included. A pass checks source grounding, not whether every possible step is covered."
     >
       {card ? <Results card={card} /> : <Coming />}
     </Section>

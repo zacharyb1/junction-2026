@@ -1,0 +1,7 @@
+{
+  "tool": "image_gen.imagegen",
+  "prompt": "Use case: illustration-story. Produce one small production decoration for a literary reading page: a single thin cranberry felt-pen underline on native transparent background. The stroke rises very slightly toward the right, almost straight, with a fine left end and softly rounded right end. Deep cranberry #980c2c. This is ink, not a glowing object: absolutely no halo, wash, glow, shadow, spray, fog or surrounding pixels. Keep every pixel outside the sharp softly antialiased ink edge fully transparent. No paper or text. Match the reference's restrained line weight and placement. Wide horizontal transparent canvas, 136:22 aspect preferred, with the line spanning 85 percent of width and under 18 percent of height. Draw a new ink mark, not a crop of a webpage.",
+  "reference": ".impeccable/build/ink-assets/intro-ink-ref.png",
+  "transparent_background": true,
+  "approved": false
+}
