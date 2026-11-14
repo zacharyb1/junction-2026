@@ -7,12 +7,12 @@ This is an operational reference for the current implementation, not a roadmap o
 | Part | Current implementation / recorded state |
 |---|---|
 | Web app and Engine | Next.js on the existing Vercel project `junction-2026`, at `https://junction-2026.vercel.app`. The Git integration uses `main`; GitHub CI checks code but does not perform the deployment. This handover has not inspected current Vercel environment settings. |
-| Hermes | A separate persistent process on a laptop/server, using Telegram polling and calling the Engine's MCP endpoint. It is not started by a Vercel deployment. The latest local process check found the Engine running but no Hermes gateway. |
-| Local gate | Ollama with Gemma, used by the Hermes plugin. The plugin is installed locally; its presence alone does not establish a running model service. |
-| Case data | Private Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set; otherwise `.data/cases` under the Engine's working directory. Five local Case files were present at the morning check. |
+| Hermes | A separate persistent process on a laptop/server, using Telegram polling and calling the Engine's MCP endpoint. It is not started by a Vercel deployment. The former local installation was removed after its source merged; its remaining Engine and gate processes were stopped at 05:48 EET on 14 November. No gateway or scheduler from that installation was running. |
+| Local gate | Ollama with Gemma, used by the Hermes plugin. Setup installs the plugin into each Hermes home; its presence alone does not establish a running model service. |
+| Case data | Private Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set; otherwise `.data/cases` under the Engine's working directory. The five former local test Cases are no longer available from the removed installation. |
 | Bot state | Memories, conversations, configuration and scheduled jobs in the private `.hermes-local/home`. They are not in Git or Blob. |
 
-The bot configuration still targets a local Engine. Earlier Telegram tests used localhost links; production bot integration and reminder delivery are unverified. Detailed evidence is in [HERMES_HANDOVER.md](HERMES_HANDOVER.md).
+Earlier Telegram tests targeted a local Engine and used localhost links; production bot integration and reminder delivery are unverified. The removed installation's private bot state and reminder were not in Git, and targeted checks found no surviving external backup. A new installation starts with fresh state unless a separate backup is supplied. Detailed evidence is in [HERMES_HANDOVER.md](HERMES_HANDOVER.md).
 
 The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for Mac/Linux setup and separate persistent volumes for Cases, Hermes state and Ollama models. The default Compose command starts only the web service; `--profile bot` explicitly starts Hermes and the Gemma gate too. Starting containers does not move existing runtime state. Exa and NVIDIA remain external API services.
 
@@ -117,4 +117,4 @@ Stop the bot before switching its endpoint, then restart on the chosen host. Thi
 
 A Git pull changes source, not running processes. The local startup script reuses an existing `.next/BUILD_ID`; it does not automatically rebuild after source updates. For a managed local Engine update, stop the runtime, retain its data, run the repository's checks/build, then start again. For a deployed Engine, the web deployment is independent of the persistent bot host. Runtime prompt/config updates still need their own application/restart; see [the runbook](../hermes/README.md).
 
-This reference documents the current scripts and their limits. No deployment, token change, state transfer or process restart was performed while writing it.
+This reference documents the current scripts and their limits. The final handover cleanup stopped the orphaned Engine and gate after removal of their worktree. It did not deploy the app, change a token, transfer private state or start a replacement bot.

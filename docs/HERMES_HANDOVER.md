@@ -6,19 +6,19 @@ The recorded scope is repeatable selected scenarios and polite handling of other
 
 ## Current runtime state
 
-A read-only process check on Vlad's machine on Saturday 14 November morning found the recorded Engine process still running, but no Hermes gateway process. The recorded gateway PID was absent, and no process matched the gateway command or this installation's Hermes runtime path. The configured bot endpoint still points at the local Engine. The gate plugin is installed; whether its model process is running was not established by this check. Five local Case JSON files are present.
+At 05:48 Helsinki on Saturday 14 November, the completed bot worktree had been removed after its source merged. Its leftover Engine and Ollama processes were then stopped. No Hermes gateway or scheduler from that installation was running. The five local test Cases, conversations, memory and saved reminder are no longer available from that installation; they were private files, not Git content. Targeted checks found no surviving external backup. A fresh installation starts with fresh state unless a separate backup is supplied.
 
-No new Telegram delivery was attempted and no service was changed during that check. The successful Telegram runs below are historical evidence, not a claim that the bot is currently connected. This local process check does not establish whether another machine is polling the shared token.
+All tests and recovery results below predate that removal. They establish earlier behavior, not currently reachable local Case links, a retained reminder or an online bot. No new Telegram delivery was attempted during cleanup. This local check does not establish whether another machine is polling the shared token.
 
 ## State and evidence
 
 | Component | State | Evidence and limits |
 |---|---|---|
 | Pinned, removable Hermes | Done | v0.23.1, commit `3b421578588243f920886e6fe79a6faa87ea026e`. Prior session's one-shot answer took 4 s. Runtime and home are inside `.hermes-local/`. |
-| Telegram DM returns a plan | Done against the local engine | At 02:42, Helsinki-to-Tampere move: `research_case` returned four plan lines and 5/5 verified quotes. All four lines, counts and URL match the DM reply. Case page and API returned HTTP 200. The approved draft was saved with `case_update` and is present in the stored case. |
+| Telegram DM returns a plan | Done against the local engine | At 02:42, Helsinki-to-Tampere move: `research_case` returned four plan lines and 5/5 verified quotes. All four lines, counts and URL match the DM reply. Case page and API returned HTTP 200. The approved draft was saved with `case_update` and was confirmed in the stored case. |
 | Family group with silence | Observed on the selected live messages | Group research, approval buttons and intentional silence observed. The gate stopped 6 of 7 small-talk messages locally; the false wake reached the cloud model, which stayed silent. This is a small sample, not a general reliability claim. |
 | Local gate | Done for the labelled-set check | `eval/results/gate-gemma3-1b.json`: 60 messages, 20 triggers, 40 small talk; 0 missed triggers, 4 false wakes, 0 gate errors. The live gateway also logged `pre_gateway_dispatch skip: reason=kaveri-gate:gemma:small_talk`. |
-| Handover | Published in draft PR | This document and PR #6 contain the measured state at this snapshot. |
+| Handover | Merged in PR #6 | This document retains the measured evidence, with the later runtime cleanup recorded above. |
 
 Before this track, the runbook was documentation-only. Now the local runtime, tool calls, group flow, local gate and a letter photo have live evidence. `hermes/CHECKS.md` records the boundaries. The 12 scenario rehearsals are direct CLI chats; they do not test Telegram delivery or group silence.
 
@@ -46,11 +46,11 @@ Keep `.data/cases` when moving or rebuilding a local engine. Its location is rel
 
 The portable setup and deployment instructions are in [Deployment and operation](DEPLOYMENT.md#hermes-and-telegram), with detailed configuration in the [repo-local runbook](../hermes/README.md#quick-start-the-repo-local-install). Neither the project nor its running bot requires Orca or a Claude Code session. Teammates can use their own terminals, editors and deployment workflow.
 
-Install and configure first; start a gateway only with its own development token or after the existing shared-token instance has stopped. The [morning process check](#current-runtime-state) found the Engine process running and no Hermes gateway on Vlad's machine. The bot configuration still uses a localhost Engine URL, so those Case links cannot open on another device. This document is a snapshot, not a live process monitor.
+Install and configure first; start a gateway only with its own development token or after the existing shared-token instance has stopped. The [final runtime check](#current-runtime-state) records removal of the old installation and shutdown of its remaining services. Earlier bot tests used localhost Engine URLs, which cannot open on another device. This document is a snapshot, not a live process monitor.
 
 There is no cross-machine lock or automatic runtime takeover. The start script checks this installation's PID files; it cannot detect a teammate polling the same token elsewhere. Independent Telegram development needs a separate bot token and isolated Hermes state. Moving the shared bot requires stopping the former instance before starting its replacement. The deployment guide describes both arrangements.
 
-Reminders, conversation state and memory are local to the Hermes home; a fresh clone does not inherit them. The repaired rent-letter reminder remains in the original runtime's local scheduler. Copying scheduled jobs into another active runtime can duplicate delivery, even when the Telegram polling conflict is avoided. Case storage and backups also need separate treatment when moving the runtime; git carries neither private state nor local Cases.
+Reminders, conversation state and memory are local to the Hermes home; a fresh clone does not inherit them. The repaired rent-letter reminder belonged to the removed installation and is not available in this source handover. Copying scheduled jobs from a separate backup into another active runtime can duplicate delivery, even when the Telegram polling conflict is avoided. Case storage and backups also need separate treatment when moving the runtime; Git carries neither private state nor local Cases.
 
 The repo-local prerequisites are git, curl, macOS or Linux, Node 22+ with npx for a local Engine, and Podman or Docker for the gate. Fedora was tested; macOS was not. The secret helper may offer to save missing values through the private keys repo's `put` command, which commits and pushes there. Private values belong in local files or the team's secret store, not chat.
 

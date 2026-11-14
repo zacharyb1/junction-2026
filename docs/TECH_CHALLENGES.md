@@ -34,7 +34,7 @@ Hostinger's scam-check idea is exploratory and is not part of the implemented de
 ## Unresolved state
 
 - The final bot track and concrete demo scenarios are not selected in this record. The recorded scope is selected scenarios and polite handling of other messages; the broad live silence run was cancelled.
-- Production Engine credentials and the full Telegram-to-public-Case flow have not been validated here. Current local Case links use localhost.
+- Production Engine credentials and the full Telegram-to-public-Case flow have not been validated here. The tested local Case links used localhost.
 - Oxylabs has an account requirement and no recorded real API result.
 - The change-watch alert rule, Case/chat scope and demo page are unsettled. Existing `case_recheck` and a watch template do not demonstrate the proposed Context.dev/Aiven integration; no live daily watch is enabled.
 - The platform's challenge selections have not been rechecked. The prior supervisor recorded renaming the draft to Kaveri; this document does not verify that platform state.
