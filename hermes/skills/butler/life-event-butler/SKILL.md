@@ -21,10 +21,10 @@ Someone states a life event or life-admin task. For a shared letter use `letter-
 1. Send a one-line acknowledgement in the user's language ("On it, checking official sources for Finland.") together with your first tool call.
 2. Country and city: from memory entries labelled with this chat. If missing, ask once with `clarify` buttons and save both with `memory`.
 3. Call `mcp__casefile__research_case`: `situation` (the user's words plus context, 10 to 1500 characters), `country`, `region`, `language` (`en` or `fi`, as the trigger), `household` (from memory, max 600 characters). `depth` `deep` only on request; it is slower.
-4. Post one message: up to 5 `plan` lines exactly as returned, citation numbers included; "N of M quotes checked on their pages" (`evidenceVerified` of `evidenceTotal`); each `unverified` item as "I could not verify: ..."; the case `url`.
+4. Post one message: up to 5 `plan` lines exactly as returned, citation numbers included; "N of M quotes checked on their pages" (`evidenceVerified` of `evidenceTotal`); each `unverified` item as "I could not verify: ..."; the case `url`. Add no verdict or summary of your own (not "the shop is wrong"): the lines and their quotes speak.
 5. Save "Open case <id>: <title>" to memory, labelled with this chat.
 6. Offer next actions with `clarify`: Draft the notice, Set reminders, Why I spoke, Not now. Then:
-   - Draft: write it from case facts only, attach it with `mcp__casefile__case_update` (`id`, `patch.drafts`: `title`, `kind` `email`, `letter` or `checklist`, `body`), show it in chat.
+   - Draft: write it from case facts only, attach it with `mcp__casefile__case_update` (`id`, `patch.drafts`: `title`, `kind` `email`, `letter` or `checklist`, `body`), show it in chat, and end with "Review it and send it yourselves. I never send anything on your behalf." Then offer only: Set reminders, Not now.
    - Reminders: follow `deadline-keeper`.
    - Why I spoke: quote the triggering message in one line.
    - Not now: reply "Okay."

@@ -1,0 +1,17 @@
+[
+  {
+    "run": 1,
+    "message": "I'm pregnant, due in May. We both work full time.",
+    "seconds": 34.5,
+    "researchCase": true,
+    "tools": [
+      "mcp__casefile__research_case",
+      "memory"
+    ],
+    "planLines": 4,
+    "caseLink": true,
+    "offersToSend": false,
+    "reply": "On it, checking official sources for Finland.\n\nI have a verified plan. Here it is:\n\nBook your first appointment at a maternity clinic [1]\nApply for the maternity grant: no later than two months before the expected date of birth of the child (EUR 210) [2][3][5][4]\nNotify your employer of your pregnancy leave: no later than two months before it is set to begin (40 working days) [6][7][8]\nApply for the pregnancy allowance from Kela: within 2 months of the start of your pregnancy leave at the latest (40 working days) [9][10][8]\n\n10 of 10 quotes checked on their pages.\n\nCase file: http://localhost:3000/c/BwInyAOiSUJ9xmlR\n\nNext steps — pick one:\n1. Draft the notice\n2. Set reminders\n3. Why I spoke\n4. Not now\n\nDone — the case is saved and the reminders can be set once you pick a next step. Reply with your choice (1–4) or say more if something isn't clear.",
+    "error": ""
+  }
+]
