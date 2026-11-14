@@ -229,7 +229,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
           </div>
         </details>
 
-        {/* The demo is open; the field exists only while the server is set to ask for a code. */}
+        {/* The field is left out where the deployment opened the demo to everyone (DEMO_OPEN=1). */}
         {needsCode && (!initialCode || rejected) && (
           <div className="flex flex-col gap-2">
             <label htmlFor="code" className="text-sm font-medium">

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#05080d" };
 
 export default async function Autopilot({ searchParams }: PageProps<"/autopilot">) {
-  // The lawyer's step runs a live check. The demo is open; a code in the address matters only while the server asks for one.
+  // The lawyer's step runs a live check: with the same access code as /try, or for everyone where the demo is open.
   const params = await searchParams;
   const code = typeof params.code === "string" ? params.code : "";
 

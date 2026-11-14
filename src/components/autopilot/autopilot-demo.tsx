@@ -169,7 +169,7 @@ export function AutopilotDemo({ code: linkCode, needsCode }: { code: string; nee
             if (code.trim() || !needsCode) void runCheck(code);
           }}
         >
-          {/* The demo is open; the field exists only while the server is set to ask for a code. */}
+          {/* The field is left out where the deployment opened the demo to everyone (DEMO_OPEN=1). */}
           {needsCode && (
             <>
               <label htmlFor="autopilot-code">Access code</label>

@@ -29,7 +29,7 @@ In a family group it is ambient: a life event can trigger research without a dir
 
 - A Telegram group chat where the bot is a member. The bot is a separate runtime that calls the research engine.
 - The case file at `/c/[id]`: steps, deadlines, money, numbered quotes with how each was checked, gaps and open questions. Tapping a source number opens the official page at the quoted sentence.
-- The browser demo at `/try`: the same engine without Telegram, with live progress. It is open to everyone and rate limited; an access code is asked for only when `DEMO_REQUIRE_CODE=1` is set on the server.
+- The browser demo at `/try`: the same engine without Telegram, with live progress. It needs an access code that the table's QR code carries, unless the deployment sets `DEMO_OPEN=1`, as the server does: then it is open to everyone and rate limited.
 - The landing page at `/`: explains the product, links to the demo and a sample case file, shows the scorecard.
 - The scorecard: a fixed set of everyday scenarios run through the live engine by `eval/run.mjs`, written to `src/data/scorecard.json`.
 - Official source lists per country in `src/data/official-sources.json`. Twelve countries have a checked list. Elsewhere it searches the open web and labels every source.

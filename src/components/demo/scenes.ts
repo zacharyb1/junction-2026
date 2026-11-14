@@ -81,7 +81,7 @@ export const AUTOPILOT: Scene = {
   place: "One step ahead",
   title: "One step ahead",
   story: "A family mentions a move and a letter from the bank. Specialists propose the next step, and nothing happens until the family says yes.",
-  real: "A fixed script with one live check: with the access code, the lawyer's question is researched while you watch.",
+  real: "A fixed script with one live check: the lawyer's question can be researched while you watch.",
   tag: "One live check",
   tone: "real",
 };

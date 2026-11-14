@@ -61,7 +61,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
     last.current?.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "nearest" });
   }, [count]);
 
-  // The chat is open; this notice exists only while the server is set to ask for a code.
+  // The notice is left out where the deployment opened the demo to everyone (DEMO_OPEN=1).
   if (needsCode && !code) {
     return (
       <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 text-sm">
@@ -152,7 +152,7 @@ export function UkkChat({ code, needsCode }: { code: string; needsCode: boolean 
             <CopyButton text={draft} />
           </div>
         )}
-        <a href={`${elsewhere}?code=${encodeURIComponent(code)}`} className={linkButtonClasses({ size: "cta" })}>
+        <a href={code ? `${elsewhere}?code=${encodeURIComponent(code)}` : elsewhere} className={linkButtonClasses({ size: "cta" })}>
           Open the chat there
         </a>
       </div>

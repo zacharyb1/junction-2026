@@ -80,7 +80,7 @@ For a separate deployment, import the repository into a new Vercel project with 
 |---|---|
 | `EXA_API_KEY` | Live research and Exa Contents. |
 | `CASEFILE_SECRET` | Bot/script authentication for research, direct Case operations and MCP. MCP/direct authenticated writes fail in production without it; public research can still publish a Case using a valid demo code. |
-| `DEMO_ACCESS_CODE` | Browser `/try` access, asked for only while `DEMO_REQUIRE_CODE=1` is set. The demo is otherwise open and rate limited. |
+| `DEMO_ACCESS_CODE` | Browser `/try` access. Not asked for where `DEMO_OPEN=1` is set: the demo is then open to everyone and rate limited. |
 | `BLOB_READ_WRITE_TOKEN` | Persistent Case storage in the connected private Blob store. |
 | `PUBLIC_BASE_URL` | Optional Case-link origin. Use the actual site origin, without `/api/mcp`, or omit it to derive the request origin. A copied localhost value produces unusable external links. |
 | `OXYLABS_API_KEY` | Optional third reader; no real API test is recorded. |

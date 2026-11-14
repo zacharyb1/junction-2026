@@ -24,7 +24,7 @@ judges without Telegram can use the same engine at `/try`, and the bot runtime c
 ## Auth
 
 - Bot and scripts: `Authorization: Bearer <CASEFILE_SECRET>`.
-- Public web demo: open to everyone and rate limited. Only when the server sets `DEMO_REQUIRE_CODE=1` does it ask for the header `x-demo-code: <DEMO_ACCESS_CODE>`; a code sent while the demo is open is ignored.
+- Public web demo: header `x-demo-code: <DEMO_ACCESS_CODE>`, rate limited. The code is in the QR link on our table. A deployment that sets `DEMO_OPEN=1`, as the server does, answers every visitor without the code and ignores one that is sent; the rate limit, with its cap for a whole day, then protects the Exa credit.
 - Reading a case needs nothing. The id is 16 random characters.
 - Asking for a source re-check from the case page (`POST /api/cases/:id/check`) needs nothing either. It is rate limited and reads a case at most once in 10 minutes.
 - The daily job: `Authorization: Bearer <CRON_SECRET>`, which Vercel sends to cron routes. The bot secret works too.
@@ -313,7 +313,7 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 |---|---|---|
 | `EXA_API_KEY` | Vercel, Hermes `.env` | engine and verifier, Hermes web search |
 | `CASEFILE_SECRET` | Vercel, Hermes `.env` | bot and script writes |
-| `DEMO_ACCESS_CODE` | Vercel | public `/try` access, used only with `DEMO_REQUIRE_CODE=1` |
+| `DEMO_ACCESS_CODE` | Vercel | public `/try` access; not asked for where `DEMO_OPEN=1` is set |
 | `CRON_SECRET` | Vercel | lets Vercel Cron call the daily source re-check. Any long random string |
 | `DEMO_RATE_PER_MINUTE` | Vercel, optional | public requests per client address per minute, default 20 (a venue shares one address) |
 | `DEMO_RATE_TOTAL_PER_MINUTE` | Vercel, optional | all public requests per minute, default 40 |

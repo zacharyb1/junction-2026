@@ -81,9 +81,9 @@ AIDaddy is the product. UKK is the name of its butler, the character who speaks 
 | Page | What a visitor gets | What it is |
 |---|---|---|
 | `/` | The front page: what UKK does, one recorded run, the scorecard, and the way to every other page. | Live page. Its figures are read from `src/data/replay.json` and `src/data/scorecard.json`. |
-| `/try` | The research form: describe what happened and get a plan with sources. Open to everyone, rate limited. | Live. |
+| `/try` | The research form: describe what happened and get a plan with sources. Open to everyone on the server (`DEMO_OPEN=1`), rate limited; elsewhere it needs the access code. | Live. |
 | `/c/[id]` | The case file: steps, deadlines, quotes, drafts and the log of what UKK did, with the click that approves. | Live. A case exists only in the store it was researched into. |
-| `/ukk` | A chat with UKK by text or voice. Open to everyone, rate limited; needs the web-only Hermes instance. | Live on the server. |
+| `/ukk` | A chat with UKK by text or voice. Open like `/try`; needs the web-only Hermes instance. | Live on the server. |
 | `/setup` | What UKK may follow: the Telegram chat today, the phone and the browser as concepts. | Mockup. |
 | `/demo` | The list of replays. | Index page. |
 | `/demo/chat`, `/demo/browser`, `/demo/talk`, `/demo/calendar` | Scripted replays built from real case files. Add `?loop=1` to repeat one without the site's header and footer on the screen at the table, or `?bare=1` to play it once that way for a recording. | Scripted replays. The browser, kitchen-table and calendar scenes show concepts. |
@@ -132,7 +132,7 @@ cp .env.example .env.local  # first setup only; fill in the values locally
 pnpm dev                  # http://localhost:3000
 ```
 
-Set `EXA_API_KEY` and `CASEFILE_SECRET` in `.env.local`; open `/try`. The demo is open and rate limited; `DEMO_REQUIRE_CODE=1` with `DEMO_ACCESS_CODE` puts it behind an access code again (`/try?code=<your demo code>`). Leave `BLOB_READ_WRITE_TOKEN` empty for isolated local data. Keep an existing `.env.local` rather than replacing it. The [.env.example](.env.example) and [contract](docs/CONTRACTS.md) explain the remaining settings.
+Set `EXA_API_KEY`, `CASEFILE_SECRET` and `DEMO_ACCESS_CODE` in `.env.local`; open `/try?code=<your demo code>`. With `DEMO_OPEN=1` the demo needs no code and `/try` works as it is; the rate limit then protects the Exa credit. Leave `BLOB_READ_WRITE_TOKEN` empty for isolated local data. Keep an existing `.env.local` rather than replacing it. The [.env.example](.env.example) and [contract](docs/CONTRACTS.md) explain the remaining settings.
 
 The team's secrets live in the separate private `kapuchai/junction-2026-keys` repository, in `app.env` and `bot.env`. Get access through the team. Never paste values into chat or commit them here.
 
