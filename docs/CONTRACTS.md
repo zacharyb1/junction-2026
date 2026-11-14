@@ -29,6 +29,18 @@ judges without Telegram can use the same engine at `/try`, and the bot runtime c
 - Asking for a source re-check from the case page (`POST /api/cases/:id/check`) needs nothing either. It is rate limited and reads a case at most once in 10 minutes.
 - The daily job: `Authorization: Bearer <CRON_SECRET>`, which Vercel sends to cron routes. The bot secret works too.
 
+Limits on public requests (`src/lib/rate-limit.ts`): 20 a minute per client address and 40 a minute in total, counted per
+server instance, shared by the demo, the source re-check and new audio. Requests with the bot secret are not counted.
+The client address comes from a header the caller cannot write: on Vercel `x-vercel-forwarded-for` (set by the platform),
+elsewhere the last entry of `x-forwarded-for`, which the nearest reverse proxy appends. With no proxy in front, as in
+local development, that header is the caller's own, and only the total limit holds.
+
+A JSON body larger than 1 MB is not read and is answered `400` like any other invalid input.
+
+Every response carries `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin` (a case link is a secret, so
+other sites never see it), `X-Frame-Options: DENY` with `Content-Security-Policy: frame-ancestors 'none'`, and a
+`Permissions-Policy` that turns off camera, microphone, location, payment and USB (`next.config.ts`).
+
 ## `POST /api/research` and MCP tool `research_case`
 
 Request body, same fields for both:
@@ -99,6 +111,8 @@ Response `200`:
   or `secondary`. `verification` and `checkedVia` are the marks described under "Case tools"; `checkedVia` is absent
   unless the quote was verified.
 - Errors: `400` invalid input, `401` missing or wrong credentials, `429` rate limited, `502` Exa failed, each with `{ "error": "…" }`.
+  A fault that is not the engine's own (storage, an unexpected exception) is `500` with `{ "error": "research failed" }`;
+  the detail goes to the server log, not to the caller.
 
 Streaming for the `/try` page: send `Accept: text/event-stream`. Each event has a JSON `data` line that repeats the event
 name as `type`. `ms` is the time since the research started.
@@ -275,6 +289,14 @@ Finding is always Exa. Reading a cited page to check a quote can go three ways:
 In fast research the Oxylabs read is spent only on pages nothing else could open. In deep research and in `case_recheck`
 every refused page gets a live Oxylabs read. The research trail on the case page records it.
 Not yet run against the real Oxylabs API: it was tested against a local stand-in shaped like their documented response.
+
+Our own request only goes to public web addresses (`isPublicUrl` in `src/lib/verify.ts`), because a cited address comes
+from a language model or from a caller. Refused: any scheme but http and https, a port, a user name, a host name without
+a dot or with a local suffix, every IPv6 literal, and the private, loopback, link-local, carrier, documentation,
+benchmark, multicast and reserved IPv4 ranges, in whatever notation the address is written. A name is refused when any
+address it resolves to is one of those. Redirects are followed by hand, at most five, and each hop is checked the same way.
+Known gap: the name is resolved once for the check and again by the request, so a name that changes its answer in between
+is not caught.
 
 ## What the bot does and does not do
 

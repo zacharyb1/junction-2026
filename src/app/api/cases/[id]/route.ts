@@ -1,5 +1,5 @@
 import { CasePatch } from "@/lib/case";
-import { baseUrl, isAuthorised, loadCase, recheckCase, updateCase } from "@/lib/cases";
+import { baseUrl, isAuthorised, loadCase, readJson, recheckCase, updateCase } from "@/lib/cases";
 
 export const maxDuration = 60;
 
@@ -14,7 +14,7 @@ export async function GET(_req: Request, ctx: RouteContext<"/api/cases/[id]">) {
 export async function PATCH(req: Request, ctx: RouteContext<"/api/cases/[id]">) {
   if (!isAuthorised(req)) return Response.json({ error: "unauthorised" }, { status: 401 });
   const { id } = await ctx.params;
-  const parsed = CasePatch.safeParse(await req.json().catch(() => null));
+  const parsed = CasePatch.safeParse(await readJson(req).catch(() => null));
   if (!parsed.success) {
     return Response.json({ error: "invalid patch", issues: parsed.error.issues }, { status: 400 });
   }

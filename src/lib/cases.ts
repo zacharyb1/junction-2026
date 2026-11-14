@@ -51,6 +51,36 @@ export function mayResearch(req: Request): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+/** Larger than any valid research request or case, which stay well under 200 kB. */
+export const MAX_BODY_BYTES = 1_000_000;
+
+/**
+ * The JSON body of a request, or null when it is not JSON or is larger than `max` bytes.
+ * Read piece by piece, so a body without an end is dropped at the limit and never held in memory.
+ */
+export async function readJson(req: Request, max = MAX_BODY_BYTES): Promise<unknown> {
+  if (Number(req.headers.get("content-length") ?? 0) > max) return null;
+  const reader = req.body?.getReader();
+  if (!reader) return null;
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.length;
+    if (size > max) {
+      await reader.cancel().catch(() => {});
+      return null;
+    }
+    chunks.push(value);
+  }
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
 const slug = (text: string, i: number) =>
   `${text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "item"}-${i + 1}`;
 

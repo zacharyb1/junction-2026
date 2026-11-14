@@ -20,13 +20,65 @@ const EXA_BATCH = 4;
 const WINDOW = 5;
 export const VERIFY_THRESHOLD = 0.8;
 
+const BLOCK_OPEN = /<(script|style|noscript|svg|template|head)/gi;
+
+/**
+ * Removes script, style and similar blocks, from the opening tag to its closing tag.
+ * A scan, not one pattern: a pattern starts over from every "<" and reads on to the end of the page,
+ * so a 200 kB page of unclosed tags kept the whole server busy for half a minute.
+ */
+function dropBlocks(html: string): string {
+  const kept: string[] = [];
+  let from = 0;
+  // Tags with no closing tag in the rest of the page. Looking again from a later place cannot find one.
+  const unclosed = new Set<string>();
+  BLOCK_OPEN.lastIndex = 0;
+  for (let open = BLOCK_OPEN.exec(html); open; open = BLOCK_OPEN.exec(html)) {
+    const name = open[1].toLowerCase();
+    if (unclosed.has(name)) continue;
+    const tagEnd = html.indexOf(">", BLOCK_OPEN.lastIndex);
+    if (tagEnd < 0) break;
+    const closing = new RegExp(`</${name}>`, "gi");
+    closing.lastIndex = tagEnd + 1;
+    const close = closing.exec(html);
+    if (!close) {
+      unclosed.add(name);
+      continue;
+    }
+    kept.push(html.slice(from, open.index), " ");
+    from = close.index + close[0].length;
+    BLOCK_OPEN.lastIndex = from;
+  }
+  kept.push(html.slice(from));
+  return kept.join("");
+}
+
+/** Every tag that is left becomes a space. A scan for the same reason as above. */
+function dropTags(html: string): string {
+  const kept: string[] = [];
+  let from = 0;
+  let open = html.indexOf("<");
+  while (open >= 0) {
+    const close = html.indexOf(">", open + 1);
+    if (close < 0) break;
+    // "<>" is not a tag and stays as text.
+    if (close > open + 1) {
+      kept.push(html.slice(from, open), " ");
+      from = close + 1;
+    }
+    open = html.indexOf("<", close + 1);
+  }
+  kept.push(html.slice(from));
+  return kept.join("");
+}
+
 /** HTML to text. Block elements become line breaks so sentences do not run together. */
 export function htmlToText(html: string): string {
-  return html
-    .replace(/<(script|style|noscript|svg|template|head)[^>]*>[\s\S]*?<\/\1>/gi, " ")
-    .replace(/<\/(p|div|li|ul|ol|h[1-6]|tr|td|th|section|article|header|footer|blockquote|dd|dt|summary|details)>/gi, "\n")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<[^>]+>/g, " ")
+  return dropTags(
+    dropBlocks(html)
+      .replace(/<\/(p|div|li|ul|ol|h[1-6]|tr|td|th|section|article|header|footer|blockquote|dd|dt|summary|details)>/gi, "\n")
+      .replace(/<br\s*\/?>/gi, "\n"),
+  )
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
@@ -56,10 +108,38 @@ export function quoteMatch(quote: string, page: string): number {
   return hits / total;
 }
 
-const PRIVATE_HOST =
-  /^(localhost|.*\.(local|localhost|internal|lan|home|corp)|\[.*\]|0\.\d+\.\d+\.\d+|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|169\.254\.\d+\.\d+|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d+\.\d+)$/i;
-// IPv6: unspecified, loopback, IPv4-mapped (it can carry any of the private IPv4 ranges), unique local, link-local.
-const PRIVATE_ADDRESS = /^(0\.|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|::1?$|::ffff:|f[cd][0-9a-f]{2}:|fe[89ab][0-9a-f]:)/i;
+// Names that are never a public site: local suffixes and every IPv6 literal.
+const LOCAL_NAME = /^(localhost|.*\.(local|localhost|internal|lan|home|corp)|\[.*\])$/i;
+const IPV4 = /^\d+\.\d+\.\d+\.\d+$/;
+
+/**
+ * IPv4 ranges that are not the public internet: this network, private, carrier NAT, loopback, link-local,
+ * the protocol and documentation ranges (some hosts number their internal network from those), benchmarking,
+ * multicast and reserved.
+ */
+function isPrivateV4(address: string): boolean {
+  const [a, b, c] = address.split(".").map(Number);
+  return (
+    a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    a >= 224 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
+    (a === 192 && b === 0 && (c === 0 || c === 2)) ||
+    (a === 198 && (b === 18 || b === 19)) ||
+    (a === 198 && b === 51 && c === 100) ||
+    (a === 203 && b === 0 && c === 113)
+  );
+}
+
+// IPv6: everything under "::" (unspecified, loopback, and the IPv4-compatible and IPv4-mapped forms, which can
+// carry any private IPv4 address), NAT64, unique local, link-local and multicast.
+const PRIVATE_V6 = /^(::|64:ff9b:|f[cd][0-9a-f]{2}:|fe[89ab][0-9a-f]:|ff[0-9a-f]{2}:)/i;
+
+const isPrivateAddress = (address: string) => (IPV4.test(address) ? isPrivateV4(address) : PRIVATE_V6.test(address));
 
 /**
  * Cited URLs come from a language model and from callers of the API, so our own request
@@ -76,11 +156,13 @@ export async function isPublicUrl(raw: string): Promise<boolean> {
   if (url.port || url.username || url.password) return false;
   // "localhost." with the root dot is the same host as "localhost".
   const host = url.hostname.replace(/\.$/, "");
-  if (PRIVATE_HOST.test(host)) return false;
-  if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) return true;
+  // A name without a dot is a machine on the local network: "localhost", "metadata", a container's service name.
+  if (!host.includes(".") || LOCAL_NAME.test(host)) return false;
+  if (IPV4.test(host)) return !isPrivateV4(host);
   try {
-    const { address } = await lookup(url.hostname);
-    return !PRIVATE_ADDRESS.test(address);
+    // A name can resolve to several addresses and the request may go to any of them, so every one must be public.
+    const addresses = await lookup(url.hostname, { all: true });
+    return addresses.every(({ address }) => !isPrivateAddress(address));
   } catch {
     // No DNS from here (for example behind a proxy). The request itself decides.
     return true;
