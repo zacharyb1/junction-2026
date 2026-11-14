@@ -32,7 +32,7 @@ function Totals({ card }: { card: ScorecardData }) {
         <div key={item.label} className="l-total">
           <dt>
             {item.label}
-            {item.note && <span className="l-total-note">, {item.note}</span>}
+            {item.note && <span className="l-total-note">{item.note}</span>}
           </dt>
           <dd>{item.value}</dd>
         </div>
