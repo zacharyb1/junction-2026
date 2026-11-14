@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Core } from "@/components/hud/core";
 import type { PlanRow } from "@/components/hud/data";
+import { HearPlan } from "@/components/hud/hear-plan";
 import type { Scorecard } from "@/components/landing/scorecard-data";
 import { TryLink } from "@/components/landing/try-link";
 
@@ -204,6 +205,7 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
           Tap a number: the official page opens at the quoted sentence.{" "}
           <Link href={caseHref}>Open the full case file for this run →</Link>
         </p>
+        <HearPlan src="/hud/plan.mp3" seconds={40} />
       </div>
       <ul className="hud-rules">
         {RULES.map((rule) => (

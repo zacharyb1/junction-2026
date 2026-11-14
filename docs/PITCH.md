@@ -1,5 +1,7 @@
 # Pitch kit: AIDaddy
 
+**Newer run of show:** [DEMO_PLAN.md](DEMO_PLAN.md) (Saturday 09:05) uses the new front page and the run 12 numbers. Its table replaces the two-minute video table below. The story, the criteria table and the judge answers here still hold.
+
 **Before using this kit:** this script and the generated voiceover contain earlier scorecard measurements and proposed demo beats. Reconcile them with [the current handover](../README.md#what-the-evidence-establishes) and [challenge status](TECH_CHALLENGES.md) for the selected build before recording or submitting.
 
 Filled in from `docs/PITCH_TEMPLATE.md`. Numbers below are from runs 8 and 9 (Sat 06:30 to 06:40). The newest run is 12 (Sat 07:00): 19 of 19, 98 of 98 quotes, 6 of 6 refusals, median 5.6 s. Cases now carry about five quotes each, because repeated steps are merged. Re-run the scorecard on Saturday evening and update them before recording.

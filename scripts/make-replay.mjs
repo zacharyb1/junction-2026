@@ -8,6 +8,10 @@
  * It calls POST /api/research with the event stream on, and writes every event with its real timing,
  * the result, a few messages from the gate test set and the gate's measured counts to src/data/replay.json.
  * Nothing in that file is invented: the page plays back what happened.
+ *
+ * The page's "Hear the plan" button plays public/hud/plan.mp3. After a new recording, fetch it again from an
+ * Engine that has ELEVENLABS_API_KEY set, and update the length in src/components/hud/sections.tsx:
+ *   curl -o public/hud/plan.mp3 <base>/api/cases/<new case id>/audio
  */
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
