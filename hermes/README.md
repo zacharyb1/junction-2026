@@ -4,10 +4,12 @@ From an empty laptop to "the bot answers in the family group". Follow the steps 
 
 ## Read this first
 
-- **Source of truth.** Everything here was checked against the Hermes repository at `main`, commit `4932eea7`, cloned on 13 Nov 2026. References such as `telegram.md:270` are file and line under `website/docs/` in that repository. `CHECKS.md` lists every key, variable, command and tool name with its full doc path.
+- **Original manual references.** The long runbook's upstream documentation was read at commit `4932eea7` on 13 Nov 2026. References such as `telegram.md:270` identify files and lines under `website/docs/` at that historical revision. `CHECKS.md` separates those references from later runtime observations.
 - **Part of this was run against a live Hermes** on Fri night (v0.23.1, Nemotron, Fedora): the quick start below, steps 3 and 8 to 12, the group flow of step 14 and the gate. `CHECKS.md` lists what was seen and what was not run. For the rest, treat the "Expect" lines as the test.
-- **Version drift.** The installer puts you on the latest stable release (`installation.md:90`), which can be older than the docs above. If a documented feature is missing, see "UNVERIFIED" at the top of `CHECKS.md`.
+- **Current pin.** This project's `setup-local.sh` installs Hermes v0.23.1, commit `3b421578588243f920886e6fe79a6faa87ea026e`; it does not follow the latest release. The container image verifies the same source commit. The historical manual references alone do not establish behavior on this pin; use the observations and limitations in `CHECKS.md` and [the handover](../docs/HERMES_HANDOVER.md).
 - **Contract.** The bot does not research. It calls `research_case` on our web app and posts what comes back (`docs/CONTRACTS.md`).
+
+For the complete Docker setup on Mac or Linux, use [the container guide](../docs/CONTAINERS.md). The native commands below operate a separate installation; do not launch both with the same Telegram token.
 
 ## Quick start: the repo-local install
 
@@ -42,8 +44,8 @@ Then follow the runbook from step 10 (direct message test). After `/sethome` in 
 - **One poller per bot token.** The keys repo shares one `TELEGRAM_BOT_TOKEN`. Before you start, make sure nobody else's copy is running, or one of the two fails with `Telegram polling conflict`.
 - **Secrets** live only in `.hermes-local/home/.env` and `.env.local`, both git-ignored. `bash hermes/secrets.sh --status` shows which names are set and never prints values. A value entered there goes through the keys repo's `./put` (hidden input) and is pushed to the team.
 - **If the install is interrupted**, run `bash hermes/setup-local.sh` again. It continues from the stage that failed.
-- **Do not move or rename the repository folder** after installing: Hermes' launcher stores absolute paths. Move it, then delete `.hermes-local/agent` and install again.
-- **Remove the runtime:** first run `bash hermes/stop.sh` and copy `.hermes-local/case-backups/` somewhere outside the checkout. Then remove `.hermes-local` and `.env.local`. Keep `.data/cases` if you need existing case links. The gate's container image is stored separately (`podman rmi docker.io/ollama/ollama:0.40.16`).
+- **Moving the repository:** Hermes' launcher and product configuration contain absolute paths. Stop and back up the runtime as described below before moving or renaming the folder. At the new location, remove only `.hermes-local/agent`, run `bash hermes/setup-local.sh`, then `bash hermes/configure.sh` before starting. Retain the private home and Case data; moving source does not update saved Case links or reminder URLs.
+- **Removing the runtime:** run `bash hermes/stop.sh`, then stop any separately launched gateways or schedulers using this home and prevent their service managers from restarting them. While they are stopped, copy `.hermes-local/home/`, `.hermes-local/case-backups/` and `.env.local` to a private backup outside the checkout. Confirm the backup is usable before deleting `.hermes-local` or `.env.local`: the home contains credentials, conversations, memories and approved reminders, which Case backups do not preserve. Retain `.data/cases` if existing local Case links are needed. See [private state and updates](../docs/DEPLOYMENT.md#private-state-and-updates). The gate image is stored separately and can be removed when no runtime uses it.
 
 The gate (a small local Gemma that drops small talk before any cloud call) has its own section below.
 
@@ -374,11 +376,11 @@ Three ways to let a judge try the bot. All need a gateway restart after the chan
 | 2. Open door | `TELEGRAM_ALLOW_ALL_USERS=true` in `.env` | Anyone can DM the bot. Remove it after the demo. | `environment-variables.md:315` |
 | 3. Judge's own group | `TELEGRAM_GUEST_MODE=true` and `TELEGRAM_GROUP_ALLOWED_USERS=*` in `.env` | In any group other than the family group the bot answers only when @mentioned, every turn. | `telegram.md:1314-1340`, `:1297-1299` |
 
-Two warnings:
+Access and state:
 
-- **Memory is one store per Hermes profile, not per chat** (`memory.md:82`). A judge's country and city land in the same memory as the family's. `SOUL.md` tells the model to label facts by chat and never mix them, which is a rule, not a wall. The clean way is a second bot on a second profile: `hermes profile create judges --clone`, give it its own bot token, empty its `memories/` folder, and start it with `hermes -p judges gateway run` (`cli-commands.md:2050`, `telegram.md:739`).
+- **Memory is one store per Hermes profile, not per chat** (`memory.md:82`). A judge's country and city land in the same memory as the family's. `SOUL.md` tells the model to label facts by chat and never mix them, which is a rule, not a wall. For independent judge testing, use a separate bot token and a fresh Hermes home through the [independent-bot setup](../docs/DEPLOYMENT.md#an-independent-development-bot), or a separate [Compose project with fresh volumes](../docs/CONTAINERS.md#where-the-data-goes). Do not clone the live profile: changing its token and clearing memories does not remove copied reminder jobs or other private state.
 - Option 3 depends on how guest mode and sender authorization combine, which the docs do not spell out (`CHECKS.md`, U5). Test it with an account that is not in `TELEGRAM_ALLOWED_USERS`.
-- By default every allowed user can run every slash command, `/sethome` and `/new` included (`telegram.md:1346`). Before judges get access, add the admin list described in `CHECKS.md`, U10. It is not in the config snippet yet.
+- The project's `configure.sh` requires numeric `TELEGRAM_ALLOWED_USERS` and applies the admin command lists. Other users are limited to `/start` and `/new`. The container setup uses the same configuration script. A manual installation that skips it must apply and check the restrictions described in `CHECKS.md`, U10 before allowing judges access.
 
 ## Keep the laptop awake
 
