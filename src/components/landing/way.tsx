@@ -4,7 +4,7 @@ import { Arrow, type ArrowDirection } from "@/components/landing/glyphs";
 import { cn } from "@/lib/utils";
 
 type Look = {
-  /** "primary" is the black row with the blue arrow square: one per screen. */
+  /** "primary" is the black row with the yellow arrow: one per screen. */
   tone?: "white" | "primary" | "blue" | "yellow";
   /** A row that stands alone inside a section gets corners. Rows on the overhead sign run edge to edge. */
   panel?: boolean;

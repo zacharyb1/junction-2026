@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-/** The phone's browser bar takes the colour of the overhead sign. Same value as --sign-yellow in landing.css. */
-export const viewport: Viewport = { themeColor: "#ffd109" };
+/** The phone's browser bar follows the neutral concourse ground in landing.css. */
+export const viewport: Viewport = { themeColor: "#f0f3f5" };
 
 /**
  * Landing page. Static: the environment (see landingConfig) and src/data/scorecard.json

@@ -7,7 +7,7 @@
 
 /* The phone's overscroll area continues the overhead sign. */
 body:has(.landing) {
-  background: oklch(0.875 0.178 92);
+  background: oklch(0.962 0.004 250);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -17,12 +17,12 @@ body:has(.landing) {
 }
 
 .landing {
-  /* Palette. Yellow directs, blue routes, black carries type and boards, green and red are board statuses. */
-  --sign-yellow: oklch(0.875 0.178 92);
+  /* Neutral fields, small yellow cues, muted blue links. Green and red are board statuses. */
+  --sign-yellow: oklch(0.875 0.13 92);
   --sign-black: oklch(0.205 0.012 262);
   --concourse: oklch(0.962 0.004 250);
   --panel: oklch(1 0 0);
-  --route-blue: oklch(0.43 0.16 258);
+  --route-blue: oklch(0.43 0.075 258);
   --status-go: oklch(0.5 0.14 152);
   --status-go-lit: oklch(0.84 0.19 150);
   --status-stop: oklch(0.53 0.19 32);
@@ -390,6 +390,11 @@ body:has(.landing) {
   margin-inline: calc(var(--gutter) * -1);
 }
 
+/* The two neutral secondary routes remain separate without another colour field. */
+.landing .l-ways li + li + li {
+  border-top: 1px solid var(--rule);
+}
+
 .landing .l-way {
   -webkit-tap-highlight-color: transparent;
   display: grid;
@@ -433,11 +438,6 @@ body:has(.landing) {
   font-size: var(--text-title);
 }
 
-.landing .l-way--primary .l-way-arrow {
-  background: var(--route-blue);
-  color: var(--panel);
-}
-
 .landing .l-way--blue {
   background: var(--route-blue);
   color: var(--panel);
@@ -477,8 +477,7 @@ body:has(.landing) {
   color: var(--arrow-hover-ink);
 }
 
-/* A blue square on the primary row, or any square on a blue row, turns white. */
-.landing .l-way--primary:hover .l-way-arrow,
+/* A blue row uses a white hover square to keep its edge visible. */
 .landing .l-way--blue:hover .l-way-arrow {
   background: var(--panel);
   color: var(--sign-black);

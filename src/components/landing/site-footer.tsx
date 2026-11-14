@@ -5,7 +5,7 @@ import { TryLink } from "@/components/landing/try-link";
 export function SiteFooter({ repoUrl }: { repoUrl: string | null }) {
   return (
     <footer>
-      <TryLink className="l-close l-field--yellow">
+      <TryLink className="l-close l-field--white">
         <span className="l-close-label">Try it in the browser</span>
         <span className="l-way-arrow">
           <Arrow />

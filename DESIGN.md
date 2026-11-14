@@ -2,9 +2,9 @@
 name: Kaveri
 description: A station sign system for the landing page of a butler that lives in a family group chat.
 colors:
-  sign-yellow: "oklch(0.875 0.178 92)"
+  sign-yellow: "oklch(0.875 0.13 92)"
   sign-black: "oklch(0.205 0.012 262)"
-  route-blue: "oklch(0.43 0.16 258)"
+  route-blue: "oklch(0.43 0.075 258)"
   concourse: "oklch(0.962 0.004 250)"
   panel: "oklch(1 0 0)"
   status-go: "oklch(0.5 0.14 152)"
@@ -12,9 +12,7 @@ colors:
   status-stop: "oklch(0.53 0.19 32)"
   status-stop-lit: "oklch(0.78 0.15 40)"
   ink-soft: "oklch(0.42 0.015 262)"
-  on-yellow-soft: "oklch(0.34 0.06 92)"
   on-black-soft: "oklch(0.82 0.01 262)"
-  on-blue-soft: "oklch(0.92 0.03 258)"
   rule: "oklch(0.205 0.012 262 / 0.16)"
   rule-lit: "oklch(1 0 0 / 0.2)"
 typography:
@@ -90,29 +88,20 @@ components:
     typography: "{typography.title}"
     height: "3.5rem"
     padding: "0.625rem 1rem"
-  way-blue:
-    backgroundColor: "{colors.route-blue}"
-    textColor: "{colors.panel}"
-    height: "3rem"
-  way-yellow:
-    backgroundColor: "{colors.sign-yellow}"
-    textColor: "{colors.sign-black}"
-    rounded: "{rounded.panel}"
-    height: "3rem"
   arrow-square:
     backgroundColor: "{colors.sign-black}"
     textColor: "{colors.sign-yellow}"
     width: "3.5rem"
   arrow-square-primary:
-    backgroundColor: "{colors.route-blue}"
-    textColor: "{colors.panel}"
+    backgroundColor: "{colors.sign-black}"
+    textColor: "{colors.sign-yellow}"
     width: "3.5rem"
   arrow-square-hover:
     backgroundColor: "{colors.route-blue}"
     textColor: "{colors.panel}"
   arrow-square-primary-hover:
-    backgroundColor: "{colors.panel}"
-    textColor: "{colors.sign-black}"
+    backgroundColor: "{colors.route-blue}"
+    textColor: "{colors.panel}"
   source-number:
     backgroundColor: "{colors.sign-yellow}"
     textColor: "{colors.sign-black}"
@@ -173,12 +162,12 @@ components:
 
 Opaste is Finnish for a sign that shows the way. Kaveri's first users arrive in a country whose letters they cannot read, and the first thing that works for them there is the sign system of an airport or a station: an arrow, a number, a time. The page is built as that sign system. It tells a newcomer where to go and by when, and every line carries a number that leads to its source.
 
-The system is flat, loud where it directs and quiet where it explains. Colour owns whole regions: a yellow overhead sign, a blue information point, a black departure board, on a cool grey concourse. One civic signage typeface does all the work, heavy at sign scale. There are no photographs and no illustrations. The pictures are the product's own interface: a family chat, a plan with numbered sources, a scorecard.
+The system is flat and restrained. Cool grey and white carry the page, with a black departure board giving the scorecard its own weight. Yellow marks small cues, and muted blue carries links and the line map. One civic signage typeface does all the work, heavy at sign scale. There are no photographs and no illustrations. The pictures are the product's own interface: a family chat, a plan with numbered sources, a scorecard.
 
-It rejects the assistant product page: a centred headline over a phone mock-up, three icon cards, grey tokens.
+The product interface supplies the imagery: the family chat and its plan board sit directly below the sign.
 
 **Key Characteristics:**
-- Colour fields that own a region each, never accents scattered on a neutral page.
+- Neutral fields, small yellow cues and muted blue routes; a black field for the scorecard.
 - Type as the only image, set at sign scale.
 - Every claim sits on the same row as its source number.
 - Flat panels, small corners, no shadows.
@@ -186,13 +175,13 @@ It rejects the assistant product page: a centred headline over a phone mock-up, 
 
 ## Colors
 
-Four colours with a job each, plus two status colours. A status colour appears as a small lamp, and the lit red once more as the error line under a failed scenario.
+Three neutral grounds, two restrained accents and two status colours. A status colour appears as a small lamp, and the lit red once more as the error line under a failed scenario.
 
 ### Primary
-- **Signal Yellow** (`sign-yellow`): things that direct you. The overhead sign, source numbers, chips, arrows on black squares, Kaveri's own chat bubble, board titles and figures on black, the last sign before the footer, focus rings on blue and black. Text on it is Sign Black, secondary text is `on-yellow-soft`.
+- **Signal Yellow** (`sign-yellow`): small cues that direct you. Source numbers, chips, arrows on black squares, Kaveri's mark and chat bubble, the Example tag, board titles and figures on black, and focus rings on black. Text on it is Sign Black. Yellow does not fill a section.
 
 ### Secondary
-- **Route Blue** (`route-blue`): things that take you somewhere. Text links on light ground, the line map, the arrow square of the primary row and of a hovered row, the scorecard row on the sign, the information point (the Telegram section), focus rings on light ground and on every direction row.
+- **Route Blue** (`route-blue`): a muted blue for text links on light ground, the line map, hovered arrow squares, focus rings on light ground and on every direction row. It does not fill a section or a resting direction row.
 
 ### Tertiary
 - **Go Green** (`status-go`, and `status-go-lit` on black): a quote that was found, a scenario that passed. Always a lamp with a check: white on green on light ground, black on the lit green on the black board.
@@ -200,17 +189,17 @@ Four colours with a job each, plus two status colours. A status colour appears a
 
 ### Neutral
 - **Sign Black** (`sign-black`): all type on light ground, the primary direction row, arrow squares, the scorecard board, the footer, 2px rules.
-- **Concourse** (`concourse`): the page's own ground, chat bubbles from other people, the plan board's rows.
-- **Panel White** (`panel`): the chat thread, an opened quote, specimens, white direction rows, the field of the line map section, the QR tile, type on blue and black.
-- **Soft inks** (`ink-soft`, `on-yellow-soft`, `on-black-soft`, `on-blue-soft`): secondary text, one per ground, each tinted from the ground it sits on.
-- **Hairlines** (`rule`, `rule-lit`): the 1px line between rows inside a board. Sign Black at 16% on light ground, white at 20% on dark ground.
+- **Concourse** (`concourse`): the page's own ground, the overhead sign and its overscroll area, chat bubbles from other people, and the plan board's rows.
+- **Panel White** (`panel`): the chat thread, an opened quote, specimens, secondary direction rows including the scorecard link, the line map and Telegram sections, the closing action band, the QR tile, and type on black or a hovered blue arrow square.
+- **Soft inks** (`ink-soft`, `on-black-soft`): secondary text on neutral light ground and black respectively.
+- **Hairlines** (`rule`, `rule-lit`): the 1px line between rows inside a board, and before the third hero direction row to separate the two white routes. Sign Black at 16% on light ground, white at 20% on dark ground.
 
 ### Named Rules
-**The Field Rule.** A colour is used as a field that owns a section or a full-width row, or as a small sign (a number square, a lamp, a chip). It is never a tint, a gradient or a border accent. The blue ring and line of the line map are the map itself, not a border on a panel.
+**The Field Rule.** Section fields are Concourse grey, Panel White or Sign Black. Yellow belongs to small signs and the bot's chat bubble; muted blue belongs to links, focus, hover and the line map. No gradients or decorative border accents. The blue ring and line of the line map are the map itself, not a border on a panel.
 
 **The Two-Signal Rule.** Status is never carried by colour alone. A lamp always holds a glyph, and its words stand next to it. The one place that shows a lamp without its word is the result lane of the scorecard on a phone, where the word stays for screen readers.
 
-**The Own-Ink Rule.** Secondary text takes the soft ink of its ground. Grey on yellow, blue or black is a defect.
+**The Own-Ink Rule.** Secondary text uses `ink-soft` on light neutral fields and `on-black-soft` on black. Keep the softer text legible against its actual ground.
 
 ## Typography
 
@@ -276,11 +265,11 @@ In the frontmatter a component's `typography` names its size step. Its weight an
 ### Direction rows
 The page's link that acts like a button (`way.tsx`).
 - **Shape:** a full-width row, label on the left at Body size and weight 700, a 3.5rem arrow square on the right. At least 3rem tall, the primary row 3.5rem (3.25rem and 3.75rem from 64rem). Corners only when the row stands alone inside a section.
-- **Arrow square:** always its own field, and the same width on every row so stacked squares form one column. Sign Black with a yellow arrow on white, blue and yellow rows. Route Blue with a white arrow on the primary row.
-- **Primary:** Sign Black with a white label at Title size and weight 700. One per screen.
-- **White, blue, yellow:** secondary ways. A row may carry a second, smaller line under its label (Note size, semi-condensed 500).
-- **Hover and press:** the arrow square takes a colour its field does not use. On light and yellow ground it turns Route Blue with a white arrow. The blue square of the primary row turns white with a black arrow, and so does any square on a blue row or on blue ground. Black ground is set to turn it yellow with a black arrow, and no row sits on black yet. The arrow travels 0.25rem in its own direction, 0.5rem when pressed. Focus is a blue ring inside the row with a white ring inside that. Reduced motion keeps the colour change and drops the travel.
-- **The last sign:** the footer opens with the primary action as a full-bleed yellow band at headline size. Its black arrow square reaches the edge of the screen. On hover the square turns Route Blue with a white arrow and the arrow travels 0.5rem. Its focus ring is Sign Black, inside the band.
+- **Arrow square:** the same width on every row so stacked squares form one column. Every resting square is Sign Black with a yellow arrow, including the primary row.
+- **Primary:** Sign Black with a white label at Title size and weight 700. Used for the hero demo action and the Telegram section's bot link or browser fallback.
+- **Secondary:** Panel White with a Sign Black label. The sample case and scorecard routes share this treatment, with a 1px rule before the third hero row. A row may carry a second, smaller line under its label (Note size, semi-condensed 500).
+- **Hover and press:** every interactive direction row on this page turns its arrow square muted Route Blue with a white arrow, including primary rows. The arrow travels 0.25rem in its own direction, 0.5rem when pressed. Focus is a blue ring inside the row with a white ring inside that. Reduced motion keeps the colour change and drops the travel. A static example row keeps its resting colours and does not move.
+- **The last sign:** the footer opens with the primary action as a full-bleed white band at headline size. Its black square with a yellow arrow reaches the edge of the screen. On hover the square turns muted Route Blue with a white arrow and the arrow travels 0.5rem. Its focus ring is Route Blue, inside the band.
 
 ### Source numbers
 - **Style:** a yellow square with a black tabular numeral in the semi-condensed width at 800. 2.25rem with a Title numeral on a phone, 3.25rem with a Figure numeral from 64rem.
@@ -314,7 +303,7 @@ The scorecard (`scorecard.tsx`).
 ## Do's and Don'ts
 
 ### Do:
-- **Do** give every section one field colour and let it run edge to edge.
+- **Do** let neutral section fields run edge to edge, keeping yellow cues small and blue tied to routes and interaction.
 - **Do** keep a claim and its source number on the same row.
 - **Do** use the arrow that tells the truth: right for a page of this site, up and right for another site, down for an anchor.
 - **Do** tint secondary text from its ground with the matching soft ink.

@@ -27,7 +27,7 @@ export function Hero({
 }) {
   return (
     <section aria-labelledby="hero-title">
-      <div className="l-sign l-field--yellow">
+      <div className="l-sign">
         <div className="l-wrap">
           <div className="l-id">
             <p className="l-name">
@@ -68,7 +68,6 @@ export function Hero({
                 <li>
                   <Way
                     href="#scorecard"
-                    tone="blue"
                     detail={`${totals.passed}/${totals.scenarios} scenarios passed · ${totals.verifiedQuotes}/${totals.totalQuotes} quotes verified`}
                   >
                     Scorecard

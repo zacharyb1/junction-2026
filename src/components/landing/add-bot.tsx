@@ -22,7 +22,7 @@ async function BotCard({ username }: { username: string }) {
         <p>
           Scan the code with your phone camera, or open the link. Both take you to a chat with the bot in Telegram.
         </p>
-        <Way href={url} tone="yellow" panel>
+        <Way href={url} tone="primary" panel>
           Open the bot in Telegram
         </Way>
         <p className="l-handle">t.me/{username}</p>
@@ -52,7 +52,7 @@ function ComingSoon() {
         The Telegram bot is being set up. Its link and QR code will appear here. Until then, you can run the same
         research in the browser.
       </p>
-      <TryLink className={wayClasses({ tone: "yellow", panel: true }, "l-placeholder-way")}>
+      <TryLink className={wayClasses({ tone: "primary", panel: true }, "l-placeholder-way")}>
         <WayContent>Try it in the browser</WayContent>
       </TryLink>
     </div>
@@ -64,7 +64,7 @@ export function AddBot({ username }: { username: string | null }) {
   return (
     <Section
       id="add-the-bot"
-      field="blue"
+      field="white"
       title="Add the bot"
       hint="Kaveri lives in Telegram, next to the people you already talk to."
     >
