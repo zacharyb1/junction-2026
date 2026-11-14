@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useReplayClock } from "@/components/demo/replay";
 
 /**
  * Issue #34: a scripted replay of UKK noticing that someone is stuck on a tax return, fixing the
@@ -22,20 +22,7 @@ const CAPTIONS: [number, string][] = [
 ];
 
 export function BrowserDemo({ loop = false }: { loop?: boolean }) {
-  const [now, setNow] = useState(0);
-  const start = useRef(0);
-  useEffect(() => {
-    start.current = performance.now();
-    let frame = 0;
-    const tick = () => {
-      const t = performance.now() - start.current;
-      if (t > DURATION && loop) start.current = performance.now();
-      setNow(Math.min(t, DURATION));
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [loop]);
+  const now = useReplayClock(DURATION, loop);
 
   const fixed = now >= 16000;
   const transport = now < 1200 ? "Choose…" : fixed ? "Public transport (cheapest fare)" : "Own car";
@@ -118,21 +105,24 @@ export function BrowserDemo({ loop = false }: { loop?: boolean }) {
       </div>
 
       {call && (
-        <div className="bdemo-call" role="dialog" aria-label="UKK is calling">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/ukk-avatar.jpg" alt="" className={ringing ? "is-ringing" : ""} />
-          <p className="bdemo-call-name">UKK</p>
-          <p className="bdemo-call-state">{ringing ? "calling…" : "00:" + String(Math.floor((now - 23400) / 1000)).padStart(2, "0")}</p>
-          <div className="bdemo-captions">
-            {captions.map(([at, text]) => (
-              <p key={at}>{text}</p>
-            ))}
+        // The dock is what lets the call follow the screen on a phone, where the window is taller than the screen.
+        <div className="bdemo-call-dock">
+          <div className="bdemo-call" role="group" aria-label="UKK is calling: a concept">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/ukk-avatar.jpg" alt="" className={ringing ? "is-ringing" : ""} />
+            <p className="bdemo-call-name">UKK</p>
+            <p className="bdemo-call-state">{ringing ? "calling…" : "00:" + String(Math.floor((now - 23400) / 1000)).padStart(2, "0")}</p>
+            <div className="bdemo-captions">
+              {captions.map(([at, text]) => (
+                <p key={at}>{text}</p>
+              ))}
+            </div>
+            <div className="bdemo-call-buttons" aria-hidden>
+              <span className="is-decline">✕</span>
+              <span className={`is-accept${ringing ? " is-pulse" : ""}`}>✆</span>
+            </div>
+            <p className="bdemo-concept">Concept: UKK cannot place calls yet.</p>
           </div>
-          <div className="bdemo-call-buttons" aria-hidden>
-            <span className="is-decline">✕</span>
-            <span className={`is-accept${ringing ? " is-pulse" : ""}`}>✆</span>
-          </div>
-          <p className="bdemo-concept">Concept: UKK cannot place calls yet.</p>
         </div>
       )}
     </div>

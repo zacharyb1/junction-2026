@@ -1,15 +1,16 @@
 /**
  * UKK as an original illustration: a calm older man with heavy square glasses, drawn for this project.
  * It is a cartoon, not a likeness of a real person. The mouth opens with the loudness of his voice,
- * and the ring shows what he is doing: listening (red), thinking (amber) or speaking (cyan).
+ * and the ring shows what he is doing in the site's own colours: listening with a live microphone (green),
+ * thinking (amber) or speaking (cyan).
  */
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking";
 
 const RING: Record<AvatarState, string> = {
-  idle: "#94a3b8",
-  listening: "#ef4444",
-  thinking: "#f59e0b",
-  speaking: "#22d3ee",
+  idle: "#9db0c9",
+  listening: "#3ddc97",
+  thinking: "#ffb547",
+  speaking: "#4fd8ff",
 };
 
 const LABEL: Record<AvatarState, string> = {
@@ -25,7 +26,7 @@ export function UkkAvatar({ state, level = 0, size = 112 }: { state: AvatarState
   return (
     <svg width={size} height={size} viewBox="0 0 120 120" role="img" aria-label={LABEL[state]} className="shrink-0">
       <circle cx="60" cy="60" r="57" fill="none" stroke={RING[state]} strokeWidth="3" opacity={0.35 + glow} />
-      <circle cx="60" cy="60" r="52" fill="#1e293b" />
+      <circle cx="60" cy="60" r="52" fill="#12233a" />
       {/* ears */}
       <ellipse cx="27" cy="63" rx="6" ry="10" fill="#e8b996" />
       <ellipse cx="93" cy="63" rx="6" ry="10" fill="#e8b996" />

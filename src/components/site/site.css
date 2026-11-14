@@ -1,0 +1,265 @@
+/*
+ * The frame every page of the site shares: one dark ground, one palette, one header, one footer.
+ *
+ * The palette is the front page's control room (src/components/hud/hud.css). Here it is also handed to the
+ * shared Tailwind tokens (--background, --primary, --border ...), so /try, the case file and the chat with UKK
+ * are drawn in the same colours as the front page without restyling each component.
+ *
+ * Everything is scoped to .site. The reading table at /reading does not use this frame and keeps its paper.
+ */
+
+:root:has(.site) {
+  background: #05080d;
+  color-scheme: dark;
+}
+
+.site {
+  /* The control room's names, for the header, the footer and any page that wants them. */
+  --hud-bg: #05080d;
+  --hud-line: rgb(79 216 255 / 0.22);
+  --hud-line-soft: rgb(79 216 255 / 0.08);
+  --hud-cyan: #4fd8ff;
+  --hud-amber: #ffb547;
+  --hud-green: #3ddc97;
+  --hud-text: #e6f1ff;
+  --hud-dim: #9db0c9;
+  --hud-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* The same colours under the names the shared components read. Contrast is checked against --hud-bg. */
+  --background: #05080d;
+  --foreground: #e6f1ff;
+  --card: #0b1521;
+  --card-foreground: #e6f1ff;
+  --popover: #0b1521;
+  --popover-foreground: #e6f1ff;
+  --primary: #4fd8ff;
+  --primary-foreground: #03131c;
+  --secondary: #101d2c;
+  --secondary-foreground: #e6f1ff;
+  --muted: #0e1a28;
+  /* 9:1 on the ground, 8:1 on a card. */
+  --muted-foreground: #9db0c9;
+  --accent: #12233a;
+  --accent-foreground: #e6f1ff;
+  --destructive: #ff8a80;
+  --border: rgb(79 216 255 / 0.18);
+  /* The edge of a text field is the only thing that shows where it is: 3.3:1 on the ground. */
+  --input: rgb(157 176 201 / 0.55);
+  --ring: #ffb547;
+  /* Crisp corners, as on the front page's panels and buttons. */
+  --radius: 0.3rem;
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--hud-bg);
+  color: var(--hud-text);
+}
+
+/* A faint grid and two lights: cold from the machine, warm from the family. */
+.site::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 78% 8%, rgb(79 216 255 / 0.13), transparent 70%),
+    radial-gradient(45% 40% at 5% 70%, rgb(255 181 71 / 0.06), transparent 70%),
+    linear-gradient(var(--hud-line-soft) 1px, transparent 1px) 0 0 / 100% 56px,
+    linear-gradient(90deg, var(--hud-line-soft) 1px, transparent 1px) 0 0 / 56px 100%;
+}
+
+/* A control-room page inside the frame stands on the frame's ground, not on a second one. */
+.site .hud {
+  background: transparent;
+}
+.site .hud::before {
+  content: none;
+}
+
+/* Keyboard focus is amber everywhere, as on the front page. */
+.site :focus-visible:not(.landing *) {
+  outline: 2px solid var(--hud-amber);
+  outline-offset: 3px;
+}
+
+.site ::selection {
+  background: rgb(79 216 255 / 0.3);
+  color: var(--hud-text);
+}
+
+.site-wrap {
+  width: min(1120px, 100% - 2rem);
+  margin-inline: auto;
+}
+
+/* "AI" in the accent colour, so the name cannot be read as "AlDaddy". */
+.site-mark {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--hud-text);
+}
+.site-mark b {
+  font-weight: 700;
+  color: var(--hud-cyan);
+}
+
+/* A small label above a page title, in the control room's voice. */
+.site-eyebrow {
+  font: 500 0.72rem / 1.3 var(--hud-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hud-cyan);
+}
+
+/* ---------- header ---------- */
+
+.site-header {
+  border-bottom: 1px solid var(--hud-line-soft);
+}
+.site-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 1.5rem;
+  min-height: 60px;
+}
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0 1.6rem;
+  margin-left: auto;
+}
+.site-nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font: 500 0.75rem / 1 var(--hud-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--hud-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.site-nav a:hover {
+  color: var(--hud-text);
+}
+/* The page you are on: colour and a line, so it does not depend on colour alone. */
+.site-nav a[aria-current="page"] {
+  color: var(--hud-cyan);
+}
+.site-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 8px;
+  height: 1px;
+  background: var(--hud-cyan);
+}
+
+/* On a phone the four links take their own row under the name. */
+@media (max-width: 639px) {
+  .site-header-row {
+    padding-top: 0.25rem;
+  }
+  .site-nav {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    gap: 0 0.6rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .site-nav a {
+    letter-spacing: 0.06em;
+  }
+}
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  margin-top: auto;
+  padding-block: 2.5rem 3rem;
+  border-top: 1px solid var(--hud-line-soft);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--hud-dim);
+}
+/* On a phone the three lists sit two abreast, so the footer is not a screen of its own. */
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem 1.5rem;
+}
+.site-footer-about {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 0.6rem;
+  align-content: start;
+  max-width: 34ch;
+}
+.site-footer h2 {
+  margin-bottom: 0.35rem;
+  font: 500 0.72rem / 1.3 var(--hud-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hud-text);
+}
+.site-footer li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--hud-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.site-footer li a:hover {
+  color: var(--hud-cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-footer-legal {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--hud-line-soft);
+  font-size: 0.8rem;
+}
+.site-footer-legal p {
+  max-width: 88ch;
+}
+@media (min-width: 640px) {
+  .site-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .site-footer li a {
+    min-height: 34px;
+  }
+}
+@media (min-width: 900px) {
+  .site-footer-grid {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  }
+  .site-footer-about {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav a,
+  .site-footer li a {
+    transition: none;
+  }
+}

@@ -119,7 +119,7 @@ function CaseCard({ c }: { c: Case }) {
 function GenericCard() {
   return (
     <PreviewCard>
-      <Title>A AIDaddy case file</Title>
+      <Title>An AIDaddy case file</Title>
       <span style={{ fontSize: 42, letterSpacing: "-0.01em" }}>Every line carries a quote checked on its page.</span>
     </PreviewCard>
   );

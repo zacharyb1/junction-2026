@@ -30,6 +30,11 @@ function highlightUrl(url: string, quote: string): string {
   return `${url}#:~:text=${words.length > 10 ? `${part(words.slice(0, 5))},${part(words.slice(-5))}` : part(words)}`;
 }
 
+/** A citation number, drawn as on the case page. */
+const CHIP = "rounded-sm border border-primary/30 bg-primary/10 px-1.5 py-0.5 font-mono text-primary";
+
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
 const FOUND = {
   live: "found on the live page",
   oxylabs: "found on the live page, read through Oxylabs",
@@ -42,7 +47,7 @@ function Sentence({ e }: { e: Cited }) {
     <li className="flex flex-col gap-1.5">
       <blockquote className="border-l-2 border-primary/40 pl-3 text-sm italic">“{e.quote}”</blockquote>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pl-3.5 text-xs text-muted-foreground">
-        <span className="rounded bg-muted px-1.5 py-0.5 font-mono">{e.n}</span>
+        <span className={CHIP}>{e.n}</span>
         <Badge variant={e.sourceType === "official" ? "secondary" : "outline"}>
           {e.sourceType === "official" ? "Official source" : "Secondary source"}
         </Badge>
@@ -60,11 +65,11 @@ function Sentence({ e }: { e: Cited }) {
           </span>
         </a>
         {verified ? (
-          <span className="inline-flex items-center gap-1 text-emerald-800 dark:text-emerald-300">
+          <span className="inline-flex items-center gap-1 text-(--hud-green)">
             <BadgeCheck className="size-3.5 shrink-0" /> {FOUND[e.checkedVia ?? "live"]}
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-amber-800 dark:text-amber-300">
+          <span className="inline-flex items-center gap-1 text-(--hud-amber)">
             <CircleAlert className="size-3.5 shrink-0" />{" "}
             {e.verification === "unreachable" ? "page could not be opened" : "not found on the page"}
           </span>
@@ -85,7 +90,7 @@ function PlanLine({ line, evidence, open }: { line: string; evidence: Cited[]; o
         {text}
         <span className="ml-1 inline-flex gap-1 align-baseline">
           {refs.map((n) => (
-            <span key={n} className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs font-normal text-muted-foreground">
+            <span key={n} className={`${CHIP} text-xs font-normal`}>
               {n}
             </span>
           ))}
@@ -93,8 +98,8 @@ function PlanLine({ line, evidence, open }: { line: string; evidence: Cited[]; o
       </p>
       {cited.length > 0 && (
         <details open={open} className="group mt-1.5">
-          <summary className="flex cursor-pointer list-none items-start gap-1 py-1 text-xs text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
-            <ChevronRight className="mt-0.5 size-3.5 shrink-0 transition-transform group-open:rotate-90" />
+          <summary className="flex cursor-pointer list-none items-start gap-1 py-2 text-xs text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="mt-0.5 size-3.5 shrink-0 transition-transform group-open:rotate-90 motion-reduce:transition-none" />
             <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
               {cited.length} {cited.length === 1 ? "quote" : "quotes"} from {hosts.join(", ")}
               {kinds.map((kind) => (
@@ -120,18 +125,18 @@ export function TryResult({ result, ref }: { result: ResearchResult; ref?: Ref<H
   // Quotes start open where there is room for them. On a phone the plan stays short and each line opens on a tap.
   const [open] = useState(() => typeof window !== "undefined" && window.matchMedia("(min-width: 640px)").matches);
   return (
-    <Card ref={ref} className="scroll-mt-4 border-primary/40">
+    <Card ref={ref} className="scroll-mt-4 ring-primary/50">
       <CardHeader>
         <CardTitle role="heading" aria-level={2}>
           {result.title}
         </CardTitle>
         <CardDescription className="flex flex-wrap items-center gap-2">
-          <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
+          <Badge className="border-(--hud-green)/40 bg-(--hud-green)/10 text-(--hud-green)">
             <BadgeCheck /> {result.evidenceVerified} of {result.evidenceTotal} quotes found on their pages
           </Badge>
           <span>
-            {(result.ms / 1000).toFixed(1)} s · {result.exa.searches} Exa searches · {result.readers.live} pages read live,{" "}
-            {result.exa.contents} through Exa
+            {(result.ms / 1000).toFixed(1)} s · {count(result.exa.searches, "Exa search", "Exa searches")} ·{" "}
+            {count(result.readers.live, "page", "pages")} read live, {result.readers.exa} through Exa
           </span>
         </CardDescription>
       </CardHeader>
@@ -158,7 +163,7 @@ export function TryResult({ result, ref }: { result: ResearchResult; ref?: Ref<H
           href={result.url}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 self-center py-1 text-xs text-muted-foreground hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 self-center text-xs text-muted-foreground hover:text-foreground hover:underline"
         >
           Open in a new tab <ExternalLink className="size-3" />
           <span className="sr-only">: the case file</span>

@@ -18,10 +18,10 @@ import { ActionLog } from "@/components/action-log";
 import { CopyButton } from "@/components/copy-button";
 import { DeadlineDate } from "@/components/deadline-date";
 import { ListenButton } from "@/components/listen-button";
+import { SiteShell } from "@/components/site/site-shell";
 import { SourceCheckPanel } from "@/components/source-check-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { type Case, type Evidence, type Step, verifiedCount } from "@/lib/case";
 import { type Labels, labels, langOf } from "@/lib/i18n";
 import { loadCase } from "@/lib/store";
@@ -96,6 +96,13 @@ function due(value: string | undefined, t: Labels) {
   return value;
 }
 
+/**
+ * One scheme for the whole page, in the site's own colours: amber waits or needs attention, green is confirmed,
+ * cyan is the neutral accent.
+ */
+const AMBER = "border-(--hud-amber)/40 bg-(--hud-amber)/10 text-(--hud-amber)";
+const GREEN = "border-(--hud-green)/40 bg-(--hud-green)/10 text-(--hud-green)";
+
 function Refs({ refs, t }: { refs: number[]; t: Labels }) {
   if (!refs.length) return null;
   return (
@@ -106,7 +113,7 @@ function Refs({ refs, t }: { refs: number[]; t: Labels }) {
           href={`#source-${n}`}
           aria-label={t.sourceNumber(n)}
           // 24 px each way: the smallest target a finger can hit without catching its neighbour.
-          className="min-w-6 rounded bg-muted px-1.5 py-1 text-center font-mono text-xs text-muted-foreground no-underline hover:bg-primary hover:text-primary-foreground"
+          className="min-w-6 rounded-sm border border-primary/30 bg-primary/10 px-1.5 py-1 text-center font-mono text-xs text-primary no-underline hover:bg-primary hover:text-primary-foreground"
         >
           {n}
         </a>
@@ -117,8 +124,8 @@ function Refs({ refs, t }: { refs: number[]; t: Labels }) {
 
 const STATUS = {
   todo: { icon: CircleDashed, label: "todo", tone: "text-muted-foreground" },
-  needs_approval: { icon: Hand, label: "needsApproval", tone: "text-amber-600 dark:text-amber-400" },
-  done: { icon: CircleCheck, label: "done", tone: "text-emerald-600 dark:text-emerald-400" },
+  needs_approval: { icon: Hand, label: "needsApproval", tone: "text-(--hud-amber)" },
+  done: { icon: CircleCheck, label: "done", tone: "text-(--hud-green)" },
 } as const;
 
 function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<number> }) {
@@ -137,13 +144,13 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
         </p>
         {step.detail && <p className="mt-1 text-sm text-muted-foreground">{step.detail}</p>}
         {step.conflict && (
-          <p className="mt-2 flex gap-2 rounded-lg bg-amber-50 p-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+          <p className={`mt-2 flex gap-2 rounded-lg border p-2 text-sm ${AMBER}`}>
             <Scale className="mt-0.5 size-4 shrink-0" /> {step.conflict}
           </p>
         )}
         <div className="mt-2 flex flex-wrap gap-2 text-xs">
           {!confirmed && (
-            <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+            <Badge className={AMBER}>
               <CircleAlert /> {t.notConfirmed}
             </Badge>
           )}
@@ -164,7 +171,7 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
             </Badge>
           )}
           {step.status === "needs_approval" && (
-            <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200">{t.approveInChat}</Badge>
+            <Badge className={AMBER}>{t.approveInChat}</Badge>
           )}
         </div>
         {deadline && <DeadlineDate step={step} source={step.evidence.find((n) => verified.has(n))} locale={t.locale} t={t.date} />}
@@ -176,13 +183,13 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
 function Mark({ e, t }: { e: Evidence; t: Labels }) {
   if (e.verification === "verified") {
     return (
-      <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
+      <Badge className={GREEN}>
         <BadgeCheck /> {e.checkedVia === "exa" ? t.foundExa : e.checkedVia === "oxylabs" ? t.foundOxylabs : t.foundLive}
       </Badge>
     );
   }
   return (
-    <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+    <Badge className={AMBER}>
       <CircleAlert /> {e.verification === "unreachable" ? t.unreachable : t.notFound}
     </Badge>
   );
@@ -196,9 +203,9 @@ function thisYear(e: Evidence): number | null {
 
 function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
   return (
-    <li id={`source-${e.n}`} className="scroll-mt-4 rounded-xl border bg-card p-4">
+    <li id={`source-${e.n}`} className="scroll-mt-4 rounded-lg border bg-card p-4">
       <div className="flex items-start gap-3">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-xs text-primary-foreground">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-sm border border-primary/40 bg-primary/10 font-mono text-xs text-primary">
           {e.n}
         </span>
         <div className="min-w-0 flex-1">
@@ -206,7 +213,7 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
             href={e.url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-6 items-center gap-1 font-medium leading-snug hover:underline"
+            className="inline-flex min-h-6 items-center gap-1 font-medium leading-snug underline-offset-4 hover:text-primary hover:underline"
           >
             {e.title} <ExternalLink className="size-3.5 shrink-0" />
             <span className="sr-only">({t.newTab})</span>
@@ -217,14 +224,14 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
           </p>
         </div>
       </div>
-      <blockquote className="mt-3 border-l-2 border-primary/40 pl-3 text-sm italic">“{e.quote}”</blockquote>
+      <blockquote className="mt-3 border-l-2 border-primary/50 pl-3 text-sm leading-relaxed italic">“{e.quote}”</blockquote>
       {e.quoteTranslation && <p className="mt-2 pl-3.5 text-sm text-muted-foreground">{e.quoteTranslation}</p>}
       {e.verification === "verified" && highlightUrl(e.url, e.quote) && (
         <a
           href={highlightUrl(e.url, e.quote) ?? e.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-flex min-h-6 items-center gap-1 pl-3.5 text-sm font-medium text-primary hover:underline"
+          className="mt-2 inline-flex min-h-6 items-center gap-1 pl-3.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
         >
           <Highlighter className="size-3.5 shrink-0" /> {t.showOnPage}
           {/* Every source has this link, so a screen reader also hears which one it belongs to. */}
@@ -262,10 +269,11 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-3">
+    // A hairline above every part, as in a printed report.
+    <section className="flex flex-col gap-4 border-t pt-8">
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-        {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
+        <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+        {hint && <p className="mt-1 text-sm text-muted-foreground">{hint}</p>}
       </div>
       {children}
     </section>
@@ -276,31 +284,37 @@ function Header({ c, t }: { c: Case; t: Labels }) {
   const verified = verifiedCount(c);
   const found = new Set(c.evidence.filter((e) => e.verification === "verified").map((e) => e.n));
   const deadlines = c.steps.filter((s) => s.due && s.evidence.some((n) => found.has(n))).length;
-  const approvals = c.steps.filter((s) => s.status === "needs_approval").length;
+  // Both kinds of waiting are on this page: a step that needs a yes, and a proposal in the action log that needs a click.
+  const approvals =
+    c.steps.filter((s) => s.status === "needs_approval").length +
+    (c.actions?.filter((a) => a.kind === "irreversible" && a.status === "waiting").length ?? 0);
+  const place = [c.jurisdiction.region, t.country(c.jurisdiction.country)].filter(Boolean).join(", ");
+  const quotesTone = !c.evidence.length ? "" : verified === c.evidence.length ? "text-(--hud-green)" : "text-(--hud-amber)";
   return (
-    <header className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        <Badge variant="secondary">
-          <MapPin /> {[c.jurisdiction.region, t.country(c.jurisdiction.country)].filter(Boolean).join(", ")}
-        </Badge>
+    // The same head as /try and /ukk: a small label, the title, one paragraph.
+    <header className="flex flex-col gap-3">
+      <p className="site-eyebrow flex flex-wrap items-center gap-x-2 gap-y-1">
+        <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
+        <span>{place}</span>
         <span className="text-muted-foreground">
-          {t.updated} {when(c.updatedAt, t)}
+          · {t.updated} {when(c.updatedAt, t)}
         </span>
-      </div>
-      <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{c.title}</h1>
-      <p className="text-muted-foreground">{c.summary}</p>
+      </p>
+      <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{c.title}</h1>
+      <p className="leading-relaxed text-muted-foreground">{c.summary}</p>
       {process.env.ELEVENLABS_API_KEY && (
         <ListenButton src={`/api/cases/${c.id}/audio`} label={t.listen} loadingLabel={t.listenLoading} errorLabel={t.listenError} />
       )}
-      <dl className="grid grid-cols-3 gap-2 text-center">
+      <dl className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
         {[
-          { value: `${verified}/${c.evidence.length}`, label: t.quotesVerified },
-          { value: deadlines, label: deadlines === 1 ? t.deadline : t.deadlines },
-          { value: approvals, label: t.waiting },
+          { value: `${verified}/${c.evidence.length}`, label: t.quotesVerified, tone: quotesTone },
+          { value: deadlines, label: deadlines === 1 ? t.deadline : t.deadlines, tone: "" },
+          { value: approvals, label: t.waiting, tone: approvals ? "text-(--hud-amber)" : "" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border bg-card px-2 py-3">
-            <dd className="text-xl font-semibold tabular-nums">{stat.value}</dd>
-            <dt className="text-xs text-muted-foreground">{stat.label}</dt>
+          // The label comes first for a screen reader and sits under its number on the page.
+          <div key={stat.label} className="flex flex-col-reverse justify-end gap-1 rounded-lg border bg-card p-3">
+            <dt className="text-xs leading-snug text-muted-foreground">{stat.label}</dt>
+            <dd className={`text-2xl font-semibold tabular-nums ${stat.tone}`}>{stat.value}</dd>
           </div>
         ))}
       </dl>
@@ -317,150 +331,162 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
   const verified = new Set(c.evidence.filter((e) => e.verification === "verified").map((e) => e.n));
 
   return (
-    // A word longer than the screen (a Finnish compound, a pasted address) breaks instead of widening the page.
-    <main lang={langOf(c.language)} className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-8 wrap-anywhere sm:py-12">
-      <Header c={c} t={t} />
+    <SiteShell>
+      {/*
+        A word longer than the screen (a Finnish compound, a pasted address) breaks instead of widening the page.
+        The shared badge is a pill; here it gets the site's crisp corner.
+      */}
+      <main
+        lang={langOf(c.language)}
+        className="mx-auto flex w-full max-w-2xl flex-col gap-10 px-4 py-10 wrap-anywhere sm:py-14 [&_.rounded-4xl]:rounded-sm"
+      >
+        <Header c={c} t={t} />
 
-      {c.steps.length > 0 && (
-        <Section title={t.whatToDo} hint={t.whatToDoHint}>
-          <ol className="flex flex-col gap-5">
-            {c.steps.map((step) => (
-              <StepRow key={step.id} step={step} t={t} verified={verified} />
-            ))}
-          </ol>
-        </Section>
-      )}
-
-      {c.money.length > 0 && (
-        <Section title={t.money}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {c.money.map((m) => (
-              <Card key={`${m.label} ${m.amount}`}>
-                <CardHeader>
-                  <CardDescription>
-                    {m.label}
-                    <Refs refs={m.evidence} t={t} />
-                  </CardDescription>
-                  <CardTitle className="text-base">{m.amount}</CardTitle>
-                </CardHeader>
-                {m.note && <CardContent className="text-sm text-muted-foreground">{m.note}</CardContent>}
-              </Card>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {c.drafts.length > 0 && (
-        <Section title={t.drafts} hint={t.draftsHint}>
-          {c.drafts.map((d) => (
-            <Card key={d.id}>
-              <CardHeader className="flex flex-row items-center justify-between gap-3">
-                <div>
-                  <CardTitle className="text-base">{d.title}</CardTitle>
-                  <CardDescription className="capitalize">{t.draftKind[d.kind]}</CardDescription>
-                </div>
-                <CopyButton text={d.body} label={t.copy} copiedLabel={t.copied} />
-              </CardHeader>
-              <CardContent>
-                <pre className="whitespace-pre-wrap rounded-lg bg-muted p-3 font-sans text-sm">{d.body}</pre>
-              </CardContent>
-            </Card>
-          ))}
-        </Section>
-      )}
-
-      {(c.unverified.length > 0 || c.openQuestions.length > 0) && (
-        <Section title={t.gaps} hint={t.gapsHint}>
-          <ul className="flex flex-col gap-2 text-sm">
-            {c.unverified.map((u) => (
-              <li key={u} className="flex gap-2">
-                <CircleAlert className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" /> {u}
-              </li>
-            ))}
-            {c.openQuestions.map((q) => (
-              <li key={q} className="flex gap-2">
-                <HelpCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> {q}
-              </li>
-            ))}
-          </ul>
-        </Section>
-      )}
-
-      {c.evidence.length > 0 && (
-        <Section title={t.sources} hint={t.sourcesHint}>
-          <SourceCheckPanel c={c} t={t} />
-          <ol className="flex flex-col gap-3">
-            {c.evidence.map((e) => (
-              <EvidenceCard key={e.n} e={e} t={t} />
-            ))}
-          </ol>
-        </Section>
-      )}
-
-      {c.news && c.news.length > 0 && (
-        <Section title={t.news} hint={t.newsHint}>
-          <ul className="flex flex-col gap-2">
-            {c.news.map((n) => (
-              <li key={n.url} className="rounded-xl border bg-card p-3 text-sm">
-                <a href={n.url} target="_blank" rel="noreferrer" className="inline-flex min-h-6 items-start gap-1 font-medium leading-snug hover:underline">
-                  {n.title} <ExternalLink className="mt-0.5 size-3.5 shrink-0" />
-                  <span className="sr-only">({t.newTab})</span>
-                </a>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {due(n.date, t)} · {n.publisher && n.publisher !== host(n.url) ? `${n.publisher} · ` : ""}
-                  {host(n.url)}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </Section>
-      )}
-
-      {c.actions?.length ? (
-        <Section title={t.actions}>
-          <p className="text-sm text-muted-foreground">{t.actionsHint}</p>
-          <ActionLog
-            caseId={c.id}
-            actions={c.actions}
-            t={{
-              actionKind: t.actionKind,
-              actionTrigger: t.actionTrigger,
-              approve: t.approve,
-              approved: t.approved,
-              approvedNote: t.approvedNote,
-              approvedLetter: t.approvedLetter,
-              approveFailed: t.approveFailed,
-            }}
-          />
-        </Section>
-      ) : null}
-
-      {c.trail && (
-        <Section title={t.researched}>
-          <details className="rounded-xl border bg-card p-4 text-sm">
-            {/* Stretched over the padding of the box, so the whole row opens it. */}
-            <summary className="-m-4 cursor-pointer p-4 font-medium">
-              {t.trail(c.trail.searches, c.trail.pagesRead, (c.trail.ms / 1000).toFixed(1))}
-            </summary>
-            <ol className="mt-3 flex flex-col gap-1.5">
-              {c.trail.events.map((event, i) => (
-                <li key={i} className="flex items-baseline gap-2">
-                  <span className="w-12 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
-                    {(event.ms / 1000).toFixed(1)}s
-                  </span>
-                  <span>{event.detail}</span>
-                </li>
+        {c.steps.length > 0 && (
+          <Section title={t.whatToDo} hint={t.whatToDoHint}>
+            <ol className="flex flex-col gap-6">
+              {c.steps.map((step) => (
+                <StepRow key={step.id} step={step} t={t} verified={verified} />
               ))}
             </ol>
-            <p className="mt-3 text-xs text-muted-foreground">
-              {t.trailNote(c.trail.officialDomains, c.trail.costDollars.toFixed(3))}
-            </p>
-          </details>
-        </Section>
-      )}
+          </Section>
+        )}
 
-      <Separator />
-      <footer className="text-xs text-muted-foreground">{t.footer}</footer>
-    </main>
+        {c.money.length > 0 && (
+          <Section title={t.money}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {c.money.map((m) => (
+                <Card key={`${m.label} ${m.amount}`} className="ring-border">
+                  <CardHeader>
+                    <CardDescription>
+                      {m.label}
+                      <Refs refs={m.evidence} t={t} />
+                    </CardDescription>
+                    <CardTitle className="text-base">{m.amount}</CardTitle>
+                  </CardHeader>
+                  {m.note && <CardContent className="text-sm text-muted-foreground">{m.note}</CardContent>}
+                </Card>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {c.drafts.length > 0 && (
+          <Section title={t.drafts} hint={t.draftsHint}>
+            {c.drafts.map((d) => (
+              <Card key={d.id} className="ring-border">
+                <CardHeader className="flex flex-row items-center justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-base">{d.title}</CardTitle>
+                    <CardDescription className="capitalize">{t.draftKind[d.kind]}</CardDescription>
+                  </div>
+                  <CopyButton text={d.body} label={t.copy} copiedLabel={t.copied} />
+                </CardHeader>
+                <CardContent>
+                  <pre className="whitespace-pre-wrap rounded-lg bg-muted p-3 font-sans text-sm leading-relaxed">{d.body}</pre>
+                </CardContent>
+              </Card>
+            ))}
+          </Section>
+        )}
+
+        {(c.unverified.length > 0 || c.openQuestions.length > 0) && (
+          <Section title={t.gaps} hint={t.gapsHint}>
+            <ul className="flex flex-col gap-2 text-sm">
+              {c.unverified.map((u) => (
+                <li key={u} className="flex gap-2">
+                  <CircleAlert className="mt-0.5 size-4 shrink-0 text-(--hud-amber)" /> {u}
+                </li>
+              ))}
+              {c.openQuestions.map((q) => (
+                <li key={q} className="flex gap-2">
+                  <HelpCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> {q}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
+        {c.evidence.length > 0 && (
+          <Section title={t.sources} hint={t.sourcesHint}>
+            <SourceCheckPanel c={c} t={t} />
+            <ol className="flex flex-col gap-3">
+              {c.evidence.map((e) => (
+                <EvidenceCard key={e.n} e={e} t={t} />
+              ))}
+            </ol>
+          </Section>
+        )}
+
+        {c.news && c.news.length > 0 && (
+          <Section title={t.news} hint={t.newsHint}>
+            <ul className="flex flex-col gap-2">
+              {c.news.map((n) => (
+                <li key={n.url} className="rounded-lg border bg-card p-3 text-sm">
+                  <a
+                    href={n.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-6 items-start gap-1 font-medium leading-snug underline-offset-4 hover:text-primary hover:underline"
+                  >
+                    {n.title} <ExternalLink className="mt-0.5 size-3.5 shrink-0" />
+                    <span className="sr-only">({t.newTab})</span>
+                  </a>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {due(n.date, t)} · {n.publisher && n.publisher !== host(n.url) ? `${n.publisher} · ` : ""}
+                    {host(n.url)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
+        {c.actions?.length ? (
+          <Section title={t.actions} hint={t.actionsHint}>
+            <ActionLog
+              caseId={c.id}
+              actions={c.actions}
+              t={{
+                actionKind: t.actionKind,
+                actionTrigger: t.actionTrigger,
+                approve: t.approve,
+                approved: t.approved,
+                approvedNote: t.approvedNote,
+                approvedLetter: t.approvedLetter,
+                approveFailed: t.approveFailed,
+              }}
+            />
+          </Section>
+        ) : null}
+
+        {c.trail && (
+          <Section title={t.researched}>
+            <details className="rounded-lg border bg-card p-4 text-sm">
+              {/* Stretched over the padding of the box, so the whole row opens it. */}
+              <summary className="-m-4 cursor-pointer p-4 font-medium">
+                {t.trail(c.trail.searches, c.trail.pagesRead, (c.trail.ms / 1000).toFixed(1))}
+              </summary>
+              <ol className="mt-3 flex flex-col gap-1.5">
+                {c.trail.events.map((event, i) => (
+                  <li key={i} className="flex items-baseline gap-2">
+                    <span className="w-12 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
+                      {(event.ms / 1000).toFixed(1)}s
+                    </span>
+                    <span>{event.detail}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-3 text-xs text-muted-foreground">
+                {t.trailNote(c.trail.officialDomains, c.trail.costDollars.toFixed(3))}
+              </p>
+            </details>
+          </Section>
+        )}
+
+        {/* In the language of the case, which the site's own footer is not. */}
+        <p className="border-t pt-6 text-xs leading-relaxed text-muted-foreground">{t.footer}</p>
+      </main>
+    </SiteShell>
   );
 }

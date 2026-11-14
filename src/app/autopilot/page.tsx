@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { AutopilotDemo } from "@/components/autopilot/autopilot-demo";
-import { Footer, Section, Wordmark } from "@/components/hud/sections";
-import { landingConfig } from "@/components/landing/config";
+import { Section } from "@/components/hud/sections";
+import { SiteShell } from "@/components/site/site-shell";
 import "@/components/hud/hud.css";
 
 const title = "AIDaddy autopilot: a demo of proactive help";
@@ -19,35 +19,29 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#05080d" };
 
 export default async function Autopilot({ searchParams }: PageProps<"/autopilot">) {
-  const { repoUrl } = landingConfig();
   // The same access code as /try. With it, the lawyer's step runs a live check.
   const params = await searchParams;
   const code = typeof params.code === "string" ? params.code : "";
 
   return (
-    <div className="hud">
-      <header className="hud-wrap">
-        <nav className="hud-top" aria-label="Main">
-          <Link href="/" aria-label="AIDaddy home">
-            <Wordmark />
-          </Link>
-          <Link href="/setup" className="hud-top-link">
-            Set it up
-          </Link>
-        </nav>
-      </header>
-      <main>
-        <Section
-          id="autopilot"
-          index="A1"
-          label="Demo"
-          title="One step ahead, with the family in control."
-          lede="Specialist agents each keep their own context. The orchestrator routes a situation to the right ones, and nothing happens until the family says yes."
-        >
-          <AutopilotDemo code={code} />
-        </Section>
-      </main>
-      <Footer repoUrl={repoUrl} />
-    </div>
+    <SiteShell>
+      <div className="hud">
+        <main>
+          <Section
+            id="autopilot"
+            index="Demo"
+            label="Scripted, with one live check"
+            title="One step ahead, with the family in control."
+            lede="UKK has specialists for law, money and travel, and each keeps its own notes. In this demo a situation goes to the ones that have something to add, and nothing happens until the family says yes."
+            pageTitle
+          >
+            <AutopilotDemo code={code} />
+            <p className="hud-note hud-autopilot-after">
+              What UKK may follow is the family&apos;s choice. <Link href="/setup">See the setup screen</Link>, a mockup.
+            </p>
+          </Section>
+        </main>
+      </div>
+    </SiteShell>
   );
 }

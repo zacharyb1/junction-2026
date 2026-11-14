@@ -1,0 +1,479 @@
+/*
+ * The demos: the programme at /demo and the frame the four replays share.
+ *
+ * Everything here stands on the site's ground and uses its palette (src/components/site/site.css). The things a
+ * replay depicts (a chat app, a browser window, a calendar) keep their own look in their own stylesheets,
+ * because they are pictures of other people's software.
+ */
+
+/* ---------- shared pieces ---------- */
+
+.demo-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 0.6rem;
+  border: 1px solid;
+  border-radius: 0.3rem;
+  font: 500 0.72rem / 1.2 var(--hud-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.demo-tag--real {
+  border-color: rgb(61 220 151 / 0.4);
+  color: var(--hud-green);
+}
+.demo-tag--concept {
+  border-color: rgb(255 181 71 / 0.45);
+  color: var(--hud-amber);
+}
+
+.demo-replay,
+.demo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 1px solid var(--hud-line);
+  border-radius: 0.3rem;
+  background: rgb(79 216 255 / 0.05);
+  color: var(--hud-text);
+  font: 500 0.92rem / 1 var(--font-sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+.demo-replay:hover,
+.demo-btn:hover {
+  border-color: var(--hud-cyan);
+  background: rgb(79 216 255 / 0.14);
+}
+.demo-btn--primary {
+  border-color: var(--hud-cyan);
+  background: var(--hud-cyan);
+  color: #03131c;
+  font-weight: 600;
+}
+.demo-btn--primary:hover {
+  background: #8ae6ff;
+}
+
+/* ---------- the links between the replays ---------- */
+
+.demo-nav {
+  border-bottom: 1px solid var(--hud-line-soft);
+}
+.demo-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.demo-nav ul {
+  display: flex;
+  gap: 0 1.5rem;
+  list-style: none;
+}
+.demo-nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  font-size: 0.86rem;
+  white-space: nowrap;
+  color: var(--hud-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.demo-nav a:hover {
+  color: var(--hud-text);
+}
+/* The row scrolls sideways when it must, which would cut a ring drawn outside the link. */
+.site .demo-nav a:focus-visible {
+  outline-offset: -2px;
+}
+/* The replay you are on: colour and a line, so it does not depend on colour alone. */
+.demo-nav a[aria-current="page"] {
+  color: var(--hud-text);
+}
+.demo-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--hud-cyan);
+}
+
+/* On a phone the four names need the whole row, so the way back is the arrow alone. Its words stay for screen readers. */
+@media (max-width: 559px) {
+  .demo-nav-row {
+    gap: 0 0.5rem;
+  }
+  .demo-nav ul {
+    flex: 1;
+    justify-content: space-between;
+    gap: 0 0.75rem;
+  }
+  .demo-nav-back {
+    min-width: 44px;
+    font-size: 1.05rem;
+  }
+  .demo-nav-back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ---------- a replay page ---------- */
+
+.demo-page {
+  /* How much of the screen's height is not the phone on the stage. The phone replays size themselves with it. */
+  --demo-chrome: 4.5rem;
+  flex: 1;
+  padding-block: 1.5rem 3rem;
+}
+.demo-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+.demo-head h1 {
+  margin-top: 0.5rem;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.demo-story {
+  max-width: 52ch;
+  margin-top: 0.5rem;
+  line-height: 1.55;
+  color: var(--hud-dim);
+}
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 1rem;
+}
+.demo-stage {
+  /* A tap on Replay brings the stage to the top of a phone's screen, with a little air above it. */
+  scroll-margin-top: 0.5rem;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-sans);
+}
+.demo-scene {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--hud-dim);
+}
+.demo-caption {
+  max-width: 62ch;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--hud-dim);
+}
+.demo-caption a {
+  color: var(--hud-cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 900px) {
+  .demo-page {
+    padding-block: 1.75rem 3.5rem;
+  }
+
+  /* A wide window sits under its heading; the label and the Replay button stand at the heading's right. */
+  .demo-page--wide .demo-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: 2rem;
+  }
+  .demo-page--wide .demo-head > * {
+    grid-column: 1;
+  }
+  .demo-page--wide .demo-controls {
+    grid-row: 1 / span 3;
+    grid-column: 2;
+    margin-top: 0;
+  }
+  .demo-page--wide .demo-story {
+    max-width: none;
+  }
+
+  /* A phone stands beside its heading, as the picture stands beside the words on the front page. */
+  .demo-page--framed.demo-page--phone {
+    --demo-chrome: 11rem;
+  }
+  .demo-page--framed.demo-page--phone .demo-body {
+    grid-template-rows: auto 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 390px);
+    column-gap: 4rem;
+  }
+  .demo-page--framed.demo-page--phone .demo-head {
+    grid-row: 1;
+    grid-column: 1;
+    padding-top: 3.5rem;
+  }
+  .demo-page--framed.demo-page--phone .demo-head h1 {
+    font-size: clamp(2.1rem, 4vw, 2.9rem);
+  }
+  .demo-page--framed.demo-page--phone .demo-story {
+    font-size: 1.08rem;
+  }
+  .demo-page--framed.demo-page--phone .demo-controls {
+    margin-top: 1.5rem;
+  }
+  .demo-page--framed.demo-page--phone .demo-stage {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+  .demo-page--framed.demo-page--phone .demo-caption {
+    grid-row: 2;
+    grid-column: 1;
+    align-self: end;
+    max-width: 52ch;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hud-line-soft);
+  }
+}
+
+/* A laptop window is shorter than the header, the heading and a 16:9 window together, so the window shrinks to stay above the fold. */
+@media (min-width: 1100px) and (max-height: 899px) {
+  .demo-page--framed.demo-page--wide .demo-stage > * {
+    zoom: 0.9;
+  }
+}
+@media (min-width: 1100px) and (max-height: 859px) {
+  .demo-page--framed.demo-page--wide .demo-stage > * {
+    zoom: 0.8;
+  }
+}
+@media (min-width: 1100px) and (max-height: 789px) {
+  .demo-page--framed.demo-page--wide .demo-stage > * {
+    zoom: 0.7;
+  }
+}
+
+/* The four names do not fit beside the arrow on a narrow phone at full size. */
+@media (max-width: 400px) {
+  .demo-nav ul {
+    gap: 0 0.5rem;
+  }
+  .demo-nav a {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 340px) {
+  .demo-nav ul {
+    gap: 0 0.3rem;
+  }
+  .demo-nav a {
+    font-size: 0.74rem;
+  }
+}
+
+/* ---------- bare: the screen at the table and the recorder see only the replay and its caption ---------- */
+
+.demo-page--bare {
+  /* The padding, the gap and a caption of two lines, so the picture never needs to scroll. */
+  --demo-chrome: 6.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+.demo-page--bare.demo-page--wide {
+  padding: 1.5rem;
+}
+.demo-page--bare .demo-stage {
+  width: 100%;
+}
+.demo-page--bare .demo-caption {
+  max-width: 900px;
+  text-align: center;
+}
+.demo-page--bare.demo-page--phone .demo-caption {
+  max-width: 400px;
+  font-size: 0.8rem;
+}
+
+/* ---------- the programme at /demo ---------- */
+
+.demo-hub {
+  flex: 1;
+  padding-block: 3rem 4rem;
+}
+.demo-hub h1 {
+  margin-top: 0.75rem;
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.demo-hub-lede {
+  max-width: 58ch;
+  margin-top: 1rem;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--hud-dim);
+}
+
+.demo-programme {
+  margin-top: 2.5rem;
+  border-bottom: 1px solid var(--hud-line);
+  list-style: none;
+}
+.demo-scene-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  gap: 0.35rem 0;
+  padding: 1.4rem 0.75rem 1.5rem;
+  border-top: 1px solid var(--hud-line);
+  transition: background-color 0.2s;
+}
+.demo-scene-row:hover {
+  background: rgb(79 216 255 / 0.05);
+}
+.demo-scene-no {
+  padding-top: 0.42rem;
+  font: 500 0.8rem / 1.3 var(--hud-mono);
+  letter-spacing: 0.08em;
+  color: var(--hud-cyan);
+}
+.demo-scene-row h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.demo-scene-row h2 a {
+  color: var(--hud-text);
+  text-decoration: none;
+}
+/* The whole row is the link, so a thumb does not have to find the title. */
+.demo-scene-row h2 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.demo-scene-row:hover h2 a {
+  color: var(--hud-cyan);
+}
+.demo-scene-text,
+.demo-scene-meta {
+  grid-column: 2;
+}
+.demo-scene-story {
+  max-width: 60ch;
+  margin-top: 0.3rem;
+  line-height: 1.55;
+  color: var(--hud-text);
+}
+.demo-scene-real {
+  max-width: 60ch;
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--hud-dim);
+}
+.demo-scene-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  margin-top: 0.5rem;
+}
+.demo-scene-kind {
+  font: 500 0.72rem / 1.3 var(--hud-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hud-dim);
+}
+.demo-scene-go {
+  display: none;
+  font-size: 1.2rem;
+  color: var(--hud-dim);
+  transition:
+    color 0.2s,
+    transform 0.2s;
+}
+.demo-scene-row:hover .demo-scene-go {
+  color: var(--hud-cyan);
+  transform: translateX(4px);
+}
+
+@media (min-width: 800px) {
+  .demo-scene-row {
+    grid-template-columns: 4rem minmax(0, 1fr) 15rem 1.5rem;
+    align-items: start;
+    column-gap: 1.5rem;
+    padding: 1.6rem 1rem 1.7rem;
+  }
+  .demo-scene-meta {
+    grid-column: 3;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 0.3rem;
+  }
+  .demo-scene-go {
+    display: block;
+    grid-column: 4;
+    justify-self: end;
+  }
+}
+
+.demo-hub-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-top: 2.5rem;
+}
+.demo-hub-next p {
+  margin-right: auto;
+  color: var(--hud-dim);
+}
+.demo-hub-next div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-replay,
+  .demo-btn,
+  .demo-nav a,
+  .demo-scene-row,
+  .demo-scene-go {
+    transition: none;
+  }
+  .demo-scene-row:hover .demo-scene-go {
+    transform: none;
+  }
+}

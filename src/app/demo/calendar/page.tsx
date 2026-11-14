@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { CalendarDemo, CASE_URL } from "@/components/calendar-demo/calendar-demo";
+import { DemoFrame, demoMode } from "@/components/demo/demo-frame";
 import "@/components/calendar-demo/calendar-demo.css";
 
 export const metadata: Metadata = {
@@ -8,18 +9,24 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export const viewport: Viewport = { themeColor: "#1a2230" };
+export const viewport: Viewport = { themeColor: "#05080d" };
 
-/** Issue #36: a replay for the demo video. Add ?loop=1 to repeat it. */
+/** Issue #36: a replay for the demo video. ?loop=1 repeats it; ?bare=1 shows it without the site around it. */
 export default async function CalendarDemoPage({ searchParams }: PageProps<"/demo/calendar">) {
-  const params = await searchParams;
+  const { loop, bare } = demoMode(await searchParams);
   return (
-    <main className="cdemo-stage">
-      <CalendarDemo loop={params.loop === "1"} />
-      <p className="cdemo-caption">
-        Demo replay with a fictional family. The three options and their facts come from a <a href={CASE_URL}>real run</a> on
-        the venues&apos; own pages; the booking dates are UKK&apos;s suggestions.
-      </p>
-    </main>
+    <DemoFrame
+      scene="calendar"
+      shape="wide"
+      bare={bare}
+      caption={
+        <>
+          Concept: UKK cannot read or write a calendar yet. Demo replay with a fictional family. The three options and their facts come from a <a href={CASE_URL}>real run</a> on
+          the venues&apos; own pages; the booking dates are UKK&apos;s suggestions.
+        </>
+      }
+    >
+      <CalendarDemo loop={loop} />
+    </DemoFrame>
   );
 }

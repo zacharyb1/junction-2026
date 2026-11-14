@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { DemoFrame, demoMode } from "@/components/demo/demo-frame";
 import { CASE_URL, TalkDemo } from "@/components/talk-demo/talk-demo";
 import "@/components/talk-demo/talk-demo.css";
 
@@ -8,19 +9,25 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export const viewport: Viewport = { themeColor: "#2b2118" };
+export const viewport: Viewport = { themeColor: "#05080d" };
 
-/** Issue #35: a replay for the demo video. Add ?loop=1 to repeat it. */
+/** Issue #35: a replay for the demo video. ?loop=1 repeats it; ?bare=1 shows it without the site around it. */
 export default async function TalkDemoPage({ searchParams }: PageProps<"/demo/talk">) {
-  const params = await searchParams;
+  const { loop, bare } = demoMode(await searchParams);
   return (
-    <main className="tdemo-stage">
-      <p className="tdemo-scene">Kitchen table · Aino and Mikko talking · the phone lies between them</p>
-      <TalkDemo loop={params.loop === "1"} />
-      <p className="tdemo-caption">
-        Concept demo: UKK cannot listen on the phone yet. The research and its quotes are a <a href={CASE_URL}>real run</a>{" "}
-        on kkv.fi, the Finnish consumer authority.
-      </p>
-    </main>
+    <DemoFrame
+      scene="talk"
+      shape="phone"
+      bare={bare}
+      caption={
+        <>
+          Concept demo: UKK cannot listen on the phone yet. The research and its quotes are a <a href={CASE_URL}>real run</a>{" "}
+          on kkv.fi, the Finnish consumer authority.
+        </>
+      }
+    >
+      <p className="demo-scene">Kitchen table · Aino and Mikko talking · the phone lies between them</p>
+      <TalkDemo loop={loop} />
+    </DemoFrame>
   );
 }

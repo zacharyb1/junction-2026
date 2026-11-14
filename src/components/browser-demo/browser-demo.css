@@ -1,20 +1,16 @@
-/* /demo/browser (issue #34): a scripted browser replay. Original styling, scoped to .bdemo-stage. */
-.bdemo-stage {
-  display: flex;
-  min-height: 100dvh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1.5rem;
-  background: #14202c;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
+/*
+ * /demo/browser (issue #34): a scripted browser replay. Original styling, every selector prefixed bdemo-.
+ * The page around the window (ground, heading, caption) is the shared frame in src/components/demo/demo.css.
+ * The window keeps its own light look on purpose: it is a picture of a browser with someone else's form in it.
+ */
 .bdemo {
   position: relative;
+  display: flex;
   width: min(1180px, 100%);
+  flex-direction: column;
+  /* 16:9 is the least it is. With clip instead of hidden the window grows when its content needs more room. */
   aspect-ratio: 16 / 9;
-  overflow: hidden;
+  overflow: clip;
   border-radius: 12px;
   background: #f5f6f8;
   box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
@@ -59,10 +55,12 @@
 }
 .bdemo-body {
   display: flex;
-  height: calc(100% - 46px);
+  flex: 1;
+  min-height: 0;
 }
 .bdemo-form {
   display: flex;
+  min-width: 0;
   flex: 1;
   flex-direction: column;
   gap: 0.9rem;
@@ -118,7 +116,7 @@
   animation: bdemo-blink 1s steps(1) infinite;
 }
 .bdemo-stuck {
-  color: #a8650b;
+  color: #8a5a00;
   font-size: 0.82rem;
   font-weight: 500;
 }
@@ -145,7 +143,7 @@
   box-shadow: 0 0 0 4px rgb(227 161 58 / 0.6);
 }
 .bdemo-wait {
-  color: #a8650b;
+  color: #8a5a00;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -202,7 +200,8 @@
   align-self: flex-start;
   padding: 0.6rem 1.1rem;
   border-radius: 8px;
-  background: #2e9e5b;
+  /* White text on this green is 5.3:1. */
+  background: #1f7a4b;
   color: #fff;
   font-weight: 600;
   animation: bdemo-in 0.4s ease-out;
@@ -210,6 +209,10 @@
 .bdemo-fix.is-pressed {
   transform: scale(0.96);
   filter: brightness(0.9);
+}
+/* On a wide screen the dock is not there and the call sits in the middle of the window. */
+.bdemo-call-dock {
+  display: contents;
 }
 .bdemo-call {
   position: absolute;
@@ -226,7 +229,7 @@
   box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
   color: #fff;
   transform: translate(-50%, -50%);
-  animation: bdemo-in 0.4s ease-out;
+  animation: bdemo-pop 0.4s ease-out;
 }
 .bdemo-call img {
   width: 92px;
@@ -274,13 +277,13 @@
   border-radius: 50%;
   font-size: 1.4rem;
 }
-.is-decline {
+.bdemo-call-buttons .is-decline {
   background: #e5484d;
 }
-.is-accept {
+.bdemo-call-buttons .is-accept {
   background: #30a46c;
 }
-.is-accept.is-pulse {
+.bdemo-call-buttons .is-accept.is-pulse {
   animation: bdemo-ring 1s ease-in-out infinite;
 }
 .bdemo-concept {
@@ -288,23 +291,11 @@
   color: #f6c14b;
   font-size: 0.75rem;
 }
-.bdemo-caption {
-  max-width: 900px;
-  color: #c8d3de;
-  font-size: 0.82rem;
-  text-align: center;
-}
-.bdemo-caption a {
-  color: #8cc8ff;
-}
 @keyframes bdemo-in {
   from {
     opacity: 0;
     transform: translateY(6px);
   }
-}
-.bdemo-call {
-  animation-name: bdemo-pop;
 }
 @keyframes bdemo-pop {
   from {
@@ -322,9 +313,71 @@
     opacity: 0;
   }
 }
+@keyframes bdemo-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+}
+
+/* Too narrow for a form and a panel side by side: the window grows taller and the panel opens under the form. */
+@media (max-width: 899px) {
+  .bdemo {
+    aspect-ratio: auto;
+  }
+  .bdemo-chrome {
+    flex-wrap: wrap;
+    gap: 0.4rem 0.8rem;
+  }
+  /* The address takes a row of its own under the tab. */
+  .bdemo-url {
+    flex-basis: 100%;
+    overflow-wrap: anywhere;
+  }
+  .bdemo-body {
+    flex-direction: column;
+  }
+  .bdemo-form {
+    padding: 1.4rem 1.1rem 1.5rem;
+  }
+  .bdemo-h {
+    font-size: 1.35rem;
+  }
+  .bdemo-actions {
+    margin-top: 0.6rem;
+  }
+  .bdemo-panel {
+    display: none;
+  }
+  .bdemo-panel.is-open {
+    display: flex;
+    width: auto;
+    padding: 1.3rem 1.1rem 1.5rem;
+    border-top: 1px solid #d5dbe1;
+    border-left: 0;
+    animation: bdemo-in 0.4s ease-out;
+  }
+  /* The window is now taller than the screen, so the call follows the bottom of the screen while the window is in view. */
+  .bdemo-call-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    display: block;
+    height: 0;
+  }
+  .bdemo-call {
+    top: auto;
+    bottom: 1rem;
+    width: min(330px, calc(100% - 1.5rem));
+    transform: translateX(-50%);
+    animation-name: bdemo-rise;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .bdemo-stage *,
-  .bdemo-stage *::before {
+  .bdemo,
+  .bdemo *,
+  .bdemo *::before {
     animation: none !important;
     transition: none !important;
   }

@@ -5,19 +5,23 @@ import type { ReactNode } from "react";
  * They are drawn by next/og, which lays out with flexbox only and draws with the one font it ships: Geist Regular.
  */
 
-/** The light theme of src/app/globals.css as hex, because the renderer does not read OKLCH. */
+/**
+ * The site's dark palette (src/components/site/site.css) as hex, because the renderer does not read CSS variables.
+ * A case link posted in a chat shows this card, so it is drawn in the same colours as the page it opens.
+ */
 export const tone = {
-  background: "#ffffff",
-  foreground: "#0a0a0a",
-  primary: "#171717",
-  primaryForeground: "#fafafa",
-  muted: "#f5f5f5",
-  // One step darker than muted-foreground: a preview is shown small, so the grey has to carry.
-  soft: "#525252",
-  border: "#e5e5e5",
-  // The emerald and amber of the badges on the case page.
-  found: { background: "#d1fae5", text: "#064e3b" },
-  open: { background: "#fef3c7", text: "#78350f" },
+  background: "#05080d",
+  foreground: "#e6f1ff",
+  primary: "#4fd8ff",
+  primaryForeground: "#03131c",
+  muted: "#0e1a28",
+  // The site's dim text. A preview is shown small, and this is 9:1 on the ground.
+  soft: "#9db0c9",
+  // The site's hairline, cyan at 18%, mixed onto the ground.
+  border: "#122d39",
+  // The green and amber of the badges on the case page, as text on a dark tint of themselves.
+  found: { background: "#0c2b22", text: "#3ddc97" },
+  open: { background: "#33260f", text: "#ffb547" },
 };
 
 /** Line height and tracking of a large heading. */
@@ -35,7 +39,7 @@ const NO_GLYPH =
  */
 export const printable = (text: string) => text.normalize("NFC").replace(NO_GLYPH, " ").replace(/\s+/g, " ").trim();
 
-/** Lucide's concierge bell on a dark tile, then the name: the same mark as on the landing page. */
+/** Lucide's concierge bell on a cyan tile, then the name with "AI" in the accent colour, as in the site's header. */
 function Wordmark() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
@@ -66,12 +70,15 @@ function Wordmark() {
           <path d="M10 4h4" />
         </svg>
       </div>
-      <span style={{ fontSize: 44, letterSpacing: "-0.02em" }}>AIDaddy</span>
+      <div style={{ display: "flex", fontSize: 44, letterSpacing: "-0.02em" }}>
+        <span style={{ color: tone.primary }}>AI</span>
+        <span>Daddy</span>
+      </div>
     </div>
   );
 }
 
-/** White card with the wordmark on top and the promise at the bottom. `aside` sits opposite the wordmark. */
+/** Dark card with the wordmark on top and the promise at the bottom. `aside` sits opposite the wordmark. */
 export function PreviewCard({ aside, children }: { aside?: ReactNode; children: ReactNode }) {
   return (
     <div

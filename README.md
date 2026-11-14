@@ -72,7 +72,23 @@ The gate filters group text before a cloud call. Direct messages, addressed mess
 | Tailwind + shadcn/Base UI | Interface components; [`package.json`](package.json) and the lockfile are authoritative for versions. |
 | pnpm + GitHub Actions | Reproducible install and checks in [CI](.github/workflows/ci.yml). |
 
-The scaffold's `/chat` and `src/lib/ai.ts` remain in the repository but are not the AIDaddy research path. Sponsor tools proposed for later are listed separately below.
+The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are not the AIDaddy research path; its `/chat` page is removed and that address leads to `/ukk`. Sponsor tools proposed for later are listed separately below.
+
+### The site, page by page
+
+AIDaddy is the product. UKK is the name of its butler, the character who speaks on Telegram and on the web. Every page except `/reading` is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try it live, Talk to UKK, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
+
+| Page | What a visitor gets | What it is |
+|---|---|---|
+| `/` | The front page: what UKK does, one recorded run, the scorecard, and the way to every other page. | Live page. Its figures are read from `src/data/replay.json` and `src/data/scorecard.json`. |
+| `/try` | The research form: describe what happened and get a plan with sources. Needs the access code. | Live. |
+| `/c/[id]` | The case file: steps, deadlines, quotes, drafts and the log of what UKK did, with the click that approves. | Live. A case exists only in the store it was researched into. |
+| `/ukk` | A chat with UKK by text or voice. Needs the access code and the web-only Hermes instance. | Live on the server. |
+| `/setup` | What UKK may follow: the Telegram chat today, the phone and the browser as concepts. | Mockup. |
+| `/demo` | The list of replays. | Index page. |
+| `/demo/chat`, `/demo/browser`, `/demo/talk`, `/demo/calendar` | Scripted replays built from real case files. Add `?loop=1` to repeat one without the site's header and footer on the screen at the table, or `?bare=1` to play it once that way for a recording. | Scripted replays. The browser, kitchen-table and calendar scenes show concepts. |
+| `/autopilot` | A fixed script of specialist agents with one live check through the Engine. | Scripted demo. |
+| `/reading` | The reading-table edition of the front page, in its own paper design ([DESIGN.md](DESIGN.md)). | Live page, outside the shared frame on purpose. |
 
 ## Main decisions and why
 

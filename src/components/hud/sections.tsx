@@ -4,32 +4,15 @@ import { Core } from "@/components/hud/core";
 import type { PlanRow } from "@/components/hud/data";
 import { HearPlan } from "@/components/hud/hear-plan";
 import type { Scorecard } from "@/components/landing/scorecard-data";
-import { TryLink } from "@/components/landing/try-link";
-
-/** "AI" in the accent colour, so the name cannot be read as "AlDaddy". */
-export function Wordmark() {
-  return (
-    <span className="hud-mark">
-      <b>AI</b>Daddy
-    </span>
-  );
-}
+import { SiteLink } from "@/components/site/site-link";
 
 const oneDecimal = (ms: number) => (ms / 1000).toFixed(1);
 
 export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: number; card: Scorecard | null }) {
   const boot = ["AIDaddy online", "Watching: family group chat", `Official sites on file for Finland: ${sites}`, "Mode: silent until a life event"];
   return (
-    <header className="hud-hero">
+    <div className="hud-hero">
       <div className="hud-wrap">
-        <nav className="hud-top" aria-label="Main">
-          <Wordmark />
-          <span className="hud-online">
-            <i aria-hidden="true" /> Junction 2026 · Exa challenge
-          </span>
-          <TryLink className="hud-top-link">Try it live</TryLink>
-        </nav>
-
         <div className="hud-hero-grid">
           <div className="hud-hero-core">
             <Core state="idle" />
@@ -54,14 +37,17 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
               <em>it matters.</em>
             </h1>
             <p className="hud-lede">
-              AIDaddy lives in your family&apos;s group chat. It lets the small talk pass. When life happens, it researches
-              the live web with Exa and comes back with a plan in which every line points at a sentence on an official page.
+              AIDaddy puts a butler in your family&apos;s group chat. His name is UKK. He lets the small talk pass. When life
+              happens, he researches the live web with Exa and comes back with a plan in which every line points at a sentence
+              on an official page.
             </p>
             <div className="hud-actions">
               <a href="#research" className="hud-btn hud-btn--primary">
                 Watch it work
               </a>
-              <TryLink className="hud-btn">Try it live</TryLink>
+              <SiteLink href="/try" className="hud-btn">
+                Try it live
+              </SiteLink>
               {botUrl ? (
                 <a href={botUrl} className="hud-btn" target="_blank" rel="noopener noreferrer">
                   Add to Telegram
@@ -93,16 +79,21 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
           </div>
         </div>
       </div>
-    </header>
+    </div>
   );
 }
 
+/**
+ * One numbered part of a page. On the front page its title is an h2 under the hero's h1.
+ * A page that consists of a single section passes `pageTitle`, so the same title is that page's h1.
+ */
 export function Section({
   id,
   index,
   label,
   title,
   lede,
+  pageTitle = false,
   children,
 }: {
   id: string;
@@ -110,6 +101,7 @@ export function Section({
   label: string;
   title: string;
   lede?: ReactNode;
+  pageTitle?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -119,7 +111,13 @@ export function Section({
           <p className="hud-label">
             {index} <span aria-hidden="true">{"//"}</span> {label}
           </p>
-          <h2 id={`${id}-title`}>{title}</h2>
+          {pageTitle ? (
+            <h1 id={`${id}-title`} className="hud-title">
+              {title}
+            </h1>
+          ) : (
+            <h2 id={`${id}-title`}>{title}</h2>
+          )}
           {lede ? <p className="hud-lede">{lede}</p> : null}
         </header>
         {children}
@@ -145,13 +143,13 @@ export function GateFigures({ gate }: { gate: Gate }) {
           <dd>
             {gate.falseWakes}/{gate.smallTalk}
           </dd>
-          <dt>small-talk messages that woke it by mistake</dt>
+          <dt>small-talk messages that woke him by mistake</dt>
         </div>
       </dl>
       <p className="hud-note">
         Measured on the team&apos;s own {gate.messages} labelled chat messages, English and Finnish, with a small Gemma model (
-        {gate.gate}) running on a laptop. It is a development set, not a blind test. Photos, and messages in the three minutes
-        after a wake, go on to the conversation model.
+        {gate.gate}). That test ran on a laptop; on the server the same model does the job. It is a development set, not a
+        blind test. Photos, and messages in the three minutes after a wake, go on to the conversation model.
       </p>
     </div>
   );
@@ -167,8 +165,8 @@ const RULES = [
     text: "When two official pages give different figures, the case file shows both with their sources. It does not pick one for you in silence.",
   },
   {
-    title: "It never acts for you",
-    text: "AIDaddy researches and prepares. It never sends, files, books or pays. Drafts and reminders wait for the family to say yes.",
+    title: "He never acts for you",
+    text: "UKK researches and prepares. He never sends, files, books or pays. He may write a draft ahead of time, but nothing is sent and no reminder is set until the family says yes.",
   },
 ];
 
@@ -177,7 +175,7 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
     <div className="hud-plan">
       <div className="hud-panel hud-answer hud-reveal">
         <p className="hud-panel-title">
-          <span>AIDaddy · in the chat</span>
+          <span>UKK · in the chat</span>
           <span>the same recorded run</span>
         </p>
         <h3>{title}</h3>
@@ -216,6 +214,87 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
         ))}
       </ul>
     </div>
+  );
+}
+
+type Place = {
+  status: "Live" | "Concept" | "Replay";
+  name: string;
+  text: string;
+  /** `of` finishes a label for screen readers where several rows carry the same words. */
+  links: { href: string; label: string; of?: string }[];
+};
+
+/**
+ * Where UKK meets a household, each with what it is today. "Live" works now, "Concept" is an idea shown as a
+ * scripted replay or a mockup, "Replay" is a recording or a fixed script. The words match /setup and the demo pages.
+ */
+const PLACES: Place[] = [
+  {
+    status: "Live",
+    name: "In the group chat",
+    text: "UKK is one more member of your family's Telegram group. You can also talk to him here on the web.",
+    links: [
+      { href: "/demo/chat", label: "Watch the replay", of: "the group chat" },
+      { href: "/ukk", label: "Talk to UKK" },
+    ],
+  },
+  {
+    status: "Concept",
+    name: "In the browser",
+    text: "When someone is stuck on an official form, UKK points at the rule that applies.",
+    links: [{ href: "/demo/browser", label: "Watch the replay", of: "the browser" }],
+  },
+  {
+    status: "Concept",
+    name: "At the kitchen table",
+    text: "The phone lies on the table. Say his name, and UKK looks things up while you keep talking. He cannot listen yet.",
+    links: [{ href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" }],
+  },
+  {
+    status: "Concept",
+    name: "In the calendar",
+    text: "A birthday is coming up, and UKK comes back with three options. The birthday planner is a skill of the Telegram bot.",
+    links: [{ href: "/demo/calendar", label: "Watch the replay", of: "the calendar" }],
+  },
+  {
+    status: "Replay",
+    name: "One step ahead",
+    text: "UKK notices a situation and suggests a next step. A scripted demo with one live check on official sources.",
+    links: [{ href: "/autopilot", label: "Play the demo" }],
+  },
+  {
+    status: "Concept",
+    name: "What he may follow",
+    text: "You choose what UKK may read or hear. A mockup of the setup screen: of its three channels, only Telegram works today.",
+    links: [{ href: "/setup", label: "Open the setup" }],
+  },
+];
+
+const STATUS_TONE = { Live: "hud-label--green", Concept: "hud-label--amber", Replay: "" };
+
+export function Places() {
+  return (
+    <ul className="hud-places">
+      {PLACES.map((place) => (
+        <li key={place.name} className="hud-reveal">
+          <p className={`hud-label ${STATUS_TONE[place.status]}`}>{place.status}</p>
+          <div className="hud-place-text">
+            <h3>{place.name}</h3>
+            <p>{place.text}</p>
+          </div>
+          <div className="hud-place-links">
+            {place.links.map((link) => (
+              <SiteLink key={link.href} href={link.href}>
+                {link.label}
+                {link.of ? <span className="hud-sr"> of {link.of}</span> : null}
+                <span aria-hidden="true">→</span>
+              </SiteLink>
+            ))}
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -269,7 +348,11 @@ export function Readouts({ card }: { card: Scorecard }) {
           part={card.totals.verifiedQuotes}
           whole={card.totals.totalQuotes}
           label="quotes found"
-          note="Every quote in those plans stood on the page it cites."
+          note={
+            card.totals.verifiedQuotes === card.totals.totalQuotes
+              ? "Every quote in those plans stood on the page it cites."
+              : "Quotes in those plans that stood on the page they cite."
+          }
         />
         {card.refusals ? (
           <Gauge
@@ -301,9 +384,9 @@ export function Readouts({ card }: { card: Scorecard }) {
 }
 
 const FLOW = [
-  { name: "Family group chat", tech: "Telegram", text: "AIDaddy is one more member. Nobody has to open another app." },
-  { name: "Gate", tech: "Gemma, on the family's machine", text: "Decides whether a message is a life event. Small talk stops here." },
-  { name: "Conversation", tech: "Hermes Agent + Nemotron", text: "Reads the letter photo, asks what is missing, drafts and reminds only with a yes." },
+  { name: "Family group chat", tech: "Telegram", text: "UKK is one more member. Nobody has to open another app." },
+  { name: "Gate", tech: "Gemma, on our own server", text: "Decides whether a message is a life event. Small talk stops here." },
+  { name: "Conversation", tech: "Hermes Agent + Nemotron", text: "Reads the letter photo, asks what is missing and drafts the notice. Sends nothing, and reminds only with a yes." },
   { name: "Research engine", tech: "Exa search", text: "Four searches per case, official sites of the right country first." },
   { name: "Verifier", tech: "Own live request + Exa Contents", text: "Opens every cited page again. A quote that is not there is removed." },
   { name: "Case file", tech: "A link for the whole family", text: "Plan, quotes, gaps and open questions. Sources are re-checked every night." },
@@ -330,12 +413,14 @@ export function Start({ botUrl, caseHref }: { botUrl: string | null; caseHref: s
         <div className="hud-panel hud-start-panel hud-reveal">
           <Core state="idle" className="hud-core--small" />
           <div>
-            <h2 id="start-title">Ask it about your own life.</h2>
+            <h2 id="start-title">Ask about your own life.</h2>
             <p className="hud-lede">
               Type what happened, in your own words. The same engine runs in the browser, on the live web, in a few seconds.
             </p>
             <div className="hud-actions">
-              <TryLink className="hud-btn hud-btn--primary">Try it live</TryLink>
+              <SiteLink href="/try" className="hud-btn hud-btn--primary">
+                Try it live
+              </SiteLink>
               {botUrl ? (
                 <a href={botUrl} className="hud-btn" target="_blank" rel="noopener noreferrer">
                   Add to Telegram
@@ -349,25 +434,5 @@ export function Start({ botUrl, caseHref }: { botUrl: string | null; caseHref: s
         </div>
       </div>
     </section>
-  );
-}
-
-export function Footer({ repoUrl }: { repoUrl: string | null }) {
-  return (
-    <footer className="hud-footer">
-      <div className="hud-wrap">
-        <Wordmark />
-        <p>Built at Junction 2026 for the Exa challenge. Research with sources, not legal advice.</p>
-        <p>AIDaddy is an independent hackathon project. It is not affiliated with Kela, Vero, Telegram or any film studio.</p>
-        <p className="hud-footer-links">
-          <Link href="/reading">The reading-table edition of this page</Link>
-          {repoUrl ? (
-            <a href={repoUrl} target="_blank" rel="noopener noreferrer">
-              Source code
-            </a>
-          ) : null}
-        </p>
-      </div>
-    </footer>
   );
 }

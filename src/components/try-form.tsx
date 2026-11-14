@@ -36,7 +36,9 @@ const LANGUAGES = [
   ["fr", "Français"],
 ] as const;
 
-const field = "h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+// 44 px tall, so a thumb hits it, and 16 px text on a phone, so iOS does not zoom into the field.
+const tall = "h-11 px-3";
+const field = `${tall} w-full rounded-lg border border-input bg-input/30 text-base outline-none transition-colors focus-visible:border-ring md:text-sm`;
 
 export function TryForm({ code: initialCode }: { code: string }) {
   const [situation, setSituation] = useState("");
@@ -158,7 +160,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
                 key={ex.label}
                 type="button"
                 onClick={() => setSituation(ex.text)}
-                className="rounded-full border px-3 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="min-h-11 rounded-md border px-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-foreground motion-reduce:transition-none sm:min-h-9 sm:text-xs"
               >
                 {ex.label}
               </button>
@@ -183,6 +185,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
             {country === "other" && (
               <Input
                 required
+                className={tall}
                 aria-label="Country name"
                 placeholder="Country name"
                 value={otherCountry}
@@ -194,7 +197,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
             <label htmlFor="region" className="text-sm font-medium">
               City or region
             </label>
-            <Input id="region" placeholder="Espoo" value={region} onChange={(e) => setRegion(e.target.value)} />
+            <Input id="region" className={tall} placeholder="Espoo" value={region} onChange={(e) => setRegion(e.target.value)} />
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="language" className="text-sm font-medium">
@@ -213,8 +216,8 @@ export function TryForm({ code: initialCode }: { code: string }) {
 
         <details className="rounded-lg border text-sm">
           {/* The padding is on the summary, so the whole row opens it, not only the line of text. */}
-          <summary className="cursor-pointer px-3 py-2 font-medium">Got a letter? Paste its text</summary>
-          <div className="px-3 pt-1 pb-2">
+          <summary className="cursor-pointer px-3 py-3 font-medium">Got a letter? Paste its text</summary>
+          <div className="px-3 pb-3">
             <Textarea
               aria-label="Text of the letter"
               rows={5}
@@ -231,12 +234,12 @@ export function TryForm({ code: initialCode }: { code: string }) {
             <label htmlFor="code" className="text-sm font-medium">
               Access code
             </label>
-            <Input id="code" required value={code} onChange={(e) => setCode(e.target.value)} placeholder="From the QR code at our table" />
+            <Input id="code" required className={tall} value={code} onChange={(e) => setCode(e.target.value)} placeholder="From the QR code at our table" />
           </div>
         )}
 
         {/* Still focusable while it is busy: a disabled button drops the keyboard focus to the top of the page. */}
-        <Button type="submit" size="lg" disabled={busy} focusableWhenDisabled>
+        <Button type="submit" size="lg" className="h-11 text-base" disabled={busy} focusableWhenDisabled>
           {busy ? <Loader2 className="animate-spin motion-reduce:animate-none" /> : <Search />}
           {busy ? "Researching live" : "Research it"}
         </Button>
@@ -248,7 +251,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
       */}
       <div aria-live="polite" className="empty:-mt-6">
         {(progress.stages.length > 0 || error) && (
-          <Card>
+          <Card className="ring-border">
             <CardHeader>
               <CardTitle className="text-base" role="heading" aria-level={2}>
                 What is happening
@@ -261,7 +264,7 @@ export function TryForm({ code: initialCode }: { code: string }) {
               )}
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm">
-              <Timeline progress={progress} busy={busy} finished={Boolean(result)} />
+              {progress.stages.length > 0 && <Timeline progress={progress} busy={busy} finished={Boolean(result)} />}
               {error && (
                 <p className="flex items-start gap-2 text-destructive">
                   <CircleAlert className="mt-0.5 size-4 shrink-0" /> {error}

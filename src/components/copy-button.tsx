@@ -19,6 +19,8 @@ export function CopyButton({
       <Button
         variant="outline"
         size="sm"
+        // A full-size target on a phone, the compact one next to a mouse.
+        className="h-11 px-3 sm:h-8"
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(text);

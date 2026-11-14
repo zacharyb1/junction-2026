@@ -16,7 +16,8 @@ const context = await browser.newContext({
   recordVideo: { dir, size: { width: 860, height: 1800 } },
 });
 const page = await context.newPage();
-await page.goto(`${base}/demo/chat`, { waitUntil: "load" });
+// ?bare=1 leaves the site's header and footer out of the recording.
+await page.goto(`${base}/demo/chat?bare=1`, { waitUntil: "load" });
 await page.waitForTimeout(37_500);
 await context.close();
 await browser.close();

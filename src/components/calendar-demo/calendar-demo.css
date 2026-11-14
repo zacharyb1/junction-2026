@@ -1,20 +1,14 @@
-/* /demo/calendar (issue #36): a month view with UKK's birthday planner. Scoped to .cdemo-stage. */
-.cdemo-stage {
-  display: flex;
-  min-height: 100dvh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  padding: 1.5rem;
-  background: #1a2230;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
+/*
+ * /demo/calendar (issue #36): a month view with UKK's birthday planner. Every selector is prefixed cdemo-.
+ * The page around the calendar (ground, heading, caption) is the shared frame in src/components/demo/demo.css.
+ * The calendar keeps its own light look on purpose: it is a picture of a calendar app.
+ */
 .cdemo {
   display: flex;
   width: min(1180px, 100%);
+  /* 16:9 is the least it is. With clip instead of hidden the calendar grows when its content needs more room. */
   aspect-ratio: 16 / 9;
-  overflow: hidden;
+  overflow: clip;
   border-radius: 14px;
   background: #fff;
   box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
@@ -23,6 +17,7 @@
 .cdemo-cal {
   position: relative;
   display: flex;
+  min-width: 0;
   flex: 1;
   flex-direction: column;
   padding: 1.4rem 1.6rem;
@@ -44,7 +39,9 @@
 .cdemo-grid {
   display: grid;
   flex: 1;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  /* The row of weekday names is only as tall as its text; the weeks share the rest. */
+  grid-template-rows: auto;
   grid-auto-rows: 1fr;
   border-top: 1px solid #e3e7ec;
   border-left: 1px solid #e3e7ec;
@@ -105,6 +102,10 @@
   opacity: 0.8;
 }
 .cdemo-event--plan {
+  /* A proposed step runs on over the day after it, which is free in this month, so its words fit on fewer lines and the weeks stay short. */
+  position: relative;
+  z-index: 1;
+  width: calc(200% + 0.8rem);
   border: 1.5px dashed #2a5c8a;
   background: #eef4fa;
   color: #1f4a70;
@@ -121,7 +122,8 @@
   padding: 0.3rem 0.7rem;
   border-radius: 999px;
   background: #f0a04b;
-  color: #fff;
+  /* Dark text on this orange is 6.9:1; white was 2.1:1. */
+  color: #3b2204;
   font-size: 0.8rem;
   font-weight: 600;
   animation: cdemo-in 0.4s ease-out;
@@ -217,16 +219,8 @@
   animation: cdemo-in 0.4s ease-out;
 }
 .cdemo-add.is-done {
-  background: #2e9e5b;
-}
-.cdemo-caption {
-  max-width: 900px;
-  color: #c8d3de;
-  font-size: 0.82rem;
-  text-align: center;
-}
-.cdemo-caption a {
-  color: #8cc8ff;
+  /* White text on this green is 5.3:1. */
+  background: #1f7a4b;
 }
 @keyframes cdemo-in {
   from {
@@ -234,8 +228,62 @@
     transform: translateY(6px);
   }
 }
+/* Too narrow for a calendar and a panel side by side: the frame grows taller and the panel opens under the month. */
+@media (max-width: 1099px) {
+  .cdemo {
+    flex-direction: column;
+    aspect-ratio: auto;
+  }
+  .cdemo-cal {
+    /* Room under the grid for the "In 14 days" pill. */
+    padding: 1.1rem 0.6rem 3rem;
+  }
+  .cdemo-cal-head {
+    padding-inline: 0.3rem;
+  }
+  .cdemo-cal-head h2 {
+    font-size: 1.25rem;
+  }
+  .cdemo-grid {
+    grid-auto-rows: minmax(3.4rem, auto);
+  }
+  .cdemo-dow {
+    padding: 0.3rem 0.1rem;
+    font-size: 0.68rem;
+    text-align: center;
+  }
+  .cdemo-day {
+    padding: 0.25rem 0.15rem;
+  }
+  /* Here a day is too narrow for most words, so the birthday runs on over the next day as well. */
+  .cdemo-event,
+  .cdemo-event--plan {
+    position: relative;
+    z-index: 1;
+    width: calc(200% + 0.3rem);
+    padding: 0.15rem 0.25rem;
+    font-size: 0.7rem;
+  }
+  .cdemo-hint {
+    right: 0.6rem;
+    bottom: 0.7rem;
+  }
+  .cdemo-panel {
+    display: none;
+  }
+  .cdemo-panel.is-open {
+    display: flex;
+    width: auto;
+    padding: 1.3rem 1.1rem 1.5rem;
+    border-top: 1px solid #e3e7ec;
+    border-left: 0;
+    animation: cdemo-in 0.4s ease-out;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .cdemo-stage * {
+  .cdemo,
+  .cdemo * {
     animation: none !important;
     transition: none !important;
   }

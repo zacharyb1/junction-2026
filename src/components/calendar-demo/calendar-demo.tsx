@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useReplayClock } from "@/components/demo/replay";
 
 /**
  * Issue #36: a scripted replay of UKK planning a birthday found in the calendar (the birthday-planner
@@ -38,21 +38,11 @@ function weeks(): number[][] {
   return Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
 }
 
+/** The month never changes, so its cells are worked out once and not on every frame of the replay. */
+const DAYS = weeks().flat();
+
 export function CalendarDemo({ loop = false }: { loop?: boolean }) {
-  const [now, setNow] = useState(0);
-  const start = useRef(0);
-  useEffect(() => {
-    start.current = performance.now();
-    let frame = 0;
-    const tick = () => {
-      const t = performance.now() - start.current;
-      if (t > DURATION && loop) start.current = performance.now();
-      setNow(Math.min(t, DURATION));
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [loop]);
+  const now = useReplayClock(DURATION, loop);
 
   const spotlight = now >= 1800;
   const panel = now >= 3400;
@@ -76,27 +66,25 @@ export function CalendarDemo({ loop = false }: { loop?: boolean }) {
               {d}
             </p>
           ))}
-          {weeks()
-            .flat()
-            .map((day, i) => {
-              const plan = proposed ? PROPOSED.find((p) => p.day === day) : undefined;
-              return (
-                <div
-                  key={i}
-                  className={`cdemo-day${day === 0 ? " is-out" : ""}${day === TODAY ? " is-today" : ""}${day === BIRTHDAY && spotlight ? " is-spot" : ""}`}
-                >
-                  {day > 0 && <span className="cdemo-num">{day}</span>}
-                  {day === BIRTHDAY && <span className="cdemo-event">🎂 Mum Liisa turns 60</span>}
-                  {plan && (
-                    <span className={`cdemo-event cdemo-event--plan${added ? " is-added" : ""}`}>
-                      {plan.label}
-                      {plan.waits && <em>{added ? "waits for your click" : "proposed"}</em>}
-                      {!plan.waits && !added && <em>proposed</em>}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+          {DAYS.map((day, i) => {
+            const plan = proposed ? PROPOSED.find((p) => p.day === day) : undefined;
+            return (
+              <div
+                key={i}
+                className={`cdemo-day${day === 0 ? " is-out" : ""}${day === TODAY ? " is-today" : ""}${day === BIRTHDAY && spotlight ? " is-spot" : ""}`}
+              >
+                {day > 0 && <span className="cdemo-num">{day}</span>}
+                {day === BIRTHDAY && <span className="cdemo-event">🎂 Mum Liisa turns 60</span>}
+                {plan && (
+                  <span className={`cdemo-event cdemo-event--plan${added ? " is-added" : ""}`}>
+                    {plan.label}
+                    {plan.waits && <em>{added ? "waits for your click" : "proposed"}</em>}
+                    {!plan.waits && !added && <em>proposed</em>}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
         {spotlight && !panel && <p className="cdemo-hint">In 14 days</p>}
       </section>

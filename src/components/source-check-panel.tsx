@@ -27,15 +27,15 @@ export function SourceCheckPanel({ c, t }: { c: Case; t: Labels }) {
   const Icon = allThere ? BadgeCheck : Clock;
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 text-sm">
+    <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 text-sm">
       {check.changed.length > 0 && (
-        <p className="flex gap-2 rounded-lg bg-amber-50 p-3 font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+        <p className="flex gap-2 rounded-lg border border-(--hud-amber)/40 bg-(--hud-amber)/10 p-3 font-medium text-(--hud-amber)">
           <CircleAlert className="mt-0.5 size-4 shrink-0" /> {t.quotesGone(check.changed)}
         </p>
       )}
       <p className="flex gap-2">
         <Icon
-          className={`mt-0.5 size-4 shrink-0 ${allThere ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}
+          className={`mt-0.5 size-4 shrink-0 ${allThere ? "text-(--hud-green)" : "text-muted-foreground"}`}
         />
         <span>
           {checkedAt && `${t.sourcesChecked(checkedAt)} `}
