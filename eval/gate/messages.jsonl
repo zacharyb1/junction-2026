@@ -1,0 +1,60 @@
+{"lang":"en","label":"small_talk","text":"what's for dinner?"}
+{"lang":"en","label":"small_talk","text":"did you buy milk?"}
+{"lang":"en","label":"small_talk","text":"who picks up the kids today?"}
+{"lang":"en","label":"small_talk","text":"running 10 min late"}
+{"lang":"en","label":"small_talk","text":"lol that video was great"}
+{"lang":"en","label":"small_talk","text":"good morning everyone"}
+{"lang":"en","label":"small_talk","text":"can you grab bread on the way home?"}
+{"lang":"en","label":"small_talk","text":"the bus was packed again this morning"}
+{"lang":"en","label":"small_talk","text":"I'll be home around six"}
+{"lang":"en","label":"small_talk","text":"did anyone see my keys?"}
+{"lang":"en","label":"small_talk","text":"movie night on Friday?"}
+{"lang":"en","label":"small_talk","text":"it's snowing already!"}
+{"lang":"en","label":"small_talk","text":"thanks, love you"}
+{"lang":"en","label":"small_talk","text":"grandma called, she says hi"}
+{"lang":"en","label":"small_talk","text":"the pizza was amazing yesterday"}
+{"lang":"en","label":"small_talk","text":"are we out of coffee?"}
+{"lang":"en","label":"small_talk","text":"I paid the pizza guy already"}
+{"lang":"en","label":"small_talk","text":"football practice ends at 5 today"}
+{"lang":"en","label":"small_talk","text":"happy birthday dad!!"}
+{"lang":"en","label":"small_talk","text":"can you turn the sauna on?"}
+{"lang":"fi","label":"small_talk","text":"mitä syödään tänään?"}
+{"lang":"fi","label":"small_talk","text":"ostitko maitoa?"}
+{"lang":"fi","label":"small_talk","text":"kuka hakee lapset tänään?"}
+{"lang":"fi","label":"small_talk","text":"oon vähän myöhässä, 10 min"}
+{"lang":"fi","label":"small_talk","text":"huomenta kaikille!"}
+{"lang":"fi","label":"small_talk","text":"tuotko leipää kun tuut kotiin?"}
+{"lang":"fi","label":"small_talk","text":"bussi oli taas ihan täynnä"}
+{"lang":"fi","label":"small_talk","text":"oon kotona kuuden maissa"}
+{"lang":"fi","label":"small_talk","text":"onko kukaan nähnyt mun avaimia?"}
+{"lang":"fi","label":"small_talk","text":"leffailta perjantaina?"}
+{"lang":"fi","label":"small_talk","text":"ulkona sataa lunta!"}
+{"lang":"fi","label":"small_talk","text":"kiitos, olet rakas"}
+{"lang":"fi","label":"small_talk","text":"mummo soitti ja lähetti terveisiä"}
+{"lang":"fi","label":"small_talk","text":"eilinen pizza oli tosi hyvää"}
+{"lang":"fi","label":"small_talk","text":"onko kahvi loppu?"}
+{"lang":"fi","label":"small_talk","text":"laitatko saunan päälle?"}
+{"lang":"fi","label":"small_talk","text":"treenit loppuu viideltä"}
+{"lang":"fi","label":"small_talk","text":"haha hyvä video"}
+{"lang":"fi","label":"small_talk","text":"muista ottaa pipo mukaan"}
+{"lang":"fi","label":"small_talk","text":"nähdään illalla!"}
+{"lang":"en","label":"trigger","text":"I'm pregnant"}
+{"lang":"en","label":"trigger","text":"we got a letter from the landlord, rent goes up 80 euros from January"}
+{"lang":"en","label":"trigger","text":"I was laid off today"}
+{"lang":"en","label":"trigger","text":"our flight to London tomorrow got cancelled"}
+{"lang":"en","label":"trigger","text":"I got a parking fine on Mannerheimintie, 80 euros"}
+{"lang":"en","label":"trigger","text":"my residence permit expires in March, I need to renew it"}
+{"lang":"en","label":"trigger","text":"the tax office sent something about back taxes"}
+{"lang":"en","label":"trigger","text":"the washing machine broke and it's only a year old"}
+{"lang":"en","label":"trigger","text":"we're moving to Tampere in February"}
+{"lang":"en","label":"trigger","text":"the streaming service is raising its price again next month"}
+{"lang":"fi","label":"trigger","text":"olen raskaana"}
+{"lang":"fi","label":"trigger","text":"vuokranantajalta tuli kirje, vuokra nousee 80 euroa tammikuussa"}
+{"lang":"fi","label":"trigger","text":"mut irtisanottiin tänään"}
+{"lang":"fi","label":"trigger","text":"huominen lento Lontooseen peruttiin"}
+{"lang":"fi","label":"trigger","text":"sain pysäköintisakon, 80 euroa"}
+{"lang":"fi","label":"trigger","text":"mun oleskelulupa menee umpeen maaliskuussa"}
+{"lang":"fi","label":"trigger","text":"verottajalta tuli kirje jäännösverosta"}
+{"lang":"fi","label":"trigger","text":"pesukone hajosi ja se on vasta vuoden vanha"}
+{"lang":"fi","label":"trigger","text":"muutetaan Tampereelle helmikuussa"}
+{"lang":"fi","label":"trigger","text":"Kelalta tuli taas joku päätös, en ymmärrä mitä siinä lukee"}

@@ -123,7 +123,7 @@ export async function researchCase(input: {
 What the bot posts after the call: the `plan` lines unchanged, one line "`evidenceVerified` of `evidenceTotal` quotes checked on their pages", then `url`.
 If the agent framework speaks MCP, point it at `$CASEFILE_URL_BASE/api/mcp` with the same Authorization header instead. The tools are listed below.
 
-`CASEFILE_URL_BASE` is the site origin, for example `https://junction-2026.vercel.app`. The values are in `.env.bot` (not committed).
+`CASEFILE_URL_BASE` in the REST examples is the site origin, for example `https://junction-2026.vercel.app`. Hermes instead uses `CASEFILE_URL` with the full `/api/mcp` path. Team values live in the separate private `junction-2026-keys` repo (`bot.env`, `app.env`); `hermes/secrets.sh` writes the ignored `.hermes-local/home/.env` and, for a local Engine, `.env.local`. See [the runbook](../hermes/README.md#quick-start-the-repo-local-install).
 
 ## Case tools
 
@@ -160,7 +160,7 @@ Not yet run against the real Oxylabs API: it was tested against a local stand-in
 ## What the bot does and does not do
 
 The bot (Hermes) owns: reading the chat, staying silent, the acknowledgement, calling `research_case`,
-posting the plan and link, approval buttons, writing drafts, `case_update`, reminders, the daily `case_recheck`.
+posting the plan and link, approval buttons, writing drafts, `case_update`, reminders, and any scheduled `case_recheck`. This defines ownership, not enabled features: no daily watch is enabled in the current [Hermes handover](HERMES_HANDOVER.md).
 
 The bot does not do the research itself unless `research_case` fails. Fallback: Exa MCP tools plus `case_publish`.
 

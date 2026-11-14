@@ -15,6 +15,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: node --test hermes/preserve-cases.test.mjs
+      - run: python3 -m unittest discover -s eval/bot -p 'test_*.py'
+      - run: python3 -m unittest discover -s eval/gate -p 'test_*.py'
+      - run: python3 -m unittest discover -s hermes -p 'test_*.py'
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build

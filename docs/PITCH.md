@@ -1,5 +1,7 @@
 # Pitch kit: Kaveri
 
+**Before using this kit:** this script and the generated voiceover contain earlier scorecard measurements and proposed demo beats. Reconcile them with [the current handover](../README.md#what-the-evidence-establishes) and [challenge status](TECH_CHALLENGES.md) for the selected build before recording or submitting.
+
 Filled in from `docs/PITCH_TEMPLATE.md`. Numbers are from scorecard run 5 (Fri 23:42). Re-run the scorecard on Saturday evening and update them before recording.
 
 ## The story

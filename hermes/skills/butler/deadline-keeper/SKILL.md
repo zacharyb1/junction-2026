@@ -18,16 +18,16 @@ The family approves "Set reminders"; you run as a scheduled job (a reminder or t
 
 ## Set reminders
 
-1. Call `mcp__casefile__case_get` with the case `id`. Use only steps whose `due` is a calendar date (YYYY-MM-DD). Never invent a date.
-2. For each such step call `cronjob_manage` with:
+1. Call `mcp__casefile__case_get` with the case `id`. Proceed only when it returns that case as JSON. A missing case or failed call: say the case is unavailable and no reminders were set, then stop. Use only steps whose `due` is a calendar date (YYYY-MM-DD). Never invent a date. If the family supplies a date, store it with `case_update`, then read the case again and verify that the step has that date. A failed update ends this attempt; do not schedule from conversation history.
+2. List existing jobs and skip a reminder already scheduled for the same case, step, date and chat. For each remaining dated step call `cronjob_manage` with:
    - `action`: `create`
    - `schedule`: ISO timestamp, 09:00 two days before the due date (tomorrow 09:00 if that has passed)
-   - `name`: "Reminder: <step title>"
+   - `name`: "Reminder: <case id>: <step title>"
    - `catch_up`: true, so a laptop that slept delivers it late instead of dropping it
    - `prompt`: self-contained, because the job runs in a fresh session: "Reply with exactly this text: <first name>, <step title> is due on <date>. Case: <url>", written in the family's language
    - no `deliver`, so it posts to this chat
 3. Address the step `owner` by first name. No owner: address whoever approved.
-4. Confirm in one line: how many reminders, the first date, which steps had no date.
+4. Count only successful `create` results with job IDs. Confirm how many were created, already existed, failed, or lacked a date; state the first reminder time only when a reminder exists.
 
 ## Reminder job
 
@@ -35,10 +35,11 @@ Reply with the text from the job prompt and nothing else.
 
 ## Daily change watch job
 
-1. For every "Open case <id>" entry in memory call `mcp__casefile__case_recheck` with that `id`.
-2. Every `changed` list empty: reply exactly `[SILENT]`.
-3. Otherwise, one line per changed case: "A source for <case title> changed (citations <numbers>). Re-check before acting: <url>". Do not guess what changed.
-4. A failed call means unknown, not changed: stay `[SILENT]`. The same goes for the `unreachable` list in the result: a page that did not open today says nothing about the rule.
+1. Read the exact Telegram chat ID from the job prompt. It must match the job's explicit `telegram:<chat_id>` delivery target. Missing or conflicting IDs: reply exactly `[SILENT]` without calling case tools.
+2. Select only "Open case <id>" memory entries labelled with that exact chat ID. Skip entries belonging to other chats or whose owner is missing or ambiguous; profile memory is shared across chats. Call `mcp__casefile__case_recheck` only for the selected IDs.
+3. No matching cases, or every `changed` list empty: reply exactly `[SILENT]`.
+4. Otherwise, one line per changed case in this chat: "A source for <case title> changed (citations <numbers>). Re-check before acting: <url>". Do not guess what changed.
+5. A failed call means unknown, not changed: stay `[SILENT]` for that case. The same goes for the `unreachable` list in the result: a page that did not open today says nothing about the rule.
 
 ## Step done, case finished
 
@@ -48,4 +49,4 @@ Reply with the text from the job prompt and nothing else.
 ## Pitfalls
 
 - `clarify` does not exist inside scheduled jobs: state, never ask.
-- Before creating reminders, `list` existing jobs to avoid duplicates.
+- A case tool that fails (for example "No case with id") is reported in one line. Never confirm an update that did not happen.

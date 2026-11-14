@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Kaveri: run the repo-local Hermes (installed by hermes/setup-local.sh) with its repo-local home.
+# To use the plain `hermes` commands from the runbook in a terminal:
+#   export PATH="$PWD/hermes/bin:$PATH"
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+LOCAL="${KAVERI_HERMES_LOCAL:-$ROOT/.hermes-local}"
+BIN="$LOCAL/agent/.hermes/bin/hermes"
+if [ ! -x "$BIN" ]; then
+  echo "Hermes is not installed in $LOCAL. Run: bash hermes/setup-local.sh" >&2
+  exit 1
+fi
+export HERMES_HOME="$LOCAL/home"
+exec "$BIN" "$@"

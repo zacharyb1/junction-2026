@@ -2,6 +2,8 @@
 
 Set the project to **FINAL** (not DRAFT). Drafts are not reviewed.
 
+Review [the event rules](PLAYBOOK.md#rules-that-disqualify) before submission: product code must be written during the event, the project must not be tied to an existing company of ours, and the team has 1–4 members.
+
 ## Required fields
 - [ ] Project name
 - [ ] Punchline (one sentence, ≤ 15 words, says what it does and for whom)
@@ -30,3 +32,10 @@ Set the project to **FINAL** (not DRAFT). Drafts are not reviewed.
 - [ ] 3‑minute pitch rehearsed 3× with a timer
 - [ ] One person pitches, one drives the demo
 - [ ] Each member reviews their assigned projects on the platform (mandatory)
+
+## Tech challenges (see `docs/TECH_CHALLENGES.md`)
+- [ ] Reconcile platform selections with [the current challenge matrix](TECH_CHALLENGES.md); keep only technologies demonstrated by the chosen bot track and final demo
+- [ ] Nemotron: include the required text explanation of its actual role and evaluation in the submission form
+- [ ] One short note per challenge: which endpoints or models, what they do in the demo, why; refresh pitch/voiceover measurements from the chosen build
+- [ ] Oxylabs: the demo makes a live Web API call and shows the source URLs
+- [ ] Any add-on that was cut is unselected before FINAL

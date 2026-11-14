@@ -1,0 +1,6 @@
+# Messages that have been seen to work end to end. One per line. Run each three times:
+#   python3 eval/bot/rehearse.py -f eval/bot/scenarios.txt
+I'm pregnant, due in May. We both work full time.
+The washing machine just died. It's 18 months old and the shop says the 12 month warranty is over so it's our problem. Is that really right?
+Our flight from Helsinki to London tomorrow got cancelled. What are we owed?
+We got a letter from the landlord: the rent goes up by 80 euros from January.
