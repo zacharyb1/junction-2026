@@ -1,4 +1,4 @@
-import { isNumber, normalise, numbersIn, tokens } from "@/lib/text";
+import { includesWhole, isNumber, normalise, numbersIn, tokens } from "@/lib/text";
 
 /**
  * Grounding helpers. The search model proposes a quote, an amount and a
@@ -94,10 +94,9 @@ export function bestSupport(
   return best ? { sentence: best.sentence, score: best.score } : null;
 }
 
-/** True when `outer` contains `inner` word for word. */
+/** True when `outer` contains `inner` word for word: whole words and whole numbers, not parts of them. */
 export function contains(outer: string, inner: string): boolean {
-  const needle = normalise(inner);
-  return Boolean(needle) && normalise(outer).includes(needle);
+  return includesWhole(normalise(outer), normalise(inner));
 }
 
 /**
@@ -106,7 +105,9 @@ export function contains(outer: string, inner: string): boolean {
  * A quote that only resembles the page (a changed number, a dropped "not") is never shown.
  */
 export function snapQuote(quote: string, page: string, minScore = 0.6): { quote: string; snapped: boolean } | null {
-  const clipped = quote.trim().slice(0, MAX_QUOTE);
+  const whole = quote.trim();
+  // A quote that is too long is cut between words, so what is kept is still whole words of the page.
+  const clipped = whole.length > MAX_QUOTE ? whole.slice(0, MAX_QUOTE).replace(/\s+\S*$/, "") : whole;
   if (contains(page, clipped)) return { quote: clipped, snapped: false };
   const support = bestSupport(clipped, page);
   if (support && support.score >= minScore) return { quote: support.sentence, snapped: true };
@@ -125,10 +126,10 @@ export function sharedWords(a: string, b: string, except = ""): number {
   return new Set(tokens(a).filter((t) => t.length >= 4 && !isNumber(t) && !skip.has(t) && other.has(t))).size;
 }
 
-const BEFORE = ["before", "latest"];
+const BEFORE = ["before", "latest", "within"];
 const AFTER = ["after"];
 
-/** "14 days before" does not support "14 days after". */
+/** "14 days before" does not support "14 days after", and "within 14 days" is not "only after 14 days". */
 function wrongDirection(value: string[], sentence: Set<string>): boolean {
   const wantsBefore = BEFORE.some((t) => value.includes(t));
   const wantsAfter = AFTER.some((t) => value.includes(t));
@@ -138,23 +139,52 @@ function wrongDirection(value: string[], sentence: Set<string>): boolean {
   return wantsBefore ? saysAfter && !saysBefore : saysBefore && !saysAfter;
 }
 
+const UNITS = new Set(["day", "week", "month", "year", "%", "€", "$", "£"]);
+const MONTHS = new Set("january february march april may june july august september october november december".split(" "));
+const isUnit = (token: string | undefined) => token !== undefined && (UNITS.has(token) || MONTHS.has(token));
+
+type Measure = { figure: string; unit: string };
+
+/** What each figure of a value counts: the unit or month within three words after it, or else right before it. */
+function measures(value: string[]): Measure[] {
+  const out: Measure[] = [];
+  value.forEach((figure, i) => {
+    if (!isNumber(figure)) return;
+    const after = value.slice(i + 1, i + 4);
+    const stop = after.findIndex(isNumber);
+    const unit = (stop < 0 ? after : after.slice(0, stop)).find(isUnit) ?? (isUnit(value[i - 1]) ? value[i - 1] : undefined);
+    if (unit) out.push({ figure, unit });
+  });
+  return out;
+}
+
+/** "3 months" is not "3 weeks", "30 €" is not "30 days", "14 November" is not "14 October": the unit must sit by its figure. */
+function sameMeasures(wanted: Measure[], lines: string[]): boolean {
+  if (!wanted.length) return true;
+  const words = lines.flatMap(tokens);
+  return wanted.every(({ figure, unit }) =>
+    words.some((w, i) => w === figure && (words[i - 1] === unit || words.slice(i + 1, i + 4).includes(unit))),
+  );
+}
+
 /**
  * Is this value (an amount or a deadline) stated on the page?
- * A single sentence must carry every number of the value as a whole number, most of its words,
- * and must not point the other way in time. Two sentences together never count: that is how
- * a figure gets attached to the wrong rule.
+ * A single sentence must carry every number of the value as a whole number with its unit, most of
+ * its words, and must not point the other way in time. Two sentences together never count: that is
+ * how a figure gets attached to the wrong rule.
  */
 export function supportFor(value: string, page: string, minScore = 0.55, hint = ""): Support | null {
   const needle = tokens(value);
   const wanted = needle.filter(isNumber);
+  const units = measures(needle);
   const support = bestSupport(
     value,
     page,
     hint,
-    (c) => !c.pair && wanted.every((n) => c.words.has(n)) && !wrongDirection(needle, c.words),
+    (c) => !c.pair && wanted.every((n) => c.words.has(n)) && !wrongDirection(needle, c.words) && sameMeasures(units, [c.text]),
   );
   if (support && support.score >= minScore) return support;
-  return wanted.length >= 2 ? supportFromList(needle, wanted, page, minScore) : null;
+  return wanted.length >= 2 ? supportFromList(needle, wanted, units, page, minScore) : null;
 }
 
 /**
@@ -162,7 +192,7 @@ export function supportFor(value: string, page: string, minScore = 0.55, hint = 
  * on three lines. Up to four lines that follow each other count together, when each of them
  * carries one of the figures and the run as a whole carries all of them.
  */
-function supportFromList(needle: string[], wanted: string[], page: string, minScore: number): Support | null {
+function supportFromList(needle: string[], wanted: string[], units: Measure[], page: string, minScore: number): Support | null {
   const prepared = prepare(page);
   const { singles } = prepared;
   for (let i = 0; i < singles.length; i++) {
@@ -174,7 +204,7 @@ function supportFromList(needle: string[], wanted: string[], page: string, minSc
       for (const w of singles[k].words) words.add(w);
       const text = parts.join(" ");
       if (text.length > MAX_QUOTE) break;
-      if (parts.length < 2 || !wanted.every((n) => words.has(n))) continue;
+      if (parts.length < 2 || !wanted.every((n) => words.has(n)) || !sameMeasures(units, parts)) continue;
       const score = coverage(needle, words);
       // The lines must really follow each other on the page, with nothing between them.
       prepared.normalised ??= normalise(page);
