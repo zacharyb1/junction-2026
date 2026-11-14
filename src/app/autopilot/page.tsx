@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { AutopilotDemo } from "@/components/autopilot/autopilot-demo";
-import { replayData } from "@/components/hud/data";
 import { Footer, Section, Wordmark } from "@/components/hud/sections";
 import { landingConfig } from "@/components/landing/config";
 import "@/components/hud/hud.css";
 
 const title = "AIDaddy autopilot: a demo of proactive help";
-const description = "A scripted demo of specialist agents that notice a situation and propose a next step. Nothing listens, nothing is sent.";
+const description =
+  "A demo of specialist agents that notice a situation and propose a next step. The script is fixed, the lawyer's check runs on official sources with Exa, and nothing is sent.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -18,9 +18,11 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#05080d" };
 
-export default function Autopilot() {
+export default async function Autopilot({ searchParams }: PageProps<"/autopilot">) {
   const { repoUrl } = landingConfig();
-  const { quotes } = replayData();
+  // The same access code as /try. With it, the lawyer's step runs a live check.
+  const params = await searchParams;
+  const code = typeof params.code === "string" ? params.code : "";
 
   return (
     <div className="hud">
@@ -42,7 +44,7 @@ export default function Autopilot() {
           title="One step ahead, with the family in control."
           lede="Specialist agents each keep their own context. The orchestrator routes a situation to the right ones, and nothing happens until the family says yes."
         >
-          <AutopilotDemo quotes={quotes} />
+          <AutopilotDemo code={code} />
         </Section>
       </main>
       <Footer repoUrl={repoUrl} />
