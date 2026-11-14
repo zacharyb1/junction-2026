@@ -52,6 +52,14 @@ export default async function ChatPage({ searchParams }: PageProps<"/chat">) {
           </SiteLink>{" "}
           without the chat.
         </p>
+        <details className="rounded-lg border p-4 text-sm">
+          <summary className="min-h-11 content-center cursor-pointer font-medium">Add AIDaddy to your home screen</summary>
+          <div className="mt-3 space-y-2 leading-relaxed text-muted-foreground">
+            <p>On Android or desktop, open your browser menu and choose Install app or Add to home screen.</p>
+            <p>On iPhone or iPad, open this page in Safari, tap Share, then Add to Home Screen.</p>
+            <p>AIDaddy opens straight into the chat in its own window. An internet connection is required.</p>
+          </div>
+        </details>
       </main>
     </SiteShell>
   );
