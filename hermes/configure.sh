@@ -83,7 +83,7 @@ set_key mcp_servers.exa.headers.x-api-key '${EXA_API_KEY}'
 set_key mcp_servers.exa.timeout 120
 set_key mcp_servers.exa.supports_parallel_tool_calls true
 set_key skills.external_dirs "[\"$SKILLS_DIR\"]"
-set_key skills.auto_load '["life-event-butler", "letter-decoder", "deadline-keeper", "birthday-planner", "law-check"]'
+set_key skills.auto_load '["life-event-butler", "letter-decoder", "deadline-keeper", "birthday-planner", "law-check", "gift-finder"]'
 set_key skills.write_approval true
 DISABLED='"terminal", "file", "code_execution", "browser", "computer_use", "delegation", "image_gen", "video_gen", "session_search"'
 # On the web, strangers share one instance: no memory across visitors and no scheduled jobs.

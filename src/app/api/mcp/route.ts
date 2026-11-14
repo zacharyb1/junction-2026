@@ -2,6 +2,7 @@ import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 import { CaseInput, CasePatch } from "@/lib/case";
 import { baseUrl, isAuthorised, loadCase, publishCase, recheckCase, updateCase } from "@/lib/cases";
+import { findGifts, GiftInput } from "@/lib/engine/gifts";
 import { EngineError, ResearchInput, researchCase } from "@/lib/engine/research";
 
 export const maxDuration = 300;
@@ -37,6 +38,29 @@ function handlerFor(origin: string) {
           const message = error instanceof Error ? error.message : "research failed";
           const hint = error instanceof EngineError && error.status === 502 ? " Tell the user you could not verify this, or retry with more detail." : "";
           return { ...text(`research_case failed: ${message}.${hint}`), isError: true };
+        }
+      },
+    );
+
+    server.registerTool(
+      "find_gifts",
+      {
+        title: "Find gifts with prices",
+        description:
+          "Find products to buy online as a gift, with prices checked on each shop's own page. " +
+          "Pass `prompt` with what to look for in plain words (\"gift for Sem who likes cars, under 50 euros\"), " +
+          "or `recipient` with `clues` (one fact each). Add `occasion` (YYYY-MM-DD) to have late deliveries marked, " +
+          "and `budget` to drop anything dearer. Returns products with name, price, the price line quoted from the " +
+          "page, delivery, arrival date when the page states days, and the shop URL. Typically 3 to 15 seconds. " +
+          "Use this for any request to find, choose or buy a gift or a product.",
+        inputSchema: GiftInput,
+      },
+      async (input) => {
+        try {
+          return text(await findGifts(input));
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "gift search failed";
+          return { ...text(`find_gifts failed: ${message}. Tell the user you could not find products right now.`), isError: true };
         }
       },
     );
