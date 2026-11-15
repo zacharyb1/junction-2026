@@ -27,6 +27,15 @@
 .avatar-stage img, .avatar-stage video { position: absolute; width: 100%; height: 100%; object-fit: cover; }
 .avatar-stage video { opacity: 0; }
 .avatar-stage video.avatar-visible { opacity: 1; }
+/* Desk presence: both videos stay stacked over the poster; joins change opacity only, never layout.
+   The stage isolates its own stacking, so the scene note and the pause button stay above the videos. */
+.presence-stage { isolation: isolate; }
+.presence-stage img, .presence-stage video { pointer-events: none; }
+.presence-stage img { z-index: 0; }
+.presence-stage video { z-index: 1; transition: none; will-change: opacity; }
+.presence-stage video.is-shown { opacity: 1; }
+.presence-stage video.is-entering { z-index: 2; transition-property: opacity; transition-timing-function: linear; }
+@media (prefers-reduced-motion: reduce) { .presence-stage video { visibility: hidden; } }
 .avatar-stage > p { position: absolute; z-index: 2; inset: auto 16px 72px; color: var(--studio-ink); background: var(--studio-paper); padding: 10px; border-radius: 6px; font-size: 12px; }
 .studio-scene-note { position: absolute; bottom: 20px; left: 20px; max-width: calc(100% - 100px); min-height: 40px; padding: 10px 13px; border-radius: 7px; background: var(--studio-paper); display: flex; align-items: center; gap: 9px; font-size: 12px; line-height: 1.4; box-shadow: 0 1px 5px #182a2412; pointer-events: none; }
 .studio-state-dot { width: 6px; height: 6px; background: #78937d; border-radius: 50%; flex-shrink: 0; }

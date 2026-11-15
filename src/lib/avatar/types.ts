@@ -12,7 +12,7 @@
  *   Clip        which file plays, chosen so that poses line up
  */
 
-import type { PerformanceManifest } from "./performance";
+import type { PresenceManifest } from "./presence";
 
 /** A resting position shared by clips, for example "front" (facing the viewer) or "desk" (at the laptop). */
 export type PoseId = string;
@@ -38,8 +38,8 @@ export interface Clip {
 
 /** One look: the same acting rules rendered for one person in one place. */
 export interface Manifest {
-  /** Finite filmed performances use their own player instead of the legacy loops. */
-  performance?: PerformanceManifest;
+  /** Filmed hub-pose segments use their own player instead of the legacy loops. */
+  presence?: PresenceManifest;
   /** Folder name under `public/avatar/`. */
   profile: string;
   /** Name shown in the profile picker. */

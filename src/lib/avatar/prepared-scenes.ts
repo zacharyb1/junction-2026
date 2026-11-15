@@ -26,12 +26,3 @@ export const PREPARED_SCENES = {
 } as const;
 
 export const PREPARED_FOLLOW_UPS = ["clinic", "employer"] as const;
-
-export type PreparedMedia = Partial<Record<PreparedSceneId, {
-  video: string;
-  method: "dubbed" | "musetalk";
-  transcript: string;
-  durationMs: number;
-  /** Experimental lip-sync must remain visible as a limitation in the UI. */
-  quality: "experimental" | "reviewed";
-}>>;

@@ -7,67 +7,52 @@ import { demoCodeRequired } from "@/lib/cases";
 import { aidaddyConfigured } from "@/lib/aidaddy";
 import { validateManifest } from "@/lib/avatar/scheduler";
 import type { Manifest } from "@/lib/avatar/types";
-import type { PerformanceManifest } from "@/lib/avatar/performance";
-import type { PreparedMedia, PreparedSceneId } from "@/lib/avatar/prepared-scenes";
+import { validatePresence, type PresenceManifest, type PresenceSpeechSet } from "@/lib/avatar/presence";
 import testProfile from "../../../public/avatar/test/manifest.json";
 
 export const metadata: Metadata = { title: "Your companion", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-async function officeAssetExists(src: unknown): Promise<boolean> {
-  if (typeof src !== "string" || !/^\/avatar\/office\/[a-zA-Z0-9_./-]+$/.test(src) || src.split("/").includes("..")) return false;
+async function deskFileExists(src: string): Promise<boolean> {
+  // validatePresence already confined every path to /avatar/desk/ without traversal.
   try {
     const file = await stat(path.join(process.cwd(), "public", src));
     return file.isFile() && file.size > 0;
   } catch { return false; }
 }
 
-async function loadOffice(): Promise<Manifest | null> {
+/** The filmed desk presence, offered only when its manifest is valid and every file it names is present. */
+async function loadDesk(): Promise<Manifest | null> {
   try {
-    const performance = JSON.parse(await readFile(path.join(process.cwd(), "public/avatar/office/takes.json"), "utf8")) as PerformanceManifest;
-    if (performance.id !== "office" || typeof performance.label !== "string" ||
-        !Number.isFinite(performance.width) || performance.width <= 0 || !Number.isFinite(performance.height) || performance.height <= 0 ||
-        !Array.isArray(performance.takes) || !performance.takes.length || !await officeAssetExists(performance.poster)) return null;
-    const valid = await Promise.all(performance.takes.map(async (take) =>
-      typeof take.id === "string" && typeof take.sourceId === "string" && !!take.sourceId &&
-      ["presence", "attention", "work", "handover"].includes(take.kind) &&
-      Number.isFinite(take.sourceInMs) && Number.isFinite(take.sourceOutMs) &&
-      take.sourceInMs >= 0 && take.sourceOutMs > take.sourceInMs && await officeAssetExists(take.src)));
-    if (valid.some((item) => !item) || new Set(performance.takes.map((take) => take.id)).size !== performance.takes.length) return null;
+    const presence = JSON.parse(await readFile(path.join(process.cwd(), "public/avatar/desk/presence.json"), "utf8")) as PresenceManifest;
+    if (presence?.id !== "desk" || validatePresence(presence).length) return null;
+    const files = await Promise.all([presence.poster, ...presence.segments.map((segment) => segment.src)].map(deskFileExists));
+    if (files.some((exists) => !exists)) return null;
+    // A prepared answer without its audio file falls back to the readable text.
+    const speech: PresenceSpeechSet = {};
+    for (const [scene, entry] of Object.entries(presence.speech) as [keyof PresenceSpeechSet, NonNullable<PresenceSpeechSet[keyof PresenceSpeechSet]>][]) {
+      if (await deskFileExists(entry.src)) speech[scene] = entry;
+    }
+    const { creator, sourceUrl, license, licenseUrl, note } = presence.attribution;
     return {
-      profile: "office", label: "Office", width: performance.width, height: performance.height,
-      poster: performance.poster, performance, medium: "stock", restPose: "front", clips: [],
+      profile: "desk", label: presence.label, width: presence.width, height: presence.height,
+      poster: presence.poster, presence: { ...presence, speech }, medium: "stock", restPose: "hub", clips: [],
       // This profile never enters the legacy pose/loop scheduler.
       activities: {
-        idle: { pose: "front", loops: [] }, listening: { pose: "front", loops: [] },
-        thinking: { pose: "front", loops: [] }, working: { pose: "front", loops: [] },
-        speaking: { pose: "front", loops: [] },
+        idle: { pose: "hub", loops: [] }, listening: { pose: "hub", loops: [] },
+        thinking: { pose: "hub", loops: [] }, working: { pose: "hub", loops: [] },
+        speaking: { pose: "hub", loops: [] },
       },
-      attribution: { creator: "MART PRODUCTION", title: "Solo office performance", sourceUrl: "https://www.pexels.com/video/a-businesswoman-greeting-and-talking-7643308/", license: "Pexels License", licenseUrl: "https://www.pexels.com/license/", note: "Filmed visual stand-in. No association or endorsement." },
+      attribution: { creator, title: "Desk footage", sourceUrl, license, licenseUrl, note },
     };
   } catch { return null; }
-}
-
-async function loadPreparedMedia(): Promise<PreparedMedia> {
-  const result: PreparedMedia = {};
-  try {
-    const manifest = JSON.parse(await readFile(path.join(process.cwd(), "public/avatar/office/performances.json"), "utf8")) as PreparedMedia;
-    for (const scene of ["pregnancy", "clinic", "employer"] satisfies PreparedSceneId[]) {
-      const media = manifest[scene];
-      if (media && typeof media.transcript === "string" && media.transcript.trim() &&
-          ["dubbed", "musetalk"].includes(media.method) &&
-          Number.isFinite(media.durationMs) && media.durationMs > 0 &&
-          ["experimental", "reviewed"].includes(media.quality) && await officeAssetExists(media.video)) result[scene] = media;
-    }
-  } catch { /* The prepared text and existing recorded voice remain usable without new media. */ }
-  return result;
 }
 
 export default async function AvatarPage({ searchParams }: PageProps<"/avatar">) {
   const params = await searchParams;
   const profiles: Manifest[] = [];
-  const [office, preparedMedia] = await Promise.all([loadOffice(), loadPreparedMedia()]);
-  if (office) profiles.push(office);
+  const desk = await loadDesk();
+  if (desk) profiles.push(desk);
   for (const name of ["ari", "noor"]) {
     try {
       const profile = JSON.parse(await readFile(path.join(process.cwd(), `public/avatar/${name}/manifest.json`), "utf8")) as Manifest;
@@ -83,11 +68,11 @@ export default async function AvatarPage({ searchParams }: PageProps<"/avatar">)
   // The generation script installs this profile only after every clip is present.
   try {
     const generated = JSON.parse(await readFile(path.join(process.cwd(), "public/avatar/default/manifest.json"), "utf8")) as Manifest;
-    if (!office && !validateManifest(generated).length) profiles.unshift(generated);
+    if (!desk && !validateManifest(generated).length) profiles.unshift(generated);
   } catch { /* A generated profile is optional; the offline walkthrough is always available. */ }
   return (
     <SiteShell bare>
-      <AvatarDemo profiles={profiles} preparedMedia={preparedMedia} code={typeof params.code === "string" ? params.code : ""} needsCode={demoCodeRequired()} liveConfigured={Boolean(process.env.AVATAR_UPSTREAM || aidaddyConfigured())} voiceConfigured={Boolean(process.env.ELEVENLABS_API_KEY)} />
+      <AvatarDemo profiles={profiles} code={typeof params.code === "string" ? params.code : ""} needsCode={demoCodeRequired()} liveConfigured={Boolean(process.env.AVATAR_UPSTREAM || aidaddyConfigured())} voiceConfigured={Boolean(process.env.ELEVENLABS_API_KEY)} />
     </SiteShell>
   );
 }

@@ -2,12 +2,11 @@
 
 import { useEffect, useRef, useState, type SetStateAction } from "react";
 import { cancelAgentState, initialAgentState, readAvatarStream, reduceAgentEvent, replayRun } from "@/lib/avatar/events";
-import { playAvatarAudio } from "@/lib/avatar/play-voice";
+import { playAvatarAudio, type AvatarAudioControl } from "@/lib/avatar/play-voice";
 import { RECORDED_EXAMPLE } from "@/lib/avatar/recorded-example";
-import { PREPARED_SCENES, type PreparedMedia, type PreparedSceneId } from "@/lib/avatar/prepared-scenes";
-import { speakOnDevice } from "@/lib/avatar/voice";
+import { PREPARED_SCENES, type PreparedSceneId } from "@/lib/avatar/prepared-scenes";
+import type { PresenceSpeechSet } from "@/lib/avatar/presence";
 import type { AgentEvent } from "@/lib/avatar/types";
-import { usePerformanceSpeech } from "./use-performance-speech";
 
 export interface CompanionSettings {
   name: string;
@@ -25,11 +24,21 @@ export interface ConversationTurn {
   status: "streaming" | "complete" | "cancelled" | "error";
 }
 
-export function useAvatarConversation({ code, liveConfigured, voiceConfigured, settings, preparedMedia = {} }: {
+/** A voice that is audibly (or, when muted, silently) playing now; the picture talks for its duration. */
+export type ConversationTalking = { id: string; durationMs: number } | null;
+
+export const VOICE_UNAVAILABLE = "Voice is unavailable on this server. The reply is ready to read.";
+/** Speech rate used only when a decoded file does not report its duration. */
+const estimateMs = (text: string) => Math.max(1500, text.length * 65);
+
+export function useAvatarConversation({ code, liveConfigured, voiceConfigured, settings, preparedSpeech = {}, paused = false }: {
   code: string; liveConfigured: boolean; voiceConfigured: boolean; settings: CompanionSettings;
-  preparedMedia?: PreparedMedia;
+  /** Prepared ElevenLabs answers for the prepared scenes, from the presence manifest. */
+  preparedSpeech?: PresenceSpeechSet;
+  /** Pauses the playing voice together with the picture. */
+  paused?: boolean;
 }) {
-  const performance = usePerformanceSpeech();
+  const [talking, setTalking] = useState<ConversationTalking>(null);
   const [agent, setAgent] = useState(initialAgentState);
   const [turns, setTurns] = useState<ConversationTurn[]>([]);
   const [busy, setBusy] = useState(false);
@@ -40,6 +49,8 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
   const active = useRef<AbortController | null>(null);
   const activeVoice = useRef<AbortController | null>(null);
   const voicePreference = useRef(true);
+  const audioControl = useRef<AvatarAudioControl | null>(null);
+  const pausedRef = useRef(paused);
   const sequence = useRef(0);
   const current = (task: AbortController) => active.current === task && !task.signal.aborted;
   const patch = (id: string, change: Partial<ConversationTurn>) => setTurns((list) => list.map((turn) => turn.id === id ? { ...turn, ...change } : turn));
@@ -55,6 +66,8 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     task?.abort();
     activeVoice.current?.abort();
     activeVoice.current = null;
+    audioControl.current = null;
+    setTalking(null);
     setAgent(cancelAgentState);
     setTurns((list) => list.map((turn) => turn.status === "streaming" ? { ...turn, status: "cancelled" } : turn));
     setBusy(false);
@@ -64,10 +77,13 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     const value = typeof next === "function" ? next(voicePreference.current) : next;
     voicePreference.current = value;
     setVoice(value);
-    // A prepared video owns its soundtrack. Muting it must not restart or skip
-    // its performance; the stage receives the new mute preference directly.
-    if (!value && !performance.request) { activeVoice.current?.abort(); setVoiceNote(""); }
+    // Muting silences the playing voice without stopping it, so the picture keeps talking with it.
+    audioControl.current?.setMuted(!value);
   }
+  useEffect(() => {
+    pausedRef.current = paused;
+    if (paused) audioControl.current?.pause(); else audioControl.current?.resume();
+  }, [paused]);
   useEffect(() => () => {
     const task = active.current;
     active.current = null;
@@ -80,22 +96,31 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     const voiceTask = new AbortController();
     activeVoice.current = voiceTask;
     const signal = AbortSignal.any([task.signal, voiceTask.signal]);
+    const talkId = `voice-${++sequence.current}`;
     const onSpeech = (playing: boolean) => {
       if (activeVoice.current !== voiceTask || (playing && signal.aborted)) return;
       emit({ type: playing ? "speech-start" : "speech-end" }, task);
     };
+    // The picture starts talking when the audio actually starts, for as long as the audio lasts.
+    const audio = (fallbackMs: number, knownMs?: number) => ({
+      signal, onSpeech, muted: !voicePreference.current, paused: pausedRef.current,
+      onControl: (control: AvatarAudioControl) => { if (activeVoice.current === voiceTask) audioControl.current = control; },
+      onStart: (decodedMs: number) => {
+        if (activeVoice.current !== voiceTask || signal.aborted) return;
+        setTalking({ id: talkId, durationMs: knownMs ?? (Number.isFinite(decodedMs) ? decodedMs : fallbackMs) });
+      },
+    });
     let objectUrl: string | undefined;
     try {
-      const prepared = turn.scene ? preparedMedia[turn.scene] : undefined;
+      const prepared = turn.scene ? preparedSpeech[turn.scene] : undefined;
       if (prepared) {
-        setVoiceNote("Prepared performance · Gemini voice");
-        await performance.play(prepared.video, { signal, onSpeech });
-      } else if (turn.source === "recorded" && turn.scene) {
-        setVoiceNote("Prepared spoken summary · Gemini voice");
-        await playAvatarAudio(`/avatar/office/speech/${turn.scene}.mp3`, { signal, onSpeech });
-      } else if (turn.source === "recorded") {
+        setVoiceNote("Prepared answer · ElevenLabs voice");
+        await playAvatarAudio(prepared.src, audio(prepared.durationMs, prepared.durationMs));
+      } else if (turn.source === "recorded" && (!turn.scene || turn.scene === "pregnancy")) {
         setVoiceNote("Recorded voice for this example");
-        await playAvatarAudio(RECORDED_EXAMPLE.audio, { signal, onSpeech });
+        await playAvatarAudio(RECORDED_EXAMPLE.audio, audio(estimateMs(turn.text)));
+      } else if (turn.source === "recorded") {
+        setVoiceNote("No prepared voice for this scene. The answer is ready to read.");
       } else if (voiceConfigured) {
         setVoiceNote("Preparing voice…");
         const response = await fetch("/api/aidaddy/speak", {
@@ -107,16 +132,16 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
         if (signal.aborted) return;
         objectUrl = URL.createObjectURL(blob);
         setVoiceNote("ElevenLabs voice");
-        await playAvatarAudio(objectUrl, { signal, onSpeech });
+        await playAvatarAudio(objectUrl, audio(estimateMs(turn.text)));
       } else {
-        setVoiceNote("Device voice");
-        await speakOnDevice(turn.text, { signal, tone: settings.tone, onSpeech });
+        setVoiceNote(VOICE_UNAVAILABLE);
       }
     } catch (error) {
       if (current(task) && !signal.aborted) setVoiceNote(error instanceof Error ? error.message : "Voice could not play. You can still read the reply.");
     } finally {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
-      if (activeVoice.current === voiceTask) activeVoice.current = null;
+      setTalking((value) => value?.id === talkId ? null : value);
+      if (activeVoice.current === voiceTask) { activeVoice.current = null; audioControl.current = null; }
     }
   }
 
@@ -173,7 +198,7 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
       }
       if (!current(task) || reportedError) return;
       if (!replyComplete || !text.trim()) throw new Error("The assistant returned an incomplete reply. Please try again.");
-      if (voicePreference.current || (scene && preparedMedia[scene])) await playVoice({ ...reply, text, status: "complete" }, task);
+      if (voicePreference.current || (scene && preparedSpeech[scene])) await playVoice({ ...reply, text, status: "complete" }, task);
     } catch (error) {
       if (current(task) && !reportedError) receive({ type: "error", message: error instanceof Error ? error.message : "The connection was interrupted." });
     } finally {
@@ -185,6 +210,8 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
     const turn = turns.find((item) => item.id === id && item.role === "assistant" && item.status === "complete" && item.text.trim());
     if (!turn) return;
     stop();
+    // Asking to hear a reply turns the voice on.
+    setVoiceEnabled(true);
     const task = new AbortController();
     active.current = task;
     setBusy(true);
@@ -210,5 +237,5 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
 
   return { agent, turns, busy, voiceEnabled, setVoiceEnabled, voiceNote, error: agent.error, mode,
     runLive: (message: string) => run(message, "live"), runExample: (scene: PreparedSceneId = "pregnancy") => run(PREPARED_SCENES[scene].question, "recorded", scene),
-    speak, stop, clear, log, performance: performance.request, onPerformanceEvent: performance.onEvent };
+    speak, stop, clear, log, talking };
 }

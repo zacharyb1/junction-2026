@@ -1,0 +1,125 @@
+{
+  "id": "desk",
+  "label": "Desk",
+  "poster": "/avatar/desk/poster.jpg",
+  "width": 1280,
+  "height": 720,
+  "fps": 25,
+  "crossfadeMs": 240,
+  "segments": [
+    {
+      "id": "listen-a",
+      "src": "/avatar/desk/listen-a.mp4",
+      "kind": "listen",
+      "durationMs": 3560,
+      "sourceId": "pexels-5941016",
+      "sourceInMs": 2240,
+      "sourceOutMs": 4040,
+      "speed": 1,
+      "startHub": 100,
+      "endHub": 100
+    },
+    {
+      "id": "listen-b",
+      "src": "/avatar/desk/listen-b.mp4",
+      "kind": "listen",
+      "durationMs": 2680,
+      "sourceId": "pexels-5941016",
+      "sourceInMs": 5920,
+      "sourceOutMs": 7280,
+      "speed": 1,
+      "startHub": 181,
+      "endHub": 181
+    },
+    {
+      "id": "listen-c",
+      "src": "/avatar/desk/listen-c.mp4",
+      "kind": "listen",
+      "durationMs": 1320,
+      "sourceId": "pexels-5941016",
+      "sourceInMs": 15840,
+      "sourceOutMs": 16520,
+      "speed": 1,
+      "startHub": 396,
+      "endHub": 396
+    },
+    {
+      "id": "listen-b-slow",
+      "src": "/avatar/desk/listen-b-slow.mp4",
+      "kind": "listen",
+      "durationMs": 5360,
+      "sourceId": "pexels-5941016",
+      "sourceInMs": 5920,
+      "sourceOutMs": 7280,
+      "speed": 0.5,
+      "startHub": 181,
+      "endHub": 181
+    },
+    {
+      "id": "listen-c-slow",
+      "src": "/avatar/desk/listen-c-slow.mp4",
+      "kind": "listen",
+      "durationMs": 2640,
+      "sourceId": "pexels-5941016",
+      "sourceInMs": 15840,
+      "sourceOutMs": 16520,
+      "speed": 0.5,
+      "startHub": 396,
+      "endHub": 396
+    },
+    {
+      "id": "talk-a",
+      "src": "/avatar/desk/talk-a.mp4",
+      "kind": "talk",
+      "durationMs": 3280,
+      "sourceId": "pexels-5941016",
+      "sourceInMs": 4000,
+      "sourceOutMs": 7280,
+      "speed": 1,
+      "startHub": 100,
+      "endHub": 181
+    },
+    {
+      "id": "talk-b",
+      "src": "/avatar/desk/talk-b.mp4",
+      "kind": "talk",
+      "durationMs": 8640,
+      "sourceId": "pexels-5941016",
+      "sourceInMs": 7240,
+      "sourceOutMs": 15880,
+      "speed": 1,
+      "startHub": 181,
+      "endHub": 396
+    }
+  ],
+  "speech": {
+    "pregnancy": {
+      "src": "/avatar/desk/speech/pregnancy.mp3",
+      "durationMs": 17090,
+      "transcript": "Let's take this one step at a time. First, contact your local maternity clinic. Then we can work through leave from work and support from Kela. I've kept the official sources beside the plan. Would you like to start with the clinic, or with telling your employer?",
+      "provider": "elevenlabs",
+      "voice": "Bill"
+    },
+    "clinic": {
+      "src": "/avatar/desk/speech/clinic.mp3",
+      "durationMs": 10913,
+      "transcript": "Start with the maternity clinic or family centre in your area. That's the first step in the InfoFinland guide. I've opened the exact passage for you.",
+      "provider": "elevenlabs",
+      "voice": "Bill"
+    },
+    "employer": {
+      "src": "/avatar/desk/speech/employer.mp3",
+      "durationMs": 12214,
+      "transcript": "Kela says to inform your employer at least two months before your pregnancy leave starts. The deadline is before your leave, not before the baby's due date. Here's the passage.",
+      "provider": "elevenlabs",
+      "voice": "Bill"
+    }
+  },
+  "attribution": {
+    "creator": "Pexels contributor (see source page)",
+    "sourceUrl": "https://www.pexels.com/video/5941016/",
+    "license": "Pexels License",
+    "licenseUrl": "https://www.pexels.com/license/",
+    "note": "Stock footage of a performer who is not part of the team. Cut into short loops; some loops play a stretch backwards. The voice is synthetic (ElevenLabs, voice Bill) and was not spoken by him; his lips are not synchronised to it."
+  }
+}

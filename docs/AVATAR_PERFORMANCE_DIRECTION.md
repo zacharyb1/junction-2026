@@ -4,7 +4,7 @@ Direction and implementation status, 15 November 2026. The target follows the us
 
 ## Implemented now
 
-The default Office profile replaces the old cyclic `studio` footage. It has five finite forward-only quiet takes (35.60 seconds) and three distinct filmed speaking takes (39.04 seconds), all showing the same person alone in the inspected frames. The speaking takes use real Gemini-generated Kore soundtracks, embedded in the MP4s. Their filmed expressions and gestures are unaltered; **the dubbed words are not lip-synchronized**. [AVATAR_OFFICE_ASSETS.md](AVATAR_OFFICE_ASSETS.md) records intervals, provenance and export details.
+Superseded on 15 November 2026: the default profile is now **Desk**, one locked-off stock clip cut into listening and speaking segments that start and end in shared resting poses, with a separate ElevenLabs voice (Bill). [AVATAR_DESK_ASSETS.md](AVATAR_DESK_ASSETS.md) records its cuts and provenance. The Office footage described in the rest of this document (Gemini Kore soundtracks embedded in filmed takes) has been removed from the repository; git history keeps it.
 
 The prepared conversation concerns pregnancy in Finland, with separate clinic and employer follow-ups. They show saved source passages and their own transcripts. Pause, mute, explicit replay, Stop and replacement by a new live message are implemented. Quiet source intervals are not automatically reused within a mounted profile; exhaustion holds a suitable frame or the neutral poster. The conversation remains usable if media fails. Browser checks cover desktop and mobile controls, media state and the adopted mobile layout; they do not establish audible voice quality or lip alignment. See [AVATAR_CONCEPT.md](AVATAR_CONCEPT.md) for completed and historical checks.
 
@@ -105,7 +105,7 @@ These are recorded demonstrations of stored findings, not a fresh legal or medic
 | Start with the clinic | Saved InfoFinland citation [1]. A separate 9.64-second take carries its own Gemini answer. | Opens the exact saved passage immediately and offers its source link; no new search is staged. | Matched speech and a visually compatible transition from the main scene. |
 | What about my employer? | Saved Kela citation [3] from `during-pregnancy`. A separate 12.84-second take carries its own Gemini answer. | Opens the saved notice-period quotation and source link; explicit replay uses this answer rather than restarting the main one. | Matched speech, a gesture appropriate to the explanation and a natural handover. |
 
-The exact three authored scripts are in `src/data/avatar-performance-dialogue.json`; video paths, transcripts and provenance are in `public/avatar/office/performances.json`. All three currently declare `method: dubbed`. The original `public/hud/plan.mp3` remains a legacy recording and does not supply these soundtracks.
+The exact three authored scripts are in `src/data/avatar-performance-dialogue.json`; the Desk speech files, transcripts and provenance are in `public/avatar/desk/presence.json`. The original `public/hud/plan.mp3` remains a legacy recording and does not supply these soundtracks.
 
 Moving from Helsinki to Tampere remains a possible second situation, not an implemented scene. `src/data/autopilot-check.json`, recorded 14 Nov 2026, contains KKV lease-termination, InfoFinland notice-period and LUVN change-of-address excerpts. It still needs a reviewed script, soundtrack, acting and scene timeline. That fixture alone does not establish a new legal conclusion or a captured conversational tool trace.
 
