@@ -110,7 +110,9 @@ const qr = await QRCode.toString(`${base}/try`, { type: "svg", margin: 1, color:
 
 // ---- the slides ----
 
-const slide = (number, label, body, extra = "") => `
+// Slides number themselves in the order they are written; the first argument only labels the source.
+let count = 0;
+const slide = (_name, label, body, extra = "", number = ++count) => `
 <section class="slide ${extra}">
   <header><span class="mark"><b>AI</b>Daddy</span><span class="label">${esc(label)}</span></header>
   ${body}
@@ -128,31 +130,45 @@ const FLOW = [
 
 const slides = [
   slide(
-    1,
+    "story",
+    "Saturday night · Junction 2026",
+    `<div class="story">
+      <p>This happened to our team.</p>
+      <p>We took a brave bet: a personal assistant that is <strong>always</strong> listening.</p>
+      <p>We could not have expected this choice to end up life-changing.</p>
+      <p class="story-turn">We contacted 112. The person is stable now.</p>
+      <p>This is why we built AIDaddy.</p>
+      <p class="story-aside">Sorry. We came up with the name before the emergency.</p>
+    </div>`,
+    "slide--dark",
+  ),
+  slide(
+    "title",
     "Junction 2026 · Exa: The Internet Butler",
     `<div class="title">
       <div>
-        <h1>Silent until<br><em>it matters.</em></h1>
-        <p class="lede">AIDaddy is the butler in your family's group chat. It lets the small talk pass. When life happens, it researches the live web with Exa and answers with a plan in which every line points at a sentence on an official page.</p>
+        <h1>The assistant<br><em>you don't have to ask.</em></h1>
+        <p class="lede">Every other AI waits for a prompt. AIDaddy listens to your family's chat and your kitchen table, lets the small talk pass, and steps in when life happens: with a plan in which every line points at a sentence on an official page.</p>
+        <p class="url">AIDaddy is here to AID.</p>
       </div>
       <div class="orb"></div>
     </div>`,
     "slide--title",
   ),
   slide(
-    2,
+    "problem",
     "The problem",
-    `<h2>A life event starts a list of deadlines nobody hands you.</h2>
+    `<h2>We don't know what we don't know.</h2>
     <div class="cols">
       <ul class="points">
-        <li><strong>The answers exist, on ten official pages.</strong> Kela, the tax office, the city, the employer's duties: each page has one piece.</li>
-        <li><strong>Often in a language you do not read.</strong> A newcomer's first letters in Finland come in Finnish.</li>
-        <li><strong>A chatbot answers from memory, and you cannot check it.</strong> Amounts and deadlines change every year.</li>
+        <li><strong>Every other AI waits for a prompt.</strong> You connect your data, you set it up, and then you still have to ask.</li>
+        <li><strong>What costs you money is what you never knew to ask about.</strong> A deadline on an invoice. A benefit nobody mentioned.</li>
+        <li><strong>Nobody prompts about what they missed.</strong> You don't realize you filed your taxes wrong. You forget your wedding anniversary. Or you are just too lazy to prompt.</li>
       </ul>
       <div class="panel">
-        <p class="eyebrow">Said in a family chat</p>
+        <p class="eyebrow">Said in a family chat. Nobody asked AIDaddy.</p>
         <p class="said">“${esc(facts.run.said)}”</p>
-        <p class="eyebrow">What that one sentence sets off</p>
+        <p class="eyebrow">What it came back with, unasked</p>
         <ol class="plan">${facts.run.plan.map((line) => `<li>${esc(line)}</li>`).join("")}</ol>
       </div>
     </div>`,
@@ -168,6 +184,7 @@ const slides = [
           <li><strong>It goes to work.</strong> When someone mentions a life event or shares an official letter, it searches the official sites of the right country.</li>
           <li><strong>It answers with a plan you can check.</strong> What to do, by when, and the official sentence that says so. Tap a number and the page opens at that sentence.</li>
         </ol>
+        <p class="note"><strong>In an emergency it speaks at once,</strong> without research: call 112 first, then the Red Cross first aid steps. Fixed words, never written by a model.</p>
         <p class="note">It never sends, files, books or pays. It prepares, and the family decides.</p>
       </div>
       <figure class="pic pic--phone"><img src="img/chat.jpg" alt=""><figcaption>A replay with a fictional family. The plan is from a real run.</figcaption></figure>
@@ -274,8 +291,8 @@ const slides = [
     "Try it",
     `<div class="title title--end">
       <div>
-        <h1>Ask it about<br><em>your own life.</em></h1>
-        <p class="lede">Type what happened, and where you live. The same engine runs in the browser, on the live web, in a few seconds.</p>
+        <h1>AIDaddy is here<br><em>to AID.</em></h1>
+        <p class="lede">You don't have to ask. But you can: type what happened and where you live, and the same engine answers on the live web in a few seconds.</p>
         <p class="url">${esc(site)}/try</p>
         <p class="note">Team: Zachary, Milan, Vlad · Built at Junction 2026 with Exa, Hermes Agent, NVIDIA Nemotron, Gemma, ElevenLabs and Verda.</p>
       </div>
