@@ -187,6 +187,16 @@ describe("an emergency", () => {
     expect(speech).not.toMatch(/\d|\{n\}/);
     expect(emergencySpeech("seizure", "fi", "112")).toMatch(/yksi yksi kaksi/);
   });
+
+  it("protects the airway in a seizure by turning the person, never by reaching into the mouth", () => {
+    const en = emergencyWords("seizure", "en", "112").lines;
+    expect(en[0]).toMatch(/call 112 now/);
+    expect(en.join(" ")).toMatch(/do not put anything in their mouth/);
+    expect(en.join(" ")).toMatch(/recovery position on the floor.*tongue cannot block their breathing/);
+    const fi = emergencyWords("seizure", "fi", "112").lines.join(" ");
+    expect(fi).toMatch(/äläkä laita mitään hänen suuhunsa/);
+    expect(fi).toMatch(/lattialla kylkiasentoon.*kieli ei tuki hengitystä/);
+  });
 });
 
 describe("everyday ways of saying a matter", () => {

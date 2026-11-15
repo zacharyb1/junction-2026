@@ -7,6 +7,12 @@ import { words } from "@/lib/listen";
  * instructions (SOURCES below, read on 15 November 2026). The first thing said is always to call the emergency
  * number. AIDaddy cannot call it: it tells the people in the room to. The sentences begin with "if", so a sentence
  * heard from a film or about last year does no harm.
+ *
+ * Seizure: the recovery position on the floor is named, with its reason (the tongue cannot block the breathing),
+ * because that is what a bystander worries about. The way to protect the airway is to turn the person, never to
+ * reach into the mouth, so the words also say to put nothing in it (NHS, "What to do if someone has a seizure":
+ * "Do not put anything in their mouth, including your fingers"). The call stays first: the Red Cross page opens
+ * with "Call 112 immediately", and on speaker the caller's hands are free for the rest.
  */
 
 export type Emergency = "seizure" | "unresponsive" | "choking" | "help";
@@ -71,20 +77,20 @@ const WORDS: Record<Emergency, Record<Language, Words>> = {
       title: "A seizure",
       lines: [
         "If someone is having a seizure now, call {n} now and put the phone on speaker.",
-        "Do not hold them down or try to stop the movements.",
+        "Do not hold them down, and do not put anything in their mouth.",
         "Keep their head from hitting anything.",
-        "When the shaking allows, turn them onto their side.",
-        "When it stops, check that they are breathing normally, and stay with them.",
+        "As soon as the shaking allows, put them in the recovery position on the floor: on their side, head tilted back, so the tongue cannot block their breathing.",
+        "When it stops, check that they are breathing normally, and stay with them until help arrives.",
       ],
     },
     fi: {
       title: "Kouristelu",
       lines: [
         "Jos joku kouristelee nyt, soita heti hätänumeroon {n} ja laita puhelin kaiuttimelle.",
-        "Älä yritä estää kouristusliikkeitä.",
+        "Älä yritä estää kouristusliikkeitä äläkä laita mitään hänen suuhunsa.",
         "Huolehdi, ettei hän kolhi päätään.",
-        "Käännä hänet kyljelleen, kun kouristukset sen sallivat.",
-        "Kun kouristukset loppuvat, tarkista, hengittääkö hän normaalisti, ja pysy hänen luonaan.",
+        "Käännä hänet lattialla kylkiasentoon heti, kun kouristukset sen sallivat: kyljelleen, pää taaksepäin taivutettuna, jotta kieli ei tuki hengitystä.",
+        "Kun kouristukset loppuvat, tarkista, hengittääkö hän normaalisti, ja pysy hänen luonaan, kunnes apu tulee.",
       ],
     },
   },
