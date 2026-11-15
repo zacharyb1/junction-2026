@@ -1,11 +1,11 @@
 /**
- * The programme behind "Demos": four scripted replays and the autopilot demo, in the order a visitor sees them.
+ * The programme behind "Demos": five scripted replays and the autopilot demo, in the order a visitor sees them.
  *
  * One list feeds the hub at /demo, the links between the replays and each replay's own heading, so a scene
  * cannot be called one thing on the hub and another on its page. `real` says what in the scene comes from a
  * real research run and what does not: it is the honesty label, so change it only together with the scene.
  */
-export type SceneSlug = "chat" | "browser" | "talk" | "calendar";
+export type SceneSlug = "chat" | "browser" | "talk" | "calendar" | "call";
 
 export type Scene = {
   href: string;
@@ -76,11 +76,23 @@ export const REPLAYS: Record<SceneSlug, Scene> = {
     tone: "concept",
     seconds: 31,
   },
+  call: {
+    href: "/demo/call",
+    nav: "Phone call",
+    navShort: "Call",
+    place: "On the phone",
+    title: "AIDaddy calls your boss",
+    story: "Someone wakes up ill and asks AIDaddy to call their boss. It asks for the number, shows its exact words, and calls in a copy of their voice after a yes.",
+    real: "Concept: AIDaddy cannot copy a voice or ring a phone number yet. The people and the call are scripted. In the concept its first sentence says that an assistant is speaking.",
+    tag: "Concept",
+    tone: "concept",
+    seconds: 36,
+  },
 };
 
-export const REPLAY_ORDER: SceneSlug[] = ["chat", "browser", "talk", "calendar"];
+export const REPLAY_ORDER: SceneSlug[] = ["chat", "browser", "talk", "calendar", "call"];
 
-/** The fifth scene is not a replay: it is the autopilot page, which asks for the access code. */
+/** The last scene is not a replay: it is the autopilot page, which asks for the access code. */
 export const AUTOPILOT: Scene = {
   href: "/autopilot",
   nav: "One step ahead",

@@ -1,6 +1,6 @@
 // Re-record the existing scripted scenes. This never researches a case or calls a provider.
 // Requires the installed Playwright Chromium browser, ffmpeg and a production site:
-//   node scripts/record-demos.mjs [http://localhost:3000] [all|chat|browser|talk|calendar]
+//   node scripts/record-demos.mjs [http://localhost:3000] [all|chat|browser|talk|calendar|call]
 // CHROME_PATH may select an existing Chromium installation instead of Playwright's bundled version.
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -17,12 +17,13 @@ const scenes = {
   browser: { source: "browser-demo/browser-demo.tsx", name: "browser", width: 1280, height: 800, scale: 1.5 },
   talk: { source: "talk-demo/talk-demo.tsx", name: "talk", width: 430, height: 900, scale: 2 },
   calendar: { source: "calendar-demo/calendar-demo.tsx", name: "calendar", width: 1280, height: 800, scale: 1.5 },
+  call: { source: "call-demo/script.ts", name: "call", width: 430, height: 900, scale: 2 },
 };
 
 export function recordDemos(base = "http://localhost:3000", selection = "all") {
   const origin = new URL(base).origin;
   if (!/^https?:/.test(origin) || (selection !== "all" && !Object.hasOwn(scenes, selection))) {
-    throw new Error("Usage: node scripts/record-demos.mjs [http://localhost:3000] [all|chat|browser|talk|calendar]");
+    throw new Error("Usage: node scripts/record-demos.mjs [http://localhost:3000] [all|chat|browser|talk|calendar|call]");
   }
   const dir = mkdtempSync(join(tmpdir(), "aidaddy-demos-"));
   const session = `aidaddy-demos-${process.pid}`;

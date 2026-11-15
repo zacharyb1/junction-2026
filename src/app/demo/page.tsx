@@ -10,7 +10,7 @@ import "@/components/demo/demo.css";
 export const metadata: Metadata = {
   title: "Demos",
   description:
-    "Five short scenes of AIDaddy at work: four scripted replays and one demo with a live check. Each says what in it comes from a real research run.",
+    "Six short scenes of AIDaddy at work: five scripted replays and one demo with a live check. Each says what in it comes from a real research run.",
 };
 
 export const viewport: Viewport = { themeColor: "#fbf8f3" };
@@ -27,8 +27,8 @@ export default function DemoHub() {
           title="See AIDaddy at work"
           lede={
             <>
-              AIDaddy is a butler for your family&apos;s group chat. Here are five short scenes of it at work. Four are scripted
-              replays, and each one says which parts come from a real research run. The fifth runs one check live.
+              AIDaddy is a butler for your family&apos;s group chat. Here are six short scenes of it at work. Five are scripted
+              replays, and each one says which parts come from a real research run. The sixth runs one check live.
             </>
           }
           aside={<Core state="idle" />}
