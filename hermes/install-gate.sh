@@ -22,7 +22,7 @@ if [ "${1:-}" = "--remove" ]; then
 fi
 
 mkdir -p "$DST"
-cp "$ROOT"/hermes/plugins/kaveri-gate/{plugin.yaml,__init__.py,gate.py} "$DST/"
+cp "$ROOT"/hermes/plugins/kaveri-gate/plugin.yaml "$ROOT"/hermes/plugins/kaveri-gate/*.py "$DST/"
 {
   printf '[\n'
   sed -n 's/^ *#B   - \(".*"\)$/\1/p' "$ROOT/hermes/config.snippet.yaml" | sed '$!s/$/,/'

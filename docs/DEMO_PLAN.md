@@ -65,7 +65,7 @@ Same order as the table above, without the judge's turn:
 | Question | Answer |
 |---|---|
 | "How do I know it is not making this up?" | "Tap any number. Our server opened that page again and found that sentence. If it had not, the line would be gone and listed as unconfirmed." |
-| "Does it read all our messages?" | "A small model on the family's own machine decides first. Photos, and messages in the three minutes after it wakes, go to the conversation model. We say that on the page." |
+| "Does it read all our messages?" | "A small model on the bot server decides when to wake. When it wakes, it can use recent messages from that chat and topic so you do not repeat the context. Photos and messages in the next three minutes also reach the conversation model." |
 | "What does Exa do here that a model cannot?" | "This year's amounts and deadlines, from the official page, with the sentence. A figure stays in the plan only if it stands in a sentence on the page it cites." |
 | "What if two pages disagree?" | "It shows both with their sources. It does not choose." |
 | "Is this legal advice?" | "No. It is research with sources. It shows the sentence is on the page, not that the rule fits your case." |
