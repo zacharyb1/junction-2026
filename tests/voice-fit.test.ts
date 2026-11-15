@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as speak } from "@/app/api/aidaddy/speak/route";
-import { AIDADDY_VOICE, forVoice, renderSpeech, replyLanguage, speechHash, spokenDelivery, spokenLanguage } from "@/lib/speech";
+import { AIDADDY_VOICE, forVoice, renderSpeech, replyLanguage, speechHash, spokenDelivery, spokenLanguage, STAND_IN_VOICE } from "@/lib/speech";
 
 /**
  * The voice fits the case: its language, the model that speaks that language, and a delivery chosen from what
@@ -115,6 +115,35 @@ describe("what is sent to ElevenLabs", () => {
       language_code: "fi",
       voice_settings: { stability: 0.7, speed: 0.92 },
     });
+  });
+
+  it("reads with the standard voice when the account behind the key does not have AIDaddy's voice", async () => {
+    const urls: string[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        urls.push(url);
+        return url.includes(AIDADDY_VOICE)
+          ? Response.json({ detail: { status: "voice_not_found" } }, { status: 404 })
+          : new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/mpeg" } });
+      }),
+    );
+    expect((await renderSpeech("Apply to Kela.")).length).toBe(3);
+    expect(urls).toHaveLength(2);
+    expect(urls[1]).toContain(`/v1/text-to-speech/${STAND_IN_VOICE}`);
+  });
+
+  it("does not try another voice for any other refusal", async () => {
+    const urls: string[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        urls.push(url);
+        return Response.json({ detail: { status: "quota_exceeded" } }, { status: 401 });
+      }),
+    );
+    await expect(renderSpeech("Apply to Kela.")).rejects.toThrow("ElevenLabs answered 401 (quota_exceeded)");
+    expect(urls).toHaveLength(1);
   });
 
   it("speaks Estonian with the model that knows it", async () => {

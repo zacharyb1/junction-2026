@@ -144,13 +144,19 @@ async function refusal(res: Response): Promise<string> {
   return `ElevenLabs answered ${res.status}${word}`;
 }
 
+/**
+ * "Bill", one of the standard voices every ElevenLabs account has: an older, calm voice, the closest to AIDaddy's own.
+ * A designed voice exists only in the account that made it. With a key from another account ElevenLabs answers
+ * 404 voice_not_found, which left the production server without a voice while its key was fine.
+ */
+export const STAND_IN_VOICE = "pqHfZKP75CvOlQylNhV4";
+
 /** Text to speech with ElevenLabs, in the language and delivery given. Returns the MP3. */
 export async function renderSpeech(text: string, voice: { language?: string; delivery?: Delivery } = {}): Promise<Buffer> {
   const { language, delivery = "plain" } = voice;
   const settings = DELIVERY[delivery];
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId())}?output_format=mp3_44100_128`,
-    {
+  const speak = (id: string) =>
+    fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(id)}?output_format=mp3_44100_128`, {
       method: "POST",
       headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY ?? "", "content-type": "application/json" },
       body: JSON.stringify({
@@ -160,9 +166,15 @@ export async function renderSpeech(text: string, voice: { language?: string; del
         ...(settings ? { voice_settings: settings } : {}),
       }),
       signal: AbortSignal.timeout(20_000),
-    },
-  );
-  if (!res.ok) throw new Error(await refusal(res));
+    });
+  let res = await speak(voiceId());
+  if (!res.ok) {
+    const why = await refusal(res);
+    // The account behind this key does not have the voice: read with the standard voice, never stay silent.
+    if (!/voice_not_found/.test(why) || voiceId() === STAND_IN_VOICE) throw new Error(why);
+    res = await speak(STAND_IN_VOICE);
+    if (!res.ok) throw new Error(await refusal(res));
+  }
   const audio = Buffer.from(await res.arrayBuffer());
   if (!audio.length) throw new Error("ElevenLabs sent no audio");
   return audio;
