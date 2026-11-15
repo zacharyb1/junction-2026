@@ -11,7 +11,7 @@ Issue #39. One of AIDaddy's three specialist desks. It takes two kinds of matter
 
 ## Procedure
 
-1. Acknowledge in one line, with your first tool call: "A matter for the travel desk. Checking the route." For a cancellation or delay: "The travel desk is on it. Checking what you are owed first."
+1. Follow SOUL's work-notice rule: the Telegram runtime announces research; elsewhere acknowledge briefly with the first tool call.
 2. Read this desk's memory line for this chat (see Memory). If the trip's dates, start and destination are not in the message or that line, ask once with `clarify` or one plain sentence.
 3. Call `mcp__casefile__research_case` with `language` as the trigger, and:
    - **Planning:** `situation` = "Trip from <start> to <destination>, <dates>, <who travels>. Options to get there, where to stay, and what to see, available now."; `country` = the destination; `region` = the destination city; `scope` `open`.

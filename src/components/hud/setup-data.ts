@@ -24,7 +24,7 @@ export const CONNECTIONS: Connection[] = [
     label: "Channel 01",
     title: "Read your Telegram chat",
     description:
-      "AIDaddy joins your family or flat group and reads along. Small talk is dropped on our own server; AIDaddy speaks only when paperwork appears.",
+      "AIDaddy joins your family or flat group and reads along. It stays quiet during small talk, then uses recent messages from the same chat and topic when paperwork needs attention.",
     status: "live",
     whenOn: "On. Once AIDaddy is in your group, it reads along and stays silent until it matters.",
     whenOff: "Off. Add AIDaddy to a group to switch this on.",

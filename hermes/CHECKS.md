@@ -1,5 +1,11 @@
 # Checks: where each fact was confirmed
 
+## Current Telegram context checks, 15 November 2026
+
+The #102 implementation passes 50 gate/plugin tests inside the pinned Hermes v0.23.1 image, including native dispatch, same-chat/topic context formatting and session-bound notification routing. A real-model rehearsal passed with recent household facts supplied only through the gate, one start notice, an unrequested saved draft and a sourced fixture plan before the next-action buttons. Its 41.7-second run and fixture limits are recorded in [capability rehearsals](../eval/bot/CAPABILITIES.md#telegram-context-and-work-notices). This is not Telegram delivery evidence: #103 remains open for the [live group run](../docs/TELEGRAM_DEMO.md).
+
+## Historical setup checks
+
 Hermes docs: repository `main`, commit `4932eea7`, cloned 13 Nov 2026. Line references are files under `website/docs/` in that repository. "Source" means the Python code of the same commit, read but never run.
 
 What was tested here: `config.snippet.yaml` parses in Mode A and Mode B with no duplicate keys, the nine wake patterns match 54 trigger sentences and none of 29 small-talk sentences, the skills' front matter and word counts, `install.sh` with `bash -n` and against a stub `hermes`. Since then part of it was run live: see the next section.

@@ -46,4 +46,14 @@ jobs:
       - run: docker build --tag kaveri-web:check .
       - run: node scripts/container-smoke.mjs docker kaveri-web:check
       - run: docker build --file containers/hermes/Dockerfile --tag kaveri-hermes:check .
+      - name: Test Telegram plugins in the pinned runtime
+        run: |
+          docker run --rm --network none --volume "$PWD:/workspace:ro" \
+            --entrypoint /opt/hermes/.venv/bin/python --workdir /opt/hermes \
+            kaveri-hermes:check -c '
+          import sys, unittest
+          suite = unittest.defaultTestLoader.discover("/workspace/eval/gate", pattern="test_*.py")
+          result = unittest.TextTestRunner().run(suite)
+          sys.exit(0 if result.wasSuccessful() and not result.skipped else 1)
+          '
       - run: node scripts/hermes-container-smoke.mjs docker kaveri-hermes:check kaveri-web:check
