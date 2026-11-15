@@ -44,3 +44,33 @@
   width: 100%;
   margin-top: 0.5rem;
 }
+
+/* An emergency: the same box, with the number to call as the largest thing on the screen. */
+.listen-alarm {
+  width: min(32rem, 100%);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  border: 2px solid var(--destructive);
+}
+.listen-alarm-eyebrow {
+  color: var(--destructive);
+}
+.listen-alarm-number {
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--destructive);
+}
+.listen-alarm-steps {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.4rem;
+  list-style: decimal;
+  text-align: left;
+  font-size: 1.05rem;
+}
+.listen-call .listen-alarm-call {
+  border-color: var(--destructive);
+  background: var(--destructive);
+  color: #fff;
+}

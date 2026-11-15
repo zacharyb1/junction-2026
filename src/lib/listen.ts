@@ -36,7 +36,7 @@ export const DESKS: Record<Desk, { name: string; question: string; scope: "auto"
 };
 
 /** A whole word or phrase: not the middle of a longer word. `L` stands for "any further letters" (a word ending). */
-const words = (alternatives: string) =>
+export const words = (alternatives: string) =>
   new RegExp(`(?:^|[^\\p{L}\\p{N}])(?:${alternatives.replaceAll("L", "\\p{L}*")})(?![\\p{L}\\p{N}])`, "iu");
 
 type Rule = { kind: string; desk: Desk; urgent: boolean; pattern: RegExp };
