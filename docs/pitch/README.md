@@ -25,3 +25,13 @@ node scripts/record-demos.mjs http://localhost:3000
 An optional final argument selects `chat`, `browser`, `talk` or `calendar`. `scripts/record-chat-demo.mjs` remains the chat-only entry point. Set `CHROME_PATH` only when using an existing Chromium executable instead of Playwright's bundled browser.
 
 The recorder uses a temporary named browser session, reads each scene's duration from its source, captures `?bare=1` with the original phone or desktop viewport, and scales the complete frame into H.264 MP4. It blocks API and external requests, so recording cannot run research or contact a calling provider. Review the rendered captions and branding after recording; the source branding check cannot read words inside video pixels.
+
+## Pitch deck
+
+[aidaddy-pitch-deck.pdf](aidaddy-pitch-deck.pdf) is the ten-slide deck for the submission form; the form's text is in [../SUBMISSION_TEXT.md](../SUBMISSION_TEXT.md). Rebuild it with:
+
+```sh
+node scripts/make-deck.mjs
+```
+
+The script photographs the live site into `deck/img`, reads every figure from the result files (`src/data/scorecard.json`, `eval/results/gate-gemma3-1b.json`, `src/data/replay.json`), writes `deck/deck.html` and prints the PDF. `--no-shots` keeps the existing pictures, `--base` points it at another server, and it reports any slide that is too full.
