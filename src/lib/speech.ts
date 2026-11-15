@@ -59,26 +59,85 @@ export function spokenText(c: Case): string {
 }
 
 /**
- * A Finnish case is spoken as Finnish throughout. Left to itself the model changes language for an English phrase
- * quoted inside a Finnish plan, and the figure in it came out unclear: "40 working days" was heard as "fourteen".
- * Other cases are sent without a language, as before.
+ * The voice fits the case. Three things are chosen from the case itself, never from a model's guess:
+ * the language it is read in, the model that speaks that language, and the delivery.
  */
-export const spokenLanguage = (c: Case): string | undefined => (c.language.toLowerCase().startsWith("fi") ? "fi" : undefined);
 
-/** Names one rendering. A changed text, voice, model or language gives a new name, so stale audio is never served. */
-export function speechHash(text: string, language?: string): string {
-  const named = `${voiceId()}\n${MODEL}\n${text}${language ? `\n${language}` : ""}`;
+/**
+ * A case written in one of these languages is spoken as that language throughout. Left to itself the model changes
+ * language for an English phrase quoted inside a Finnish plan, and the figure in it came out unclear: "40 working
+ * days" was heard as "fourteen". English cases are sent without a language, as before.
+ */
+const SPOKEN_AS = new Set(["fi", "sv", "de", "es", "fr", "uk", "et"]);
+export const spokenLanguage = (c: Pick<Case, "language">): string | undefined => {
+  const code = c.language.toLowerCase().slice(0, 2);
+  return SPOKEN_AS.has(code) ? code : undefined;
+};
+
+/** The fast model does not speak Estonian (it answers 400 for that language); the newer turbo model does. */
+const MODEL_FOR: Record<string, string> = { et: "eleven_v4_turbo" };
+const modelFor = (language?: string) => (language && MODEL_FOR[language]) || MODEL;
+
+/**
+ * How a case is read. "plain" is the voice as it was designed. "gentle" is slower and steadier, for a case that
+ * starts with bad news: a dismissal, a fine, an eviction, an illness. "bright" has more movement in it, for a case
+ * that starts with good news: a baby, a wedding, a new job.
+ */
+export type Delivery = "plain" | "gentle" | "bright";
+
+/** Sent to ElevenLabs as voice_settings. Measured on one sentence: 7.4 s plain, 8.0 s gentle. */
+const DELIVERY: Record<Delivery, { stability: number; speed: number } | undefined> = {
+  plain: undefined,
+  gentle: { stability: 0.7, speed: 0.92 },
+  bright: { stability: 0.4, speed: 1.02 },
+};
+
+// The event slug is English; the title is in the case's language, so the Finnish words stand beside the English ones.
+const HARD =
+  /\b(job loss|lost (my|his|her|their|the) job|laid off|layoff|redundan\w*|dismiss\w*|terminat\w*|unemploy\w*|evict\w*|fine|fined|penalt\w*|debt\w*|overdue|bankrupt\w*|death|died|funeral|bereave\w*|illness|sick|injur\w*|accident|hospital\w*|divorce\w*|separation|cancel\w*|delay\w*|denied|refus\w*|reject\w*|rent increase|stolen|theft|burglar\w*|lost passport)\b|irtisano|lomaut|työttöm|häätö|sakko|sakon|maksumuistu|perintä|velka|kuol|hautaj|sairas|sairaus|tapaturm|avioero|peruut|peruun|myöhäst|hylä|hylkä|kielteinen|vuokrankorotu|varast|varkau/i;
+const GOOD =
+  /\b(pregnan\w*|baby|birth|newborn|expecting|wedding|marri\w*|engag\w*|new job|job offer|hired|promot\w*|graduat\w*|new home|housewarming|birthday|adopt\w*)\b|raska|vauva|syntymä|synty|häät|naimisiin|kihla|uusi työ|työtarjou|valmistu|uusi koti|uuteen kotiin/i;
+
+/** The delivery for a case, from its event and title. Bad news wins when a case holds both. */
+export function spokenDelivery(c: Pick<Case, "event" | "title">): Delivery {
+  const about = `${c.event} ${c.title}`.replace(/[_-]+/g, " ");
+  if (HARD.test(about)) return "gentle";
+  if (GOOD.test(about)) return "bright";
+  return "plain";
+}
+
+/**
+ * The name, written for the ear. As one word the voice swallows its first letters: speech to text heard
+ * "Hey, Daddy here" in English and "iDaddy" in Finnish. As two words it is heard as "AI Daddy" in both,
+ * also with a Finnish ending ("AI Daddyn"). Only what is sent to the voice changes; the page still says AIDaddy.
+ */
+export const forVoice = (text: string): string => text.replace(/AIDaddy/g, "AI Daddy");
+
+/**
+ * Names one rendering. A changed text, voice, model, language or delivery gives a new name, so stale audio is never
+ * served. A plain rendering with the fast model is named as it always was, so audio stored earlier still plays.
+ */
+export function speechHash(text: string, language?: string, delivery: Delivery = "plain"): string {
+  const model = modelFor(language);
+  const named = `${voiceId()}\n${model}\n${forVoice(text)}${language ? `\n${language}` : ""}${delivery === "plain" ? "" : `\n${delivery}`}`;
   return createHash("sha256").update(named).digest("hex").slice(0, 16);
 }
 
-/** Text to speech with ElevenLabs. Returns the MP3. */
-export async function renderSpeech(text: string, language?: string): Promise<Buffer> {
+/** Text to speech with ElevenLabs, in the language and delivery given. Returns the MP3. */
+export async function renderSpeech(text: string, voice: { language?: string; delivery?: Delivery } = {}): Promise<Buffer> {
+  const { language, delivery = "plain" } = voice;
+  const settings = DELIVERY[delivery];
   const res = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId())}?output_format=mp3_44100_128`,
     {
       method: "POST",
       headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY ?? "", "content-type": "application/json" },
-      body: JSON.stringify({ text, model_id: MODEL, ...(language ? { language_code: language } : {}) }),
+      body: JSON.stringify({
+        text: forVoice(text),
+        model_id: modelFor(language),
+        ...(language ? { language_code: language } : {}),
+        ...(settings ? { voice_settings: settings } : {}),
+      }),
       signal: AbortSignal.timeout(20_000),
     },
   );
@@ -86,6 +145,34 @@ export async function renderSpeech(text: string, language?: string): Promise<Buf
   const audio = Buffer.from(await res.arrayBuffer());
   if (!audio.length) throw new Error("ElevenLabs sent no audio");
   return audio;
+}
+
+/**
+ * The language of a chat reply, when it is clearly one of the languages a case can be spoken in. The chat has no
+ * language field: AIDaddy answers in the language it was written to. Counted on the small words every sentence of a
+ * language is made of; English, a short reply and anything unclear give no language, and the voice decides as before.
+ */
+const SMALL_WORDS: Record<string, string[]> = {
+  fi: ["ja", "on", "ei", "että", "tai", "kun", "se", "sinun", "sinä", "voit", "myös", "mutta", "kanssa", "ole", "olet", "tämä", "mitä", "miten", "ennen", "jälkeen", "pitää", "sitä", "siitä", "joka", "sen", "ovat", "voi", "tee", "hae"],
+  sv: ["och", "är", "att", "det", "du", "inte", "för", "med", "ska", "kan", "din", "ditt", "som", "på", "till", "eller", "innan", "måste", "har", "från"],
+  de: ["und", "ist", "nicht", "der", "die", "das", "mit", "für", "sie", "ein", "eine", "oder", "auf", "muss", "müssen", "vor", "wenn", "bei", "den", "dem"],
+  es: ["y", "es", "el", "la", "los", "las", "que", "para", "con", "una", "del", "antes", "debe", "puede", "por", "su", "si", "como", "más", "está"],
+  fr: ["et", "est", "le", "la", "les", "que", "pour", "avec", "une", "des", "avant", "vous", "votre", "dans", "sur", "pas", "doit", "peut", "ce", "du"],
+  en: ["the", "and", "is", "you", "your", "to", "of", "for", "with", "before", "must", "can", "that", "this", "it", "are", "on", "in", "by", "or"],
+};
+
+export function replyLanguage(text: string): string | undefined {
+  // Ukrainian is the one supported language in Cyrillic; its own letters tell it from Russian.
+  if (/[а-яіїєґ]{3}/i.test(text)) return /[іїєґ]/i.test(text) ? "uk" : undefined;
+  const words = text.toLowerCase().match(/\p{L}+/gu) ?? [];
+  if (words.length < 6) return undefined;
+  const counts = Object.entries(SMALL_WORDS)
+    .map(([language, small]) => ({ language, hits: words.filter((w) => small.includes(w)).length }))
+    .sort((a, b) => b.hits - a.hits);
+  const [best, next] = counts;
+  // Clearly one language: at least three of its small words, and well ahead of the runner-up.
+  if (best.language === "en" || best.hits < 3 || best.hits < next.hits * 1.5) return undefined;
+  return best.language;
 }
 
 /** The longest chat reply AIDaddy reads aloud. Longer replies are cut after the last whole sentence that fits. */

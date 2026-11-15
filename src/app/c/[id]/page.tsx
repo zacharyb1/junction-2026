@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Case, type Evidence, type Step, verifiedCount } from "@/lib/case";
 import { type Labels, labels, langOf } from "@/lib/i18n";
+import { spokenDelivery } from "@/lib/speech";
 import { loadCase } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
@@ -320,7 +321,13 @@ function Rail({ c, t }: { c: Case; t: Labels }) {
       <div className="flex flex-wrap items-center gap-3">
         <Core state={seal} className="hud-core--tiny" />
         {process.env.ELEVENLABS_API_KEY && (
-          <ListenButton src={`/api/cases/${c.id}/audio`} label={t.listen} loadingLabel={t.listenLoading} errorLabel={t.listenError} />
+          <ListenButton
+            src={`/api/cases/${c.id}/audio`}
+            label={t.listen}
+            loadingLabel={t.listenLoading}
+            errorLabel={t.listenError}
+            note={{ plain: undefined, gentle: t.listenGentle, bright: t.listenBright }[spokenDelivery(c)]}
+          />
         )}
       </div>
       <dl className="site-readouts site-readouts--stack">

@@ -112,6 +112,9 @@ const en = {
   listen: "Listen to the plan",
   listenLoading: "Preparing the audio…",
   listenError: "The audio could not be loaded. Try again.",
+  // How the voice reads this case, shown under the button when it is not the plain reading (src/lib/speech.ts).
+  listenGentle: "Read slowly and calmly.",
+  listenBright: "Read in a lighter voice.",
   // The only words the spoken plan adds to stored case text (src/lib/speech.ts).
   spokenDeadline: "Deadline",
   spokenConflict: "Two different figures were found for this step. See the case file.",
@@ -213,6 +216,8 @@ const fi: Labels = {
   listen: "Kuuntele suunnitelma",
   listenLoading: "Ääntä valmistellaan…",
   listenError: "Ääntä ei voitu ladata. Yritä uudelleen.",
+  listenGentle: "Luetaan rauhallisesti ja hitaasti.",
+  listenBright: "Luetaan kevyemmällä äänellä.",
   spokenDeadline: "Määräaika",
   spokenConflict: "Tälle vaiheelle löytyi kaksi eri lukua. Katso tapaussivu.",
   // Numbers stay in their basic form, so the voice does not have to inflect them.

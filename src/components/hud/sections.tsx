@@ -2,8 +2,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Core } from "@/components/hud/core";
 import type { PlanRow } from "@/components/hud/data";
+import { HearPlan } from "@/components/hud/hear-plan";
 import type { Scorecard } from "@/components/site/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
+import planAudio from "@/data/plan-audio.json";
 
 const oneDecimal = (ms: number) => (ms / 1000).toFixed(1);
 
@@ -202,6 +204,8 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
           Tap a number: the official page opens at the quoted sentence.{" "}
           <Link href={caseHref}>Open the full case file for this run →</Link>
         </p>
+        {/* The narration belongs to one case. After a new recording it is not offered until it is rendered again. */}
+        {caseHref === `/c/${planAudio.caseId}` && <HearPlan src={planAudio.file} seconds={planAudio.seconds} />}
       </div>
       <ul className="hud-rules">
         {RULES.map((rule) => (
