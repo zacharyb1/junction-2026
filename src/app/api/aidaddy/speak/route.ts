@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { mayResearch, readJson } from "@/lib/cases";
 import { allow } from "@/lib/rate-limit";
-import { renderSpeech, replyLanguage, speakable } from "@/lib/speech";
+import { renderSpeech, replyLanguage, speakable, spokenVoice } from "@/lib/speech";
 
 export const maxDuration = 30;
 
@@ -24,7 +24,9 @@ export async function POST(req: Request) {
   try {
     // AIDaddy answers in the language it was written to, and the reply is spoken as that language.
     const audio = await renderSpeech(text, { language: replyLanguage(text) });
-    return new Response(new Uint8Array(audio), { headers: { "content-type": "audio/mpeg", "cache-control": "no-store" } });
+    return new Response(new Uint8Array(audio), {
+      headers: { "content-type": "audio/mpeg", "cache-control": "no-store", "x-spoken-voice": spokenVoice() },
+    });
   } catch (error) {
     console.error("AIDaddy speech failed", error);
     // The reason is ElevenLabs' short code, for the operator; the page shows only the sentence.

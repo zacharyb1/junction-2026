@@ -20,10 +20,21 @@ const DEFAULT_VOICE = AIDADDY_VOICE;
  * it are dropped, and a value that still is not a voice id gives AIDaddy's own voice: a malformed id makes
  * ElevenLabs refuse every request (400 invalid_uid), which took the server's voice down while the key was fine.
  */
-const voiceId = () => {
+const chosenVoice = () => {
   const typed = (process.env.ELEVENLABS_VOICE_ID ?? "").trim().replace(/^["']+|["']+$/g, "").trim();
   return /^[A-Za-z0-9]{16,32}$/.test(typed) ? typed : DEFAULT_VOICE;
 };
+
+/**
+ * AIDaddy's own voice lives in one ElevenLabs account. A server whose key belongs to another account is told
+ * "voice_not_found" for it, and every spoken reply failed while the key itself was fine. Such a server now
+ * speaks with this voice, which ElevenLabs gives to every account, until a key that owns AIDaddy's voice is
+ * installed and the server is restarted. `spokenVoice()` says which of the two is in use.
+ */
+const PREMADE_VOICE = "JBFqnCBsd6RMkjVDRZzb";
+let ownVoiceMissing = false;
+const voiceId = () => (ownVoiceMissing ? PREMADE_VOICE : chosenVoice());
+export const spokenVoice = (): "own" | "premade" => (voiceId() === PREMADE_VOICE && chosenVoice() !== PREMADE_VOICE ? "premade" : "own");
 
 export const SPOKEN_LIMIT = 1500;
 
@@ -148,9 +159,8 @@ async function refusal(res: Response): Promise<string> {
 export async function renderSpeech(text: string, voice: { language?: string; delivery?: Delivery } = {}): Promise<Buffer> {
   const { language, delivery = "plain" } = voice;
   const settings = DELIVERY[delivery];
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId())}?output_format=mp3_44100_128`,
-    {
+  const ask = () =>
+    fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId())}?output_format=mp3_44100_128`, {
       method: "POST",
       headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY ?? "", "content-type": "application/json" },
       body: JSON.stringify({
@@ -160,9 +170,20 @@ export async function renderSpeech(text: string, voice: { language?: string; del
         ...(settings ? { voice_settings: settings } : {}),
       }),
       signal: AbortSignal.timeout(20_000),
-    },
-  );
-  if (!res.ok) throw new Error(await refusal(res));
+    });
+  let res = await ask();
+  if (!res.ok) {
+    const why = await refusal(res);
+    // This key cannot use the chosen voice: speak with the one every account has, from now on.
+    if (res.status === 404 && why.includes("voice_not_found") && !ownVoiceMissing) {
+      ownVoiceMissing = true;
+      console.warn("ElevenLabs does not know the chosen voice for this key. Speaking with the premade voice until a key that owns it is installed.");
+      res = await ask();
+      if (!res.ok) throw new Error(await refusal(res));
+    } else {
+      throw new Error(why);
+    }
+  }
   const audio = Buffer.from(await res.arrayBuffer());
   if (!audio.length) throw new Error("ElevenLabs sent no audio");
   return audio;

@@ -1,5 +1,5 @@
 import { allow } from "@/lib/rate-limit";
-import { renderSpeech, speechHash, spokenDelivery, spokenLanguage, spokenText } from "@/lib/speech";
+import { renderSpeech, speechHash, spokenDelivery, spokenLanguage, spokenText, spokenVoice } from "@/lib/speech";
 import { loadAudio, loadCase, saveAudio } from "@/lib/store";
 
 export const maxDuration = 30;
@@ -41,10 +41,11 @@ export async function GET(req: Request, ctx: RouteContext<"/api/cases/[id]/audio
   // The voice fits the case: read in the case's language, gently after bad news, brighter after good news.
   const language = spokenLanguage(c);
   const delivery = spokenDelivery(c);
-  const voice = { "x-spoken-language": language ?? "as written", "x-spoken-delivery": delivery };
+  // "premade" when this server's key cannot use AIDaddy's own voice (see spokenVoice in src/lib/speech.ts).
+  const voice = () => ({ "x-spoken-language": language ?? "as written", "x-spoken-delivery": delivery, "x-spoken-voice": spokenVoice() });
   const hash = speechHash(text, language, delivery);
   const stored = await loadAudio(id, hash);
-  if (stored) return audioResponse(req, stored, voice);
+  if (stored) return audioResponse(req, stored, voice());
 
   const key = `${id}-${hash}`;
   let job = rendering.get(key);
@@ -55,15 +56,17 @@ export async function GET(req: Request, ctx: RouteContext<"/api/cases/[id]/audio
     }
     job = renderSpeech(text, { language, delivery })
       .then(async (audio) => {
+        // Named after the voice that really spoke: the first rendering on a server without AIDaddy's own voice
+        // falls back to the premade one, and must not be stored under the own voice's name.
         // A failed save only means the next request renders again.
-        await saveAudio(id, hash, audio).catch(() => {});
+        await saveAudio(id, speechHash(text, language, delivery), audio).catch(() => {});
         return audio;
       })
       .finally(() => rendering.delete(key));
     rendering.set(key, job);
   }
   try {
-    return audioResponse(req, await job, voice);
+    return audioResponse(req, await job, voice());
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "speech failed" }, { status: 502 });
   }

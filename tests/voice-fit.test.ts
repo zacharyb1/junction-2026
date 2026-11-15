@@ -173,8 +173,8 @@ describe("when ElevenLabs says no", () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } })));
 
   it("names the short code of the answer, so the operator can read the cause", async () => {
-    answer(404, { detail: { type: "not_found", code: "voice_not_found", status: "voice_not_found", message: "A voice with voice_id 'x' was not found." } });
-    await expect(renderSpeech("Hello.")).rejects.toThrow("ElevenLabs answered 404 (voice_not_found)");
+    answer(400, { detail: { type: "invalid_request", code: "bad_request", status: "invalid_uid", message: "An invalid ID has been received: 'x'." } });
+    await expect(renderSpeech("Hello.")).rejects.toThrow("ElevenLabs answered 400 (invalid_uid)");
     answer(401, { detail: { status: "missing_permissions", message: "The API key you used is missing the permission text_to_speech" } });
     await expect(renderSpeech("Hello.")).rejects.toThrow("ElevenLabs answered 401 (missing_permissions)");
   });
@@ -187,12 +187,12 @@ describe("when ElevenLabs says no", () => {
   });
 
   it("gives the chat page its sentence and the operator the reason", async () => {
-    answer(404, { detail: { status: "voice_not_found" } });
+    answer(401, { detail: { status: "quota_exceeded" } });
     const res = await speak(new Request("https://aidaddy.example/api/aidaddy/speak", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "Hello there." }) }));
     expect(res.status).toBe(502);
     expect(await res.json()).toEqual({
       error: "AIDaddy lost its voice for a moment. The reply is still in the chat.",
-      reason: "ElevenLabs answered 404 (voice_not_found)",
+      reason: "ElevenLabs answered 401 (quota_exceeded)",
     });
   });
 });
@@ -228,5 +228,51 @@ describe("the voice id an operator typed", () => {
     }
     expect(sent).toHaveLength(5);
     for (const url of sent) expect(url).toContain(`/v1/text-to-speech/${AIDADDY_VOICE}?`);
+  });
+});
+
+describe("a server whose key does not own AIDaddy's voice", () => {
+  const OWN = "UWUOFJTWwuSmZFHzbMpM";
+  const PREMADE = "JBFqnCBsd6RMkjVDRZzb";
+  const asked: string[] = [];
+  beforeEach(() => {
+    asked.length = 0;
+    vi.resetModules();
+    vi.stubEnv("ELEVENLABS_API_KEY", "key-of-another-account");
+    vi.stubEnv("ELEVENLABS_VOICE_ID", "");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        asked.push(url.includes(OWN) ? "own" : url.includes(PREMADE) ? "premade" : "other");
+        if (url.includes(OWN)) {
+          return new Response(JSON.stringify({ detail: { status: "voice_not_found" } }), { status: 404, headers: { "content-type": "application/json" } });
+        }
+        return new Response(new Uint8Array([7, 7]), { headers: { "content-type": "audio/mpeg" } });
+      }),
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    vi.resetModules();
+  });
+
+  it("speaks with the voice every account has, and asks for the missing one only once", async () => {
+    const speech = await import("@/lib/speech");
+    expect(speech.spokenVoice()).toBe("own");
+    const before = speech.speechHash("Hello.");
+    expect((await speech.renderSpeech("Hello.")).length).toBe(2);
+    expect(asked).toEqual(["own", "premade"]);
+    expect(speech.spokenVoice()).toBe("premade");
+    // The rendering is named after the voice that really spoke, so it is never served as AIDaddy's own.
+    expect(speech.speechHash("Hello.")).not.toBe(before);
+    await speech.renderSpeech("Hello again.");
+    expect(asked).toEqual(["own", "premade", "premade"]);
+  });
+
+  it("still fails with the reason when the premade voice is refused too", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ detail: { status: "voice_not_found" } }), { status: 404 })));
+    const speech = await import("@/lib/speech");
+    await expect(speech.renderSpeech("Hello.")).rejects.toThrow("ElevenLabs answered 404 (voice_not_found)");
   });
 });
