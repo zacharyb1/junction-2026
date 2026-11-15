@@ -16,7 +16,7 @@ Send these as separate messages, without an @mention or a request to AIDaddy:
 
 The first two supply context. They should not start research; a first-time privacy note is okay. The third is the life event. It should produce a short start notice, then a sourced plan and a Case link. Research should use the earlier household facts and both cities without asking for them again. Any prepared letter stays a draft, waiting for the family to send it.
 
-Open the Case link. Check the plan, source quotes and recorded household facts. If the bot offers next actions, select **Not now** after the plan appears. A real research/provider failure is reported as a failure; do not replace it with a prerecorded success.
+Open the Case link. Check the plan, source quotes and recorded household facts. Any letter or email must follow a submission route supported by the sources. If the authority requires its own form or online service, the bot should link that procedure; optional preparation notes must be a checklist, not a substitute filing document or a send proposal. If the bot offers next actions, select **Not now** after the plan appears. A real research/provider failure is reported as a failure; do not replace it with a prerecorded success.
 
 ## Evidence and completion
 
