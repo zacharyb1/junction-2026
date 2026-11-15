@@ -20,6 +20,7 @@ const en = {
     details: "practical details",
     rule: "what the law or customs rule says",
     conditions: "limits, permits and penalties",
+    agent: "Exa Agent, research in several steps",
   },
 
   // Research trail.
@@ -30,6 +31,9 @@ const en = {
     `Pinned to ${j.name}. No official site list for this country yet, so searching the open web and labelling each source.`,
   searching: (official: boolean, focus: string) => `Exa search on ${official ? "official sites" : "the open web"}: ${focus}`,
   searchingNews: "Exa search on official sites: pages published in the last four months",
+  firstLook: (hosts: string[], seconds: string) => `Exa lite search, first look after ${seconds} s: ${hosts.join(", ")}`,
+  agentSearching: "Exa Agent: one run that searches, reads and reasons in several steps, official sites first",
+  agentFellBack: "The Exa Agent run did not return enough, so the usual Exa searches run as well",
   searchesSkipped: (failed: number, total: number) => `${failed} of ${total} searches failed and were skipped`,
   opening: (pages: number) => `Opening ${pages} cited pages: our own live request plus Exa Contents`,
   readBlocked: (pages: number) => `Read ${pages} blocked pages live through the Oxylabs Web API`,
@@ -92,6 +96,7 @@ const fi: Messages = {
     details: "käytännön tiedot",
     rule: "mitä laki tai tullisääntö sanoo",
     conditions: "rajat, luvat ja seuraamukset",
+    agent: "Exa Agent, monivaiheinen tutkimus",
   },
 
   pinnedOpen: (j) =>
@@ -101,6 +106,9 @@ const fi: Messages = {
     `Maa: ${inFinnish(j)}. Tälle maalle ei ole vielä virallisten sivustojen luetteloa, joten haku tehdään avoimesta verkosta ja jokaisesta lähteestä kerrotaan, onko se virallinen.`,
   searching: (official, focus) => `Exa-haku ${official ? "virallisilta sivustoilta" : "avoimesta verkosta"}: ${focus}`,
   searchingNews: "Exa-haku virallisilta sivustoilta: neljän viime kuukauden aikana julkaistut sivut",
+  firstLook: (hosts, seconds) => `Exa lite -haku, ensimmäinen silmäys ${seconds} sekunnissa: ${hosts.join(", ")}`,
+  agentSearching: "Exa Agent: yksi ajo, joka hakee, lukee ja päättelee useassa vaiheessa, viralliset sivustot ensin",
+  agentFellBack: "Exa Agent -ajo ei tuottanut tarpeeksi, joten myös tavalliset Exa-haut tehdään",
   searchesSkipped: (failed, total) => `${total} hausta ${failed} epäonnistui, ja ${failed === 1 ? "se" : "ne"} ohitettiin`,
   opening: (pages) =>
     `Avataan ${pages === 1 ? "1 lähdesivu" : `${pages} lähdesivua`} omalta palvelimeltamme ja Exa Contents -palvelun kautta`,
