@@ -42,6 +42,11 @@ function fakeBrowser(over: Partial<Effects> = {}) {
     notify: (title) => log.push(`notify:${title}`),
     pings: () => "on",
     askPings: async () => "on",
+    alarm(text, _language, done) {
+      log.push(`alarm:${text}`);
+      sayDone = done;
+      return () => done();
+    },
     say(_result, _language, done) {
       log.push("say");
       sayDone = done;
@@ -123,6 +128,40 @@ describe("the listening post", () => {
     expect(post.getSnapshot().speaking).toBeNull();
     expect(post.getSnapshot().status).toBe("listening");
     expect(post.getSnapshot().jobs[0].call).toBe("answered");
+  });
+
+  it("sounds the alarm on an emergency at once, sends nothing, and listens again when dismissed", async () => {
+    const browser = fakeBrowser();
+    const post = new ListeningPost(browser.fx);
+    post.start();
+    browser.say("help, dad is having a seizure");
+
+    const snapshot = post.getSnapshot();
+    expect(snapshot.lines.map((line) => line.tag)).toEqual(["emergency"]);
+    expect(snapshot.alarm).toMatchObject({ kind: "seizure", language: "en" });
+    expect(snapshot.status).toBe("paused");
+    expect(browser.log.find((entry) => entry.startsWith("alarm:"))).toMatch(/^alarm:Call 112 now\./);
+    expect(browser.log).toContain("notify:Call 112 now. I cannot call for you.");
+    expect(snapshot.jobs).toEqual([]);
+    await settle();
+    expect(browser.asked).toEqual([]);
+
+    post.dismissAlarm();
+    expect(post.getSnapshot().alarm).toBeNull();
+    expect(post.getSnapshot().status).toBe("listening");
+  });
+
+  it("stops a ringing call for an emergency", async () => {
+    const browser = fakeBrowser();
+    const post = new ListeningPost(browser.fx);
+    post.start();
+    browser.say("the landlord wants to raise the rent by twelve percent");
+    await settle();
+    expect(post.getSnapshot().ringing).not.toBeNull();
+    browser.say("hän ei hengitä");
+    expect(post.getSnapshot().ringing).toBeNull();
+    expect(post.getSnapshot().alarm).toMatchObject({ kind: "breathing", language: "fi" });
+    expect(browser.log.find((entry) => entry.startsWith("alarm:"))).toMatch(/^alarm:Soita 112 nyt\./);
   });
 
   it("pings when nothing is urgent", async () => {

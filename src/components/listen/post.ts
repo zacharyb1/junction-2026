@@ -1,4 +1,5 @@
 import type { EngineEvent, ResearchResult } from "@/lib/engine/research";
+import { detectEmergency, type EmergencyKind, emergencyReply, guessLanguage } from "@/lib/emergency";
 import { decide, DESKS, type Desk, importance, situation, type Trigger } from "@/lib/listen";
 
 /**
@@ -15,8 +16,11 @@ export type Line = {
   id: number;
   text: string;
   at: number;
-  /** small: stays on the device. event: sent to research. repeat: already being handled. rest: over the hourly limit. */
-  tag: "small" | "event" | "repeat" | "rest";
+  /**
+   * small: stays on the device. event: sent to research. repeat: already being handled. rest: over the hourly limit.
+   * emergency: the alarm went off on this device; nothing was sent.
+   */
+  tag: "small" | "event" | "repeat" | "rest" | "emergency";
 };
 
 export type Job = {
@@ -34,6 +38,9 @@ export type Job = {
   call?: "ringing" | "answered" | "missed" | "declined";
 };
 
+/** An emergency heard in the room: the page shows "call 112" and the first-aid steps until someone dismisses it. */
+export type Alarm = { kind: EmergencyKind; heard: string; at: number; language: Settings["language"] };
+
 export type Status = "off" | "listening" | "paused" | "denied" | "unsupported" | "trouble";
 
 export type Snapshot = {
@@ -50,6 +57,7 @@ export type Snapshot = {
   /** Notifications: ask (not decided), on, blocked, or none (this browser has none). */
   pings: "ask" | "on" | "blocked" | "none";
   settings: Settings;
+  alarm: Alarm | null;
 };
 
 export type Ears = { start(language: Settings["language"]): void; stop(): void };
@@ -89,6 +97,8 @@ export type Effects = {
   notify(title: string, body: string): void;
   pings(): Snapshot["pings"];
   askPings(): Promise<Snapshot["pings"]>;
+  /** Sound the alarm and read the emergency text aloud. Calls `done` when finished. Returns a function that stops it. */
+  alarm(text: string, language: Settings["language"], done: () => void): () => void;
   /** Read a result aloud. Calls `done` when finished. Returns a function that stops it. */
   say(result: ResearchResult, language: Settings["language"], done: () => void): () => void;
   load(): Partial<Settings>;
@@ -118,6 +128,7 @@ export const INITIAL: Snapshot = {
   speaking: null,
   pings: "none",
   settings: DEFAULTS,
+  alarm: null,
 };
 
 const NOTES = {
@@ -147,6 +158,7 @@ export class ListeningPost {
   private cancelRetry: (() => void) | null = null;
   private cancelRing: (() => void) | null = null;
   private stopSaying: (() => void) | null = null;
+  private stopAlarm: (() => void) | null = null;
 
   constructor(private readonly fx: Effects) {}
 
@@ -297,6 +309,13 @@ export class ListeningPost {
     if (previous && previous.text === text && now - previous.at < 2_000) return;
 
     const line: Line = { id: this.nextId++, text, at: now, tag: "small" };
+    const emergency = detectEmergency(text);
+    if (emergency) {
+      line.tag = "emergency";
+      this.set({ interim: "", lines: [...this.state.lines, line].slice(-KEEP_LINES) });
+      this.sound(emergency.kind, text, now);
+      return;
+    }
     const trigger = decide(text);
     if (trigger) {
       const busy = this.state.jobs.some((job) => job.kind === trigger.kind && (job.state === "collecting" || job.state === "working"));
@@ -353,6 +372,33 @@ export class ListeningPost {
     } finally {
       this.triggers.delete(id);
     }
+  }
+
+  // ---- an emergency: no research, no waiting ----
+
+  private sound(kind: EmergencyKind, heard: string, at: number) {
+    // The emergency goes before anything else: a ringing call or a plan being read out stops.
+    if (this.state.ringing !== null) this.endRing(this.state.ringing, "declined");
+    this.stopSaying?.();
+    this.stopAlarm?.();
+    const language = this.state.settings.language === "fi" || guessLanguage(heard) === "fi" ? "fi" : "en";
+    const reply = emergencyReply(kind, language);
+    this.set({ alarm: { kind, heard, at, language } });
+    this.fx.notify(reply.headline, reply.steps[0] ?? "");
+    this.hush();
+    let over = false;
+    this.stopAlarm = this.fx.alarm([reply.headline, ...reply.steps].join(" "), language, () => {
+      if (over) return;
+      over = true;
+      this.stopAlarm = null;
+      this.unhush();
+    });
+  }
+
+  /** Someone has seen the alarm: it goes quiet and the page listens again. */
+  dismissAlarm() {
+    this.stopAlarm?.();
+    this.set({ alarm: null });
   }
 
   // ---- coming back: a ping or a call ----

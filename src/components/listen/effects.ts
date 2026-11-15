@@ -266,6 +266,31 @@ export function browserEffects(): Effects {
       return pingsNow();
     },
 
+    alarm(text, language, done) {
+      // Three rising two-tone beeps, unlike the ring of a call, then the instructions in the browser's voice.
+      for (let i = 0; i < 3; i++) {
+        tone(880, i * 0.6, 0.25, 0.25);
+        tone(1320, i * 0.6 + 0.28, 0.25, 0.25);
+      }
+      navigator.vibrate?.([500, 200, 500, 200, 500]);
+      let stopVoice: (() => void) | null = null;
+      let over = false;
+      const finish = () => {
+        if (over) return;
+        over = true;
+        done();
+      };
+      const start = window.setTimeout(() => {
+        stopVoice = sayWithBrowserVoice(text, language, finish);
+      }, 1_900);
+      return () => {
+        window.clearTimeout(start);
+        navigator.vibrate?.(0);
+        stopVoice?.();
+        finish();
+      };
+    },
+
     say(result, language, done) {
       const text = spoken(result, language);
       let stopBrowserVoice: (() => void) | null = null;

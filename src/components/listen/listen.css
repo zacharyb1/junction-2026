@@ -44,3 +44,30 @@
   width: 100%;
   margin-top: 0.5rem;
 }
+
+/* The emergency alarm: the same screen as a call, in red, with one big button that dials 112 on a phone. */
+.listen-alarm {
+  background: rgb(60 8 8 / 0.75);
+}
+.listen-alarm-box {
+  border-color: #e5484d;
+  text-align: left;
+  justify-items: stretch;
+}
+.listen-alarm-eyebrow {
+  color: #ff6b6b;
+}
+.listen-alarm .listen-alarm-call {
+  min-height: 64px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: #e5484d;
+  border-color: #e5484d;
+  color: #fff;
+}
+.listen-alarm-steps {
+  display: grid;
+  gap: 0.4rem;
+  padding-left: 1.25rem;
+  list-style: decimal;
+}

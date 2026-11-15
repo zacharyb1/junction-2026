@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { aidaddyConfigured, chatUrl, cookieValue, readSession, SESSION_COOKIE, signSession } from "@/lib/aidaddy";
 import { mayResearch, readJson } from "@/lib/cases";
+import { detectEmergency, emergencyText, guessLanguage } from "@/lib/emergency";
 import { allow } from "@/lib/rate-limit";
 
 // An AIDaddy turn can include a full research run (about 10 to 40 seconds).
@@ -21,15 +22,24 @@ const WEB_CONTEXT =
 
 const json = (body: unknown, status: number) => Response.json(body, { status });
 
+/** A fixed reply in the same stream format as Hermes, so the chat page shows it like any other answer. */
+function fixedReply(text: string): Response {
+  const chunk = `data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\ndata: [DONE]\n\n`;
+  return new Response(chunk, { status: 200, headers: { "content-type": "text/event-stream", "cache-control": "no-store" } });
+}
+
 /**
  * Chat with AIDaddy from the /chat page. Forwards one message to the web-only Hermes instance
  * (OpenAI-compatible, streaming) and streams the reply back. The key stays on this server.
  * Each visitor's Hermes session lives in a signed, httpOnly cookie.
  */
 export async function POST(req: Request) {
-  if (!mayResearch(req)) return json({ error: "unauthorised" }, 401);
   const parsed = Input.safeParse(await readJson(req, 10_000).catch(() => null));
   if (!parsed.success) return json({ error: "Write a message of up to 1,500 characters." }, 400);
+  // An emergency gets the fixed "call 112" reply at once: no access code, no rate limit, no model, nothing to wait for.
+  const emergency = detectEmergency(parsed.data.message);
+  if (emergency) return fixedReply(emergencyText(emergency.kind, guessLanguage(parsed.data.message)));
+  if (!mayResearch(req)) return json({ error: "unauthorised" }, 401);
   if (!allow(req, false)) return json({ error: "AIDaddy is busy, try again in a minute." }, 429);
   if (!aidaddyConfigured()) return json({ error: "The chat runs on the team's server.", chatUrl: chatUrl() }, 503);
 

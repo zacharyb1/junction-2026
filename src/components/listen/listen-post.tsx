@@ -2,10 +2,11 @@
 
 import { type FormEvent, useState, useSyncExternalStore } from "react";
 import { browserEffects } from "@/components/listen/effects";
-import { INITIAL, type Job, type Line, ListeningPost, type Snapshot } from "@/components/listen/post";
+import { type Alarm, INITIAL, type Job, type Line, ListeningPost, type Snapshot } from "@/components/listen/post";
 import { useAccessCode } from "@/components/site/access-code";
 import { Core } from "@/components/site/core";
 import { TryResult } from "@/components/try-result";
+import { emergencyReply } from "@/lib/emergency";
 import { DESKS } from "@/lib/listen";
 
 const COUNTRIES = [
@@ -37,6 +38,7 @@ const TAGS: Record<Line["tag"], string> = {
   event: "Noticed: a matter for AIDaddy",
   repeat: "Let pass: already on it",
   rest: "Let pass: enough research for this half hour",
+  emergency: "Emergency: told the room to call 112",
 };
 
 const field = "h-11 w-full rounded-lg border border-input bg-input/30 px-3 text-base outline-none transition-colors focus-visible:border-ring md:text-sm";
@@ -105,6 +107,37 @@ function Call({ job, speaking, post }: { job: Job; speaking: boolean; post: List
             </button>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** An emergency heard in the room: call 112 first, then the steps. Over everything else on the page, until dismissed. */
+function EmergencyAlarm({ alarm, post }: { alarm: Alarm; post: ListeningPost }) {
+  const reply = emergencyReply(alarm.kind, alarm.language);
+  const fi = alarm.language === "fi";
+  return (
+    <div className="listen-call listen-alarm" role="alertdialog" aria-modal="true" aria-labelledby="listen-alarm-title">
+      <div className="listen-call-box listen-alarm-box">
+        <p className="site-eyebrow listen-alarm-eyebrow">{fi ? "Hätätilanne" : "Emergency"}</p>
+        <h2 id="listen-alarm-title" className="site-h2">
+          {reply.headline}
+        </h2>
+        <a className="site-btn listen-alarm-call" href="tel:112">
+          {fi ? "Soita 112" : "Call 112"}
+        </a>
+        <ol className="listen-alarm-steps">
+          {reply.steps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+        <p className="site-note">
+          {fi ? "Kuultu" : "Heard"} {clock(alarm.at)}: “{alarm.heard}”
+        </p>
+        <p className="site-note">{reply.note}</p>
+        <button type="button" className="site-btn listen-call-wide" onClick={() => post.dismissAlarm()}>
+          {fi ? "Sulje" : "Dismiss"}
+        </button>
       </div>
     </div>
   );
@@ -282,7 +315,8 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
         </section>
       </div>
 
-      {calling ? <Call job={calling} speaking={state.speaking === calling.id} post={post} /> : null}
+      {calling && !state.alarm ? <Call job={calling} speaking={state.speaking === calling.id} post={post} /> : null}
+      {state.alarm ? <EmergencyAlarm alarm={state.alarm} post={post} /> : null}
     </>
   );
 }
