@@ -74,8 +74,8 @@ function searchHeading(searches: Of<"search">[]) {
   if (!searches.length || back < searches.length) {
     return `Searching with Exa${searches.length ? `: ${back} of ${searches.length} back` : ""}`;
   }
-  // A failed search says so in its own row.
-  const done = searches.filter((s) => s.status === "done");
+  // A failed search says so in its own row. The first look (it names sites, not steps) proposes nothing.
+  const done = searches.filter((s) => s.status === "done" && !s.hosts);
   if (!done.length) return "No Exa search came back";
   const steps = done.reduce((sum, s) => sum + s.steps, 0);
   return `${done.length} Exa search${done.length === 1 ? "" : "es"} proposed ${count(steps, "step")}`;
@@ -102,7 +102,10 @@ function SearchRow({ search, busy }: { search: Of<"search">; busy: boolean }) {
         </span>
         <span className="ml-auto text-xs tabular-nums text-muted-foreground">
           {search.status === "done"
-            ? `${count(search.steps, "step")} · ${count(search.pages, "page")} · ${seconds(search.tookMs)}`
+            ? search.hosts?.length
+              ? // The first look proposes no steps: it names the sites it found, in well under a second.
+                `${search.hosts.join(", ")} · ${seconds(search.tookMs)}`
+              : `${count(search.steps, "step")} · ${count(search.pages, "page")} · ${seconds(search.tookMs)}`
             : search.status === "failed"
               ? "failed, skipped"
               : busy

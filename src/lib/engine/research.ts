@@ -64,6 +64,8 @@ export type EngineEvent =
       /** How long this one search took. */
       tookMs: number;
       ms: number;
+      /** The first look only (Exa's lite search): the sites it found. It proposes no steps, so its row names these. */
+      hosts?: string[];
     }
   /** One cited page, as soon as it has been read. `via` is the most direct reader that opened it. */
   | { type: "page"; url: string; title: string; official: boolean; via: PageReader; ms: number }
@@ -598,6 +600,44 @@ export async function researchCase(
 
   stage("plan", scope === "open" ? m.pinnedOpen(j) : official.length ? m.pinnedOfficial(j, official.length) : m.pinnedNoList(j));
 
+  /**
+   * A first look, back in well under a second: Exa's lite search names the pages most likely to matter while the
+   * structured searches run, so the family sees at once where the answer is being looked for. It feeds nothing
+   * into the plan: every plan line still comes from a structured search and is checked on its own page.
+   * A slow or failed first look is dropped and never holds the research up.
+   */
+  async function firstLook(): Promise<void> {
+    const began = Date.now();
+    const web = official.length ? ("official" as const) : ("open" as const);
+    const report = (status: "running" | "done" | "failed", pages = 0, hosts: string[] = []) =>
+      emit({ type: "search", focus: m.firstLook, web, status, steps: 0, pages, tookMs: Date.now() - began, ms: since(), hosts });
+    report("running");
+    try {
+      usage.searches++;
+      const res = (await exa.search(
+        `${clip(input.situation, 300)} ${where}`,
+        {
+          type: "lite",
+          numResults: 5,
+          contents: { highlights: true },
+          userLocation: j.code,
+          ...(official.length ? { includeDomains: official } : {}),
+        } as never,
+        { timeout: 4_000 } as never,
+      )) as unknown as ExaSearchResponse;
+      usage.costDollars += res.costDollars?.total ?? 0;
+      const found = (res.results ?? []).filter((r) => r.url && /^https?:\/\//.test(r.url));
+      const hosts = [...new Set(found.map((r) => hostOf(r.url)))].slice(0, 3);
+      if (found.length) {
+        trailEvents.push({ ms: since(), detail: m.firstLookDone(found.length, ((Date.now() - began) / 1000).toFixed(1), hosts.join(", ")) });
+      }
+      report("done", found.length, hosts);
+    } catch {
+      report("failed");
+    }
+  }
+  const looking = firstLook();
+
   let head: RawOutput = {};
   const questions: string[] = [];
   const given = `${input.situation}\n${input.document ?? ""}\n${input.household ?? ""}`;
@@ -816,6 +856,8 @@ export async function researchCase(
 
   // Open every cited page again, live.
   const urls = [...new Set(merged.flatMap((c) => [c.url, ...c.facts.map((f) => f.url)]))];
+  // The first look has long answered or been dropped by now; waiting here keeps its last event inside the stream.
+  await looking;
   stage("read", m.opening(urls.length));
   // Fast mode spends an Oxylabs read only on pages nothing else could open. Deep mode reads every blocked page live.
   const pages = await fetchPages(urls, { oxylabs: input.depth === "deep" ? "blocked" : "unread" }, (url, via) =>

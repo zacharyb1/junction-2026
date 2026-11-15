@@ -30,6 +30,10 @@ const en = {
     `Pinned to ${j.name}. No official site list for this country yet, so searching the open web and labelling each source.`,
   searching: (official: boolean, focus: string) => `Exa search on ${official ? "official sites" : "the open web"}: ${focus}`,
   searchingNews: "Exa search on official sites: pages published in the last four months",
+  // The first look: Exa's lite search, back in well under a second. Its name in the list of searches, and its line in the trail.
+  firstLook: "first look",
+  firstLookDone: (pages: number, seconds: string, hosts: string) =>
+    `First look with Exa's lite search: ${pages} ${pages === 1 ? "page" : "pages"} in ${seconds} s (${hosts})`,
   searchesSkipped: (failed: number, total: number) => `${failed} of ${total} searches failed and were skipped`,
   opening: (pages: number) => `Opening ${pages} cited pages: our own live request plus Exa Contents`,
   readBlocked: (pages: number) => `Read ${pages} blocked pages live through the Oxylabs Web API`,
@@ -101,6 +105,9 @@ const fi: Messages = {
     `Maa: ${inFinnish(j)}. Tälle maalle ei ole vielä virallisten sivustojen luetteloa, joten haku tehdään avoimesta verkosta ja jokaisesta lähteestä kerrotaan, onko se virallinen.`,
   searching: (official, focus) => `Exa-haku ${official ? "virallisilta sivustoilta" : "avoimesta verkosta"}: ${focus}`,
   searchingNews: "Exa-haku virallisilta sivustoilta: neljän viime kuukauden aikana julkaistut sivut",
+  firstLook: "ensisilmäys",
+  firstLookDone: (pages, seconds, hosts) =>
+    `Ensisilmäys Exan lite-haulla: ${pages} ${pages === 1 ? "sivu" : "sivua"} ${seconds} sekunnissa (${hosts})`,
   searchesSkipped: (failed, total) => `${total} hausta ${failed} epäonnistui, ja ${failed === 1 ? "se" : "ne"} ohitettiin`,
   opening: (pages) =>
     `Avataan ${pages === 1 ? "1 lähdesivu" : `${pages} lähdesivua`} omalta palvelimeltamme ja Exa Contents -palvelun kautta`,
