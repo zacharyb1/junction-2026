@@ -377,7 +377,7 @@ export function Readouts({ card }: { card: Scorecard }) {
       </ul>
       <p className="hud-note hud-reveal">
         Latest run of our own test set{ran ? `, ${ran}` : ""}. The web is live, so runs differ: recent runs passed 17 to 19 of{" "}
-        {card.totals.scenarios}. <Link href="/reading#scorecard">See every scenario and its case file →</Link>
+        {card.totals.scenarios}. <Link href="/scorecard">See every scenario and its case file →</Link>
       </p>
     </>
   );

@@ -29,40 +29,6 @@
   color: var(--hud-amber);
 }
 
-.demo-replay,
-.demo-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  padding: 0 1.1rem;
-  border: 1px solid var(--hud-line);
-  border-radius: 0.3rem;
-  background: rgb(79 216 255 / 0.05);
-  color: var(--hud-text);
-  font: 500 0.92rem / 1 var(--font-sans);
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    border-color 0.2s,
-    background-color 0.2s;
-}
-.demo-replay:hover,
-.demo-btn:hover {
-  border-color: var(--hud-cyan);
-  background: rgb(79 216 255 / 0.14);
-}
-.demo-btn--primary {
-  border-color: var(--hud-cyan);
-  background: var(--hud-cyan);
-  color: #03131c;
-  font-weight: 600;
-}
-.demo-btn--primary:hover {
-  background: #8ae6ff;
-}
-
 /* ---------- the links between the replays ---------- */
 
 .demo-nav {
@@ -87,7 +53,9 @@
   align-items: center;
   gap: 0.4rem;
   min-height: 44px;
-  font-size: 0.86rem;
+  font: 500 0.75rem / 1 var(--hud-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   white-space: nowrap;
   color: var(--hud-dim);
   text-decoration: none;
@@ -102,18 +70,39 @@
 }
 /* The replay you are on: colour and a line, so it does not depend on colour alone. */
 .demo-nav a[aria-current="page"] {
-  color: var(--hud-text);
+  color: var(--hud-cyan);
 }
 .demo-nav a[aria-current="page"]::after {
   content: "";
   position: absolute;
-  inset: auto 0 0;
-  height: 2px;
+  inset: auto 0 8px;
+  height: 1px;
   background: var(--hud-cyan);
 }
 
-/* On a phone the four names need the whole row, so the way back is the arrow alone. Its words stay for screen readers. */
+/* As in the header: tighter capitals on a phone. */
+@media (max-width: 639px) {
+  .demo-nav a {
+    letter-spacing: 0.06em;
+  }
+}
+.demo-nav-short {
+  display: none;
+}
+
+/* On a phone the four names need the whole row, so the way back is the arrow alone and each replay its short name.
+   The words stay for screen readers. */
 @media (max-width: 559px) {
+  .demo-nav a {
+    min-width: 44px;
+    justify-content: center;
+  }
+  .demo-nav-full {
+    display: none;
+  }
+  .demo-nav-short {
+    display: inline;
+  }
   .demo-nav-row {
     gap: 0 0.5rem;
   }
@@ -151,11 +140,6 @@
 }
 .demo-head h1 {
   margin-top: 0.5rem;
-  font-size: clamp(1.6rem, 4vw, 2.1rem);
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
 }
 .demo-story {
   max-width: 52ch;
@@ -215,11 +199,13 @@
     grid-column: 1;
   }
   .demo-page--wide .demo-controls {
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 2;
     grid-column: 2;
     margin-top: 0;
   }
-  .demo-page--wide .demo-story {
+  /* The story runs under the label, the title and the controls, so it stays one line. */
+  .demo-page--wide .demo-head .demo-story {
+    grid-column: 1 / -1;
     max-width: none;
   }
 
@@ -235,13 +221,8 @@
   .demo-page--framed.demo-page--phone .demo-head {
     grid-row: 1;
     grid-column: 1;
-    padding-top: 3.5rem;
-  }
-  .demo-page--framed.demo-page--phone .demo-head h1 {
-    font-size: clamp(2.1rem, 4vw, 2.9rem);
-  }
-  .demo-page--framed.demo-page--phone .demo-story {
-    font-size: 1.08rem;
+    /* The label stands as far under the links as every other page's label stands under the header. */
+    padding-top: calc(clamp(2.5rem, 6vw, 4rem) - 1.75rem);
   }
   .demo-page--framed.demo-page--phone .demo-controls {
     margin-top: 1.5rem;
@@ -282,16 +263,10 @@
   .demo-nav ul {
     gap: 0 0.5rem;
   }
-  .demo-nav a {
-    font-size: 0.8rem;
-  }
 }
 @media (max-width: 340px) {
   .demo-nav ul {
     gap: 0 0.3rem;
-  }
-  .demo-nav a {
-    font-size: 0.74rem;
   }
 }
 
@@ -324,27 +299,7 @@
 
 /* ---------- the programme at /demo ---------- */
 
-.demo-hub {
-  flex: 1;
-  padding-block: 3rem 4rem;
-}
-.demo-hub h1 {
-  margin-top: 0.75rem;
-  font-size: clamp(2.2rem, 7vw, 3.4rem);
-  font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-}
-.demo-hub-lede {
-  max-width: 58ch;
-  margin-top: 1rem;
-  font-size: 1.08rem;
-  line-height: 1.6;
-  color: var(--hud-dim);
-}
-
 .demo-programme {
-  margin-top: 2.5rem;
   border-bottom: 1px solid var(--hud-line);
   list-style: none;
 }
@@ -383,6 +338,14 @@
   inset: 0;
 }
 .demo-scene-row:hover h2 a {
+  color: var(--hud-cyan);
+}
+/* A keyboard on the row's link tints the row as the pointer does. */
+.demo-scene-row:focus-within {
+  background: var(--hud-fill);
+}
+.demo-scene-row:focus-within h2 a,
+.demo-scene-row:focus-within .demo-scene-go {
   color: var(--hud-cyan);
 }
 .demo-scene-text,
@@ -453,7 +416,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem 1.5rem;
-  margin-top: 2.5rem;
 }
 .demo-hub-next p {
   margin-right: auto;
@@ -466,8 +428,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .demo-replay,
-  .demo-btn,
   .demo-nav a,
   .demo-scene-row,
   .demo-scene-go {

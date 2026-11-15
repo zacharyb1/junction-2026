@@ -18,7 +18,10 @@
     radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.35) 0 2px, transparent 3px),
     radial-gradient(circle at 70% 60%, rgb(255 255 255 / 0.3) 0 2px, transparent 3px);
   background-size: 46px 46px, 38px 38px;
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
+  box-shadow:
+    0 0 0 1px rgb(79 216 255 / 0.22),
+    0 0 60px rgb(79 216 255 / 0.1),
+    0 30px 80px rgb(0 0 0 / 0.5);
   color: #111;
 }
 

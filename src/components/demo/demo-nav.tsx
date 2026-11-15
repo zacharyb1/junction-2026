@@ -11,13 +11,27 @@ export function DemoNav({ current }: { current: SceneSlug }) {
           <span className="demo-nav-back-text">All demos</span>
         </Link>
         <ul>
-          {REPLAY_ORDER.map((slug) => (
-            <li key={slug}>
-              <Link href={REPLAYS[slug].href} aria-current={slug === current ? "page" : undefined}>
-                {REPLAYS[slug].nav}
-              </Link>
-            </li>
-          ))}
+          {REPLAY_ORDER.map((slug) => {
+            const { href, nav, navShort } = REPLAYS[slug];
+            // Under 560px the short name shows; the full name stays the link's name for screen readers.
+            const short = navShort && navShort !== nav ? navShort : undefined;
+            return (
+              <li key={slug}>
+                <Link href={href} aria-current={slug === current ? "page" : undefined} aria-label={short ? nav : undefined}>
+                  {short ? (
+                    <>
+                      <span className="demo-nav-full">{nav}</span>
+                      <span className="demo-nav-short" aria-hidden="true">
+                        {short}
+                      </span>
+                    </>
+                  ) : (
+                    nav
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </nav>

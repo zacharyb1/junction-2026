@@ -14,7 +14,10 @@
   overflow: hidden;
   border-radius: 30px;
   background: #0f1720;
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.55);
+  box-shadow:
+    0 0 0 1px rgb(79 216 255 / 0.22),
+    0 0 60px rgb(79 216 255 / 0.1),
+    0 30px 80px rgb(0 0 0 / 0.5);
   color: #eef3f8;
 }
 .tdemo-status {

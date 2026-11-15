@@ -14,7 +14,7 @@ These work today. Each has a note you can paste into the form.
 
 - **Why it fits:** this is the challenge the product was built for.
 - **Note to paste:**
-  > AIDaddy is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web: 19 of 19 scenarios, 98 of 98 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 5.6 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
+  > AIDaddy is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web, on the Verda server: 17 of 19 scenarios, 95 of 95 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 7.4 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
 - **Evidence:** `src/data/scorecard.json`, `eval/results/latest.md`, the front page replay.
 
 ### - [ ] NVIDIA: Best Use of Nemotron

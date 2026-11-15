@@ -27,7 +27,6 @@ export const viewport: Viewport = { themeColor: "#05080d" };
  * the plan, the places AIDaddy works, the proof. It is also the entrance to every other page of the site.
  * Every figure on it is read from a file a script wrote:
  * src/data/replay.json (one recorded run, see scripts/make-replay.mjs) and src/data/scorecard.json (the eval harness).
- * The calmer "reading table" edition of this page lives at /reading.
  */
 export default async function Home() {
   const { botUsername, sampleCaseHref } = landingConfig();

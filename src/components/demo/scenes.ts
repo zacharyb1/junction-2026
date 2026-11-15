@@ -11,6 +11,8 @@ export type Scene = {
   href: string;
   /** The short name in the links between the replays. */
   nav: string;
+  /** The shortest name, for those links on a narrow phone (under 560px). */
+  navShort?: string;
   /** The name on the hub. */
   place: string;
   /** The heading on the scene's own page. */
@@ -29,8 +31,9 @@ export const REPLAYS: Record<SceneSlug, Scene> = {
   chat: {
     href: "/demo/chat",
     nav: "Group chat",
+    navShort: "Chat",
     place: "In the group chat",
-    title: "AIDaddy in the family group chat",
+    title: "AIDaddy in the group chat",
     story: "A family shares big news. AIDaddy stays silent through the small talk, then answers with a plan in four steps.",
     real: "Fictional family. The plan, its sources and the case link come from a real run.",
     tag: "Plan from a real run",
@@ -40,6 +43,7 @@ export const REPLAYS: Record<SceneSlug, Scene> = {
   browser: {
     href: "/demo/browser",
     nav: "Browser",
+    navShort: "Browser",
     place: "In the browser",
     title: "AIDaddy in the browser",
     story: "Someone is stuck on a tax form. AIDaddy shows what the rule says and corrects the form. Submitting stays with the person.",
@@ -51,6 +55,7 @@ export const REPLAYS: Record<SceneSlug, Scene> = {
   talk: {
     href: "/demo/talk",
     nav: "Kitchen table",
+    navShort: "Table",
     place: "At the kitchen table",
     title: "AIDaddy at the kitchen table",
     story: "Two people talk about a rent increase. AIDaddy checks the rules in the background while they go on talking.",
@@ -62,6 +67,7 @@ export const REPLAYS: Record<SceneSlug, Scene> = {
   calendar: {
     href: "/demo/calendar",
     nav: "Calendar",
+    navShort: "Calendar",
     place: "In the calendar",
     title: "AIDaddy in the calendar",
     story: "A 60th birthday is two weeks away. AIDaddy finds three options, drafts the invitation and books nothing.",

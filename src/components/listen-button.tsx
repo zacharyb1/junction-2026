@@ -50,7 +50,7 @@ export function ListenButton({
         </Button>
       )}
       {state === "error" && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="site-row site-row--amber site-status">
           {errorLabel}
         </p>
       )}

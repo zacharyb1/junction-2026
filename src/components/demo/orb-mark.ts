@@ -1,0 +1,3 @@
+/** AIDaddy's face at small sizes (DESIGN.md, "Small mark"), as an address an <img> can show. */
+const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><radialGradient id="g"><stop offset="0" stop-color="#e6f9ff"/><stop offset="0.35" stop-color="#4fd8ff"/><stop offset="1" stop-color="#4fd8ff" stop-opacity="0"/></radialGradient></defs><circle cx="16" cy="16" r="16" fill="#05080d"/><circle cx="16" cy="16" r="11.5" fill="none" stroke="#4fd8ff" stroke-width="2.6" stroke-dasharray="39 7.5 17 8.76" transform="rotate(-62 16 16)"/><circle cx="16" cy="16" r="7" fill="url(#g)"/><circle cx="16" cy="16" r="2.6" fill="#f2fcff"/></svg>`;
+export const ORB_MARK = `data:image/svg+xml,${encodeURIComponent(SVG)}`;

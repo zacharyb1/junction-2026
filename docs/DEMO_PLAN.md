@@ -26,11 +26,11 @@ One laptop shows the front page. One phone is in the presenter's hand.
 |---|---|---|
 | 0:00 | Front page, first screen | "This is AIDaddy. It lives in your family's group chat, and most days it says nothing." |
 | 0:10 | Scroll to the chat. Messages pass, then the pregnancy message. | "Dinner, keys, who picks up the kids. A small model on the family's own machine lets that pass. Then this." |
-| 0:25 | The research replay runs: 8.7 seconds | "This is a real run at its real speed. Four Exa searches on Finland's official sites. Six pages opened again by our own server. Eleven quotes looked up on those pages." |
+| 0:25 | The research replay runs: 7.6 seconds | "This is a real run at its real speed. Four Exa searches on Finland's official sites. Six pages opened again by our own server. Nine quotes looked up on those pages." |
 | 0:45 | The plan. Tap source 5. | "Four steps, three deadlines. Tap a number: Kela's page, at the sentence." |
 | 0:55 | Press "Hear the plan" for five seconds | "It can read the plan to you. It says only what the file shows." |
 | 1:05 | Hand over the phone, `/try` open | "Now yours. What happened, and in which country?" |
-| 1:35 | While it runs: the four gauges | "We test it on the live web: 19 of 19 scenarios in the latest run, 98 of 98 quotes found, and 6 of 6 messages with nothing to research were refused. Recent runs passed 17 to 19." |
+| 1:35 | While it runs: the four gauges | "We test it on the live web: 17 of 19 scenarios in the latest run, 95 of 95 quotes found, and 6 of 6 messages with nothing to research were refused. Recent runs passed 17 to 19." |
 | 1:50 | Telegram: the bot in the family group | "And this is where it lives. It never sends, files, books or pays. You decide." |
 
 **If the bot is not online by the rehearsal at 16:00:** the last line is shown from a recorded clip, and the presenter says it is a recording.
@@ -56,7 +56,7 @@ Same order as the table above, without the judge's turn:
 - **QR code 1:** the front page address with the access code, so `/try` opens without typing. Print it large.
 - **QR code 2:** the Telegram bot, only if the bot is online and renamed.
 - **Phone:** on mobile data, not venue Wi-Fi. Keep one stored case file open in a tab.
-- **A card with the one sentence** and the three numbers: 19 of 19, 98 of 98, 6 of 6.
+- **A card with the one sentence** and the three numbers: 17 of 19, 95 of 95, 6 of 6.
 
 ## 6. Questions judges ask
 

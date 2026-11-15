@@ -589,7 +589,7 @@
   color: var(--hud-dim);
 }
 .hud-quiet-state[data-awake="true"] {
-  color: var(--hud-amber);
+  color: var(--hud-cyan);
 }
 
 .hud-gate {
@@ -1221,6 +1221,7 @@
 }
 .hud-start-panel > div:last-child {
   display: grid;
+  align-content: center;
   gap: 1rem;
   justify-items: center;
 }
@@ -1275,16 +1276,20 @@
 .hud-autopilot {
   display: grid;
   gap: 1.25rem;
-  max-width: 48rem;
   padding: clamp(1rem, 3vw, 1.5rem);
 }
 .hud-autopilot-consent {
   display: grid;
   gap: 0.75rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--hud-line);
+  border-bottom: 1px solid var(--hud-line-soft);
   font-size: 0.92rem;
   color: var(--hud-dim);
+}
+.hud-autopilot-consent input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--hud-cyan);
 }
 .hud-autopilot-consent label {
   display: inline-flex;
@@ -1336,12 +1341,15 @@
 .hud .hud-autopilot-status--live {
   color: var(--hud-green);
 }
+.hud .hud-autopilot-status--run {
+  color: var(--hud-cyan);
+}
 .hud-autopilot-pulse {
   flex: none;
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: var(--hud-amber);
+  background: var(--hud-cyan);
 }
 @media (prefers-reduced-motion: no-preference) {
   .hud-autopilot-pulse {
@@ -1367,7 +1375,7 @@
   min-width: 0;
   min-height: 44px;
   padding: 0 0.75rem;
-  border: 1px solid var(--hud-line);
+  border: 1px solid var(--input);
   border-radius: 3px;
   background: rgb(79 216 255 / 0.05);
   color: var(--hud-text);
@@ -1381,30 +1389,23 @@
 .hud-autopilot-after {
   margin-top: 1.5rem;
 }
+/* A disabled button does not answer the pointer. */
+.hud .hud-btn:is(:disabled, [aria-disabled="true"]) {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.hud .hud-btn:is(:disabled, [aria-disabled="true"]):hover {
+  border-color: var(--hud-line);
+  background: rgb(79 216 255 / 0.05);
+  box-shadow: none;
+}
+.hud .hud-btn--primary:is(:disabled, [aria-disabled="true"]):hover {
+  border-color: var(--hud-cyan);
+  background: var(--hud-cyan);
+}
 /* ---------- /setup (issue #42, mockup) ---------- */
 
-.hud-setup {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding-block: clamp(2.5rem, 6vw, 4rem) clamp(3.5rem, 9vw, 7rem);
-}
-.hud-setup-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1.25rem;
-}
-.hud-setup-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 1px solid var(--hud-line);
-  box-shadow: 0 0 0 4px rgb(79 216 255 / 0.08);
-}
-.hud .hud-setup-h1 {
-  margin-block: 0.5rem 0.75rem;
-}
 .hud-setup-grid {
   display: grid;
   gap: 1.25rem;

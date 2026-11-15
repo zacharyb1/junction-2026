@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AIDaddyChat } from "@/components/aidaddy-chat";
 import { landingConfig } from "@/components/site/config";
+import { PageHead } from "@/components/site/page-head";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
 import { demoCodeRequired } from "@/lib/cases";
@@ -22,36 +23,26 @@ export default async function ChatPage({ searchParams }: PageProps<"/chat">) {
   const code = typeof params.code === "string" ? params.code.trim() : "";
   // The same bot as on the front page when it is configured there; otherwise the team's bot.
   const bot = landingConfig().botUsername ?? "junction_kaveri_bot";
-  const link = "text-foreground underline underline-offset-4 hover:text-primary";
   return (
     <SiteShell>
-      {/* The same column and the same head as /try and the case file. */}
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-10 sm:py-14">
-        <header className="flex flex-col gap-3">
-          <p className="site-eyebrow">One step ahead</p>
-          <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/aidaddy-avatar.svg" alt="" width={48} height={48} className="size-12 rounded-full border" />
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Talk to AIDaddy</h1>
-          </div>
-          <p className="leading-relaxed text-muted-foreground">
-            Tell AIDaddy about a life event or an official letter, and it answers with a plan and quotes from official
-            pages.
+      {/* The same wrap, head and split as /try and the case file: the work at the left, the orb at the right. */}
+      <main className="site-wrap site-page">
+        <div className="site-split site-split--three">
+          <PageHead
+            label="One step ahead"
+            title="Talk to AIDaddy"
+            lede="Tell AIDaddy about a life event or an official letter, and it answers with a plan and quotes from official pages."
+          />
+          <AIDaddyChat code={code} needsCode={demoCodeRequired()} />
+          <p className="site-note">
+            Prefer Telegram?{" "}
+            <a href={`https://t.me/${bot}`} target="_blank" rel="noreferrer">
+              Add AIDaddy to your group
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            . Or <SiteLink href="/try">run one research case</SiteLink> without the chat.
           </p>
-        </header>
-        <AIDaddyChat code={code} needsCode={demoCodeRequired()} />
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Prefer Telegram?{" "}
-          <a href={`https://t.me/${bot}`} target="_blank" rel="noreferrer" className={link}>
-            Add AIDaddy to your group
-            <span className="sr-only"> (opens in a new tab)</span>
-          </a>
-          . Or{" "}
-          <SiteLink href="/try" className={link}>
-            run one research case
-          </SiteLink>{" "}
-          without the chat.
-        </p>
+        </div>
       </main>
     </SiteShell>
   );
