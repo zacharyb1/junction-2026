@@ -184,3 +184,26 @@ export function emergencyWords(kind: Emergency, language: Language, number: stri
 export function emergencySpeech(kind: Emergency, language: Language, number: string): string {
   return WORDS[kind][language].lines.map((line) => line.replaceAll("{n}", SAID[language][number] ?? number)).join(" ");
 }
+
+/** Finnish when the sentence has Finnish letters or words, so the reply is in the language that was used. */
+function languageOf(text: string): Language {
+  return /[äö]|(?:^|\s)(?:ei|on|hän|soita|soittakaa|apua|joku)(?:\s|$)/i.test(text) ? "fi" : "en";
+}
+
+/**
+ * The web chat's reply to an emergency, or null: the same fixed words as /listen, with 112 (the chat does not know
+ * the visitor's country) and the Red Cross page they follow. Sent before the access code, rate limit or model.
+ */
+export function emergencyChatReply(text: string): string | null {
+  const kind = emergencyIn(text);
+  if (!kind) return null;
+  const language = languageOf(text);
+  const { lines } = emergencyWords(kind, language, "112");
+  const cannot = language === "fi" ? "En voi soittaa puolestasi." : "I cannot call for you.";
+  const note =
+    language === "fi"
+      ? "Olen keksitty apuri, en hätäpalvelu. Ohjeet:"
+      : "I am a made-up helper, not an emergency service. The steps follow:";
+  const [call, ...steps] = lines;
+  return [`${call} ${cannot}`, "", ...steps.map((step) => `- ${step}`), "", `${note} ${SOURCES[kind].url}`].join("\n");
+}

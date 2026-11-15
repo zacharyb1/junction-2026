@@ -9,7 +9,9 @@ Fri 23:15):
   - the gate is down or too slow  -> the runbook's wake patterns alone decide,
                                      never "let every message through"
 
-Order: rules (addressed, command, attachment), then wake patterns, then the model.
+Order: rules (emergency, addressed, command, attachment), then wake patterns, then the model.
+An emergency (a seizure, someone not breathing, a fire) always wakes the bot and expects a reply:
+SOUL.md answers it at once with "call 112" and first-aid steps, without research.
 
 Standard library only, no Hermes imports, so eval/gate/run.py can call it directly.
 """
@@ -68,6 +70,44 @@ SHOTS = [
 BOT_NAME = re.compile(
     r"(?<!\w)(ai ?daddy(n|a|ä|lle|lla|llä|lta|ltä|ssa|ssä|sta|stä|yn|na|nä|ksi)?(kin|kaan|kään|han|hän|ko|kö|pa|pä)?"
     r"|ukk|kaveri)(?!\w)",
+    re.IGNORECASE,
+)
+
+
+# Emergencies, English, Finnish and Swedish. Wider on purpose than src/lib/emergency.ts (/listen and the web chat):
+# a wake costs one model turn, a missed emergency much more. SOUL.md (Emergency first) decides what is said, and
+# still treats a figure of speech or a past event as ordinary talk.
+EMERGENCY = re.compile(
+    r"(?<!\w)("
+    # seizure
+    r"seizures?|seizing|convuls\w*|epileptic (fit|attack)|having a fit|kourist\w*|epilepsiakohtau\w*|kaatumakohtau\w*|kramp(er|anfall)\w*"
+    # breathing, unconscious, collapsed
+    r"|not breathing|stopped breathing|can'?t breathe|cannot breathe|unconscious|unresponsive|collapsed on the floor"
+    r"|(he|she|they|someone|somebody|mum|mom|dad|grandma|grandpa|granny|my \w+) (has |just |suddenly )?(collapsed|passed out|fainted)"
+    r"|won'?t wake up|not waking up|no pulse|cardiac arrest"
+    r"|ei hengitä|lakkasi hengittämästä|ei saa henkeä|tajuton\w*|menetti tajuntansa|pyörty\w*|lyyhisty\w*|ei herää|ei reagoi"
+    r"|andas inte|medvetslös|svimma\w*"
+    # choking
+    r"|chok(e|es|ed|ing)|tukehtu\w*|meni henkeen|jäi kurkkuun|sätter i halsen|kvävs"
+    # heart and stroke
+    r"|chest pain|heart attack|rintakip\w*|sydänkohtau\w*|sydäninfarkt\w*|bröstsmärt\w*|hjärtinfarkt\w*"
+    r"|having a stroke|had a stroke|(face|mouth) (is )?drooping|slurr\w* (speech|words)|speech is slurred"
+    r"|aivoinfarkt\w*|aivoveritulp\w*|aivohalvau\w*|puhe sammaltaa|suupieli roikkuu"
+    # bleeding
+    r"|bleeding (heavily|a lot|badly|everywhere|so much)|(won'?t|will not|doesn'?t|does not) stop bleeding|lots of blood|so much blood"
+    r"|vuotaa paljon verta|verenvuoto ei (lakkaa|lopu)|runsas verenvuoto|paljon verta|blöder mycket"
+    # allergy
+    r"|anaphyla\w*|allergic reaction|(throat|tongue|lips?) (is |are )?swell\w*|epi-?pen|anafyla\w*|allerginen reaktio|adrenaliinikynä"
+    # poison
+    r"|swallowed (some |the |a )?(pills|tablets|bleach|medicine|detergent|batter\w+|button batter\w+|poison)"
+    r"|(was|been|got|is|are) poisoned|overdos\w*|myrkyty\w*|yliannost\w*|förgiftning\w*"
+    # fire and drowning
+    r"|(house|home|kitchen|apartment|flat|building|room|car) (is )?on fire|there'?s a fire|caught fire|smoke everywhere"
+    r"|tulipalo\w*|(talo|keittiö|asunto|rappu|auto) palaa|syttyi palamaan|det brinner|drowning|drowned|hukku\w*|drunkn\w*"
+    # asking for help
+    r"|call (an|the) ambulance|need an ambulance|call 112|call 911|medical emergency|(it'?s|this is) an emergency"
+    r"|soita(kaa)? 112|ambulanss\w*|hätätilanne|ring 112|ambulans"
+    r")(?!\w)",
     re.IGNORECASE,
 )
 
@@ -141,7 +181,9 @@ def decide(
         return Decision(wake, source, label, int((time.monotonic() - started) * 1000), error)
 
     text = (text or "").strip()
-    # Rules that need no model.
+    # Rules that need no model. An emergency goes first, so it is labelled as one even when addressed.
+    if EMERGENCY.search(text):
+        return done(True, "rule", "emergency")
     if addressed or BOT_NAME.search(text):
         return done(True, "rule", "addressed")
     if text.startswith("/"):
