@@ -28,3 +28,13 @@ An optional final argument selects `chat`, `browser`, `talk`, `calendar` or `cal
 The recorder uses a temporary named browser session, reads each scene's duration from its source, captures `?bare=1` with the original phone or desktop viewport, and scales the complete frame into H.264 MP4. It blocks API and external requests, so recording cannot run research or contact a calling provider. Review the rendered captions and branding after recording; the source branding check cannot read words inside video pixels.
 
 The recordings of 15 November were not made with this recorder: its browser session did not start in the cloud session they were made in. They were captured with Playwright's own video recording from the same `?bare=1` pages, with the same viewports, sizes and frame rate, and with API and external requests blocked in the same way.
+
+## Pitch deck
+
+[aidaddy-pitch-deck.pdf](aidaddy-pitch-deck.pdf) is the ten-slide deck for the submission form; the form's text is in [../SUBMISSION_TEXT.md](../SUBMISSION_TEXT.md). Rebuild it with:
+
+```sh
+node scripts/make-deck.mjs
+```
+
+The script photographs the live site into `deck/img`, reads every figure from the result files (`src/data/scorecard.json`, `eval/results/gate-gemma3-1b.json`, `src/data/replay.json`), writes `deck/deck.html` and prints the PDF. `--no-shots` keeps the existing pictures, `--base` points it at another server, and it reports any slide that is too full.
