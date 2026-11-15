@@ -15,7 +15,7 @@ describe("setup page connections", () => {
     expect(CONNECTIONS.filter((c) => c.status === "live").map((c) => c.id)).toEqual(["telegram"]);
     const voice = CONNECTIONS.find((c) => c.id === "voice");
     expect(voice?.limits).toMatch(/while the page is open/);
-    expect(voice?.limits).toMatch(/cannot listen from a locked phone/);
+    expect(voice?.limits).toMatch(/stops when the screen locks/);
     expect(CONNECTIONS.find((c) => c.id === "browser")?.limits).toMatch(/not in the Chrome Web Store/);
   });
 

@@ -254,10 +254,10 @@ const PLACES: Place[] = [
   {
     status: "First version",
     name: "At the kitchen table",
-    text: "A phone or a laptop stays open in the room. AIDaddy follows the talk, lets small talk pass, and looks things up when it hears a matter. It listens while its page is open.",
+    text: "A phone or a laptop lies on the table with the listening page open. It hears a life event, researches it on its own, and comes back with a call or a ping. It listens only while that page is open.",
     links: [
+      { href: "/listen", label: "Start listening" },
       { href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" },
-      { href: "/listen", label: "Let it listen" },
     ],
   },
   {

@@ -80,7 +80,7 @@ export default async function Home() {
             index="04"
             label="Where it works"
             title="One butler, wherever the household is."
-            lede="AIDaddy works in the Telegram group chat and in a chat on this site. Listening in the room and the browser extension are first versions you can switch on today. The calendar is an idea, shown as a scripted replay that says so."
+            lede="Today AIDaddy works in the Telegram group chat, in a chat on this site, and as a listening page you leave open on a device. The browser extension is a first version you can download. The calendar is an idea, shown as a scripted replay that says so."
           >
             <Places />
           </Section>

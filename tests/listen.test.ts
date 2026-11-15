@@ -1,92 +1,117 @@
 import { describe, expect, it } from "vitest";
-import patterns from "@/data/wake-patterns.json";
-import { hear, sameMatter, situation, spell } from "@/lib/listen";
-import { wakePatterns } from "../scripts/make-listen-data.mjs";
+import { decide, DESKS, hasDeadline, importance, isAddressed, situation, spoken, withoutName } from "@/lib/listen";
 
-describe("what the listening page lets pass", () => {
-  // The promise on the page: small talk stays on the device.
-  it.each([
-    "what should we eat tonight",
-    "see you at seven",
-    "did you feed the cat already",
-    "the game was great yesterday",
-    "can you pick up milk on the way home",
-    "mennäänkö kävelylle illalla",
-  ])("lets small talk pass: %s", (sentence) => {
-    expect(hear(sentence)).toEqual({ wake: false, why: "small talk" });
+describe("what the listening post makes of a sentence", () => {
+  it("leaves small talk alone", () => {
+    for (const text of ["what's for dinner", "did you buy milk", "who picks up the kids today", "lol that video was great", "see you at seven", "mennäänkö kävelylle"]) {
+      expect(decide(text), text).toBeNull();
+    }
   });
 
-  it("lets a word or two pass, and a thank you to its name", () => {
-    expect(hear("okay then").wake).toBe(false);
-    expect(hear("Thanks, AI Daddy")).toEqual({ wake: false, why: "too short" });
-  });
-});
-
-describe("what the listening page notices", () => {
-  it.each([
-    "The landlord sent a letter, they want to raise the rent",
-    "I got a parking ticket today",
-    "my flight to Berlin was cancelled this morning",
-    "I think I am pregnant",
-    "they laid off half the team, I lost my job",
-    "Migristä tuli päätös tänään",
-    "can we bring snus back from Sweden",
-  ])("notices life admin: %s", (sentence) => {
-    expect(hear(sentence)).toEqual({ wake: true, why: "life admin" });
+  it("hears a life event without being asked", () => {
+    expect(decide("I'm pregnant, took two tests this morning")).toMatchObject({ kind: "family", desk: "life", urgent: false, addressed: false });
+    expect(decide("the landlord wants to raise the rent by twelve percent")).toMatchObject({ kind: "rent", desk: "legal" });
+    expect(decide("I got a letter from the tax office about back taxes")).toMatchObject({ kind: "tax", desk: "finance" });
+    expect(decide("we are moving to Tampere in March")).toMatchObject({ kind: "moving", desk: "life" });
+    expect(decide("do we still get housing allowance from Kela")).toMatchObject({ kind: "benefit", desk: "finance" });
   });
 
-  it("notices its name with a matter behind it, as speech to text writes the name", () => {
-    expect(hear("AI Daddy, what do we owe the housing company")).toEqual({ wake: true, why: "said its name" });
+  it("marks what cannot wait as urgent", () => {
+    expect(decide("our flight to Lisbon was cancelled an hour ago")).toMatchObject({ kind: "travel", desk: "travel", urgent: true });
+    expect(decide("they cancelled the train again")).toMatchObject({ kind: "travel", urgent: true });
+    expect(decide("I got laid off today")).toMatchObject({ kind: "job-loss", urgent: true });
+    expect(decide("we got an eviction notice")).toMatchObject({ kind: "eviction", desk: "legal", urgent: true });
+    expect(decide("I got a parking ticket outside the school")).toMatchObject({ kind: "fine", urgent: true });
+    expect(decide("the baby has a fever again")).toMatchObject({ kind: "sick-child", urgent: true });
   });
 
-  // Nobody asks a question here. This is the case the page exists for.
-  it.each(["I'll just bring ten cartons of cigarettes from Tallinn", "we can just sublet the flat while we are away", "I'm not going to declare that income"])(
-    "notices a plan that has rules: %s",
-    (sentence) => {
-      expect(hear(sentence)).toEqual({ wake: true, why: "a plan with rules" });
-    },
-  );
-
-  it("uses the Telegram gate's wake patterns, unchanged", async () => {
-    expect(patterns).toEqual(await wakePatterns());
-    expect(patterns.length).toBeGreaterThan(5);
-  });
-});
-
-describe("the research question", () => {
-  it("is the room's own words, in the order they were said", () => {
-    expect(situation(["The landlord sent a letter", "they want to raise the rent by 80 euros from January"])).toBe(
-      "The landlord sent a letter. they want to raise the rent by 80 euros from January.",
-    );
+  it("hears Finnish", () => {
+    expect(decide("olen raskaana")).toMatchObject({ kind: "family" });
+    expect(decide("vuokranantaja lähetti kirjeen vuokrankorotuksesta")).toMatchObject({ kind: "rent", desk: "legal" });
+    expect(decide("lento Helsinkiin on peruttu")).toMatchObject({ kind: "travel", urgent: true });
+    expect(decide("sain pysäköintivirhemaksun")).toMatchObject({ kind: "fine", urgent: true });
+    expect(decide("verokortti pitää tilata")).toMatchObject({ kind: "tax", desk: "finance" });
+    expect(decide("Migristä tuli päätös oleskeluluvasta")).toMatchObject({ kind: "permit" });
   });
 
-  it("asks whether a plan is allowed when nobody asked", () => {
-    expect(situation(["I'll just bring ten cartons of cigarettes from Tallinn"])).toBe(
-      "I'll just bring ten cartons of cigarettes from Tallinn. Is it allowed, and what are the rules?",
-    );
-    // The question is already in the words: nothing is added.
-    expect(situation(["can we just sublet the flat while we are away?"])).toBe("can we just sublet the flat while we are away?");
+  it("does not match a word that only contains a trigger", () => {
+    expect(decide("the visage of that actor")).toBeNull();
+    expect(decide("skeleton costumes for everyone")).toBeNull(); // "kela" inside a word
+    expect(decide("she is training for a marathon")).toBeNull();
   });
 
-  it("spells the name the way the product does", () => {
-    expect(spell("hey AI Daddy, a letter came")).toBe("hey AIDaddy, a letter came");
-    expect(situation(["ai daddy what about the tax card"])).toBe("AIDaddy what about the tax card.");
+  it("knows its name, as written and as speech recognition hears it", () => {
+    for (const text of ["AIDaddy, what do I do about my passport", "hey AI Daddy can you check this", "ok A.I. daddy look this up", "eye daddy what is a tax card", "I daddy can you check the bus times"]) {
+      expect(isAddressed(text), text).toBe(true);
+    }
+    for (const text of ["I'm a daddy now", "Daddy, what's for dinner", "hey daddy can I have ice cream", "my dad is here"]) {
+      expect(isAddressed(text), text).toBe(false);
+    }
   });
 
-  it("stays within what the Engine takes, keeping the newest words", () => {
-    const long = situation([...Array.from({ length: 60 }, (_, n) => `sentence number ${n} about nothing in particular`), "the rent increase letter came today"]);
-    expect(long.length).toBeLessThanOrEqual(1400);
-    expect(long.endsWith("the rent increase letter came today.")).toBe(true);
+  it("researches a question addressed to it, and ignores its bare name", () => {
+    expect(decide("AIDaddy, how do I register my address in Espoo")).toMatchObject({ kind: "asked", addressed: true });
+    expect(decide("AI daddy, our flight was cancelled")).toMatchObject({ kind: "travel", addressed: true });
+    expect(decide("AIDaddy")).toBeNull();
+    expect(decide("hey AI daddy thanks")).toBeNull();
+    expect(withoutName("Hey AI Daddy, how do I get a tax card")).toBe("how do I get a tax card");
   });
 });
 
-describe("the same matter twice", () => {
-  it("is recognised, so one matter costs one research run", () => {
-    expect(sameMatter("The landlord sent a letter. They want to raise the rent.", "that letter from the landlord about raising the rent again")).toBe(true);
+describe("what is sent to research", () => {
+  const lines = [
+    { text: "did you buy milk", at: 0 },
+    { text: "the dishwasher is done", at: 100_000 },
+    { text: "by the way the landlord called", at: 130_000 },
+    { text: "AI daddy, he wants to raise the rent by twelve percent", at: 135_000 },
+    { text: "from the first of January", at: 138_000 },
+    { text: "anyway what's for dinner", at: 139_000 },
+    { text: "pasta", at: 200_000 },
+  ];
+
+  it("sends the sentence, its close neighbours and the desk's question, and nothing else", () => {
+    const text = situation(lines, 3, "legal");
+    expect(text).toContain("by the way the landlord called.");
+    expect(text).toContain("he wants to raise the rent by twelve percent.");
+    expect(text).toContain("from the first of January.");
+    expect(text.endsWith(DESKS.legal.question)).toBe(true);
+    expect(text).not.toContain("milk"); // said long before
+    expect(text).not.toContain("pasta"); // more than two sentences later
+    expect(text).not.toMatch(/ai daddy/i);
+    expect(text.length).toBeLessThanOrEqual(1500);
   });
 
-  it("is not confused with another matter", () => {
-    expect(sameMatter("The landlord sent a letter. They want to raise the rent.", "I got a parking ticket in Tampere today")).toBe(false);
-    expect(sameMatter("", "I got a parking ticket in Tampere today")).toBe(false);
+  it("leaves out a sentence that was said too long before", () => {
+    const text = situation(lines, 2, "legal");
+    expect(text).toContain("dishwasher"); // 30 seconds before: still part of the same talk
+    expect(text).not.toContain("milk"); // more than two minutes before
+  });
+});
+
+describe("call or ping", () => {
+  const found = { evidenceVerified: 3 };
+
+  it("finds a deadline in a plan line, not in its title", () => {
+    expect(hasDeadline("Apply for the maternity grant: no later than two months before the due date [5][7]")).toBe(true);
+    expect(hasDeadline("Ilmoita muutosta: viimeistään viikon kuluessa [2]")).toBe(true);
+    expect(hasDeadline("Book the first maternity clinic appointment [1]")).toBe(false);
+    expect(hasDeadline("Monthly allowance: EUR 210 [3]")).toBe(false);
+    expect(hasDeadline("Check the month of your tax card [1]")).toBe(false);
+  });
+
+  it("calls for a deadline or an urgent matter, pings otherwise", () => {
+    expect(importance({ urgent: false }, { plan: ["Object to the increase: within 14 days [1]"], ...found })).toBe("call");
+    expect(importance({ urgent: true }, { plan: ["Ask the airline for a refund [1]"], ...found })).toBe("call");
+    expect(importance({ urgent: false }, { plan: ["Book a clinic appointment [1]"], ...found })).toBe("ping");
+  });
+
+  it("never calls about a plan with nothing confirmed", () => {
+    expect(importance({ urgent: true }, { plan: [], evidenceVerified: 0 })).toBe("ping");
+    expect(importance({ urgent: true }, { plan: ["Something: within 3 days [1]"], evidenceVerified: 0 })).toBe("ping");
+  });
+
+  it("speaks the plan as stored, without source numbers", () => {
+    const text = spoken({ title: "Rent increase", plan: ["Object in writing: within two (2) weeks [1][2]"], evidenceVerified: 2, evidenceTotal: 2 }, "en");
+    expect(text).toBe("Rent increase. Object in writing: within two weeks. 2 of 2 quotes were found on their pages. The sources are on the screen.");
   });
 });

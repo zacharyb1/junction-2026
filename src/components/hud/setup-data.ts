@@ -3,8 +3,8 @@
  *
  * Each one is real and says how far it goes. "Live" runs on the team's server and has been used in real groups.
  * "First version" works on the person's own device and is new: the page names its limits next to the button.
- * Keep every line true to what the code does: hermes/SOUL.md for the chat, src/lib/listen.ts for the microphone,
- * extension/README.md for the browser.
+ * Keep every line true to what the code does: hermes/SOUL.md for the chat, src/app/listen/page.tsx and
+ * src/components/listen/ for the microphone, extension/README.md for the browser.
  */
 export type Connection = {
   id: "telegram" | "voice" | "browser";
@@ -41,10 +41,10 @@ export const CONNECTIONS: Connection[] = [
     label: "Connection 02",
     title: "Listening on your phone or laptop",
     description:
-      "Leave AIDaddy open on a device in the room. It follows what is said and lets small talk pass. When it hears a letter, a deadline, a life event or a plan that has rules, it looks up the official pages and shows what to do, before anyone asks.",
+      "Leave a phone or a laptop on the table with the listening page open. AIDaddy hears the room and keeps small talk on the device. When someone mentions a life event, it researches it on its own and comes back with a call or a ping, before anyone asks.",
     status: "first version",
-    control: "It hears only while its page is open, and one button stops it. What it heard stays on the device and is gone when the page closes.",
-    limits: "Chrome, Edge and Safari, while the page is open and in front. It cannot listen from a locked phone, and the browser's own speech service turns the sound into text.",
+    control: "It listens only after you press Start, and one button stops it. What it heard stays on the device and is gone when the page closes.",
+    limits: "Chrome, Edge and Safari, while the page is open and on screen. It stops when the screen locks, and the browser's own speech service turns the sound into text.",
     action: { label: "Let AIDaddy listen", href: "/listen", kind: "page" },
     replay: { href: "/demo/talk", of: "AIDaddy at the kitchen table" },
   },
