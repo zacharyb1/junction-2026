@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { mayResearch, readJson } from "@/lib/cases";
 import { sortSentence } from "@/lib/listen-sort";
+import { clientAddress } from "@/lib/rate-limit";
 
 export const maxDuration = 20;
 
@@ -10,12 +11,18 @@ const json = (body: unknown, status: number) => Response.json(body, { status });
 /** Its own small limit per address: a sentence check is cheap and frequent, and must not use up the research limit. */
 const WINDOW_MS = 60_000;
 const PER_WINDOW = 40;
+/** For everyone together, so a caller who changes address cannot keep the one small model busy. */
+const ALL_PER_WINDOW = 240;
 const hits = new Map<string, number[]>();
+let all: number[] = [];
 function allowSort(req: Request): boolean {
-  const client = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "local";
+  // The address the nearest proxy saw, as for research: the caller cannot choose it.
+  const client = clientAddress(req);
   const now = Date.now();
+  all = all.filter((at) => now - at < WINDOW_MS);
   const recent = (hits.get(client) ?? []).filter((at) => now - at < WINDOW_MS);
-  if (recent.length >= PER_WINDOW) return false;
+  if (recent.length >= PER_WINDOW || all.length >= ALL_PER_WINDOW) return false;
+  all.push(now);
   recent.push(now);
   hits.set(client, recent);
   if (hits.size > 5_000) hits.delete(hits.keys().next().value as string);
