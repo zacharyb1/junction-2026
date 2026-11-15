@@ -8,6 +8,8 @@ import { Core } from "@/components/hud/core";
  *
  * The file is the audio the case file's own "Listen" route produced for that case (ElevenLabs reading the stored
  * plan, nothing added), saved once to public/hud/plan.mp3. It is loaded only when someone presses the button.
+ * src/data/plan-audio.json names the case it was rendered from, and the front page offers the button only for
+ * that case, so a new recording can never be narrated by the old one's audio.
  */
 export function HearPlan({ src, seconds }: { src: string; seconds: number }) {
   const audio = useRef<HTMLAudioElement>(null);

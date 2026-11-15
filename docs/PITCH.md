@@ -58,6 +58,8 @@ Do not say "100% accurate". Say: "every line shown is backed by a sentence on a 
 
 Each line of the table is rendered as its own file in `docs/pitch/voiceover/` with ElevenLabs (voice George, model `eleven_v4`), about 50 seconds of speech in total, so each can be placed on the video timeline. The words were checked by transcribing the files back to text. Nobody has listened to them yet. Lines 02 and 08 say the product name; their text spells it "A.I. Daddy" so the voice reads it as two words. Line 07 no longer quotes a quote count, because that number moves with every scorecard run.
 
+The same eight lines in AIDaddy's own voice (the voice designed for this project with ElevenLabs Voice Design, the one the product speaks with) are in `docs/pitch/voiceover-aidaddy/`, 46 seconds in total, rendered on Sunday with `node scripts/voiceover.mjs --voice UWUOFJTWwuSmZFHzbMpM --out docs/pitch/voiceover-aidaddy`. Lines 02, 07 and 08 were transcribed back and match. Use one set for the whole video, not a mix.
+
 Line 07 holds the scorecard numbers. If Saturday's run gives other numbers, change the text in `docs/pitch/voiceover.json` and run `node scripts/voiceover.mjs --only 07-numbers` (needs `ELEVENLABS_API_KEY`; in a Claude cloud session run it with `NODE_USE_ENV_PROXY=1` and no key).
 
 ## What was added on Friday night
