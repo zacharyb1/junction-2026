@@ -81,7 +81,7 @@ export default async function Home() {
             index="04"
             label="Where it works"
             title="One butler, wherever the household is."
-            lede="Today AIDaddy works in the Telegram group chat and in a chat on this site. The other places are ideas. Each one is shown as a scripted replay or a mockup, and says so."
+            lede="Today AIDaddy works in the Telegram group chat, in a chat on this site, and as a listening page you leave open on a device. The other places are ideas. Each one is shown as a scripted replay or a mockup, and says so."
           >
             <Places />
           </Section>
