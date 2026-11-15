@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { AUTOPILOT, REPLAY_ORDER, REPLAYS, type Scene } from "@/components/demo/scenes";
-import { Core } from "@/components/site/core";
-import { PageHead } from "@/components/site/page-head";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
 import "@/components/demo/demo.css";
@@ -13,7 +12,7 @@ export const metadata: Metadata = {
     "Five short scenes of AIDaddy at work: four scripted replays and one demo with a live check. Each says what in it comes from a real research run.",
 };
 
-export const viewport: Viewport = { themeColor: "#fbf8f3" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 const SCENES: Scene[] = [...REPLAY_ORDER.map((slug) => REPLAYS[slug]), AUTOPILOT];
 
@@ -21,53 +20,49 @@ const SCENES: Scene[] = [...REPLAY_ORDER.map((slug) => REPLAYS[slug]), AUTOPILOT
 export default function DemoHub() {
   return (
     <SiteShell>
-      <main className="site-wrap site-page">
-        <PageHead
-          label="Demos"
-          title="See AIDaddy at work"
-          lede={
-            <>
-              AIDaddy is a butler for your family&apos;s group chat. Here are five short scenes of it at work. Four are scripted
-              replays, and each one says which parts come from a real research run. The fifth runs one check live.
-            </>
-          }
-          aside={<Core state="idle" />}
-        />
+      <main className="demo-hub">
+        <div className="site-wrap">
+          <h1>See AIDaddy at work</h1>
+          <p className="demo-hub-lede">
+            AIDaddy is a butler for your family&apos;s group chat. Here are five short scenes of it at work. Four are scripted
+            replays, and each one says which parts come from a real research run. The fifth runs one check live.
+          </p>
 
-        <ol className="demo-programme">
-          {SCENES.map((scene, i) => (
-            <li key={scene.href} className="demo-scene-row">
-              <span className="demo-scene-no" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div className="demo-scene-text">
-                <h2>
-                  {/* The autopilot page asks for the access code, so its link carries the code a visitor already has. */}
-                  {scene === AUTOPILOT ? <SiteLink href={scene.href}>{scene.place}</SiteLink> : <Link href={scene.href}>{scene.place}</Link>}
-                </h2>
-                <p className="demo-scene-story">{scene.story}</p>
-                <p className="demo-scene-real">{scene.real}</p>
-              </div>
-              <p className="demo-scene-meta">
-                <span className={`demo-tag demo-tag--${scene.tone}`}>{scene.tag}</span>
-                <span className="demo-scene-kind">{scene.seconds ? `Replay · ${scene.seconds} s` : "Fixed script"}</span>
-              </p>
-              <span className="demo-scene-go" aria-hidden="true">
-                →
-              </span>
-            </li>
-          ))}
-        </ol>
+          <ol className="demo-programme">
+            {SCENES.map((scene, i) => (
+              <li key={scene.href} className="demo-scene-row">
+                <span className="demo-scene-no" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="demo-scene-text">
+                  <h2>
+                    {/* The autopilot page asks for the access code, so its link carries the code a visitor already has. */}
+                    {scene === AUTOPILOT ? <SiteLink href={scene.href}>{scene.place}</SiteLink> : <Link href={scene.href}>{scene.place}</Link>}
+                  </h2>
+                  <p className="demo-scene-story">{scene.story}</p>
+                  <p className="demo-scene-real">{scene.real}</p>
+                </div>
+                <p className="demo-scene-meta">
+                  <span className={`demo-tag demo-tag--${scene.tone}`}>{scene.tag}</span>
+                  <span className="demo-scene-kind">{scene.seconds ? `Replay · ${scene.seconds} s` : "Fixed script"}</span>
+                </p>
+                <span className="demo-scene-go" aria-hidden="true">
+                  <ArrowRight size={18} />
+                </span>
+              </li>
+            ))}
+          </ol>
 
-        <div className="demo-hub-next">
-          <p>These are scenes. The research itself is open to try.</p>
-          <div>
-            <SiteLink href="/try" className="demo-btn demo-btn--primary">
-              Try AIDaddy without setup
-            </SiteLink>
-            <SiteLink href="/chat" className="demo-btn">
-              Talk to AIDaddy
-            </SiteLink>
+          <div className="demo-hub-next">
+            <p>These are scenes. The research itself is open to try.</p>
+            <div>
+              <SiteLink href="/try" className="demo-btn demo-btn--primary">
+                Try AIDaddy without setup
+              </SiteLink>
+              <SiteLink href="/chat" className="demo-btn">
+                Talk to AIDaddy
+              </SiteLink>
+            </div>
           </div>
         </div>
       </main>

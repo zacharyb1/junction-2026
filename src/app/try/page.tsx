@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { PageHead } from "@/components/site/page-head";
 import { SiteShell } from "@/components/site/site-shell";
 import { TryForm } from "@/components/try-form";
 import { demoCodeRequired } from "@/lib/cases";
@@ -21,20 +20,22 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
   const code = typeof params.code === "string" ? params.code : "";
   return (
     <SiteShell>
-      <main className="site-wrap site-page">
-        {/* The head, the form and the result in the left column; the run panel at the right from the top. */}
-        <div className="site-split site-split--three wrap-anywhere">
-          <PageHead
-            label="Try AIDaddy without setup"
-            title="Try it on your own life"
-            lede="The same engine AIDaddy uses in the family chat. It searches the live web with Exa, official sites first, opens every page it cites, and keeps only what it can point at."
-          >
-            <p className="site-note">
-              Do not paste anything you would not show a stranger: this demo stores the case under an unguessable link.
-            </p>
-          </PageHead>
-          <TryForm code={code} needsCode={demoCodeRequired()} />
-        </div>
+      {/*
+        The same column and the same head as the case file and the chat with AIDaddy.
+        The shared badge is a pill; here it gets the site's crisp corner.
+      */}
+      <main className="task-page">
+        <header className="flex flex-col gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">What’s on your plate?</h1>
+          <p className="leading-relaxed text-muted-foreground">
+            The same engine AIDaddy uses in the family chat. It searches the live web with Exa, official sites first, opens
+            every page it cites, and keeps only what it can point at.
+          </p>
+        </header>
+        <TryForm code={code} needsCode={demoCodeRequired()} />
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          Do not paste anything you would not show a stranger: this demo stores the case under an unguessable link.
+        </p>
       </main>
     </SiteShell>
   );

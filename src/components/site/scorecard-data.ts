@@ -124,3 +124,11 @@ export function caseLink(url: string | null | undefined): string | null {
     return null;
   }
 }
+
+/** Recorded case seeds travel with the app, so their links stay on the current deployment. */
+export function recordedCaseLink(value: string | null | undefined): string | null {
+  const safe = caseLink(value);
+  if (!safe) return null;
+  const url = new URL(safe, "https://aidaddy.example");
+  return /^\/c\/[A-Za-z0-9_-]{8,40}$/.test(url.pathname) ? url.pathname : safe;
+}

@@ -109,9 +109,6 @@ export function Section({
     <section id={id} className="hud-section" aria-labelledby={`${id}-title`}>
       <div className="hud-wrap">
         <header className="hud-section-head hud-reveal">
-          <p className="hud-label">
-            {index} <span aria-hidden="true">{"//"}</span> {label}
-          </p>
           {pageTitle ? (
             <h1 id={`${id}-title`} className="hud-title">
               {title}
@@ -120,6 +117,7 @@ export function Section({
             <h2 id={`${id}-title`}>{title}</h2>
           )}
           {lede ? <p className="hud-lede">{lede}</p> : null}
+          <p className="hud-label">{index}: {label}</p>
         </header>
         {children}
       </div>

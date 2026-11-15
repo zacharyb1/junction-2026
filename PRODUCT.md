@@ -50,14 +50,14 @@ In a family group it is ambient: a life event can trigger research without a dir
 
 - Name: AIDaddy. Role: a butler.
 - Voice: plain, short sentences, concrete. It says what it could not confirm.
-- No inherited logo or photographs. The product's own interface (the chat, the case file, the scorecard) is the picture material; the glowing core is AIDaddy's face (`src/components/hud/core.tsx`, `src/components/aidaddy-avatar.tsx`, `public/aidaddy-avatar.svg`), recorded in `DESIGN.md`.
+- No inherited logo or photographs. The product's own interface (the chat, the case file, the scorecard) is the picture material. The accepted reading world uses paper and ink assets, typographic state marks in the working interface, and a service-bell vector for the app icon and replay avatar, recorded in `DESIGN.md`.
 - Independent hackathon project. Not affiliated with Kela, Vero or Telegram, and must not look as if it were.
 
 ## Evidence on Hand
 
 - `src/data/scorecard.json`: real runs, with a link to the case file each scenario produced. Read it, never retype it.
 - `src/data/sample-case.json`: the sample case (expecting a baby, Espoo). Plan lines and quoted source sentences come from it.
-- `src/data/replay.json`: one recorded research run (see `scripts/make-replay.mjs`), replayed on the front page.
+- `src/data/replay.json`: one recorded research run (see `scripts/make-replay.mjs`) retained for the research replay. The current homepage conversation and expandable plan use the five steps and quoted sentences in `src/data/sample-case.json`.
 - Case-page labels in `src/lib/i18n.ts`, reused on `/scorecard` so the two cannot drift apart.
 - Numbers the team says aloud, with their sources, in `docs/PITCH.md`.
 - There are no testimonials, customers, press or user counts. Do not invent any.

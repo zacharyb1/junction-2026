@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight, Check, X } from "lucide-react";
 import { Core } from "@/components/site/core";
 import { PageHead } from "@/components/site/page-head";
 import {
-  caseLink,
+  recordedCaseLink,
   groupRows,
   hostOf,
   loadScorecard,
@@ -78,14 +79,14 @@ function CaseLink({ href, title }: { href: string; title: string }) {
   if (href.startsWith("/")) {
     return (
       <Link href={href} className="site-arrow">
-        Open<span className="sr-only"> the case file for: {title}</span> <span aria-hidden="true">→</span>
+        Open<span className="sr-only"> the case file for: {title}</span> <ArrowRight size={16} aria-hidden="true" />
       </Link>
     );
   }
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="site-arrow">
       Open<span className="sr-only"> the case file for: {title} (opens in a new tab)</span>{" "}
-      <span aria-hidden="true">↗</span>
+      <ArrowUpRight size={16} aria-hidden="true" />
     </a>
   );
 }
@@ -93,7 +94,7 @@ function CaseLink({ href, title }: { href: string; title: string }) {
 function Row({ row }: { row: ScorecardRow }) {
   const quotes = row.evidence > 0 ? `${row.verified}/${row.evidence}` : null;
   const time = seconds(row.ms);
-  const href = caseLink(row.url);
+  const href = recordedCaseLink(row.url);
   // Below 768px the middle columns fold into one line under the title.
   const folded = [row.country, quotes && `${quotes} quotes`, time].filter(Boolean).join(" · ");
 
@@ -230,7 +231,7 @@ function Checked() {
           <div key={row.label} className={row.tone}>
             <dt className="font-medium">
               <span aria-hidden="true" className={row.mark === "✓" ? "text-(--hud-green)" : "text-(--hud-amber)"}>
-                {row.mark}
+                {row.mark === "✓" ? <Check size={16} className="inline" /> : <X size={16} className="inline" />}
               </span>{" "}
               {row.label}
             </dt>

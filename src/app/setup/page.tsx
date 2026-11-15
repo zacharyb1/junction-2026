@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { SetupPanel } from "@/components/hud/setup-panel";
-import { Core } from "@/components/site/core";
-import { PageHead, Slash } from "@/components/site/page-head";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
 import "@/components/hud/hud.css";
@@ -18,7 +16,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export const viewport: Viewport = { themeColor: "#fbf8f3" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 /**
  * Get your own AIDaddy: the three connections a household can switch on. It began as a mockup (issue #42);
@@ -28,19 +26,13 @@ export default function SetupPage() {
   return (
     <SiteShell>
       <div className="hud">
-        <main className="site-wrap site-page">
-          <PageHead
-            label={
-              <>
-                Setup
-                <Slash />
-                Three connections
-              </>
-            }
-            title="Get your own AIDaddy."
-            lede="Connect what AIDaddy may follow: your group chat, the talk in the room, the page in your browser. The more it follows, the sooner it can step in without being asked. Nothing switches on without you, and you can switch any of it off again."
-            aside={<Core state="idle" />}
-          />
+        <main className="hud-wrap hud-setup">
+          <header className="hud-setup-header">
+            <div>
+              <h1 className="hud-title hud-setup-h1">A place in your everyday life.</h1>
+              <p className="hud-lede">Connect what AIDaddy may follow: your group chat, the talk in the room, the page in your browser. Nothing switches on without you, and you can switch any of it off again.</p>
+            </div>
+          </header>
 
           <SetupPanel />
 
@@ -61,10 +53,10 @@ export default function SetupPage() {
             in hermes/README.md. What is heard follows src/lib/listen.ts and the /listen page; what the extension reads
             follows extension/README.md. The small print follows src/lib/verify.ts and docs/CONTRACTS.md.
           */}
-          <section id="privacy" className="site-section" aria-labelledby="privacy-title">
-            <div className="site-section-head">
-              <h2 id="privacy-title" className="site-h2">Privacy and limits</h2>
-              <p className="site-note">A butler that reads, listens and looks should be plain about what it does and where it stops.</p>
+          <section id="privacy" className="hud-setup-privacy" aria-labelledby="privacy-title">
+            <div className="hud-setup-privacy-head">
+              <h2 id="privacy-title" >Privacy and limits</h2>
+              <p className="hud-note">A butler that reads, listens and looks should be plain about what it does and where it stops.</p>
             </div>
             <ul className="hud-rules">
               <li>
@@ -89,8 +81,8 @@ export default function SetupPage() {
               </li>
             </ul>
             <ul className="grid gap-2">
-              <li className="site-note">A checked quote shows that the sentence is on the page. It does not show that the rule fits your exact situation.</li>
-              <li className="site-note">A case file is a web page with a random address. Anyone who has the link can open it.</li>
+              <li className="hud-note">A checked quote shows that the sentence is on the page. It does not show that the rule fits your exact situation.</li>
+              <li className="hud-note">A case file is a web page with a random address. Anyone who has the link can open it.</li>
             </ul>
           </section>
         </main>

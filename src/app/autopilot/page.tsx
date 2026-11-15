@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export const viewport: Viewport = { themeColor: "#fbf8f3" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 export default async function Autopilot({ searchParams }: PageProps<"/autopilot">) {
   // The lawyer's step runs a live check: with the same access code as /try, or for everyone where the demo is open.
@@ -38,7 +38,7 @@ export default async function Autopilot({ searchParams }: PageProps<"/autopilot"
           >
             <AutopilotDemo code={code} needsCode={demoCodeRequired()} />
             <p className="hud-note hud-autopilot-after">
-              What AIDaddy may follow is the family&apos;s choice. <Link href="/setup">Choose it on the setup page</Link>.
+              What AIDaddy may follow is the family&apos;s choice. <Link href="/setup">Choose a way to connect</Link>.
             </p>
           </Section>
         </main>

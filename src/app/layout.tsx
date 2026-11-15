@@ -1,13 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import { readingDisplay, readingBody, readingSans, readingHand } from "@/components/landing/fonts";
 import { baseUrl } from "@/lib/cases";
 import "./globals.css";
-
-// The household app's face: Inter for everything a person reads.
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -34,20 +29,19 @@ export const metadata: Metadata = {
   applicationName: "AIDaddy",
   appleWebApp: { capable: true, title: "AIDaddy", statusBarStyle: "default" },
   icons: { apple: { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" } },
-  // A page below the front page that sets its own openGraph replaces this one as a whole, image included:
+  // A page below the landing page that sets its own openGraph replaces this one as a whole, image included:
   // it repeats siteName and brings an opengraph-image file of its own (see src/app/try).
   openGraph: { title: "AIDaddy", description, siteName: "AIDaddy", type: "website" },
   twitter: { card: "summary_large_image", title: "AIDaddy", description },
 };
 
-/** Every page is drawn on the same warm off-white ground, so a phone's address bar is too. */
-export const viewport: Viewport = { themeColor: "#fbf8f3", colorScheme: "light" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${readingSans.variable} ${readingDisplay.variable} ${readingBody.variable} ${readingHand.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

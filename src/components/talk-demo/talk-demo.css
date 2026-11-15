@@ -9,23 +9,20 @@
   /* --demo-chrome is how much of the screen's height the frame around the phone takes. The scene line above the phone and this caption's third line take 5rem more. */
   height: min(800px, calc(100dvh - var(--demo-chrome, 4rem) - 5rem));
   min-height: min(480px, 100dvh);
-  border: 1px solid #e5dccf;
   flex-direction: column;
   overflow: hidden;
   border-radius: 30px;
-  background: #fbf8f3;
-  box-shadow:
-    0 1px 2px rgb(60 40 25 / 0.06),
-    0 30px 80px rgb(60 40 25 / 0.18);
-  color: #211b17;
+  background: #fffdf7;
+  box-shadow: 0 16px 48px rgb(65 37 23 / 0.12);
+  color: #211b1d;
 }
 .tdemo-status {
   display: flex;
   align-items: center;
   gap: 0.55rem;
   padding: 2.2rem 1rem 0.9rem;
-  border-bottom: 1px solid #efe8dd;
-  color: #6b625b;
+  border-bottom: 1px solid #dfcdb8;
+  color: #65544e;
   /* At this size the listening line, with the name in it, fits on one line in a phone 390px wide, so the bar keeps its height when the status changes. */
   font-size: 0.8rem;
 }
@@ -34,10 +31,11 @@
   height: 10px;
   flex: none;
   border-radius: 50%;
-  background: #a39685;
+  background: #806d62;
 }
 .tdemo-ear.is-awake {
-  background: #23744a;
+  background: #38604a;
+
   animation: tdemo-pulse 1.2s ease-in-out infinite;
 }
 .tdemo-lines {
@@ -57,54 +55,53 @@
   max-width: 88%;
   padding: 0.5rem 0.75rem;
   border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(60 40 25 / 0.06);
+  background: #f5ecdd;
   font-size: 0.92rem;
   line-height: 1.38;
   animation: tdemo-in 0.35s ease-out;
 }
 .tdemo-line--mikko {
   align-self: flex-end;
-  background: rgb(176 120 30 / 0.12);
+  background: #f7e9e5;
 }
 .tdemo-line--aidaddy {
   align-self: center;
   max-width: 80%;
-  background: rgb(46 139 87 / 0.16);
+  background: #e8eee4;
   text-align: center;
 }
 .tdemo-who {
-  color: #6b625b;
+  color: #65544e;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
 }
 .tdemo-line--aidaddy .tdemo-who {
-  color: #23744a;
+  color: #38604a;
 }
 .tdemo-task {
   margin: 0 0.8rem 0.8rem;
   padding: 0.7rem 0.85rem;
-  border: 1px solid rgb(46 139 87 / 0.35);
+  border: 1px solid #bbcdbd;
   border-radius: 12px;
-  background: rgb(46 139 87 / 0.06);
+  background: #eef2e9;
   font-size: 0.8rem;
   animation: tdemo-in 0.35s ease-out;
 }
 .tdemo-task-title {
   margin-bottom: 0.3rem;
-  color: #23744a;
+  color: #38604a;
   font-weight: 600;
 }
 .tdemo-step {
-  color: #3d342e;
+  color: #65544e;
   animation: tdemo-in 0.35s ease-out;
 }
 .tdemo-card {
   margin: 0 0.8rem 0.9rem;
   padding: 0.85rem 0.9rem;
   border-radius: 16px;
-  background: #fff;
-  color: #211b17;
+  background: #f5ecdd;
+  color: #211b1d;
   animation: tdemo-drop 0.5s ease-out;
   transition: transform 0.4s ease;
 }
@@ -126,7 +123,7 @@
   font-weight: 650;
 }
 .tdemo-card-sub {
-  color: #6b625b;
+  color: #65544e;
   font-size: 0.8rem;
 }
 .tdemo-card-lines {
@@ -139,7 +136,7 @@
   list-style: decimal;
 }
 .tdemo-card-meta {
-  color: #6b625b;
+  color: #65544e;
   font-size: 0.75rem;
 }
 .tdemo-card-buttons {
@@ -151,15 +148,15 @@
   flex: 1;
   padding: 0.45rem 0.3rem;
   border-radius: 8px;
-  background: #f1ebe2;
-  color: #9d4122;
+  background: #f3ddd8;
+  color: #98112c;
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
 }
 .tdemo-card-buttons span.is-done {
-  background: #e3f1e8;
-  color: #23744a;
+  background: #e8eee4;
+  color: #38604a;
 }
 .site .tdemo-lines:focus-visible {
   outline-offset: -3px;

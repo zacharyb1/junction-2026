@@ -15,16 +15,52 @@
   padding: 0 0.6rem;
   border: 1px solid;
   border-radius: 0.3rem;
-  font: 500 0.8rem / 1.2 var(--hud-ui);
+  font: 500 0.72rem / 1.2 var(--hud-mono);
+  letter-spacing: 0;
+  text-transform: none;
   white-space: nowrap;
 }
 .demo-tag--real {
-  border-color: rgb(46 139 87 / 0.4);
+  border-color: rgb(56 96 74 / 0.4);
   color: var(--hud-green);
 }
 .demo-tag--concept {
-  border-color: rgb(176 120 30 / 0.45);
+  border-color: rgb(134 85 27 / 0.45);
   color: var(--hud-amber);
+}
+
+.demo-replay,
+.demo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 1px solid var(--hud-line);
+  border-radius: 0.3rem;
+  background: rgb(152 17 44 / 0.05);
+  color: var(--hud-text);
+  font: 500 0.92rem / 1 var(--font-sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+.demo-replay:hover,
+.demo-btn:hover {
+  border-color: var(--hud-cyan);
+  background: rgb(152 17 44 / 0.14);
+}
+.demo-btn--primary {
+  border-color: var(--hud-cyan);
+  background: var(--hud-cyan);
+  color: #fffaf1;
+  font-weight: 600;
+}
+.demo-btn--primary:hover {
+  background: #740b22;
 }
 
 /* ---------- the links between the replays ---------- */
@@ -51,7 +87,7 @@
   align-items: center;
   gap: 0.4rem;
   min-height: 44px;
-  font: 500 0.8rem / 1 var(--hud-ui);
+  font-size: 0.86rem;
   white-space: nowrap;
   color: var(--hud-dim);
   text-decoration: none;
@@ -66,38 +102,18 @@
 }
 /* The replay you are on: colour and a line, so it does not depend on colour alone. */
 .demo-nav a[aria-current="page"] {
-  color: var(--hud-accent);
+  color: var(--hud-text);
 }
 .demo-nav a[aria-current="page"]::after {
   content: "";
   position: absolute;
-  inset: auto 0 8px;
-  height: 1px;
-  background: var(--hud-accent);
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--hud-cyan);
 }
 
-/* As in the header: tighter capitals on a phone. */
-@media (max-width: 639px) {
-  .demo-nav a {
-  }
-}
-.demo-nav-short {
-  display: none;
-}
-
-/* On a phone the four names need the whole row, so the way back is the arrow alone and each replay its short name.
-   The words stay for screen readers. */
+/* On a phone the four names need the whole row, so the way back is the arrow alone. Its words stay for screen readers. */
 @media (max-width: 559px) {
-  .demo-nav a {
-    min-width: 44px;
-    justify-content: center;
-  }
-  .demo-nav-full {
-    display: none;
-  }
-  .demo-nav-short {
-    display: inline;
-  }
   .demo-nav-row {
     gap: 0 0.5rem;
   }
@@ -135,6 +151,11 @@
 }
 .demo-head h1 {
   margin-top: 0.5rem;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 .demo-story {
   max-width: 52ch;
@@ -173,7 +194,7 @@
   color: var(--hud-dim);
 }
 .demo-caption a {
-  color: var(--hud-accent);
+  color: var(--hud-cyan);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -194,13 +215,11 @@
     grid-column: 1;
   }
   .demo-page--wide .demo-controls {
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     grid-column: 2;
     margin-top: 0;
   }
-  /* The story runs under the label, the title and the controls, so it stays one line. */
-  .demo-page--wide .demo-head .demo-story {
-    grid-column: 1 / -1;
+  .demo-page--wide .demo-story {
     max-width: none;
   }
 
@@ -216,8 +235,13 @@
   .demo-page--framed.demo-page--phone .demo-head {
     grid-row: 1;
     grid-column: 1;
-    /* The label stands as far under the links as every other page's label stands under the header. */
-    padding-top: calc(clamp(2.5rem, 6vw, 4rem) - 1.75rem);
+    padding-top: 3.5rem;
+  }
+  .demo-page--framed.demo-page--phone .demo-head h1 {
+    font-size: clamp(2.1rem, 4vw, 2.9rem);
+  }
+  .demo-page--framed.demo-page--phone .demo-story {
+    font-size: 1.08rem;
   }
   .demo-page--framed.demo-page--phone .demo-controls {
     margin-top: 1.5rem;
@@ -258,10 +282,16 @@
   .demo-nav ul {
     gap: 0 0.5rem;
   }
+  .demo-nav a {
+    font-size: 0.8rem;
+  }
 }
 @media (max-width: 340px) {
   .demo-nav ul {
     gap: 0 0.3rem;
+  }
+  .demo-nav a {
+    font-size: 0.74rem;
   }
 }
 
@@ -294,7 +324,27 @@
 
 /* ---------- the programme at /demo ---------- */
 
+.demo-hub {
+  flex: 1;
+  padding-block: 3rem 4rem;
+}
+.demo-hub h1 {
+  margin-top: 0.75rem;
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.demo-hub-lede {
+  max-width: 58ch;
+  margin-top: 1rem;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--hud-dim);
+}
+
 .demo-programme {
+  margin-top: 2.5rem;
   border-bottom: 1px solid var(--hud-line);
   list-style: none;
 }
@@ -308,13 +358,13 @@
   transition: background-color 0.2s;
 }
 .demo-scene-row:hover {
-  background: rgb(184 79 42 / 0.05);
+  background: rgb(152 17 44 / 0.05);
 }
 .demo-scene-no {
   padding-top: 0.42rem;
-  font: 500 0.8rem / 1.3 var(--hud-ui);
-  letter-spacing: 0.05em;
-  color: var(--hud-accent);
+  font: 500 0.8rem / 1.3 var(--hud-mono);
+  letter-spacing: 0.08em;
+  color: var(--hud-cyan);
 }
 .demo-scene-row h2 {
   font-size: 1.4rem;
@@ -333,15 +383,7 @@
   inset: 0;
 }
 .demo-scene-row:hover h2 a {
-  color: var(--hud-accent);
-}
-/* A keyboard on the row's link tints the row as the pointer does. */
-.demo-scene-row:focus-within {
-  background: var(--hud-fill);
-}
-.demo-scene-row:focus-within h2 a,
-.demo-scene-row:focus-within .demo-scene-go {
-  color: var(--hud-accent);
+  color: var(--hud-cyan);
 }
 .demo-scene-text,
 .demo-scene-meta {
@@ -368,9 +410,9 @@
   margin-top: 0.5rem;
 }
 .demo-scene-kind {
-  font: 500 0.72rem / 1.3 var(--hud-ui);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font: 500 0.72rem / 1.3 var(--hud-mono);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-dim);
 }
 .demo-scene-go {
@@ -382,7 +424,7 @@
     transform 0.2s;
 }
 .demo-scene-row:hover .demo-scene-go {
-  color: var(--hud-accent);
+  color: var(--hud-cyan);
   transform: translateX(4px);
 }
 
@@ -411,6 +453,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem 1.5rem;
+  margin-top: 2.5rem;
 }
 .demo-hub-next p {
   margin-right: auto;
@@ -423,6 +466,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .demo-replay,
+  .demo-btn,
   .demo-nav a,
   .demo-scene-row,
   .demo-scene-go {
@@ -432,3 +477,39 @@
     transform: none;
   }
 }
+
+/* The programme reads like a set of short family stories. */
+.demo-hub { padding-block: clamp(2.5rem, 6vw, 5rem); }
+.demo-hub h1, .demo-head h1, .demo-scene-row h2 { font-family: var(--font-reading-display), serif; font-weight: 700; line-height: 1.18; }
+.demo-hub h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin: 0; }
+.demo-hub-lede, .demo-story { font-family: var(--font-reading-body), serif; line-height: 1.8; }
+.demo-hub-lede { max-width: 68ch; }
+.demo-programme { margin-top: 3rem; }
+.demo-scene-row { padding-block: 1.75rem; }
+.demo-scene-row h2 { font-size: 1.65rem; }
+.demo-scene-no { font-family: var(--font-reading-hand), cursive; font-size: 1.35rem; letter-spacing: 0; padding-top: .1rem; }
+.demo-scene-story { line-height: 1.7; }
+.demo-tag { font-size: .76rem; border: 0; border-radius: 0; padding: 0; white-space: normal; }
+.demo-tag::before { content: ""; width: 5px; height: 5px; margin-right: .45rem; border-radius: 50%; background: currentColor; }
+.demo-scene-kind { font-size: .78rem; }
+.demo-btn, .demo-replay { border-radius: 12px; min-height: 48px; font-family: var(--font-reading-sans), sans-serif; }
+.demo-btn--primary { color: #fffaf1; }
+.demo-replay svg { transition: transform 400ms cubic-bezier(.16,1,.3,1); }
+.demo-replay:hover svg { transform: rotate(-45deg); }
+.demo-page { padding-block: 2.5rem 4rem; }
+.demo-head h1 { margin-top: 0; }
+.demo-provenance { margin-top: 1rem; font: 400 .8rem / 1.6 var(--font-reading-sans), sans-serif; color: var(--hud-dim); }
+.demo-controls { margin-top: .6rem; }
+.demo-nav { background: #f5ecdd; }
+.demo-nav a { min-height: 52px; }
+.demo-caption { font-family: var(--font-reading-body), serif; line-height: 1.8; }
+.demo-scene-row:focus-within { background: #f5ecdd; }
+@media (prefers-reduced-motion: reduce) { .demo-replay svg { transition: none; } .demo-replay:hover svg { transform: none; } }
+/* A held or offscreen replay also pauses its small typing/ringing animations. */
+.demo-stage[data-replay-active="false"] *,
+.demo-stage[data-replay-active="false"] *::before,
+.demo-stage[data-replay-active="false"] *::after { animation-play-state: paused !important; }
+@media (max-width: 559px) { .demo-controls .demo-tag { flex-basis: 100%; } }
+
+.demo-nav-short { display: none; }
+@media (max-width: 559px) { .demo-nav-full { display: none; } .demo-nav-short { display: inline; } }

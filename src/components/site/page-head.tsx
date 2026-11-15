@@ -12,8 +12,6 @@ export function Slash() {
  * stage needs the height.
  */
 export function PageHead({
-  label,
-  labelTone,
   state,
   title,
   titleId,
@@ -40,13 +38,10 @@ export function PageHead({
   return (
     <header className={aside ? "site-head site-head--aside" : "site-head"}>
       <div className="site-head-main">
-        <div className="site-head-rail">
-          <p className={labelTone ? `site-eyebrow site-eyebrow--${labelTone}` : "site-eyebrow"}>{label}</p>
-          {state ? <p className={stateClass}>{state.text}</p> : null}
-        </div>
         <h1 id={titleId} className={compact ? "site-title site-title--compact" : "site-title"}>
           {title}
         </h1>
+        {state ? <p className={stateClass}>{state.text}</p> : null}
         {lede ? <p className="site-lede">{lede}</p> : null}
         {children}
       </div>

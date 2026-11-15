@@ -1,0 +1,514 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-15T01:52:11.409312+00:00",
+  "title": "Design System: AIDaddy",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Cranberry",
+        "tonalRamp": [
+          "oklch(15% 0.0413 18.5)",
+          "oklch(27% 0.0909 18.5)",
+          "oklch(39% 0.1405 18.5)",
+          "oklch(51% 0.1653 18.5)",
+          "oklch(63% 0.1488 18.5)",
+          "oklch(75% 0.1074 18.5)",
+          "oklch(87% 0.0579 18.5)",
+          "oklch(95% 0.0198 18.5)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Deep cranberry",
+        "tonalRamp": [
+          "oklch(15% 0.0339 17.1)",
+          "oklch(27% 0.0745 17.1)",
+          "oklch(39% 0.1152 17.1)",
+          "oklch(51% 0.1355 17.1)",
+          "oklch(63% 0.1220 17.1)",
+          "oklch(75% 0.0881 17.1)",
+          "oklch(87% 0.0474 17.1)",
+          "oklch(95% 0.0163 17.1)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Ivory paper",
+        "tonalRamp": [
+          "oklch(15% 0.0033 82.4)",
+          "oklch(27% 0.0072 82.4)",
+          "oklch(39% 0.0111 82.4)",
+          "oklch(51% 0.0130 82.4)",
+          "oklch(63% 0.0117 82.4)",
+          "oklch(75% 0.0085 82.4)",
+          "oklch(87% 0.0046 82.4)",
+          "oklch(95% 0.0016 82.4)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Paper panel",
+        "tonalRamp": [
+          "oklch(15% 0.0017 88.6)",
+          "oklch(27% 0.0038 88.6)",
+          "oklch(39% 0.0059 88.6)",
+          "oklch(51% 0.0069 88.6)",
+          "oklch(63% 0.0062 88.6)",
+          "oklch(75% 0.0045 88.6)",
+          "oklch(87% 0.0024 88.6)",
+          "oklch(95% 0.0008 88.6)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Warm ink",
+        "tonalRamp": [
+          "oklch(15% 0.0025 355.8)",
+          "oklch(27% 0.0055 355.8)",
+          "oklch(39% 0.0086 355.8)",
+          "oklch(51% 0.0101 355.8)",
+          "oklch(63% 0.0091 355.8)",
+          "oklch(75% 0.0065 355.8)",
+          "oklch(87% 0.0035 355.8)",
+          "oklch(95% 0.0012 355.8)"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted ink",
+        "tonalRamp": [
+          "oklch(15% 0.0062 40.4)",
+          "oklch(27% 0.0136 40.4)",
+          "oklch(39% 0.0209 40.4)",
+          "oklch(51% 0.0246 40.4)",
+          "oklch(63% 0.0222 40.4)",
+          "oklch(75% 0.0160 40.4)",
+          "oklch(87% 0.0086 40.4)",
+          "oklch(95% 0.0030 40.4)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Paper rule",
+        "tonalRamp": [
+          "oklch(15% 0.0087 71.6)",
+          "oklch(27% 0.0192 71.6)",
+          "oklch(39% 0.0296 71.6)",
+          "oklch(51% 0.0348 71.6)",
+          "oklch(63% 0.0313 71.6)",
+          "oklch(75% 0.0226 71.6)",
+          "oklch(87% 0.0122 71.6)",
+          "oklch(95% 0.0042 71.6)"
+        ]
+      },
+      "rule-soft": {
+        "role": "neutral",
+        "displayName": "Soft paper rule",
+        "tonalRamp": [
+          "oklch(15% 0.0057 71.8)",
+          "oklch(27% 0.0126 71.8)",
+          "oklch(39% 0.0195 71.8)",
+          "oklch(51% 0.0230 71.8)",
+          "oklch(63% 0.0207 71.8)",
+          "oklch(75% 0.0149 71.8)",
+          "oklch(87% 0.0080 71.8)",
+          "oklch(95% 0.0028 71.8)"
+        ]
+      },
+      "inset": {
+        "role": "neutral",
+        "displayName": "Inset paper",
+        "tonalRamp": [
+          "oklch(15% 0.0055 80.7)",
+          "oklch(27% 0.0122 80.7)",
+          "oklch(39% 0.0188 80.7)",
+          "oklch(51% 0.0222 80.7)",
+          "oklch(63% 0.0199 80.7)",
+          "oklch(75% 0.0144 80.7)",
+          "oklch(87% 0.0078 80.7)",
+          "oklch(95% 0.0027 80.7)"
+        ]
+      },
+      "rose": {
+        "role": "primary",
+        "displayName": "Rose",
+        "tonalRamp": [
+          "oklch(15% 0.0041 36.5)",
+          "oklch(27% 0.0089 36.5)",
+          "oklch(39% 0.0138 36.5)",
+          "oklch(51% 0.0162 36.5)",
+          "oklch(63% 0.0146 36.5)",
+          "oklch(75% 0.0105 36.5)",
+          "oklch(87% 0.0057 36.5)",
+          "oklch(95% 0.0019 36.5)"
+        ]
+      },
+      "rose-ink": {
+        "role": "primary",
+        "displayName": "Rose ink",
+        "tonalRamp": [
+          "oklch(15% 0.0329 13.9)",
+          "oklch(27% 0.0724 13.9)",
+          "oklch(39% 0.1118 13.9)",
+          "oklch(51% 0.1316 13.9)",
+          "oklch(63% 0.1184 13.9)",
+          "oklch(75% 0.0855 13.9)",
+          "oklch(87% 0.0460 13.9)",
+          "oklch(95% 0.0158 13.9)"
+        ]
+      },
+      "selection": {
+        "role": "primary",
+        "displayName": "Selection rose",
+        "tonalRamp": [
+          "oklch(15% 0.0132 9.4)",
+          "oklch(27% 0.0290 9.4)",
+          "oklch(39% 0.0449 9.4)",
+          "oklch(51% 0.0528 9.4)",
+          "oklch(63% 0.0475 9.4)",
+          "oklch(75% 0.0343 9.4)",
+          "oklch(87% 0.0185 9.4)",
+          "oklch(95% 0.0063 9.4)"
+        ]
+      },
+      "confirmed": {
+        "role": "secondary",
+        "displayName": "Garden green",
+        "tonalRamp": [
+          "oklch(15% 0.0146 158.9)",
+          "oklch(27% 0.0321 158.9)",
+          "oklch(39% 0.0496 158.9)",
+          "oklch(51% 0.0583 158.9)",
+          "oklch(63% 0.0525 158.9)",
+          "oklch(75% 0.0379 158.9)",
+          "oklch(87% 0.0204 158.9)",
+          "oklch(95% 0.0070 158.9)"
+        ]
+      },
+      "confirmed-fill": {
+        "role": "secondary",
+        "displayName": "Pale garden",
+        "tonalRamp": [
+          "oklch(15% 0.0040 130.4)",
+          "oklch(27% 0.0088 130.4)",
+          "oklch(39% 0.0135 130.4)",
+          "oklch(51% 0.0159 130.4)",
+          "oklch(63% 0.0143 130.4)",
+          "oklch(75% 0.0104 130.4)",
+          "oklch(87% 0.0056 130.4)",
+          "oklch(95% 0.0019 130.4)"
+        ]
+      },
+      "waiting": {
+        "role": "secondary",
+        "displayName": "Warm ochre",
+        "tonalRamp": [
+          "oklch(15% 0.0241 66.0)",
+          "oklch(27% 0.0529 66.0)",
+          "oklch(39% 0.0818 66.0)",
+          "oklch(51% 0.0962 66.0)",
+          "oklch(63% 0.0866 66.0)",
+          "oklch(75% 0.0625 66.0)",
+          "oklch(87% 0.0337 66.0)",
+          "oklch(95% 0.0115 66.0)"
+        ]
+      },
+      "invalid": {
+        "role": "secondary",
+        "displayName": "Error red",
+        "tonalRamp": [
+          "oklch(15% 0.0404 26.1)",
+          "oklch(27% 0.0888 26.1)",
+          "oklch(39% 0.1372 26.1)",
+          "oklch(51% 0.1614 26.1)",
+          "oklch(63% 0.1453 26.1)",
+          "oklch(75% 0.1049 26.1)",
+          "oklch(87% 0.0565 26.1)",
+          "oklch(95% 0.0194 26.1)"
+        ]
+      },
+      "field-edge": {
+        "role": "neutral",
+        "displayName": "Field edge",
+        "tonalRamp": [
+          "oklch(15% 0.0091 62.7)",
+          "oklch(27% 0.0200 62.7)",
+          "oklch(39% 0.0309 62.7)",
+          "oklch(51% 0.0364 62.7)",
+          "oklch(63% 0.0327 62.7)",
+          "oklch(75% 0.0236 62.7)",
+          "oklch(87% 0.0127 62.7)",
+          "oklch(95% 0.0044 62.7)"
+        ]
+      },
+      "placeholder": {
+        "role": "neutral",
+        "displayName": "Placeholder ink",
+        "tonalRamp": [
+          "oklch(15% 0.0076 48.1)",
+          "oklch(27% 0.0167 48.1)",
+          "oklch(39% 0.0258 48.1)",
+          "oklch(51% 0.0303 48.1)",
+          "oklch(63% 0.0273 48.1)",
+          "oklch(75% 0.0197 48.1)",
+          "oklch(87% 0.0106 48.1)",
+          "oklch(95% 0.0036 48.1)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Homepage promise",
+        "purpose": "Regular literary display on the open homepage."
+      },
+      "headline": {
+        "displayName": "Task heading",
+        "purpose": "Bold page headings for forms and working surfaces."
+      },
+      "section": {
+        "displayName": "Reading section",
+        "purpose": "Regular display headings on the homepage."
+      },
+      "title": {
+        "displayName": "Working title",
+        "purpose": "Compact bold display titles in task panels."
+      },
+      "body": {
+        "displayName": "Prose",
+        "purpose": "Readable introductions and source quotations."
+      },
+      "lede": {
+        "displayName": "Task introduction",
+        "purpose": "Prose introductions up to 66ch."
+      },
+      "label": {
+        "displayName": "Factual label",
+        "purpose": "Navigation, dates and operating context."
+      },
+      "control": {
+        "displayName": "Action",
+        "purpose": "Sentence-case action labels."
+      },
+      "note": {
+        "displayName": "Margin note",
+        "purpose": "A short annotation near the thought it supports."
+      }
+    },
+    "shadows": [
+      {
+        "name": "listening-dialog",
+        "value": "0 18px 70px rgb(33 27 29 / 0.2)",
+        "purpose": "Lift the listening call dialog over its dimmed backdrop."
+      },
+      {
+        "name": "replay-phone",
+        "value": "0 16px 48px rgb(65 37 23 / 0.12)",
+        "purpose": "Separate the kitchen-table replay phone from the page."
+      }
+    ],
+    "motion": [
+      {
+        "name": "settle-easing",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "Shared quick-settling curve for meaningful arrival and disclosure."
+      },
+      {
+        "name": "control-feedback",
+        "value": "160ms",
+        "purpose": "Shared button fill, text and border transitions."
+      },
+      {
+        "name": "ink-stroke",
+        "value": "700ms; stagger 360ms",
+        "purpose": "Reveal only the three decorative hero marks; replay on request."
+      },
+      {
+        "name": "sample-change",
+        "value": "320ms",
+        "purpose": "A small clip and 5px horizontal settle when the selected sample step changes."
+      },
+      {
+        "name": "disclosure",
+        "value": "300ms",
+        "purpose": "Expand native details where intrinsic-size interpolation is supported."
+      },
+      {
+        "name": "page-heading",
+        "value": "500ms",
+        "purpose": "Settle a task heading by 8px."
+      },
+      {
+        "name": "reply-arrival",
+        "value": "380ms",
+        "purpose": "Settle a new chat row by 10px with a short clip reveal."
+      },
+      {
+        "name": "research-sweep",
+        "value": "1.6s",
+        "purpose": "Indicate a running operation; its adjacent status carries the meaning."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "static default; explicit replay allowed",
+        "purpose": "Remove decorative transitions and show completed replay content until playback is requested."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "home-tight",
+        "value": "359px"
+      },
+      {
+        "name": "replay-navigation",
+        "value": "559px"
+      },
+      {
+        "name": "mobile-navigation",
+        "value": "700px"
+      },
+      {
+        "name": "home-stack",
+        "value": "760px"
+      },
+      {
+        "name": "scorecard-columns",
+        "value": "768px"
+      },
+      {
+        "name": "working-split",
+        "value": "900px"
+      },
+      {
+        "name": "home-gap",
+        "value": "1100px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The next useful action on a working page.",
+      "html": "<button class=\"ds-primary\" type=\"button\">Make a plan <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.6rem 1.2rem;border:1px solid #dfcdb8;border-radius:12px;font:600 .95rem/1.3 var(--font-reading-sans, Inter), sans-serif;cursor:pointer;transition:color 160ms,background-color 160ms,border-color 160ms;background:#98112c;color:#fffaf1;border-color:#98112c;}.ds-primary:hover{background:#740b22;}.ds-primary:focus-visible{outline:3px solid #98112c;outline-offset:4px;}.ds-primary:active{transform:translateY(1px);}.ds-primary:disabled{opacity:.5;cursor:default;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none;}.ds-primary:active{transform:none;}}"
+    },
+    {
+      "name": "Secondary action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A supporting action on paper.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Read an example</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.6rem 1.2rem;border:1px solid #dfcdb8;border-radius:12px;font:600 .95rem/1.3 var(--font-reading-sans, Inter), sans-serif;cursor:pointer;transition:color 160ms,background-color 160ms,border-color 160ms;background:#fffdf8;color:#211b1d;}.ds-secondary:hover{background:#f7e9e5;border-color:#98112c;}.ds-secondary:focus-visible{outline:3px solid #98112c;outline-offset:4px;}.ds-secondary:active{transform:translateY(1px);}.ds-secondary:disabled{opacity:.5;cursor:default;}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none;}.ds-secondary:active{transform:none;}}"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "A labelled field with a visible editable boundary.",
+      "html": "<label class=\"ds-field-label\">City or region<input class=\"ds-field\" type=\"text\" placeholder=\"Espoo\" /></label>",
+      "css": ".ds-field-label{display:grid;gap:.45rem;color:#211b1d;font:400 .9rem/1.5 var(--font-reading-sans, Inter), sans-serif;}.ds-field{height:44px;min-width:0;padding:0 .75rem;border:1px solid #a08b79;border-radius:.8rem;background:#fffdf8;color:#211b1d;font:400 1rem/1.5 var(--font-reading-sans, Inter), sans-serif;caret-color:#98112c;transition:border-color 160ms;}.ds-field::placeholder{color:#756157;opacity:1;}.ds-field:focus{border-color:#98112c;}.ds-field:focus-visible{outline:3px solid #98112c;outline-offset:4px;}.ds-field[aria-invalid=true]{border-color:#a12424;}.ds-field:disabled{opacity:.5;}@media(prefers-reduced-motion:reduce){.ds-field{transition:none;}}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Current location is indicated with color and an underline.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main\"><a href=\"/demo\" aria-current=\"page\">See it work</a><a href=\"/chat\">Have a chat</a><a class=\"ds-nav-action\" href=\"/try\">Make a plan</a></nav>",
+      "css": ".ds-nav{display:flex;flex-wrap:wrap;align-items:center;gap:1.6rem;}.ds-nav a{position:relative;display:inline-flex;align-items:center;min-height:44px;color:#65544e;font:500 .84rem/1.5 var(--font-reading-sans, Inter), sans-serif;text-decoration:none;transition:color 160ms;}.ds-nav a::after{content:\"\";position:absolute;inset:auto 0 7px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform 220ms cubic-bezier(.16,1,.3,1);}.ds-nav a:hover,.ds-nav a[aria-current=page]{color:#98112c;}.ds-nav a:hover::after,.ds-nav a[aria-current=page]::after{transform:scaleX(1);}.ds-nav a:focus-visible{outline:3px solid #98112c;outline-offset:4px;}.ds-nav .ds-nav-action{padding-inline:1.1rem;border-radius:12px;background:#98112c;color:#fffaf1;}.ds-nav .ds-nav-action:hover{background:#740b22;color:#fffaf1;}.ds-nav .ds-nav-action::after{inset-inline:1.1rem;}@media(prefers-reduced-motion:reduce){.ds-nav a,.ds-nav a::after{transition:none;}}"
+    },
+    {
+      "name": "Confirmed status",
+      "kind": "chip",
+      "refersTo": "tag-confirmed",
+      "description": "A status word carries meaning alongside its color.",
+      "html": "<span class=\"ds-tag\">Source checked</span>",
+      "css": ".ds-tag{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .5rem;border:1px solid #dfcdb8;border-radius:8px;background:#e8eee3;color:#38604a;font:400 .8rem/1.5 var(--font-reading-sans, Inter), sans-serif;}"
+    },
+    {
+      "name": "Working panel",
+      "kind": "card",
+      "refersTo": "paper-panel",
+      "description": "A flat working container with a quiet title row.",
+      "html": "<section class=\"ds-panel\" aria-labelledby=\"ds-panel-title\"><h2 class=\"ds-panel-title\" id=\"ds-panel-title\">What was heard</h2><div class=\"ds-panel-body\">The sentence stays beside the next step.</div></section>",
+      "css": ".ds-panel{border:1px solid #dfcdb8;border-radius:12px;background:#fffdf8;color:#211b1d;}.ds-panel-title{margin:0;padding:.8rem 1rem;border-bottom:1px solid #dfcdb8;color:#65544e;font:400 .85rem/1.5 var(--font-reading-sans, Inter), sans-serif;}.ds-panel-body{padding:1rem;font:400 1rem/1.8 var(--font-reading-body, Lora), serif;}"
+    },
+    {
+      "name": "Plan evidence disclosure",
+      "kind": "custom",
+      "refersTo": "evidence",
+      "description": "The source sentence opens directly beneath its plan line.",
+      "html": "<details class=\"ds-evidence\" open><summary><span>Tell both employers about parental leave</span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-evidence-body\"><span class=\"ds-source-name\">InfoFinland · Source 5</span><blockquote>“If you have a job, notify your employer about your parental leave two (2) months before it begins.”</blockquote><a href=\"https://www.infofinland.fi/en/family/financial-support-for-families/benefits-for-a-family-after-a-child-is-born\">Read the official page</a></div></details>",
+      "css": ".ds-evidence{border-top:1px solid #dfcdb8;color:#211b1d;}.ds-evidence summary{display:flex;align-items:center;gap:12px;min-height:44px;padding:17px 0;list-style:none;cursor:pointer;font:700 17px/1.4 var(--font-reading-display, \"Chiron Sung HK\"), serif;}.ds-evidence summary::-webkit-details-marker{display:none;}.ds-evidence summary span{flex:1;}.ds-evidence summary:hover span{text-decoration:underline;text-underline-offset:4px;}.ds-evidence[open] summary{color:#98112c;}.ds-evidence summary svg{flex:none;transition:transform 240ms cubic-bezier(.16,1,.3,1);}.ds-evidence[open] summary svg{transform:rotate(180deg);}.ds-evidence-body{padding:17px 20px;border-radius:4px;background:#f7e9e5;}.ds-source-name{color:#98112c;font:600 11px/1.6 var(--font-reading-sans, Inter), sans-serif;}.ds-evidence blockquote{margin:8px 0;font:400 15px/1.7 var(--font-reading-body, Lora), serif;}.ds-evidence a{display:inline-flex;align-items:center;min-height:44px;color:#98112c;font:600 12px/1.5 var(--font-reading-sans, Inter), sans-serif;text-underline-offset:.25em;}.ds-evidence a:hover{color:#740b22;}.ds-evidence :is(summary,a):focus-visible{outline:3px solid #98112c;outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-evidence summary svg{transition:none;}}"
+    },
+    {
+      "name": "Sample step control",
+      "kind": "button",
+      "refersTo": "sample-step-control",
+      "description": "A full touch target for moving through a sample.",
+      "html": "<button class=\"ds-step\" type=\"button\" aria-label=\"Next sample step\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
+      "css": ".ds-step{display:grid;place-items:center;min-width:44px;min-height:44px;padding:0;border:1px solid #dfcdb8;border-radius:50%;background:transparent;color:#98112c;cursor:pointer;transition:background-color 180ms,border-color 180ms;}.ds-step:hover{background:#f7e9e5;border-color:#98112c;}.ds-step:focus-visible{outline:3px solid #98112c;outline-offset:4px;}.ds-step:active{background:#f5c7cd;}@media(prefers-reduced-motion:reduce){.ds-step{transition:none;}}"
+    },
+    {
+      "name": "Typographic state mark",
+      "kind": "custom",
+      "refersTo": "state-mark",
+      "description": "The chat and voice mark stays still at rest.",
+      "html": "<div class=\"ds-avatar\" role=\"img\" aria-label=\"AIDaddy\"><span aria-hidden=\"true\">Ai</span></div>",
+      "css": ".ds-avatar{display:grid;place-items:center;width:72px;height:72px;border-radius:22%;background:#f7e9e5;color:#98112c;}.ds-avatar span{font:700 38.25px/1 var(--font-reading-display, \"Chiron Sung HK\"), serif;letter-spacing:-.04em;}"
+    },
+    {
+      "name": "Replay controls",
+      "kind": "custom",
+      "refersTo": "button-secondary",
+      "description": "Pause and replay sit next to the scene status and duration.",
+      "html": "<div class=\"ds-replay-controls\"><button class=\"ds-replay\" type=\"button\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.5 8a5.5 5.5 0 1 0 1.7-4M2.5 2.5v3h3\"/></svg>Replay</button><button class=\"ds-replay\" type=\"button\" aria-pressed=\"false\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M10 4H6v16h4zM18 4h-4v16h4z\"/></svg>Pause</button></div>",
+      "css": ".ds-replay-controls{display:flex;flex-wrap:wrap;gap:.75rem 1rem;}.ds-replay{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:0 1.1rem;border:1px solid #dfcdb8;border-radius:12px;background:rgb(152 17 44 / .05);color:#211b1d;font:500 .92rem/1 var(--font-reading-sans, Inter), sans-serif;cursor:pointer;transition:border-color 200ms,background-color 200ms;}.ds-replay:hover{border-color:#98112c;background:rgb(152 17 44 / .14);}.ds-replay:focus-visible{outline:3px solid #98112c;outline-offset:4px;}.ds-replay[aria-pressed=true]{background:#f7e9e5;border-color:#98112c;}@media(prefers-reduced-motion:reduce){.ds-replay{transition:none;}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The family reading table",
+    "overview": "AIDaddy puts useful words and their evidence within reach, with the feeling of a family reading together. Ivory paper, cranberry annotations and literary headings make official material approachable. The product's own words, conversations, plans and quoted sentences supply the picture material.\n\nThe world is warm, readable and expressive. Space gives a sentence room; rules and paper tones organize the work. Motion follows a meaningful change: ink draws attention to a thought, a new answer arrives, a source opens, or a replay advances under the reader's control. The person can always pause, inspect and decide.",
+    "keyCharacteristics": [
+      "Open reading surfaces with a clear heading and one immediate next action.",
+      "Literary display type, generous prose and precise sans-serif controls.",
+      "Cranberry ink beside the words or evidence it helps explain.",
+      "Real HTML text, checked-source links and visible uncertainty.",
+      "Replayable motion with a complete static reading state."
+    ],
+    "rules": [
+      {
+        "name": "The Evidence Rule",
+        "body": "Give a statement and its supporting sentence a visible relationship. Use placement, a source number and words alongside color.",
+        "section": "colors"
+      },
+      {
+        "name": "The Four Voices Rule",
+        "body": "Use display type for the thought, prose type for reading, sans-serif for operating the product, and handwriting for a short human annotation.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper Rule",
+        "body": "Make a document readable through alignment, whitespace and tonal separation before adding a container. Reserve lifted depth for a dialog or a depicted device.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the life event, next step and supporting sentence easy to read together.",
+      "Do use the shared shell for new product pages and the focused reading column for task flows.",
+      "Do use existing paper and ink assets with their provenance intact, and keep every word selectable HTML.",
+      "Do label samples, recorded runs and concepts where the reader encounters them.",
+      "Do let the reader pause a timeline, inspect evidence and recover from a failed action.",
+      "Do verify direct loads, keyboard focus, narrow screens and reduced-motion states after visible changes."
+    ],
+    "donts": [
+      "Don't restore the terracotta orb identity; use the reading palette and the existing typographic or bell marks in their proper contexts.",
+      "Don't add decorative kickers, repeated category labels or text glyphs in place of the existing vector icon language.",
+      "Don't make color or animation the only evidence of a status, selection or result.",
+      "Don't convert the open homepage promise or every paragraph into a rounded panel.",
+      "Don't stretch the homepage composition or a replay's device frame into a rule for every page.",
+      "Don't hide text until an animation finishes or make continuous idle motion part of reading."
+    ]
+  }
+}

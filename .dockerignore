@@ -23,3 +23,8 @@
 **/.env*
 **/*.pem
 **/*.key
+
+# The shared reading surface and original reading page import these local PNGs.
+!assets/
+!assets/plates/
+!assets/plates/*.png

@@ -1,13 +1,13 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { CircleAlert, Loader2, Search } from "lucide-react";
 import { useRef, useState } from "react";
 import { EarlierCases } from "@/components/earlier-cases";
-import { Core } from "@/components/site/core";
 import { EXAMPLES } from "@/lib/examples";
 import { advance, Elapsed, NO_PROGRESS, type Progress, Timeline } from "@/components/try-progress";
 import { TryResult } from "@/components/try-result";
 import { Button } from "@/components/ui/button";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { EngineEvent, ResearchResult } from "@/lib/engine/research";
@@ -49,7 +49,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
   const [document, setDocument] = useState("");
   const [code, setCode] = useState(initialCode);
   const [busy, setBusy] = useState(false);
-  // What was sent, shown in the run panel: not what is being typed now.
+  // Keep the submitted question stable while the visitor edits the next one.
   const [asked, setAsked] = useState("");
   const [progress, setProgress] = useState<Progress>(NO_PROGRESS);
   const [result, setResult] = useState<ResearchResult | null>(null);
@@ -141,8 +141,8 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
   }
 
   return (
-    <>
-      <form onSubmit={run} className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 wrap-anywhere">
+      <form onSubmit={run} className="try-form flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <label htmlFor="situation" className="text-sm font-medium">
             What happened?
@@ -158,13 +158,14 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
             onChange={(e) => setSituation(e.target.value)}
             placeholder="Write it the way you would text your partner."
           />
-          <div className="flex flex-wrap gap-2">
+          <div className="try-examples flex flex-wrap gap-2">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex.label}
                 type="button"
                 onClick={() => setSituation(ex.text)}
-                className="site-btn site-btn--compact"
+                aria-pressed={situation === ex.text}
+                className="min-h-11 rounded-md border px-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-foreground motion-reduce:transition-none sm:text-xs"
               >
                 {ex.label}
               </button>
@@ -244,73 +245,60 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
         )}
 
         {/* Still focusable while it is busy: a disabled button drops the keyboard focus to the top of the page. */}
-        <Button type="submit" size="lg" className="site-btn--cta w-full sm:w-fit sm:self-start" disabled={busy} focusableWhenDisabled>
-          {!busy && <Search />}
+        <Button type="submit" size="lg" className="h-11 text-base" disabled={busy} focusableWhenDisabled>
+          {busy ? <Loader2 className="animate-spin motion-reduce:animate-none" /> : <Search />}
           {busy ? "Researching live" : "Research it"}
         </Button>
       </form>
 
-      {/* The run panel is on the page before a run, at every width. Not sticky: it can be taller than the window. */}
-      <div className="site-rail">
-        <section className="site-panel" aria-labelledby="run-title">
-          <div className="site-panel-title">
-            <h2 id="run-title">What is happening</h2>
-            <span className={busy ? "text-primary" : result ? "text-(--hud-green)" : error ? "text-(--hud-amber)" : undefined}>
-              {busy ? "Researching" : result ? "Case file ready" : error ? "Stopped" : "Standing by"}
-            </span>
-          </div>
-          <div className="site-panel-body grid grid-cols-1 gap-4">
-            <div className="flex items-center gap-4">
-              <Core state={busy ? "active" : result ? "done" : "idle"} className="hud-core--tiny" />
-              <div className="min-w-0 flex-1">
-                {asked ? (
-                  <>
-                    <p className="site-eyebrow site-eyebrow--amber">Your question</p>
-                    <p className="line-clamp-3">{asked}</p>
-                  </>
-                ) : (
-                  <p className="site-note">Each search, each page and each check, as it happens.</p>
-                )}
-              </div>
-              {progress.stages.length > 0 && <Elapsed busy={busy} final={result?.ms} />}
-            </div>
-            {/*
-              The live region is on the page before anything happens: a screen reader announces what is added to a
-              region it already knows, not a region that arrives with its text. While it is empty it takes no room.
-            */}
-            <div aria-live="polite" className="grid grid-cols-1 gap-3 text-sm empty:-mt-4">
+      {/*
+        The live region is on the page before anything happens: a screen reader announces what is added to a region
+        it already knows, not a region that arrives with its text. While it is empty it takes no room.
+      */}
+      <div aria-live="polite" className="empty:-mt-6">
+        {(progress.stages.length > 0 || error) && (
+          <Card className="ring-border">
+            <CardHeader>
+              <CardTitle className="text-base" role="heading" aria-level={2}>
+                What is happening
+              </CardTitle>
+              <CardDescription>Each search, each page and each check, as it happens.</CardDescription>
+              {progress.stages.length > 0 && (
+                <CardAction>
+                  <Elapsed busy={busy} final={result?.ms} />
+                </CardAction>
+              )}
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 text-sm">
+              {asked && <blockquote aria-label="Submitted question" className="border-l border-border pl-3 text-muted-foreground">{asked}</blockquote>}
               {progress.stages.length > 0 && <Timeline progress={progress} busy={busy} finished={Boolean(result)} />}
-              {error && <p className="site-row site-row--amber site-status">{error}</p>}
+              {error && (
+                <p className="flex items-start gap-2 text-destructive">
+                  <CircleAlert className="mt-0.5 size-4 shrink-0" /> {error}
+                </p>
+              )}
               {error && liveDown && <EarlierCases situation={situation} failed />}
-            </div>
-            {result && (
-              // Two by two: four cells at the shared minimum width would leave one alone on a second row.
-              <dl className="site-readouts grid-cols-2!">
-                <div>
-                  <dt>Exa searches</dt>
-                  <dd>{result.exa.searches}</dd>
-                </div>
-                <div>
-                  <dt>Pages read</dt>
-                  <dd>{progress.pages.length}</dd>
-                </div>
-                <div>
-                  <dt>Quotes found</dt>
-                  <dd className={result.evidenceVerified === result.evidenceTotal ? "text-(--hud-green)" : "text-(--hud-amber)"}>
-                    {result.evidenceVerified}/{result.evidenceTotal}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Exa cost</dt>
-                  <dd>${result.exa.costDollars.toFixed(3)}</dd>
-                </div>
-              </dl>
-            )}
-          </div>
-        </section>
+              {result && (
+                <dl className="mt-2 grid grid-cols-2 gap-4 border-t pt-4">
+                  {[
+                    ["Exa searches", result.exa.searches],
+                    ["Pages read", progress.pages.length],
+                    ["Quotes found", `${result.evidenceVerified}/${result.evidenceTotal}`],
+                    ["Exa cost", `$${result.exa.costDollars.toFixed(3)}`],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <dt className="text-xs text-muted-foreground">{label}</dt>
+                      <dd className="mt-1 text-lg font-medium tabular-nums">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {result && <TryResult result={result} ref={resultRef} />}
-    </>
+    </div>
   );
 }

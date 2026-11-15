@@ -24,10 +24,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   headers: async () => [{ source: "/:path*", headers: securityHeaders }],
   // The chat lives at /chat. Its earlier address, /ukk, leads there with its query string, so printed QR codes and
-  // shared links keep working. The paper edition at /reading was retired; its address leads to the scorecard it held.
+  // shared links keep working.
   redirects: async () => [
     { source: "/ukk", destination: "/chat", permanent: false },
-    { source: "/reading", destination: "/scorecard", permanent: false },
   ],
   // The container runs the traced server; native/Vercel builds keep their current mode.
   ...(process.env.KAVERI_STANDALONE === "1" ? { output: "standalone" as const } : {}),
