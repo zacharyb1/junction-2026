@@ -1,0 +1,3 @@
+# Public keys of the operator's laptops, added to the server's root login by add.sh. Public keys are not secrets.
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHF8BPiKmK2LVlKKdsuvKDcJvHX03uplG2LzXa/Oy24n zachary-mac
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFk7jb/kfhNveez5oJg31qHxv2mKUPe4P8G4hlxv2pYd zachary

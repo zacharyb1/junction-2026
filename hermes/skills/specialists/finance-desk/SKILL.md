@@ -16,7 +16,7 @@ Issue #39. One of AIDaddy's three specialist desks. It takes a matter about the 
 3. Call `mcp__casefile__research_case`: `situation` = the person's words, then "Which amounts and limits apply this year, what do I have to file or apply for, and by when?"; `country`, `region`, `language`; `scope` `official`; `household` from the household basics plus this desk's line. Pass a shared letter's text as `document`.
 4. Post one message: "From the finance desk, in N articles:" (none on bad news), then up to 5 plan lines exactly as returned, citation numbers included. Put lines with a deadline first, then lines with an amount. Then "N of M quotes checked on their pages", unverified items as "AIDaddy could not confirm this: …", and the case link.
 5. When the case shows two figures for the same thing, say so in one line: "Two official pages give different figures. Both are in the case file." Never choose between them.
-6. Update this desk's memory line, save "Open case <id>: <title>" as `life-event-butler` step 5 does, and offer next steps with `clarify`: Draft the application or claim, Set reminders, Not now.
+6. Update this desk's memory line, save "Open case <id>: <title>" as `life-event-butler` step 5 does, and offer next steps with `clarify`: Set reminders, Not now. Include Draft the application or claim only when `life-event-butler` step 4 confirms a supported letter/email route. Drafting follows that skill's step 6; otherwise show the verified official procedure or route gap.
 
 ## Memory (Telegram only)
 

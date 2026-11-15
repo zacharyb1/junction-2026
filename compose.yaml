@@ -169,6 +169,21 @@ services:
     init: true
     restart: ${KAVERI_RESTART:-no}
 
+  # One-off, Sunday 15 November (docs/DECISIONS.md, Sun 03:55): adds the operator's laptop keys in
+  # containers/admin-keys/keys.pub to the server's root login, so private values can be set in .env.local.
+  # Appends only and skips keys already there. Server only (profile public): Compose on a laptop never touches
+  # that laptop's /root/.ssh. Remove this service once the keys are in.
+  admin-keys:
+    image: docker.io/curlimages/curl:8.11.1
+    profiles: [public]
+    user: "0:0"
+    entrypoint: [/bin/sh, /kaveri/add.sh]
+    volumes:
+      - ./containers/admin-keys/add.sh:/kaveri/add.sh:ro
+      - ./containers/admin-keys/keys.pub:/kaveri/keys.pub:ro
+      - /root/.ssh:/host-ssh
+    restart: "no"
+
 volumes:
   case-data:
   hermes-home:

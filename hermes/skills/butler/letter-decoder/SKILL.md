@@ -28,7 +28,7 @@ Someone shares a photo, screenshot or PDF of an official letter or document: lan
    - `situation`: who sent what, the demand, then "Is this correct and what can we do?", plus the user's words
    - `document`: the transcribed text, at most 6000 characters, without identity numbers or bank details
    - `country`, `region`, `language`, `household` as in `life-event-butler`
-6. Continue with `life-event-butler` steps 4 to 6: prepare any useful draft first, then show the plan, checked-quotes line and case link before the buttons. Offer Draft a reply only when no draft is already attached.
+6. Continue with `life-event-butler` steps 4 to 6, including the submission-route check: prepare an eligible draft, then show the plan, checked-quotes line and case link before the buttons. Offer Draft a reply only when that check supports a letter/email and the corresponding draft is not attached yet.
 
 ## Pitfalls
 
