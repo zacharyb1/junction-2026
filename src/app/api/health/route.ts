@@ -1,6 +1,8 @@
 import { providerName } from "@/lib/ai";
+import { demoCallConfiguration } from "@/lib/demo-calls";
 
 export function GET() {
+  const calls = demoCallConfiguration();
   return Response.json({
     ok: true,
     // The scaffold chat's model provider. The Engine does not use it, so "none" here is fine.
@@ -9,6 +11,8 @@ export function GET() {
     search: process.env.EXA_API_KEY ? "exa" : "none",
     store: process.env.BLOB_READ_WRITE_TOKEN ? "blob" : "local",
     voice: process.env.ELEVENLABS_API_KEY ? "elevenlabs" : "none",
+    // Demo calls: "phone" dials the test phone, "browser" rings at a web address, "off" until the operator enables them.
+    calls: calls.ready ? calls.line : "off",
     // Vercel sets VERCEL_GIT_COMMIT_SHA; the server deploy script sets KAVERI_COMMIT.
     commit: (process.env.VERCEL_GIT_COMMIT_SHA || process.env.KAVERI_COMMIT)?.slice(0, 7) || "local",
     time: new Date().toISOString(),

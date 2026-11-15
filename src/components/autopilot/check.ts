@@ -1,4 +1,4 @@
-import { highlightUrl, hostOf } from "@/components/landing/sample";
+import { highlightUrl, hostOf } from "@/components/site/sample";
 import recording from "@/data/autopilot-check.json";
 import type { EngineEvent, ResearchResult } from "@/lib/engine/research";
 
@@ -44,6 +44,8 @@ export const RECORDED = {
 /** What the page shows while the check runs: the Engine's own words for each stage, and each page as it is opened. */
 export function progressLine(event: EngineEvent): string | null {
   if (event.type === "stage") return event.detail;
+  // Exa lite answers in well under a second, so this is the first sign of life a listener gets.
+  if (event.type === "glance") return `First look: ${[...new Set(event.pages.map((p) => hostOf(p.url)))].slice(0, 3).join(", ")}`;
   if (event.type === "page") return event.via === "none" ? `Could not open ${hostOf(event.url)}` : `Opened ${hostOf(event.url)}`;
   if (event.type === "verified") return `${event.verified} of ${plural(event.total, "quote")} found on the cited pages`;
   return null;

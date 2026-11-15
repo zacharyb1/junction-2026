@@ -11,10 +11,11 @@ describe("withCode", () => {
     expect(withCode("/try", "table7")).toBe("/try?code=table7");
     expect(withCode("/chat", "table7")).toBe("/chat?code=table7");
     expect(withCode("/autopilot", "table7")).toBe("/autopilot?code=table7");
+    expect(withCode("/call", "table7")).toBe("/call?code=table7");
   });
 
   it("does not hand the code to pages that have no use for it", () => {
-    for (const href of ["/", "/demo", "/demo/chat", "/setup", "/reading", "/c/AzP8JIyzfPeJYESo", "/tryout", "https://t.me/x"]) {
+    for (const href of ["/", "/demo", "/demo/chat", "/setup", "/scorecard", "/c/AzP8JIyzfPeJYESo", "/tryout", "https://t.me/x"]) {
       expect(withCode(href, "table7")).toBe(href);
     }
   });

@@ -11,12 +11,12 @@ type ActionLabels = Pick<
   "actionKind" | "actionTrigger" | "approve" | "approved" | "approvedNote" | "approvedLetter" | "approveFailed"
 >;
 
-// The site's scheme: cyan is the neutral accent, amber waits for the family, green is done and confirmed.
-const TAG: Record<string, string> = {
-  read: "border-primary/40 bg-primary/10 text-primary",
-  draft: "border-border bg-muted text-foreground",
-  waiting: "border-(--hud-amber)/50 bg-(--hud-amber)/10 text-(--hud-amber)",
-  approved: "border-(--hud-green)/50 bg-(--hud-green)/10 text-(--hud-green)",
+// The site's state code: cyan is AIDaddy's own work, amber waits for the family, green is done and confirmed.
+const TONE: Record<string, string> = {
+  read: "site-tag--cyan",
+  draft: "",
+  waiting: "site-tag--amber",
+  approved: "site-tag--green",
 };
 
 /** UTC, so the server render and the browser agree. */
@@ -68,15 +68,15 @@ export function ActionLog({ caseId, actions, t }: { caseId: string; actions: Cas
     .reverse();
   return (
     <div className="flex flex-col gap-3">
-      <ol className="flex flex-col divide-y rounded-lg border bg-card text-sm">
+      <ol className="site-panel flex flex-col divide-y divide-(--hud-line-soft) text-sm">
         {rows.map(({ action, index }) => {
           const tag = action.kind === "irreversible" ? (action.status === "approved" ? "approved" : "waiting") : action.kind;
           const label = tag === "approved" ? t.approved : t.actionKind[action.kind];
           return (
             <li key={index} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:gap-4">
               {/* A column of its own on a wide screen, so the sentences start on one line. */}
-              <span className="shrink-0 sm:w-32">
-                <span className={`inline-block rounded-sm border px-2 py-0.5 text-xs font-medium ${TAG[tag]}`}>{label}</span>
+              <span className="shrink-0 sm:w-40">
+                <span className={`site-tag ${TONE[tag]}`}>{label}</span>
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <p>{action.summary}</p>
@@ -88,7 +88,7 @@ export function ActionLog({ caseId, actions, t }: { caseId: string; actions: Cas
                     type="button"
                     onClick={() => approve(index)}
                     disabled={busy !== null}
-                    className="mt-2 min-h-11 w-full rounded-lg bg-(--hud-amber) px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-(--hud-amber)/85 disabled:opacity-60 motion-reduce:transition-none sm:w-fit"
+                    className="site-btn site-btn--amber site-btn--compact mt-2 w-full sm:w-fit"
                   >
                     {t.approve}
                   </button>

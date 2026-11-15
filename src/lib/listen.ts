@@ -6,8 +6,8 @@
  * (hermes/config.snippet.yaml), in English and Finnish, without look-behind so older phones can read them.
  */
 
-/** The four desks a matter can go to. They ask the Engine different questions, as the bot's skills do. */
-export type Desk = "life" | "legal" | "travel" | "finance";
+/** The five desks a matter can go to. They ask the Engine different questions, as the bot's skills do. */
+export type Desk = "life" | "legal" | "travel" | "finance" | "rules";
 
 export type Trigger = {
   /** What it is about, for the "already on it" check: "rent", "travel", "tax", ... or "asked" when only the name was said. */
@@ -32,6 +32,7 @@ export const DESKS: Record<Desk, { name: string; question: string; scope: "auto"
     question: "Which amounts and limits apply this year, what do I have to file or apply for, and by when?",
     scope: "official",
   },
+  rules: { name: "Rules desk", question: "Is it allowed, and what are the rules?", scope: "official" },
 };
 
 /** A whole word or phrase: not the middle of a longer word. `L` stands for "any further letters" (a word ending). */
@@ -143,10 +144,23 @@ const RULES: Rule[] = [
   },
   {
     kind: "allowed",
-    desk: "legal",
+    desk: "rules",
     urgent: false,
     pattern: words(
       "customs|duty[- ]free|is it (?:legal|illegal|allowed)|can (?:i|we) (?:bring|take|carry|import)|tulliL|saa(?:ko|nko) (?:tuoda|viedä)|onko (?:laillista|sallittua)",
+    ),
+  },
+  {
+    // Someone says what they are about to do, and it is the kind of thing that has rules: "I'll just bring ten cartons
+    // from Tallinn", "we can just sublet the flat while we are away". Nobody asked, so AIDaddy asks for them.
+    // The list of things is short on purpose: "I'll bring milk" and "we'll park here" are small talk.
+    kind: "plan",
+    desk: "rules",
+    urgent: false,
+    pattern: words(
+      "(?:i'?m going to|i am going to|i will|i'?ll|we will|we'?ll|we are going to|we'?re going to|let'?s|(?:i|we) can just|(?:i|we) could just|i'?m not going to|we'?re not going to)[^.?!]{0,80}" +
+        "(?:sublet|rent out|smuggle|not pay|stop paying|pay late|declare|keep the deposit|withhold" +
+        "|(?:bring|carry|import|take)[^.?!]{0,40}(?:cartons?|cigarettes|tobacco|snus|alcohol|wine|beer|spirits|medicine|medication|pills|cash|meat|plants?|seeds|a knife|pepper spray|a drone))",
     ),
   },
 ];
@@ -182,6 +196,9 @@ export function decide(text: string): Trigger | null {
 
 export type Heard = { text: string; at: number };
 
+/** A question about what is allowed is already in the words. */
+const ASKS_IF_ALLOWED = /\b(?:is (?:it|that|this) (?:legal|illegal|allowed|permitted)|are we allowed|am i allowed|can (?:i|we) )/i;
+
 /** How far back and forward the sentences around a life event still belong to it. */
 const BEFORE_MS = 45_000;
 const AROUND = 2;
@@ -199,6 +216,8 @@ export function situation(lines: Heard[], index: number, desk: Desk): string {
     .filter(Boolean)
     .map((line) => (/[.!?…]$/.test(line) ? line : `${line}.`))
     .join(" ");
+  // The rules desk asks "is it allowed" only when nobody in the room already did.
+  if (desk === "rules" && ASKS_IF_ALLOWED.test(said)) return said.slice(0, 1400);
   return `${said.slice(0, 1100)} ${DESKS[desk].question}`.trim();
 }
 

@@ -1,0 +1,402 @@
+/* The pitch deck, in the site's warm household look. One slide is one 1280 by 720 page. Built by scripts/make-deck.mjs. */
+
+@page {
+  size: 1280px 720px;
+  margin: 0;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --bg: #fbf8f3;
+  --line: #e5dccf;
+  --line-soft: #efe8dd;
+  --accent: #b84f2a;
+  --amber: #96600f;
+  --green: #23744a;
+  --text: #211b17;
+  --dim: #6b625b;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 400 20px/1.5 "Inter", system-ui, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+ul,
+ol {
+  list-style: none;
+}
+
+.slide {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 1280px;
+  height: 720px;
+  padding: 44px 64px 40px;
+  overflow: hidden;
+  break-after: page;
+  background:
+    radial-gradient(60% 50% at 82% 0%, rgb(255 179 138 / 0.22), transparent 70%),
+    radial-gradient(45% 40% at 0% 70%, rgb(255 215 110 / 0.12), transparent 70%),
+    var(--bg);
+}
+.slide > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 26px;
+}
+.mark {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.mark b {
+  font-weight: 700;
+  color: var(--accent);
+}
+.label,
+.eyebrow {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.slide > footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 14px;
+  color: var(--dim);
+  font-size: 13px;
+}
+
+h1 {
+  font-size: 92px;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+h2 {
+  margin-bottom: 22px;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+strong {
+  font-weight: 600;
+}
+.lede {
+  max-width: 34em;
+  margin-top: 26px;
+  color: var(--dim);
+  font-size: 23px;
+  line-height: 1.45;
+}
+.note {
+  margin-top: 18px;
+  color: var(--dim);
+  font-size: 16px;
+}
+
+/* ---------- title slides ---------- */
+
+.title {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: 40px;
+  align-items: center;
+  flex: 1;
+}
+.orb {
+  justify-self: center;
+  width: 330px;
+  height: 330px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 26%, rgb(255 255 255 / 0.85), transparent 30%),
+    radial-gradient(circle at 60% 82%, #ffd27a, transparent 55%),
+    radial-gradient(circle at 12% 55%, #f7a8a4, transparent 55%),
+    #ffc2a0;
+  box-shadow: 0 0 110px rgb(255 179 138 / 0.6);
+}
+.url {
+  margin-top: 26px;
+  color: var(--accent);
+  font-size: 30px;
+  font-weight: 600;
+}
+.qr {
+  justify-self: center;
+  width: 300px;
+  height: 300px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(60 40 25 / 0.08);
+}
+.qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- text and pictures ---------- */
+
+.cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 48px;
+  align-items: start;
+}
+.cols--pic {
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 56px;
+}
+.cols--pic2 {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 40px;
+}
+.points,
+.moves {
+  display: grid;
+  gap: 16px;
+}
+.points li,
+.moves li {
+  padding-left: 18px;
+  border-left: 3px solid var(--accent);
+  color: var(--dim);
+  font-size: 19px;
+  line-height: 1.45;
+}
+.points strong,
+.moves strong,
+.row strong,
+.exa strong {
+  color: var(--text);
+}
+.moves {
+  counter-reset: move;
+}
+.moves li {
+  position: relative;
+  padding-left: 52px;
+  border-left: 0;
+  counter-increment: move;
+}
+.moves li::before {
+  content: counter(move);
+  position: absolute;
+  top: 2px;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.panel {
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(60 40 25 / 0.06);
+}
+.said {
+  margin: 8px 0 18px;
+  font-size: 20px;
+  line-height: 1.4;
+}
+.plan {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  counter-reset: step;
+}
+.plan li {
+  position: relative;
+  padding-left: 30px;
+  font-size: 16px;
+  line-height: 1.4;
+  counter-increment: step;
+}
+.plan li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  color: var(--amber);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.75;
+}
+
+.pic {
+  display: grid;
+  gap: 8px;
+}
+.pic img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgb(60 40 25 / 0.1);
+}
+.pic figcaption {
+  color: var(--dim);
+  font-size: 13px;
+}
+.pic--phone img {
+  max-height: 480px;
+  width: auto;
+  justify-self: center;
+  border-radius: 28px;
+}
+.pic--phone figcaption {
+  text-align: center;
+}
+.cols--pic2 .pic img {
+  max-height: 480px;
+  object-fit: cover;
+  object-position: top left;
+}
+.pic--wide img {
+  max-height: 320px;
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  box-shadow: none;
+  object-fit: cover;
+  object-position: top;
+  /* The cards run on below; fade them out so the cut reads as deliberate. */
+  mask-image: linear-gradient(#000 62%, transparent);
+}
+
+/* ---------- the flow ---------- */
+
+.flow {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  counter-reset: node;
+}
+.flow li {
+  position: relative;
+  padding: 44px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--dim);
+  font-size: 14px;
+  line-height: 1.4;
+  counter-increment: node;
+}
+.flow li::before {
+  content: counter(node, decimal-leading-zero);
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.flow h3 {
+  color: var(--text);
+  font-size: 17px;
+}
+.tech {
+  margin: 2px 0 8px;
+  color: var(--amber);
+  font-size: 12px;
+  font-weight: 600;
+}
+.exa {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 40px;
+  margin-top: 26px;
+}
+.exa li {
+  padding-left: 16px;
+  border-left: 3px solid var(--accent);
+  color: var(--dim);
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+/* ---------- rows and numbers ---------- */
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.row li {
+  padding-left: 14px;
+  border-left: 3px solid var(--accent);
+  color: var(--dim);
+  font-size: 16px;
+  line-height: 1.4;
+}
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.numbers li {
+  display: grid;
+  gap: 8px;
+  padding: 24px 22px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(60 40 25 / 0.06);
+}
+.numbers b {
+  color: var(--green);
+  font-size: 58px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.numbers span {
+  color: var(--dim);
+  font-size: 16px;
+  line-height: 1.35;
+}
+.numbers--small {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+.numbers--small li {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+}
+.numbers--small b {
+  color: var(--text);
+  font-size: 36px;
+}

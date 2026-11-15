@@ -13,7 +13,10 @@
   overflow: clip;
   border-radius: 12px;
   background: #f5f6f8;
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  box-shadow:
+    0 0 0 1px rgb(184 79 42 / 0.22),
+    0 0 60px rgb(184 79 42 / 0.1),
+    0 30px 80px rgb(0 0 0 / 0.5);
   color: #1b2430;
 }
 .bdemo-chrome {
@@ -236,9 +239,14 @@
   height: 92px;
   border-radius: 50%;
   object-fit: cover;
+  /* The orb's ring, drawn as a shadow so the box does not change. */
+  box-shadow:
+    0 0 0 1px rgb(184 79 42 / 0.35),
+    0 0 0 5px rgb(184 79 42 / 0.08),
+    0 0 28px rgb(184 79 42 / 0.3);
 }
 .bdemo-call img.is-ringing {
-  animation: bdemo-ring 1s ease-in-out infinite;
+  animation: bdemo-halo 1s ease-in-out infinite;
 }
 .bdemo-call-name {
   font-size: 1.4rem;
@@ -306,6 +314,21 @@
 @keyframes bdemo-ring {
   50% {
     transform: scale(1.06);
+  }
+}
+@keyframes bdemo-halo {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgb(184 79 42 / 0.35),
+      0 0 0 0 rgb(184 79 42 / 0.45),
+      0 0 24px rgb(184 79 42 / 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgb(184 79 42 / 0.35),
+      0 0 0 10px rgb(184 79 42 / 0),
+      0 0 40px rgb(184 79 42 / 0.55);
   }
 }
 @keyframes bdemo-blink {

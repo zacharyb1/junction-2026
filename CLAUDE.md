@@ -18,13 +18,13 @@ The team uses Claude Code with its own workflows and tools. This repository does
 
 - Research and verification live in the shared Engine. Conversation, silence, approvals, drafts and reminders live in the bot runtime.
 - Plans require fetched-page evidence. Preserve page-word quotes, whole-number matching and same-page support in `ground.ts`, `text.ts` and `verify.ts`; do not weaken grounding to pass a test. This is research with sources, not legal advice.
-- The bot never sends, files, books or pays. Drafts/reminders need family approval. Existing Cases and saved dates must be read successfully before reuse/scheduling; chat labels and delivery scope must match.
+- The bot never sends, files, books or pays in the real world. A confirmed demo call may contact only the operator-configured test phone, or ring the browser test line; purchases/payments are simulated (docs/DEMO_CALLS.md). Drafts/reminders need family approval. Existing Cases and saved dates must be read successfully before reuse/scheduling; chat labels and delivery scope must match.
 - English is primary; Finnish is a product/demo language. Support expansion is a team decision: check `LANGUAGE_NAMES`, `UNSUPPORTED_COUNTRIES` in `src/lib/engine/research.ts` and existing source lists before changing it.
 - One active gateway per Telegram token, including alternate runtimes. The scripts cannot detect another machine. Hermes CLI calls can auto-start a gateway; separate profiles may still share credentials and a gateway. Private memories/jobs are not synchronized by Git.
 - Local Cases follow the Engine's working directory. Preserve `.data/cases` and backups before moving/removing an Engine; Case backups do not include Hermes memories or reminders. Builds/type generation write `.next`, so they can disrupt a running server using that directory.
 - Secrets, private Case data, Hermes homes and family logs stay out of commits. A shared Blob token means shared Case storage; changing a bot token alone does not isolate copied reminder state.
 - For UI work, shadcn uses Base UI: link-styled buttons use `LinkButton`/`linkButtonClasses`, not `asChild`. Cache Components are intentionally off.
-- Every page except `/reading` renders inside `SiteShell` (`src/components/site/`), which supplies the shared header, footer and dark palette; a new page uses it, and links to `/try`, `/chat` or `/autopilot` use `SiteLink` so the demo's access code travels along. AIDaddy is the one name for the product and its butler.
+- Every page renders inside `SiteShell` (`src/components/site/`), which supplies the shared header, footer and dark palette; a new page uses it with `PageHead` and the `site-` classes of `site.css` (see DESIGN.md), and links to `/try`, `/chat` or `/autopilot` use `SiteLink` so the demo's access code travels along. AIDaddy is the one name for the product and its butler.
 
 ## Checks and decision history
 

@@ -2,6 +2,7 @@ import Exa from "exa-js";
 import { z } from "zod";
 import { type CaseInput, type Evidence, type EvidenceInput, LIMITS } from "@/lib/case";
 import { publishCase } from "@/lib/cases";
+import { applicabilityFor } from "@/lib/engine/applicability";
 import {
   bestSupport,
   contains,
@@ -38,7 +39,12 @@ export const ResearchInput = z.object({
   language: z.string().trim().min(2).max(20).default("en").describe("Language to write the plan in, e.g. en, fi, sv."),
   household: z.string().trim().max(600).optional().describe("Known facts about the household: who works where, residence status."),
   document: z.string().trim().max(6000).optional().describe("Text of a letter or document the family shared."),
-  depth: z.enum(["fast", "deep"]).default("fast").describe("fast: about 6 to 12 seconds. deep: more questions and Exa deep search."),
+  depth: z
+    .enum(["fast", "deep", "agent"])
+    .default("fast")
+    .describe(
+      "fast: about 6 to 12 seconds. deep: more questions and Exa deep search. agent: one Exa Agent run that researches in several steps, about 30 to 60 seconds.",
+    ),
   scope: z
     .enum(["auto", "official", "open"])
     .default("auto")
@@ -65,6 +71,11 @@ export type EngineEvent =
       tookMs: number;
       ms: number;
     }
+  /**
+   * The first pages on the topic, from one Exa lite search, while the structured searches are still running.
+   * Pointers to look at, not checked claims: nothing from them enters the plan.
+   */
+  | { type: "glance"; pages: { url: string; title: string; official: boolean }[]; tookMs: number; ms: number }
   /** One cited page, as soon as it has been read. `via` is the most direct reader that opened it. */
   | { type: "page"; url: string; title: string; official: boolean; via: PageReader; ms: number }
   /** Sent once the case is stored: how many quoted sentences were confirmed on their pages. */
@@ -114,6 +125,13 @@ type ExaSearchResponse = {
   output?: { content?: unknown; grounding?: Grounding[] };
   costDollars?: { total?: number };
 };
+/** A finished Exa Agent run, as far as the engine reads it. */
+type ExaAgentRun = {
+  id: string;
+  status: string;
+  output?: { structured?: unknown; grounding?: Grounding[] } | null;
+  costDollars?: { total?: number } | null;
+};
 
 // Ten properties in total, nesting depth two: the limits of Exa's structured search output.
 const OUTPUT_SCHEMA = {
@@ -148,6 +166,14 @@ const OUTPUT_SCHEMA = {
   },
   required: ["title", "summary", "steps"],
 } as const;
+
+/** The same shape for an Exa Agent run. The Agent API asks for a bound on every list. */
+const AGENT_SCHEMA = {
+  ...OUTPUT_SCHEMA,
+  properties: { ...OUTPUT_SCHEMA.properties, steps: { ...OUTPUT_SCHEMA.properties.steps, maxItems: 8 } },
+};
+/** How long one Agent run may take before the usual searches take over. */
+const AGENT_TIMEOUT_MS = 100_000;
 
 /** The date a page prints for itself: "Published 18/11/2025", "Julkaistu 13.5.2026". ISO form, or null. */
 function statedDate(text: string): string | null {
@@ -193,7 +219,7 @@ function systemPrompt(j: Jurisdiction, language: string): string {
   // Unlisted languages fall back to English.
   const lang = LANGUAGE_NAMES[language.toLowerCase().slice(0, 2)] ?? "English";
   return [
-    `You are preparing a practical checklist for a family living in ${j.region ? `${j.region}, ` : ""}${j.name}.`,
+    `You are preparing a practical checklist under the rules of ${j.region ? `${j.region}, ` : ""}${j.name}. The family's current residence and destination are the facts stated in their situation, not assumptions from this jurisdiction label.`,
     `Use the rules that apply in ${j.name} today. Prefer the authority's own pages over news, blogs or forums.`,
     "For every step, copy one sentence word for word from the source page into `quote`, in the page's own language, and give that page's exact URL in `sourceUrl`.",
     "Choose the sentence that states the rule, deadline or amount itself, so a reader can check the step from the quote alone.",
@@ -204,6 +230,7 @@ function systemPrompt(j: Jurisdiction, language: string): string {
     "The summary says only what the steps say, in plain words, with no urgency and no advice beyond the steps. Do not ask a question that the situation already answers.",
     `When the authority publishes the page in ${lang}, cite that version of the page.`,
     "Include only steps that directly help with this exact situation. Skip general information about neighbouring topics, and anything the sources do not cover.",
+    "For each rule, check its prerequisites against the full situation and household. An authentic quote about arriving in a country does not establish a requirement for someone already living there and changing address. Do not assume citizenship, permanent residence or a pending application. Keep the conditions of relevant benefits explicit.",
     "At most five steps, in the order the family does them. Five well-sourced steps beat ten vague ones. One step per separate application or notice the family must file.",
     "`detail` restates what the quote says in plain words and adds nothing the page does not say.",
     "When a rule differs by contract date, permit type or another fact you do not have, give one step per branch and name the branch in its title. Prefer the national authority's page over an EU-level page when both cover the rule.",
@@ -223,7 +250,8 @@ const withoutOrders = (document: string) =>
 function frame(input: ResearchInput, j: Jurisdiction): string {
   const where = `${j.region ? `${j.region}, ` : ""}${j.name}`;
   return [
-    `Situation of a family living in ${where}: ${input.situation}`,
+    `Research jurisdiction: ${where}. The stated origin and destination below take precedence over this search location.`,
+    `Family's situation: ${input.situation}`,
     input.household ? `About the household: ${input.household}` : "",
     input.document ? `They received this document:\n"""\n${withoutOrders(input.document).slice(0, 3000)}\n"""` : "",
   ]
@@ -492,12 +520,44 @@ const MONEY = /[€$£%]|\b(eur|euros?|euroa|usd|dollars?|pounds?|gbp|sek|nok|dk
 const TIMING =
   /\b(before|after|within|no later|at the latest|deadline|by the end|prior to|as soon as|week \d|weeks? of|ennen|viimeistään|kuluessa|menness|jälkeen|senast|innan|inom|efter)\b/i;
 
-/** The model sometimes repeats the deadline in `amount`. Keep only real amounts and durations. */
+// Classify the matching period in its own clause: a payment mentioned elsewhere
+// in the sentence cannot turn a photo age or document validity into an entitlement.
+const ENTITLEMENT_PERIOD =
+  /\b(paid|payable|entitled|maksetaan|betalas|gezahlt|bezahlt)\b|\b(receive|get|grant)\w*\b[^.;:!?]{0,80}\b(allowances?|benefits?|compensation|leave)\b|\b(allowances?|benefits?|compensation|leave|warrant(?:y|ies))\b[^.;:!?]{0,60}\b(available|lasts?|valid|covers?|continues?|for)\b|\breturn (window|period|right)\b/i;
+const DOCUMENT_AGE = /\b(photos?|photographs?|passports?|identity cards?|documents?|certificates?)\b[^.;:!?]{0,100}\b(valid|validity|issued|dated|taken|older|old|recent)\b/i;
+
+function moneyContext(value: string, sentence: string): boolean {
+  const unit = unitOf(value);
+  if (MONEY.test(value) || !["day", "week", "month", "year"].includes(unit)) return true;
+  const numbers = new Set(numbersIn(value));
+  let supported = false;
+  const clauses = sentence.replace(/\s+/g, " ").split(/,(?!\d)|[;:]|\b(?:but|whereas|while|if|when|and (?=your\b|the\b|you\b))\b/i);
+  for (const clause of clauses) {
+    let cursor = 0;
+    for (const figure of figuresIn(clause)) {
+      const at = clause.indexOf(figure, cursor);
+      cursor = at + figure.length;
+      if (unitOf(figure) !== unit || !numbersIn(figure).every((n) => numbers.has(n))) continue;
+      const before = clause.slice(0, at);
+      const after = clause.slice(cursor);
+      if (DOCUMENT_AGE.test(before) || /^\s*(old|earlier|ago|of age)\b/i.test(after)) return false;
+      const entitlement = ENTITLEMENT_PERIOD.test(before)
+        || /^\s*(?:of\s+)?(?:(?:paid|parental|maternity|paternity|annual|sick)\s+)+leave\b/i.test(after)
+        || (OTHERS_DUTY.test(clause) && !OWN_DUTY.test(clause)) || WAITING.test(clause);
+      // An ambiguous repeated figure is withheld rather than borrowing its other occurrence's role.
+      if (!entitlement) return false;
+      supported = true;
+    }
+  }
+  return supported;
+}
+
+/** Reject malformed or duplicate amounts here; classify periods against their verified sentence later. */
 function realAmount(amount: string | undefined, due: string | undefined): string | undefined {
   if (!amount) return undefined;
   if (due && sameThing(amount, due)) return undefined;
-  // With a deadline already set, a second timing phrase is the deadline again. Without one it is a period
-  // someone else must keep, such as a notice period, which is an entitlement.
+  // With a deadline already set, a second timing phrase is the deadline again.
+  // Otherwise keep the candidate until its verified sentence establishes its role.
   if (due && TIMING.test(amount) && !MONEY.test(amount)) return undefined;
   if (/free of charge|income/i.test(amount)) return amount;
   // A bare number is not an amount: "14A" is a form, "112" a phone number. It needs money or a length of time.
@@ -580,7 +640,8 @@ export async function researchCase(
   const usage = { searches: 0, contents: 0, costDollars: 0 };
   const scope = resolveScope(input);
   const official = scope === "official" ? j.officialDomains : [];
-  const context = frame(input, j);
+  const applicability = applicabilityFor(input, j.name);
+  const context = [applicability.instructions, frame(input, j)].filter(Boolean).join("\n");
   const where = `${j.region ? `${j.region}, ` : ""}${j.name}`;
   const ruleCheck = scope === "official" && isRuleCheck(input);
   const system =
@@ -601,6 +662,38 @@ export async function researchCase(
   let head: RawOutput = {};
   const questions: string[] = [];
   const given = `${input.situation}\n${input.document ?? ""}\n${input.household ?? ""}`;
+  const inapplicable = new Set<string>();
+
+  /** The steps a search or an agent run proposed, as candidates for the page check. */
+  const candidates = (out: RawOutput | null, graded: Map<number, Confidence>): Candidate[] =>
+    (out?.steps ?? [])
+      .map((s, index) => ({ ...s, confidence: graded.get(index) }))
+      .filter((s) => s.title && s.quote && s.sourceUrl && /^https?:\/\//.test(s.sourceUrl) && !JUNK.test(s.title))
+      .filter((s) => {
+        if (!applicability.exclusion({ ...s, sourceTitle: titles.get(s.sourceUrl!.trim()) })) return true;
+        inapplicable.add(s.title!);
+        return false;
+      })
+      .map((s) => {
+        // A value the family told us themselves (for example the rent in their letter) is not a claim to verify.
+        const own = (value: string | undefined) => (value && contains(given, value) ? undefined : value);
+        const due = own(tidy(s.due));
+        const amount = realAmount(own(tidy(s.amount)), due);
+        const url = s.sourceUrl!.trim();
+        const quote = clip(s.quote, LIMITS.quote);
+        const facts: Fact[] = [];
+        if (due) facts.push({ kind: "deadline", value: due, url, quote });
+        if (amount) facts.push({ kind: "amount", value: amount, url, quote });
+        return {
+          confidence: s.confidence,
+          title: clip(s.title, 140),
+          detail: JUNK.test(s.detail ?? "") ? undefined : clip(s.detail, 600) || undefined,
+          facts,
+          quote,
+          url,
+          official: isOfficial(url, j),
+        };
+      });
 
   async function search(focus: Focus, restrict: boolean): Promise<Candidate[]> {
     stage("search", m.searching(Boolean(restrict && official.length), focus.name));
@@ -645,7 +738,7 @@ export async function researchCase(
       for (const c of g.citations ?? []) if (c.title && !titles.has(c.url)) titles.set(c.url, c.title);
     }
     const out = parseOutput(res.output?.content);
-    if (out && (focus.lead || !head.title)) head = { title: out.title, summary: out.summary };
+    if (out && (focus.lead || !head.title)) head = { title: applicability.narrative(out.title), summary: applicability.narrative(out.summary) };
     for (const q of out?.questions ?? []) if (q) questions.push(q);
     // Exa grades how well each field is grounded in the pages it read.
     const graded = new Map<number, Confidence>();
@@ -655,31 +748,97 @@ export async function researchCase(
         graded.set(Number(m[1]), g.confidence);
       }
     }
-    const proposed = (out?.steps ?? [])
-      .map((s, index) => ({ ...s, confidence: graded.get(index) }))
-      .filter((s) => s.title && s.quote && s.sourceUrl && /^https?:\/\//.test(s.sourceUrl) && !JUNK.test(s.title))
-      .map((s) => {
-        // A value the family told us themselves (for example the rent in their letter) is not a claim to verify.
-        const own = (value: string | undefined) => (value && contains(given, value) ? undefined : value);
-        const due = own(tidy(s.due));
-        const amount = realAmount(own(tidy(s.amount)), due);
-        const url = s.sourceUrl!.trim();
-        const quote = clip(s.quote, LIMITS.quote);
-        const facts: Fact[] = [];
-        if (due) facts.push({ kind: "deadline", value: due, url, quote });
-        if (amount) facts.push({ kind: "amount", value: amount, url, quote });
-        return {
-          confidence: s.confidence,
-          title: clip(s.title, 140),
-          detail: JUNK.test(s.detail ?? "") ? undefined : clip(s.detail, 600) || undefined,
-          facts,
-          quote,
-          url,
-          official: isOfficial(url, j),
-        };
-      });
+    const proposed = candidates(out, graded);
     report("done", proposed.length, new Set(proposed.map((c) => c.url)).size);
     return proposed;
+  }
+
+  /**
+   * One Exa Agent run in place of the separate searches: the agent searches, reads and reasons in several steps
+   * and returns the same fields. What it proposes goes through the same page check as any search result.
+   */
+  async function agentSearch(asks: Focus[]): Promise<Candidate[]> {
+    stage("search", m.agentSearching);
+    usage.searches++;
+    const began = Date.now();
+    const report = (status: "running" | "done" | "failed", steps = 0, pages = 0) =>
+      // The agent is told which sites to prefer, but nothing limits it to them: "open" is the honest label.
+      emit({ type: "search", focus: m.focus.agent, web: "open", status, steps, pages, tookMs: Date.now() - began, ms: since() });
+    report("running");
+    const named = official.filter((d) => !d.startsWith("*")).slice(0, 40);
+    const query = [
+      context,
+      `Research task: ${asks.map((a) => a.ask).join(" ")}`,
+      // One run covers what three searches cover, so it may return more steps than one search does.
+      system.replace("At most five steps", "At most eight steps"),
+      named.length ? `Search these official sites first and prefer them over any other source: ${named.join(", ")}.` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+    let id = "";
+    try {
+      const created = (await withRetry(() =>
+        exa.agent.runs.create({ query, effort: "low", outputSchema: AGENT_SCHEMA } as never),
+      )) as unknown as ExaAgentRun;
+      id = created.id;
+      const done = (await exa.agent.runs.pollUntilFinished(id, {
+        pollInterval: 2_000,
+        timeoutMs: AGENT_TIMEOUT_MS,
+      })) as unknown as ExaAgentRun;
+      // Only a completed run carries results. A failed or cancelled one must not look like an empty success.
+      if (done.status !== "completed") throw new Error(`Exa Agent run ended as ${done.status}`);
+      usage.costDollars += done.costDollars?.total ?? 0;
+      const grounding = done.output?.grounding ?? [];
+      for (const g of grounding) for (const c of g.citations ?? []) if (c.title && !titles.has(c.url)) titles.set(c.url, c.title);
+      const out = parseOutput(done.output?.structured);
+      if (out) head = { title: applicability.narrative(out.title), summary: applicability.narrative(out.summary) };
+      for (const q of out?.questions ?? []) if (q) questions.push(q);
+      const graded = new Map<number, Confidence>();
+      for (const g of grounding) {
+        const at = g.field.match(/^(?:structured\.)?steps\[(\d+)\](?:\.quote)?$/);
+        if (at && (g.confidence === "low" || g.confidence === "medium" || g.confidence === "high")) {
+          graded.set(Number(at[1]), g.confidence);
+        }
+      }
+      const proposed = candidates(out, graded);
+      report("done", proposed.length, new Set(proposed.map((c) => c.url)).size);
+      return proposed;
+    } catch (error) {
+      report("failed");
+      // A run that is still going after the time limit would keep spending. Stopping it is best effort.
+      if (id) void exa.agent.runs.cancel(id).catch(() => {});
+      throw error;
+    }
+  }
+
+  /**
+   * A first look while the research runs: Exa lite answers from its index in well under a second.
+   * The pages are shown as pointers. Nothing from them enters the plan, which only holds checked quotes.
+   */
+  async function firstLook(): Promise<void> {
+    const began = Date.now();
+    usage.searches++;
+    const res = (await exa.search(
+      `${clip(input.situation, 300)} ${where}`,
+      {
+        type: "lite",
+        numResults: 5,
+        userLocation: j.code,
+        contents: { highlights: true },
+        ...(official.length ? { includeDomains: official } : {}),
+      } as never,
+      { timeout: 5_000 } as never,
+    )) as unknown as ExaSearchResponse;
+    usage.costDollars += res.costDollars?.total ?? 0;
+    const pages = (res.results ?? [])
+      .filter((r) => /^https?:\/\//.test(r.url))
+      .slice(0, 5)
+      .map((r) => ({ url: r.url, title: clip(r.title ?? "", 200) || hostOf(r.url), official: isOfficial(r.url, j) }));
+    if (!pages.length) return;
+    for (const page of pages) if (!titles.has(page.url)) titles.set(page.url, page.title);
+    const tookMs = Date.now() - began;
+    trailEvents.push({ ms: since(), detail: m.firstLook([...new Set(pages.map((p) => hostOf(p.url)))], (tookMs / 1000).toFixed(1)) });
+    emit({ type: "glance", pages, tookMs, ms: since() });
   }
 
   // One failed search must not sink the case: the others still carry it.
@@ -732,13 +891,29 @@ export async function researchCase(
       .filter((n) => n.date >= since.slice(0, 10));
   }
   const asks = scope === "open" ? choiceFocuses(m.focus) : ruleCheck ? ruleFocuses(m.focus) : focuses(input, m.focus);
-  let found = await run(asks, true);
+  // Runs beside the research and never holds it up. A failed first look costs nothing but the look.
+  const glance = firstLook().catch(() => {});
+  let found: Candidate[] = [];
+  if (input.depth === "agent") {
+    found = await agentSearch(asks).catch((error: unknown) => {
+      lastError = error;
+      return [];
+    });
+    // Too little from the agent: the usual searches run too, so this mode never returns less than the fast one.
+    if (found.length < 3) {
+      stage("search", m.agentFellBack);
+      found = [...found, ...(await run(asks, true))];
+    }
+  } else {
+    found = await run(asks, true);
+  }
   // Too little from official sites: widen to the open web once.
   if (found.length < 3 && official.length) found = [...found, ...(await run(asks.slice(0, 2), false))];
   if (!found.length) {
     if (lastError) {
       throw new EngineError(m.searchFailed(lastError instanceof Error ? lastError.message : String(lastError)), 502);
     }
+    if (inapplicable.size) throw new EngineError(m.nothingConfirmed, 502);
     // Nothing to research, or nothing found. Not a server fault, so the caller gets a message it can show.
     throw new EngineError(m.nothingToResearch, 422);
   }
@@ -750,6 +925,8 @@ export async function researchCase(
       throw new EngineError(m.nothingToResearch, 422);
     }
   }
+  // The first look finished long ago, or gave up after its five seconds. Its cost and trail line belong to this case.
+  await glance;
   const searchMs = since();
 
   // Official sources first (stable sort keeps the lead focus on top), then merge near-duplicates.
@@ -830,7 +1007,7 @@ export async function researchCase(
 
   stage("verify", m.checking);
   const evidence: EvidenceInput[] = [];
-  const unverified: string[] = [];
+  const unverified: string[] = [...inapplicable].map((title) => m.arrivalNotEstablished(title));
   /** Returns the citation number, or null when the case already holds as many sources as it may. */
   const cite = (url: string, quote: string): number | null => {
     const existing = evidence.find((e) => e.url === url && (contains(e.quote, quote) || contains(quote, e.quote)));
@@ -987,6 +1164,7 @@ export async function researchCase(
       }
       const sentence = evidence.find((e) => e.n === n)?.quote ?? "";
       if (fact.kind === "deadline" && notOurDeadline(sentence)) {
+        if (!moneyContext(fact.value, sentence)) continue;
         // The time limit binds someone else, or is a waiting time or an example: it is listed under its own sentence.
         const label = sentenceLabel(n);
         if (money.length < LIMITS.money && !money.some((x) => x.label === label || sameFigure(x.amount, fact.value))) {
@@ -1008,6 +1186,7 @@ export async function researchCase(
           differ(target.due, first, fact.value, n);
         }
       } else {
+        if (!moneyContext(fact.value, sentence)) continue;
         // Two amounts for one step that share a unit but not a figure are shown side by side.
         const seen = amounts.get(target) ?? [];
         const clash = seen.find((a) => !sameNumbers(a.value, fact.value) && unitOf(a.value) === unitOf(fact.value));
@@ -1060,6 +1239,7 @@ export async function researchCase(
     const figures = figuresIn(evidence.find((e) => e.n === step.evidence[0])?.quote ?? "").filter((f) => !contains(given, f));
     const quote = evidence.find((e) => e.n === step.evidence[0])?.quote ?? "";
     const takes = (figure: string) => {
+      if (!moneyContext(figure, quote)) return;
       if (money.length >= LIMITS.money || money.some((m) => sameFigure(m.amount, figure))) return;
       const own = numbersIn(figure);
       // Already inside a line that rests on the same sentence ("€250" within "€250, €400 or €600").
@@ -1214,12 +1394,17 @@ export async function researchCase(
       .split(/(?<=[.!?])\s+/)
       .filter((part) => !disputed.some((d) => unitOf(d) && tokens(part).includes(unitOf(d)) && numbersIn(d).some((n) => numbersIn(part).includes(n))))
       .join(" ");
+  const retainedClaims = steps.map((step) => [step.title, step.detail,
+    ...step.evidence.map((n) => evidence.find((item) => item.n === n)?.quote),
+  ].filter(Boolean).join(" ")).join("\n");
   const caseInput: CaseInput = {
     title,
     event: key(title).split(" ").slice(0, 4).join("_").slice(0, 60) || "case",
     language: input.language,
     jurisdiction: { country: j.name, region: j.region },
-    summary: backed(withoutDisputed(clip(head.summary, 800)), cited) ?? m.sourcedPlan(clip(input.situation, 200)),
+    // The extracted summary may still paraphrase a discarded prerequisite even
+    // when its wording no longer names that prerequisite. Do not reuse it then.
+    summary: (!inapplicable.size && backed(withoutDisputed(clip(head.summary, 800)), cited)) || m.sourcedPlan(clip(input.situation, 200)),
     steps,
     money,
     evidence,
@@ -1227,6 +1412,7 @@ export async function researchCase(
     news: news.length ? news : undefined,
     unverified: dedupe(unverified, 6).map((u) => u.slice(0, 300)),
     openQuestions: questions
+      .filter((q) => applicability.keepQuestion(q, retainedClaims))
       .filter((q) => q.trim().endsWith("?") && backed(q, cited) === q.trim())
       // A question whose words are mostly in the family's own message has been answered already.
       .filter((q) => {

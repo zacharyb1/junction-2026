@@ -25,8 +25,9 @@ export async function POST(req: Request) {
   if (!parsed.success) return json({ error: "invalid input", issues: parsed.error.issues }, 400);
   // A request that fails validation costs nothing, so only valid ones count against the limit.
   if (!allow(req, trusted)) return json({ error: "The demo is busy. Please try again in a minute." }, 429);
-  // Deep research costs several times more. The public demo code only buys the fast mode.
-  if (!trusted) parsed.data.depth = "fast";
+  // Deep research costs several times more. The public demo code buys the fast mode and the Exa Agent mode,
+  // which costs about the same as the fast one and only takes longer.
+  if (!trusted && parsed.data.depth === "deep") parsed.data.depth = "fast";
   const origin = baseUrl(req);
 
   if (!(req.headers.get("accept") ?? "").includes("text/event-stream")) {

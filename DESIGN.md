@@ -1,306 +1,173 @@
 ---
-name: AIDaddy — Family reading table
-description: An annotated ivory reading surface for a family plan and its official evidence.
+name: AIDaddy — At home
+description: Warm paper, white cards with soft corners, one terracotta accent, and one face (the orb in peach and butter). Soft and warm, like home, not a clinic.
+source: the team's design project for the household app (phone screens 1 to 7, the laptop board and the orb options); the orb is option A, "Sunday morning"
 colors:
-  cranberry: '#98112c'
-  cranberry-hover: '#740b22'
-  paper: '#fffaf1'
-  ink: '#211b1d'
-  muted: '#65544e'
-  rule: '#dfcdb8'
-  specimen: '#f5ecdd'
-  selection: '#f5c7cd'
-  source-rule: '#e4d0b6'
-  qr-white: '#fff'
+  ground: '#fbf8f3'        # --hud-bg, --background
+  card: '#ffffff'          # --hud-panel, --card, --popover
+  text: '#211b17'          # --hud-text, --foreground           15.9:1 on the ground
+  dim: '#6b625b'           # --hud-dim, --muted-foreground       5.6:1 on the ground, 6.0:1 on a card
+  accent: '#b84f2a'        # --hud-accent, --primary, --ring     4.7:1 on the ground, white on it 5.0:1. The design's #c4572f, one step darker to pass AA both ways
+  accent-hi: '#9d4122'     # --hud-accent-hi                     a filled button under the pointer
+  honey: '#96600f'         # --hud-amber                         4.8:1   attention, the person's move
+  green: '#23744a'         # --hud-green                         5.4:1   confirmed, done
+  ink: '#ffffff'           # --hud-ink, --primary-foreground     text on an accent, honey or green fill
+  line: '#e5dccf'          # --hud-line, --border                card and box edges
+  line-soft: '#efe8dd'     # --hud-line-soft                     dividers inside a card, header and footer lines
+  field-edge: '#9c8f7e'    # --input                             3:1, the edge of a text field
+  fill: '#f6f0e7'          # --hud-fill                          a ruled row, a soft surface
+  fill-hi: '#ede4d6'       # --hud-fill-hi                       the same under the pointer, a pressed switch
+  bubble: '#f1ebe2'        # --hud-bubble, --secondary, --accent a person's chat message, a soft tile
+  orb: ['#ffe3cf', '#ffb38a', '#ffd76e', '#f59aa8']   # --orb-a to --orb-d: peach, apricot, butter, rose
+  orb-done: ['#e6f2df', '#9fd3b0', '#f6dd7f', '#ffb59a']  # the orb when confirmed: sage, mint, butter, peach
+  invalid: '#b3261e'       # --destructive
 typography:
-  display:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 9.62cqw
-    fontWeight: 700
-    lineHeight: 1.12
-    letterSpacing: -0.035em
-  display-wide:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(48px, 4.8vw, 60px)
-    fontWeight: 700
-    lineHeight: 1.15
-    letterSpacing: -0.035em
-  headline:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(2rem, 5vw, 3.5rem)
-    fontWeight: 700
-    lineHeight: 1.12
-    letterSpacing: -0.035em
-  title:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 1.5rem
-    fontWeight: 700
-    lineHeight: 1.25
-    letterSpacing: -0.02em
-  body:
-    fontFamily: Lora, serif
-    fontSize: 1rem
-    fontWeight: 400
-    lineHeight: 1.5
-  lead:
-    fontFamily: Lora, serif
-    fontSize: 1.05rem
-    fontWeight: 400
-    lineHeight: 1.8
-  statement:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(1.5rem, 2.4vw, 2rem)
-    fontWeight: 700
-    lineHeight: 1.35
-    letterSpacing: -0.02em
-  evidence-figure:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(2rem, 3.4vw, 2.75rem)
-    fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: -0.02em
-  hint:
-    fontFamily: Lora, serif
-    fontSize: 1.05rem
-    fontWeight: 400
-    lineHeight: 1.75
-  label:
-    fontFamily: Inter, sans-serif
-    fontSize: .8rem
-    fontWeight: 400
-    lineHeight: 1.7
-  navigation:
-    fontFamily: Inter, sans-serif
-    fontSize: .875rem
-    fontWeight: 500
-    lineHeight: 1.5
-  note:
-    fontFamily: Kalam, cursive
-    fontSize: 1.25rem
-    fontWeight: 400
-    lineHeight: 1.5
-  action:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 1.2rem
-    fontWeight: 700
-    lineHeight: 1.3
-  plan-title:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 1.1rem
-    fontWeight: 700
-    lineHeight: 1.35
-  quote:
-    fontFamily: Lora, serif
-    fontSize: 1.05rem
-    fontWeight: 400
-    lineHeight: 1.7
-rounded:
-  specimen: 4px
-  action: 14px
-  hero-action: 4cqw
-  hero-action-wide: 16px
-spacing:
-  compact: .75rem
-  base: 1rem
-  inset: 1.25rem
-  room: 1.5rem
-  group: 2rem
-  chapter-head: 2.5rem
-  reading-gap: 3.5rem
-  spread-gap: 4rem
-  section: 4.5rem
-  section-wide: 5rem
-components:
-  button-primary:
-    backgroundColor: '{colors.cranberry}'
-    textColor: '{colors.paper}'
-    typography: '{typography.action}'
-    rounded: '{rounded.action}'
-    padding: .65rem 1.25rem
-  button-secondary:
-    backgroundColor: transparent
-    textColor: '{colors.cranberry}'
-    typography: '{typography.action}'
-    rounded: '{rounded.action}'
-    padding: .65rem 1.25rem
-  button-hover:
-    backgroundColor: '{colors.cranberry-hover}'
-    textColor: '{colors.paper}'
-  annotation-replay:
-    backgroundColor: transparent
-    textColor: '{colors.cranberry}'
-    padding: .4rem 0 .4rem .5rem
-  hero-primary:
-    backgroundColor: '{colors.cranberry}'
-    textColor: '{colors.paper}'
-    rounded: '{rounded.hero-action}'
-    width: 100%
-    height: 100%
-  hero-secondary:
-    backgroundColor: transparent
-    textColor: '{colors.cranberry}'
-    rounded: '{rounded.hero-action}'
-    width: 100%
-    height: 100%
-  navigation:
-    textColor: '{colors.cranberry}'
-    typography: '{typography.navigation}'
-    padding: 2.5rem 0 1rem
-  decision-chip:
-    textColor: '{colors.cranberry}'
-  specimen:
-    backgroundColor: '{colors.specimen}'
-    textColor: '{colors.ink}'
-    rounded: '{rounded.specimen}'
-    padding: 1.5rem
-  source-disclosure:
-    textColor: '{colors.ink}'
-    typography: '{typography.plan-title}'
-    padding: 1.1rem 0
-  source-quote:
-    backgroundColor: '{colors.specimen}'
-    textColor: '{colors.ink}'
-    typography: '{typography.quote}'
-    padding: 1rem 1.25rem
+  family: Inter (next/font, --font-sans). One face for everything a person reads; --hud-ui is the same face for labels, buttons and figures.
+  display:  { fontSize: 'clamp(2.6rem, 9vw, 5rem)',   fontWeight: 700, lineHeight: 1,    letterSpacing: -0.035em }  # front page hero only
+  title:    { fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', fontWeight: 700, lineHeight: 1.05, letterSpacing: -0.025em }
+  heading:  { fontSize: 1.15rem, fontWeight: 600, lineHeight: 1.3 }
+  lede:     { fontSize: 'clamp(1.02rem, 1.6vw, 1.2rem)', fontWeight: 400, lineHeight: 1.55 }   # at most 58ch, in dim
+  body:     { fontSize: 1rem,   fontWeight: 400, lineHeight: 1.55 }
+  note:     { fontSize: 0.9rem, fontWeight: 400, lineHeight: 1.55 }   # at most 72ch
+  button:   { fontSize: 0.95rem, fontWeight: 600, lineHeight: 1.2 }   # sentence case
+  nav:      { fontSize: 0.8rem, fontWeight: 500 }                     # sentence case
+  state:    { fontSize: 0.82rem, fontWeight: 600 }                    # sentence case, with its light
+  label:    { fontSize: 0.72rem to 0.75rem, fontWeight: 600, letterSpacing: 0.05em, textTransform: uppercase }  # a section label, a card's title bar, a figure's caption. Short words only
+shape:
+  control: 14px            # --radius: a button, a field
+  card: 20px               # --radius-card: a card, a panel
+  pill: 99px               # a badge, a tag, a chip
+  shadow: '0 1px 2px rgb(60 40 25 / 0.05), 0 8px 24px rgb(60 40 25 / 0.05)'   # --hud-shadow, on a card
+  button-shadow: '0 6px 16px rgb(184 79 42 / 0.28)'                              # under a filled button
 ---
 
 # Design System: AIDaddy
 
 ## Overview
 
-**Creative North Star: "Family reading table"**
+AIDaddy looks like something that belongs in a home. The ground is warm paper. What can be read or pressed sits on a white card with soft corners and a faint shadow. One colour, a terracotta, marks what can be acted on. One face, the orb, says what AIDaddy is doing.
 
-Family reading table is a warm, literary surface: substantial book serif, italic prose, plain factual labels and cranberry handwritten annotations. The plan and its official sentence share the page, like a document a family has read and marked together. The emphasis belongs to useful words and evidence.
-
-This system applies only to the reading-table page, which moved from `/` to `/reading` on 14 November (see docs/DECISIONS.md, Sat 08:57). It is implemented in `src/app/reading/page.tsx` and `src/components/landing/`. Its five core color variables and four font variables live on the landing wrapper. This replaces the former station-sign landing system. The reading world uses ink marks, soft marker pigment and paper texture rather than transit signage.
-
-Every other page shares one dark frame since 14 November (docs/DECISIONS.md, Sat 19:00): `SiteShell` in `src/components/site/` gives `/`, `/try`, `/c/[id]`, `/chat`, `/setup`, `/autopilot`, `/demo` and its replays the same header, footer and palette. The palette is the front page's control room, defined in `src/components/hud/hud.css`, described in docs/FRONT_PAGE_PLAN.md and handed to the shared Tailwind tokens inside `.site` by `src/components/site/site.css`. That frame is a separate system from this document: the paper, the four reading fonts and the cranberry palette below are still not extended to those pages, and the dark frame is not applied to `/reading`.
-
-**Key Characteristics:**
-- One continuous ivory reading surface with calm rules and occasional inset specimens.
-- Dark literary headings, readable prose, sans factual metadata and handwritten marginal notes.
-- A plan and its exact source sentence remain visibly paired.
-- An ink sequence follows the headline, case, plan and source; the words remain immediately readable.
-- Real local paper and ink plates; all words, controls and table data are semantic HTML.
+The look comes from the team's design project for the household app and was applied to the whole site on 15 November 2026. It replaced a near-black "control room" look; the stylesheets keep their `--hud-` token names and `hud-`/`site-` class names from that time, and only the values and shapes changed. Do not read a name as a colour: `--hud-amber` is the honey of "your move", and the class `site-state--cyan` is the accent.
 
 ## Colors
 
-Warm neutrals carry the reading; cranberry supplies the purposeful emphasis and interaction.
+The table in the front matter is complete. Rules:
 
-### Primary
-- **Cranberry ink** (`cranberry`): actions, source links, annotations, process titles, open plan titles and quote rules, status symbols, scorecard figures and focus outlines. **Deep cranberry** (`cranberry-hover`) fills hovered primary and secondary actions.
+- **One accent.** Terracotta is for the thing to press, the link, the label above a title and the working light. It is never a large background.
+- **Text is near-black brown, never pure black**, and secondary text is `dim`. Both pass AA on the ground and on a card.
+- **Edges are hairlines in tan**, not in the accent. A card is told from the ground by its white, its edge and its shadow together.
+- **Tints** of the accent, honey and green (5 to 15 per cent) may fill a row or a tag that carries that meaning.
 
-### Neutral
-- **Ivory paper** (`paper`): the continuous page ground and reversed action text; the browser theme color follows it. The raster paper texture adds material variation.
-- **Book ink** (`ink`): primary text. **Warm secondary ink** (`muted`): captions, factual metadata and hints.
-- **Paper rule** (`rule`): chapter, plan-row and table dividers. **Source rule** (`source-rule`): the hero's warm vertical rule.
-- **Inset paper** (`specimen`): opened source quotes, factual examples in the trust section and a table row under hover or case-link focus, without a raised card effect.
-- **Selection pink** (`selection`): selected text. Pink and cream marker plates also carry their own pigment; these raster colors are not interchangeable solid-fill UI tokens.
-- **QR white** (`qr-white`): the small QR backing only.
+### The state code
 
-### Named Rules
-**The Evidence Pair Rule.** A plan statement and its supporting sentence belong to the same reading sequence; a colored mark never substitutes for a source label or link.
+A state is always a light and a word, never a colour alone.
+
+| State | Colour | Meaning |
+| --- | --- | --- |
+| working | accent | AIDaddy is doing something now |
+| your move | honey | something waits for the person |
+| confirmed | green | found, checked, done |
+| idle | dim | nothing is happening |
 
 ## Typography
 
-**Display Font:** Chiron Sung HK, serif fallback. **Body Font:** Lora, serif fallback. **Factual Font:** Inter, sans-serif fallback. **Annotation Font:** Kalam, cursive fallback.
+Inter everywhere. Titles are bold with tight tracking. Sentences, buttons, links and states are in sentence case. Only a short label (a section label, the title bar of a card, the caption of a figure) is in capitals, at 0.05em. Nothing a person reads is smaller than 0.8rem except such a label.
 
-The four fonts load through `next/font/google` in `fonts.ts` and are applied only by the landing wrapper. Chiron loads weights 400 and 700; Lora loads normal and italic styles; Kalam loads 400. Inter supplies the compact factual voice. These are actual text fonts, never rasterized lettering.
+## Shapes and depth
 
-### Hierarchy
-- **Display:** the portrait hero uses the `display` token relative to its query container. The desktop spread switches to `display-wide`. Wordmark, case title and next-chapter title share its weight and tight tracking, at different optical sizes.
-- **Headline / title:** lower chapter headings use the fluid `headline` token and balanced wrapping; subsection titles use `title`. The closing statement grows from 2.5rem to 4.5rem, capped at 17ch, using the same display voice and headline line height.
-- **Body / statement / lead / hint:** the base reading voice uses `body`; the audience sentence uses the stronger `statement` token, followed by opening paragraphs in `lead`. Running paragraphs often expand to line-height 1.8, while `hint` supplies the softer section introduction. Main reading copy is capped at 68ch.
-- **Label / navigation / evidence figure:** Inter sets captions, sources, dates, navigation and tabular evidence. Captions use `label`; navigation uses `navigation`. The verified-quotes total uses `evidence-figure`, while the other totals remain 1.65rem. Totals use lining and tabular numerals; table figures use tabular numerals.
-- **Note:** short marginal or conversational notes use `note`. Hero annotations scale in container units and rotate slightly, while the role line uses Lora italic.
-- **Action / plan / quote:** `action` sets lower-page actions; `plan-title` and `quote` keep the expandable evidence readable. Hero actions and quotes use Chiron and a separate container-scaled treatment.
+Soft corners: 14px on a control, 20px on a card, a full pill on a badge or tag, a circle for the orb and for an avatar. A card has one soft shadow; a filled button has a shadow in its own colour; nothing glows. There are no grids, brackets or scan lines.
 
-### Named Rules
-**The Four Voices Rule.** Use Chiron Sung HK for display and substantial actions, Lora for reading and italic role copy, Inter for facts, and Kalam for short annotations. Keep handwriting out of long prose and table data.
-
-## Layout
-
-The hero is an annotated portrait with positions derived from an 852 × 1846 reference frame in `reading-layout.css`. Its frame keeps that aspect ratio, is centered and is at most 852px wide. Type uses container units so words and physical marks scale together. This coordinate system belongs to the hero; it is not a reusable layout grid for other pages.
-
-Between 600px and 999px viewport width, when the viewport aspect ratio is at least 1:2, the hero width is the smaller of the viewport width and `100svh * 852 / 1846`, fitting the portrait sequence to the available height. Taller portrait viewports retain the original width-based frame, including the 852 × 1846 reference. At 1000px and above, it becomes a two-page reading spread, at most 1240px wide and 900px tall: promise and actions on the left, plan and source on the right. The desktop headline marker's vertical position and height are derived from the actual headline size and line height in CSS, rather than a fixed percentage alone. Changes to fonts or wording still require visual verification.
-
-Below 360px, action height, source-link size, marginal labels and the next chapter are adjusted to keep the portrait usable. The lower-page wrapper uses a 1rem side inset at these widths; otherwise it uses 1.5rem and caps at 1160px. Main reading copy is limited to 68ch. Chapters have 4.5rem vertical space, increasing to 5rem from 768px. Rules divide chapters; groups use the extracted spacing steps rather than uniform card tiles.
-
-At 768px, the conversation and plan become an `.8fr / 1.2fr` split; process and trust content become two columns, the bot section places its QR beside the text, and privacy becomes three columns. Gaps range from 2.5rem to 4rem. Scorecard totals change from two columns to four. Below 768px, country, quote count and time fold beneath the scenario name; the table retains result, scenario and case-link columns. Navigation wraps in normal document flow.
-
-At 1000px, the opening audience statement and its supporting paragraphs form an `.8fr / 1.2fr` spread with a 4rem gap. Each lower chapter also pairs its heading on the left with its introduction on the right using that split. Smaller widths retain the reading sequence in one column; the hero geometry and primary-action placement stay unchanged.
-
-## Elevation & Depth
-
-The surface has no panel shadows. Depth comes from the tiled paper grain, translucent pigment in local raster marks and the warmer specimen inset. Hairline rules organize text without enclosing each item. Text stays sharp during source opening; there is no glass or blur effect.
-
-The paper asset is a clean 55 × 150 sample from the approved composition, mirror-tiled 4 × 4 into a 220 × 600 texture. Fourteen separate transparent ink/marker assets provide the wordmark underline, headline/plan/source highlights, intro and case underlines, sample circle, proof bracket, bracket underline, two arrows, publisher highlight, divider and next-chapter underline. `reading-plates.tsx` imports them from `assets/plates/`; the paper is the wrapper background and the remaining plates are decorative images. Each of the fifteen PNGs contains its exact provenance in the `impeccable:prompt` text chunk; some also have JSON sidecars. Preserve the embedded record rather than inferring origin from filenames or treating a missing sidecar as missing provenance.
-
-### Named Rules
-**The Paper Rule.** Keep depth in paper, pigment and tonal insets. Do not add floating panel shadows to this reading surface.
-
-## Shapes
-
-The reading surface and rules are square and open. Trust specimens have the small `specimen` radius. Lower actions have the `action` radius; hero actions use a container-relative radius in portrait and `hero-action-wide` in the spread. The soft circle, bracket and arrows are physical artwork with irregular edges, not generic geometric decoration. Source numerals are plain cranberry text, not checkbox states.
-
-Interface icons use Lucide SVG geometry: navigation arrows, replay, calendar, location, check, cross and attention. Source rows use a simple two-stroke SVG expansion sign, with its vertical stroke collapsing in the open state. Lower-page icon strokes are 1.75 units; hero location and calendar strokes are 2. These icons support adjacent words and are hidden from assistive technology when decorative.
+The ground carries two soft lights, peach from the top right and butter from the left, and nothing else.
 
 ## Components
 
-### Buttons
-Substantial serif links with softened corners.
-- **Primary:** cranberry fill and paper text. **Secondary:** transparent paper ground, cranberry text and a cranberry border. Lower actions use the frontmatter padding and a minimum height of 48px; hero actions fill their positioned region with a minimum height of 44px.
-- **Hover:** both variants use deep cranberry with paper text. With no reduced-motion preference, colors transition over 160ms; action arrows move 3px toward their destination over 180ms using `cubic-bezier(.16,1,.3,1)` on hover or keyboard focus. The hero source-link arrow shares that movement. Reduced motion keeps the color feedback immediate and the arrows still. The controls themselves do not move.
-- **Focus:** links, buttons and summaries receive a 3px cranberry outline with a 5px offset. Preserve this visible state on both action variants.
-- **Routing:** browser actions use `TryLink`, preserving an incoming access-code query value. With no configured sample route, the secondary hero action links to the on-page sample plan and names that destination truthfully.
+- **Button** (`site-btn`, `hud-btn`, the shared `Button`): 48px tall (44px compact), white with a hairline edge; the main one is filled with the accent and has white text. One filled button per view.
+- **Card** (`site-panel`, `hud-panel`, the shared `Card`): white, hairline, 20px corners, soft shadow. A title bar is a label row with a soft line under it.
+- **Field**: white, the field edge, 14px corners, 44px tall. The label stands above it in the text colour.
+- **Row** (`site-row`): a soft fill with a 3px rule on the left in the colour of its meaning: a source, a reply of AIDaddy, a thing that was heard.
+- **Badge and tag**: a pill with short words.
+- **Icon tile**: a 44px white tile with a hairline edge and a drawn sign in the accent, as on the setup cards.
+- **The orb** (`Core`, `AIDaddyAvatar`, `src/app/icon.svg`): AIDaddy's face. A ball in peach with apricot, butter and rose inside and a light at the top left. It breathes at rest, its colours swirl fast while AIDaddy works, and it turns to garden colours when something is confirmed. In the chat a light inside grows with the voice and a ring shows the state. One orb per view where it carries a state. The still picture (the icon, the small mark, share images, the app icons) is the same ball without motion.
 
-**Replay annotations** is a quiet, underlined Inter button at .75rem and weight 500 beside the wordmark, with a 44px minimum target and a 15px replay icon. It appears only after the required browser APIs, fonts and five hero plates are ready, and only without a reduced-motion preference. Clicking restarts the annotation sequence from the beginning; repeated clicks cancel the previous run safely. Its icon rotates -45 degrees over 250ms on hover or keyboard focus, while its text and target stay still.
+### How the shared layer reaches a page
 
-### Navigation
-Underlined cranberry links in Inter sit after the conversation. Their flex row wraps, with 1.5rem gaps and 44px minimum link height. There is no fixed or overlay navigation. Ordinary source links also stay underlined; hover increases underline thickness. External links announce a new tab in accessible text.
+`site.css` is unlayered and Tailwind's utilities are layered, so a shared rule beats every utility on the same element. Three kinds of rule follow from that.
 
-### Chips
-The decision chip is a quiet cranberry text label in Inter at .8rem and weight 500. It has no filled pill or enclosing border. Handwritten “Example” and “Illustrative example” labels mark the nature of material; they are not navigational badges.
+1. **Inherited rules** have no specificity (`:where()`), so any class in any stylesheet outranks them. They dress what a page already uses, with no edit.
+2. **Named classes** are written `.site .site-x`, so they outrank an element rule of a page.
+3. **The property contract**: these properties belong to the shared layer, and a utility for them on the same element does nothing.
 
-### Cards / Containers
-Trust specimens use inset paper, small corners and 1.5rem padding. An opened source quote uses the same paper inset, square corners and the `source-quote` padding. Conversations, plan rows and the scorecard remain open documents on the main paper, divided by rules. They do not inherit a generic card shadow or padded dashboard shell.
+| Element | Properties taken | Way out |
+| --- | --- | --- |
+| `h1` | font-size, weight, line-height, letter-spacing, text-wrap | `site-title--compact` |
+| a paragraph directly under a page's `header` | max-width, font-size, line-height | use `PageHead` |
+| a link inside a paragraph | colour, underline | `no-underline` on the link |
+| `blockquote` | font-size (1rem), upright, line-height | |
+| `summary` | list-style, cursor, the `+` sign | `list-none` on the summary |
+| `.rounded-sm` to `.rounded-4xl` | border-radius (14px) | `rounded-full`, `rounded-none` |
+| `.border.bg-card` | background (the panel fill) | leave out `bg-card` |
+| input, select | min-height 44px, corner, fill, no ring, edge on focus | |
+| textarea | corner, fill, no ring, edge on focus; its height stays free | |
+| badge | height, padding, font, tracking, case, wrapping; colours stay free | `whitespace-normal` for a sentence |
+| card | position, overflow, border, corner, fill, no ring; title size | |
+| `site-btn` | display, gap, minimum size, padding, border, corner, fill, shadow, colour, font, tracking, case | the modifiers; width and margin stay free |
 
-### Source disclosures
-A plan row is a native `details`/`summary`, with the plan text and timing on the left and source number plus expansion sign on the right. The shared disclosure name allows one open row; source 5 starts open. Hover underlines the plan in cranberry. An open row keeps its title cranberry and its source numeral at weight 700. The opened quote has an inset paper ground and a 1px cranberry rule, its publisher and host, and a link to the exact source. The hero's source-5 quote is always visible rather than an expandable control.
+## Motion
 
-With no reduced-motion preference, browsers supporting `interpolate-size:allow-keywords` and `details::details-content` expand and collapse the native content block over 320ms using `cubic-bezier(.16,1,.3,1)`. Other browsers retain a sharp 240ms opening reveal, settling from a -2px vertical offset while its lower 14% is briefly clipped. The SVG expansion sign's vertical stroke collapses over 280ms, and the plan title's color changes over 180ms. Reduced motion makes these state changes immediate while keeping the open-state color and inset. Expansion signs are supplemental affordances; native semantics carry the open state and work without JavaScript.
+Slow, and only where it means something. These things move, and nothing else:
 
-The hero has one progressive decorative sequence in `ReadingMotion`: the headline highlight draws across (0–500ms), the sample-case circle follows (350–850ms), then the plan highlight (750–1150ms), the supporting bracket downward (1000–1500ms) and the quote highlight (1350–1800ms). Its overlapping strokes use `cubic-bezier(.16,1,.3,1)`. Automatic playback happens once when at least 45% of the quote is visible and the relevant plates and fonts are ready; a 1500ms readiness limit from the first eligible view skips late automatic playback. The explicit replay button remains available after slow assets finish loading. Text and controls never wait on this sequence. The server-rendered marks are complete by default; missing browser APIs, failed assets, no JavaScript and reduced motion all preserve that static view. Leaving the hero, hiding the document or enabling reduced motion cancels playback and restores the finished marks. There is no loop or scroll scrubbing.
+1. **The orb**: it breathes in 4 s; the colours inside turn once in 14 s at rest and once in 2.4 s while AIDaddy works; the glow grows while it works.
+2. **The voice orb**: still at rest and while it listens; its colours turn only while it thinks; the light inside grows with the voice.
+3. **A working light** fades to a quarter and back in 1.1 s.
+4. **A running bar** sweeps in 1.6 s; a recording's bar fills over the recording's own length and ends green.
+5. **A new row** rises 10px over 0.45 s (`site-rise`).
+6. **A control answers** the pointer in 0.2 s (border, fill, shadow).
+7. The front page's own story: its scroll reveal and its replay.
 
-The next-chapter underline and the underline beneath the closing word “check.” each use `InkReveal`: a single 650ms stroke across when at least 45% of the mark reaches the reading area, inset 64px from the viewport bottom. They reuse the existing underline plate without changing its geometry. Each requires ready artwork and fonts within the same 1500ms limit; it cancels on leaving the reading area, document hiding or reduced motion. Completed marks stay visible and do not replay on scrolling back.
+With `prefers-reduced-motion: reduce` every animation and transition under `.site` is off, each moving part shows its end state, and the word beside it carries the meaning.
 
-### Conversation and evidence table
-The conversation is readable prose with named speakers, a handwritten stage direction and a cranberry bot reply. Its caption explicitly identifies an example. The plan and quotes come from `src/data/sample-case.json`; decorative marks do not change their meaning.
+## Accessibility
 
-The scorecard is a real table with scoped headers, a screen-reader caption, full scenario rows, explicit Pass/Fail words and accompanying SVG symbols. Both results use cranberry; meaning never depends on green/red recognition. Run provenance and time sit above the totals. The adjacent hint states that a pass checks source grounding rather than completeness. Keep failures, error text and missing-case states visible. Data comes from `src/data/scorecard.json`; do not turn table examples in the sidecar into production metrics.
-
-The verified-quotes total leads by type size and a darker, stronger label; all four totals keep their original labels, order and values. Hovering a table row or focusing its case link applies the inset-paper ground to help track that row without adding a panel or changing its result.
-
-### Configuration and limits
-The Telegram section shows a working action and QR only when configured; otherwise it explains availability and offers the browser demo. Privacy and limits remain readable paragraphs on the same paper. The landing has no input-field design to inherit; `/try` retains its own form system.
+- WCAG AA on the ground and on a card: every text pair above is 4.5:1 or better; a field's edge is 3:1.
+- **One focus sign**: `outline: 2px solid #b84f2a; outline-offset: 3px`, on every control. No ring, no change of border.
+- **Targets**: 44px on a phone. A source chip is 28px to look at with a 44 by 44px touch area; a navigation link has a touch area at least 44px wide.
+- **Never colour alone**: a light has a word; Pass and Fail are words; a link in a sentence is underlined; a running, done or stopped step has a hidden word.
+- **Sentences are not set in capitals** and field labels stay in sans in the text colour.
+- A link that opens a new tab ends in `↗` and says so in hidden words.
+- A live region is on the page before anything happens, and what only decorates (the clock, a mirrored line) is hidden from it.
+- Reduced motion as above. Sticky and large things need height as well as width.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep paper and ink assets local, retaining their embedded provenance when replacing or optimizing them.
-- **Do** keep every quote, label, date, action and scorecard value as accessible text.
-- **Do** pair source numbers with actual evidence; the hero numeral identifies a source, not a completed family task.
-- **Do** preserve visible focus, keyboard disclosure behavior and reduced-motion access to all content.
-- **Do** use the same source data for the illustrated plan and its links, and the complete recorded run for the scorecard.
-- **Do** verify the portrait, short tablet and desktop spread when changing hero text or material positioning.
+
+- Start a page with `SiteShell` and `PageHead`; link to `/try`, `/chat` and `/autopilot` with `SiteLink`; style a link as a button with `linkButtonClasses` or `LinkButton`.
+- Keep a plan line and its sentence together: the quote stands under the line it supports, with its source.
+- Label an example as an example, and a concept as a concept.
+- Show failures: a failed scenario, its error text and a row without a case file stay on the page.
+- Say that a pass checks source grounding, not whether every possible step is covered.
+- Use real text, never a screenshot of text.
+- Check a page by a direct load, at 1440 and 390, and with reduced motion.
 
 ### Don't:
-- **Don't** extend the landing fonts, paper or palette to /try or /c/[id] without a separate design decision.
-- **Don't** replace the page or a functional section with a screenshot.
-- **Don't** substitute CSS-drawn imitation marks for the approved physical ink and marker plates.
-- **Don't** turn every paragraph into a card, or introduce a dark departure-board field.
-- **Don't** use an annotation, color or decorative icon as the only label for meaning or status.
-- **Don't** present sample evidence as a live check, illustrative figures as measured results, or a scorecard pass as completeness.
+
+- Don't add a colour, a font, a corner radius or a second focus sign.
+- Don't use a `hud-` class outside the front page, `/setup` and `/autopilot`, except `hud-core` through `Core`: after a click from the front page it looks right and after a reload it is broken.
+- Don't set a sentence in capitals, and don't bring back a mono face, a grid, a bracket or a glow.
+- Don't let colour or motion carry a meaning alone.
+- Don't put a second face on a screen: one orb where it carries a state.
+- Don't animate what means nothing: no turning mark in the header, no orb that turns at rest beside text someone is reading.
+
+## Not part of the system
+
+- **The replay pictures** (`.chatdemo`, `.bdemo`, `.cdemo`): pictures of other people's software, with their own shapes. The phone in `.tdemo` shows AIDaddy's own screen and uses this palette by hand. No shared rule reaches inside `.demo-stage`. Their size, zoom steps and timing are fixed, because the pitch videos are recorded from them.
+- **The front page's story pieces** in `hud.css`: the family chat panel, the gauges, the schematic and the four lines above the title. `hud.css` also keeps its own copies of the button, the card and the orb; they are identical to the shared ones.
+- **The browser extension** cannot load `site.css` and copies the values by hand. It uses the system fonts behind Inter, and the dot of its in-page panel keeps its four colours (watching accent, checking honey, ready green, not looking grey).
+- **A mark in the header**, a scan line on a panel, a monitor frame around a replay: considered and left out.
+- **Tables**: the scorecard styles its own in `src/app/scorecard/scorecard.css`.
+- **Popups**: the tokens sit on `.site`, and the body under it is white. A popup that is portaled to the body needs the tokens moved first.
+- **A dark theme.** The earlier control-room look is in the history, not in the code.
+- **The four recorded demo videos** in `docs/pitch/` were recorded in the earlier look. They show the same scenes; re-record them with `scripts/record-demos.mjs` when they should match.
 
 
 <!-- impeccable:scoped-design route="/avatar" tokens="avatar-studio" -->

@@ -14,17 +14,14 @@ import path from "node:path";
 import { EXAMPLES } from "../src/lib/examples.ts";
 
 const base = (process.argv.includes("--base") ? process.argv[process.argv.indexOf("--base") + 1] : "http://localhost:3000").replace(/\/$/, "");
+// The secret skips the demo's limits. A deployment with DEMO_OPEN=1 answers without it.
 const secret = process.env.CASEFILE_SECRET;
-if (!secret) {
-  console.error("Set CASEFILE_SECRET: the examples are researched with the bot secret.");
-  process.exit(2);
-}
 
 const cases = [];
 for (const example of EXAMPLES) {
   const res = await fetch(`${base}/api/research`, {
     method: "POST",
-    headers: { authorization: `Bearer ${secret}`, "content-type": "application/json" },
+    headers: { ...(secret ? { authorization: `Bearer ${secret}` } : {}), "content-type": "application/json" },
     body: JSON.stringify({ situation: example.text, country: "FI", region: "Espoo", language: "en" }),
   });
   const body = await res.json().catch(() => null);

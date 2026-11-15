@@ -16,7 +16,7 @@ Issue #39. One of AIDaddy's three specialist desks. It takes a matter where the 
 3. Call `mcp__casefile__research_case`: `situation` = the person's words, then "What are my rights here, what is the time limit to object or appeal, and which authority handles it?"; `country`, `region`, `language`; `scope` `official`; `household` from the household basics plus this desk's line. Pass a shared letter's text as `document`.
 4. Post one message: the line "From the legal desk, in N articles:" (none on bad news), then up to 5 plan lines exactly as returned, citation numbers included. Put a line that states a time limit first. Then "N of M quotes checked on their pages", each unverified item as "AIDaddy could not confirm this: …", and the case link.
 5. End with: "This is what the official pages say, not legal advice. For a dispute, the pages above name who gives free advice."
-6. Update this desk's memory line, save "Open case <id>: <title>" as `life-event-butler` step 5 does, and offer next steps with `clarify`: Draft the objection, Set reminders, Not now. A draft follows `life-event-butler` step 6. AIDaddy never sends it.
+6. Update this desk's memory line, save "Open case <id>: <title>" as `life-event-butler` step 5 does, and offer next steps with `clarify`: Set reminders, Not now. Include Draft the objection only when `life-event-butler` step 4 confirms a supported letter/email route. Drafting follows that skill's step 6; otherwise show the verified official procedure or route gap. AIDaddy never sends it.
 
 ## Memory (Telegram only)
 
