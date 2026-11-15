@@ -60,7 +60,8 @@ describe("what the listening post makes of a sentence", () => {
   });
 
   it("researches a question addressed to it, and ignores its bare name", () => {
-    expect(decide("AIDaddy, how do I register my address in Espoo")).toMatchObject({ kind: "asked", addressed: true });
+    expect(decide("AIDaddy, how do saunas work in Finland")).toMatchObject({ kind: "asked", addressed: true });
+    expect(decide("AIDaddy, how do I register my address in Espoo")).toMatchObject({ kind: "register", addressed: true });
     expect(decide("AI daddy, our flight was cancelled")).toMatchObject({ kind: "travel", addressed: true });
     expect(decide("AIDaddy")).toBeNull();
     expect(decide("hey AI daddy thanks")).toBeNull();
@@ -186,4 +187,34 @@ describe("an emergency", () => {
     expect(speech).not.toMatch(/\d|\{n\}/);
     expect(emergencySpeech("seizure", "fi", "112")).toMatch(/yksi yksi kaksi/);
   });
+});
+
+describe("everyday ways of saying a matter", () => {
+  it.each([
+    ["the dishwasher is broken again", "consumer"],
+    ["the washing machine won't start", "consumer"],
+    ["astianpesukone ei toimi", "consumer"],
+    ["the rent is going up again next month", "rent"],
+    ["we need to register our new address", "register"],
+    ["where do I get a bank ID", "register"],
+    ["I need to see a doctor about my back", "health"],
+    ["grandpa passed away last night", "death"],
+    ["we're getting divorced", "divorce"],
+    ["I had a car accident this morning", "accident"],
+    ["the insurance won't pay for it", "accident"],
+    ["it's mum's birthday next week", "occasion"],
+    ["our son starts school in August", "school"],
+    ["we got a bill from the hospital", "letter"],
+    ["I got a new job", "job"],
+    ["we have to do our taxes", "tax"],
+  ])("%s -> %s", (text, kind) => {
+    expect(decide(text)?.kind).toBe(kind);
+  });
+
+  it.each(["the dishwasher is done", "I'm going to the shop", "the kids are asleep", "what's for dinner", "I'm broke until Friday"])(
+    "small talk stays small talk: %s",
+    (text) => {
+      expect(decide(text)).toBeNull();
+    },
+  );
 });

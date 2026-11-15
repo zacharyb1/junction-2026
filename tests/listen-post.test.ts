@@ -7,6 +7,8 @@ function fakeBrowser(over: Partial<Effects> = {}) {
   const log: string[] = [];
   const asked: { situation: string; country: string; region?: string; language: string; scope: string }[] = [];
   let ears: Parameters<Effects["ears"]>[0] | null = null;
+  const sorted: string[] = [];
+  let sortAnswer: "matter" | "small" | "off" = "off";
   let sayDone: (() => void) | null = null;
   const result = (plan: string[], verified = plan.length): ResearchResult =>
     ({ id: "case12345678", url: "https://example.test/c/case12345678", title: "A plan", plan, evidence: [], evidenceTotal: plan.length, evidenceVerified: verified }) as unknown as ResearchResult;
@@ -22,6 +24,10 @@ function fakeBrowser(over: Partial<Effects> = {}) {
         },
         stop: () => log.push("ears:stop"),
       };
+    },
+    sort: async (text) => {
+      sorted.push(text);
+      return sortAnswer;
     },
     research: async (body) => {
       asked.push(body);
@@ -65,6 +71,8 @@ function fakeBrowser(over: Partial<Effects> = {}) {
     say: (text: string) => ears?.text(text, true),
     finishSaying: () => sayDone?.(),
     answerWith: (next: () => Promise<ResearchResult>) => (answer = next),
+    sorted,
+    sortWith: (next: "matter" | "small" | "off") => (sortAnswer = next),
   };
 }
 
@@ -129,6 +137,61 @@ describe("the listening post", () => {
     expect(post.getSnapshot().speaking).toBeNull();
     expect(post.getSnapshot().status).toBe("listening");
     expect(post.getSnapshot().jobs[0].call).toBe("answered");
+  });
+
+  it("keeps a sentence the phrase list missed on the device while the model check is off", async () => {
+    const browser = fakeBrowser();
+    browser.sortWith("matter");
+    const post = new ListeningPost(browser.fx);
+    post.start();
+    browser.say("our neighbour keeps parking in our spot every night");
+    await settle();
+    expect(browser.sorted).toEqual([]);
+    expect(post.getSnapshot().lines.map((line) => line.tag)).toEqual(["small"]);
+  });
+
+  it("with the model check on, sends a missed sentence to the model and researches a matter", async () => {
+    const browser = fakeBrowser();
+    browser.sortWith("matter");
+    const post = new ListeningPost(browser.fx);
+    post.change({ model: true });
+    post.start();
+    browser.say("ok");
+    browser.say("our neighbour keeps parking in our spot every night");
+    await vi.advanceTimersByTimeAsync(0);
+    // Short replies are not worth a check.
+    expect(browser.sorted).toEqual(["our neighbour keeps parking in our spot every night"]);
+    expect(post.getSnapshot().lines.map((line) => line.tag)).toEqual(["small", "model"]);
+    expect(post.getSnapshot().jobs[0]).toMatchObject({ desk: "life", state: "collecting" });
+    await settle();
+    expect(browser.asked).toHaveLength(1);
+    expect(browser.asked[0].situation).toContain("parking in our spot");
+  });
+
+  it("lets small talk and an unavailable model check pass as small talk", async () => {
+    const browser = fakeBrowser();
+    const post = new ListeningPost(browser.fx);
+    post.change({ model: true });
+    post.start();
+    browser.sortWith("small");
+    browser.say("shall we watch a film tonight then");
+    await vi.advanceTimersByTimeAsync(0);
+    browser.sortWith("off");
+    browser.say("the weather was lovely at the lake");
+    await settle();
+    expect(post.getSnapshot().lines.map((line) => line.tag)).toEqual(["small", "small"]);
+    expect(browser.asked).toEqual([]);
+  });
+
+  it("does not check a sentence the phrase list already caught", async () => {
+    const browser = fakeBrowser();
+    browser.sortWith("small");
+    const post = new ListeningPost(browser.fx);
+    post.change({ model: true });
+    post.start();
+    browser.say("the landlord wants to raise the rent by twelve percent");
+    expect(browser.sorted).toEqual([]);
+    expect(post.getSnapshot().lines[0].tag).toBe("event");
   });
 
   it("pings when nothing is urgent", async () => {

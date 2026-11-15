@@ -174,6 +174,23 @@ export function browserEffects(): Effects {
       };
     },
 
+    async sort(text, code) {
+      try {
+        const res = await fetch("/api/aidaddy/sort", {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-demo-code": code.trim() },
+          body: JSON.stringify({ text: text.slice(0, 300) }),
+          signal: AbortSignal.timeout(12_000),
+        });
+        if (!res.ok) return "off";
+        const { label } = (await res.json()) as { label?: string };
+        // As on Telegram: only clear small talk is let pass. Unsure is a matter, the Engine says when there is nothing.
+        return label === "small_talk" ? "small" : label === "trigger" || label === "unsure" ? "matter" : "off";
+      } catch {
+        return "off";
+      }
+    },
+
     async research(body, code, onEvent) {
       let res: Response;
       try {
@@ -359,6 +376,7 @@ export function browserEffects(): Effects {
           language: saved.language === "fi" ? "fi" : DEFAULTS.language,
           country: typeof saved.country === "string" && saved.country ? saved.country : DEFAULTS.country,
           city: typeof saved.city === "string" ? saved.city.slice(0, 80) : "",
+          model: saved.model === true,
         };
       } catch {
         return {};
@@ -366,7 +384,7 @@ export function browserEffects(): Effects {
     },
     save(settings) {
       try {
-        window.localStorage.setItem(SAVED, JSON.stringify({ language: settings.language, country: settings.country, city: settings.city }));
+        window.localStorage.setItem(SAVED, JSON.stringify({ language: settings.language, country: settings.country, city: settings.city, model: settings.model }));
       } catch {
         // storage is off: the settings last as long as the page
       }

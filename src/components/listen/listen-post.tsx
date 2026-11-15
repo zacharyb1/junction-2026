@@ -39,6 +39,8 @@ const TAGS: Record<Line["tag"], string> = {
   repeat: "Let pass: already on it",
   rest: "Let pass: enough research for this half hour",
   emergency: "Emergency: AIDaddy spoke up",
+  checking: "Checking with the model",
+  model: "Noticed by the model: a matter for AIDaddy",
 };
 
 const field = "h-11 w-full rounded-lg border border-input bg-input/30 px-3 text-base outline-none transition-colors focus-visible:border-ring md:text-sm";
@@ -216,7 +218,12 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
             <div className="flex items-center gap-4">
               <Core state={working ? "active" : state.jobs.some((job) => job.state === "done") ? "done" : "idle"} className="hud-core--tiny" />
               <div className="min-w-0 flex-1">
-                <p>{state.note || MIC_TEXT[state.status]}</p>
+                <p>
+                  {state.note ||
+                    (state.status === "listening" && state.settings.model
+                      ? "Listening on this device. Sentences the phrase list misses go to the model check."
+                      : MIC_TEXT[state.status])}
+                </p>
                 {state.interim ? <p className="site-status mt-1 line-clamp-2 text-muted-foreground">… {state.interim}</p> : null}
               </div>
             </div>
@@ -259,6 +266,19 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
                 </select>
               </label>
             </div>
+            <label className="flex items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1 size-4 accent-current"
+                checked={state.settings.model}
+                onChange={(event) => post.change({ model: event.target.checked })}
+              />
+              <span>
+                Model check. A sentence of four or more words that the phrase list lets pass goes to the AI model on
+                AIDaddy&apos;s server, which decides whether it is a matter. It catches more, but those sentences leave this
+                device. Nothing is stored. Off: only matters leave the device.
+              </span>
+            </label>
             <form className="grid gap-2" onSubmit={submit}>
               <label htmlFor="listen-typed" className="text-sm">
                 No microphone, or a loud room? Type a sentence the way it would be said.

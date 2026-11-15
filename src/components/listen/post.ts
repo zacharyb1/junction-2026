@@ -11,14 +11,18 @@ import { decide, DESKS, type Desk, importance, situation, type Trigger } from "@
  * so the rules can be tested without a browser. The page reads its state with `subscribe` and `getSnapshot`.
  */
 
-export type Settings = { language: "en" | "fi"; country: string; city: string; code: string };
+/** model: the presenter's switch for the model check. Off, nothing but a matter leaves the device. */
+export type Settings = { language: "en" | "fi"; country: string; city: string; code: string; model: boolean };
 
 export type Line = {
   id: number;
   text: string;
   at: number;
-  /** small: stays on the device. event: sent to research. repeat: already being handled. rest: over the hourly limit. emergency: AIDaddy spoke up. */
-  tag: "small" | "event" | "repeat" | "rest" | "emergency";
+  /**
+   * small: stays on the device. event: sent to research. repeat: already being handled. rest: over the hourly limit.
+   * emergency: AIDaddy spoke up. checking: the model check is reading it. model: the model check found a matter.
+   */
+  tag: "small" | "event" | "repeat" | "rest" | "emergency" | "checking" | "model";
 };
 
 export type Job = {
@@ -73,6 +77,8 @@ export class ResearchFailed extends Error {
 export type Effects = {
   /** The microphone and the browser's speech-to-text. Null when this browser has none. */
   ears(on: { started(): void; text(text: string, final: boolean): void; ended(why: "silence" | "denied" | "trouble"): void }): Ears | null;
+  /** The model check for one sentence the phrase list let pass: a matter, small talk, or "off" when it cannot answer. */
+  sort(text: string, code: string): Promise<"matter" | "small" | "off">;
   research(
     body: { situation: string; country: string; region?: string; language: string; scope: string },
     code: string,
@@ -118,7 +124,9 @@ export const QUIET_MS = 3 * 60_000;
 const KEEP_LINES = 30;
 const KEEP_JOBS = 10;
 
-export const DEFAULTS: Settings = { language: "en", country: "FI", city: "", code: "" };
+export const DEFAULTS: Settings = { language: "en", country: "FI", city: "", code: "", model: false };
+/** The model check reads only sentences at least this long: "yes", "okay then" and "see you" are small talk. */
+export const MODEL_MIN_WORDS = 4;
 
 export const INITIAL: Snapshot = {
   status: "off",
@@ -324,6 +332,13 @@ export class ListeningPost {
       return;
     }
     const trigger = decide(text);
+    if (!trigger && this.state.settings.model && text.split(" ").length >= MODEL_MIN_WORDS) {
+      // The phrase list let it pass. With the switch on, the server's model has a look before it counts as small talk.
+      line.tag = "checking";
+      this.set({ interim: "", lines: [...this.state.lines, line].slice(-KEEP_LINES) });
+      void this.check(line.id, text);
+      return;
+    }
     if (trigger) {
       const busy = this.state.jobs.some((job) => job.kind === trigger.kind && (job.state === "collecting" || job.state === "working"));
       const recent = this.lastRun.get(trigger.kind);
@@ -336,12 +351,32 @@ export class ListeningPost {
     this.set({ interim: "", lines: [...this.state.lines, line].slice(-KEEP_LINES) });
     if (!trigger || line.tag !== "event") return;
 
+    this.begin(trigger, line.id, text, now);
+  }
+
+  private begin(trigger: Trigger, lineId: number, text: string, now: number) {
     this.runs.push(now);
     this.lastRun.set(trigger.kind, now);
     const job: Job = { id: this.nextId++, desk: trigger.desk, kind: trigger.kind, heard: text, at: now, state: "collecting", progress: "Listening for what comes next" };
-    this.triggers.set(job.id, { trigger, line: line.id });
+    this.triggers.set(job.id, { trigger, line: lineId });
     this.set({ jobs: [...this.state.jobs, job].slice(-KEEP_JOBS) });
     this.fx.later(() => void this.work(job.id), SETTLE_MS);
+  }
+
+  private retag(lineId: number, tag: Line["tag"]) {
+    this.set({ lines: this.state.lines.map((line) => (line.id === lineId ? { ...line, tag } : line)) });
+  }
+
+  /** The model check's answer for one sentence. A matter goes to the life events desk, as on Telegram. */
+  private async check(lineId: number, text: string) {
+    const answer = await this.fx.sort(text, this.state.settings.code).catch(() => "off" as const);
+    if (answer !== "matter") return this.retag(lineId, "small");
+    const now = this.fx.now();
+    this.runs = this.runs.filter((at) => now - at < BUDGET.perMs);
+    if (this.runs.length >= BUDGET.runs) return this.retag(lineId, "rest");
+    this.retag(lineId, "model");
+    // Each sentence is its own matter: the model gives no topic to check "already on it" against.
+    this.begin({ kind: `heard-${lineId}`, desk: "life", urgent: false, addressed: false }, lineId, text, now);
   }
 
   private async work(id: number) {

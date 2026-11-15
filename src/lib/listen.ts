@@ -78,7 +78,7 @@ const RULES: Rule[] = [
     desk: "legal",
     urgent: false,
     pattern: words(
-      "landlord|rent (?:increase|rise|hike)|raisL (?:the|our|my) rent|rent (?:is|was) (?:going up|raised)|(?:my|our|the) deposit|vuokranantajL|vuokrankorotuL|vuokraL nousL|vakuusmaksuL",
+      "landlord|rent (?:increase|rise|hike)|raisL (?:the|our|my) rent|rent[^.?!]{0,30}(?:going up|goes up|went up|raised|higher|more expensive)|(?:my|our|the) deposit|lease (?:ends|ending|terminated)|vuokranantajL|vuokrankorotuL|vuokraL[^.?!]{0,30}nouL|vakuusmaksuL|vuokrasopimuL",
     ),
   },
   {
@@ -86,7 +86,7 @@ const RULES: Rule[] = [
     desk: "finance",
     urgent: false,
     pattern: words(
-      "tax (?:letter|return|card|refund|decision|office|bill|credit|deduction)|back taxes|verokortL|veroilmoituL|veropäätöL|veronpalautuL|jäännösverL|mätkyL|kotitalousvähennyL",
+      "tax (?:letter|return|card|refund|decision|office|bill|credit|deduction|rate)|taxes|(?:my|our|the) tax|back taxes|vero(?:t|ja)|verottajL|verokortL|veroilmoituL|veropäätöL|veronpalautuL|jäännösverL|mätkyL|kotitalousvähennyL",
     ),
   },
   {
@@ -118,7 +118,7 @@ const RULES: Rule[] = [
     kind: "job",
     desk: "life",
     urgent: false,
-    pattern: words("new job|job offer|unemployL|resignL|työttömL|uusi työL|työtarjouL"),
+    pattern: words("new job|job offer|(?:got|found|start(?:ing)?) (?:a|the|my) (?:new )?job|lost (?:his|her|their|our) job|unemployL|resignL|quit (?:my|his|her) job|työttömL|uusi työL|työtarjouL|sain työpaikan|irtisanouduL"),
   },
   {
     kind: "moving",
@@ -132,14 +132,14 @@ const RULES: Rule[] = [
     kind: "letter",
     desk: "legal",
     urgent: false,
-    pattern: words("letter from|got a letter|official letter|invoice|sain kirjeen|kirje (?:kelalta|verolta|migristä|vuokranantajalta|poliisilta)"),
+    pattern: words("letter from|got a letter|official letter|invoice|(?:got|received) a bill|the bill (?:came|from)|payment reminder|reminder fee|sain kirjeen|sain laskun|maksumuistutuL|karhuL|kirje (?:kelalta|verolta|migristä|vuokranantajalta|poliisilta)"),
   },
   {
     kind: "consumer",
     desk: "legal",
     urgent: false,
     pattern: words(
-      "warranty|stopped working|broke down|price (?:increase|rise|hike)|subscription (?:went up|price)|takuuL|meni rikki|hajosi|hinnankorotuL",
+      "warranty|guarantee|stopped working|broke down|(?:is|are|was|got) broken|just broke|broke again|(?:doesn'?t|does not|isn'?t|is not|won'?t) (?:work|working|start|turn on)|faulty|defective|refund|price (?:increase|rise|hike)|prices? (?:went|are going|is going) up|subscription (?:went up|price)|cancel (?:the|my|our) (?:subscription|contract|membership)|takuuL|meni rikki|on rikki|hajosi|ei toimi|lakkasi toimimasta|hyvitL|hinnankorotuL|hinta nousL|irtisanoa sopimuL",
     ),
   },
   {
@@ -149,6 +149,58 @@ const RULES: Rule[] = [
     pattern: words(
       "customs|duty[- ]free|is it (?:legal|illegal|allowed)|can (?:i|we) (?:bring|take|carry|import)|tulliL|saa(?:ko|nko) (?:tuoda|viedä)|onko (?:laillista|sallittua)",
     ),
+  },
+  {
+    kind: "register",
+    desk: "life",
+    urgent: false,
+    pattern: words(
+      "registL (?:our|my|the|a)? ?(?:new )?(?:address|move|baby|child|birth|car)|change (?:of )?(?:our|my) address|bank ?id|bank account|online banking|kela card|population (?:register|information)|dvv|digi- ?ja väestötietovirastL|maistraattL|pankkitunnuL|osoitteenmuutoL|muuttoilmoituL|rekisteröiL",
+    ),
+  },
+  {
+    kind: "health",
+    desk: "life",
+    urgent: false,
+    pattern: words(
+      "(?:see|book|need|get) (?:a|the) doctor|doctor'?s appointment|health (?:centre|center|insurance|card)|hospital (?:bill|visit|appointment)|sick leave|prescription|dentist|lääkäriL|terveyskeskuL|terveysasemL|sairauslomL|reseptL|hammaslääkäriL|sairaalL",
+    ),
+  },
+  {
+    kind: "death",
+    desk: "life",
+    urgent: false,
+    pattern: words(
+      "passed away|(?:mum|mom|dad|father|mother|grandma|grandpa|grandmother|grandfather|husband|wife|brother|sister|uncle|aunt|granny) (?:has )?died|funeral|death certificate|inheritance|estate inventory|kuoli|on kuollut|menehtyi|hautajaisL|perintöL|perunkirjoL|kuolinpesL",
+    ),
+  },
+  {
+    kind: "divorce",
+    desk: "legal",
+    urgent: false,
+    pattern: words("divorcL|separatL|break(?:ing)? up|custody|child support|avioeroL|eroamme|erotaan|erosimme|huoltajuuL|elatusapuL|elatusmaksuL"),
+  },
+  {
+    kind: "accident",
+    desk: "legal",
+    urgent: false,
+    pattern: words(
+      "(?:car|work|bike|traffic) accident|crashed (?:the|my|our) car|hit (?:my|our) car|insurance (?:claim|company|won'?t|doesn'?t|refused|denied|pay)|claim (?:on|from) (?:the|our|my) insurance|vakuutuL|kolarL|työtapaturmL|liikenneonnettomuuL",
+    ),
+  },
+  {
+    kind: "occasion",
+    desk: "life",
+    urgent: false,
+    pattern: words(
+      "birthdays?|bday|wedding|anniversary|(?:gift|present) for|christening|graduation party|syntymäpäivL|synttärL|häät|häihin|hääpäivL|vuosipäivL|lahja|ristiäiset|valmistujaisL|rippijuhlL",
+    ),
+  },
+  {
+    kind: "school",
+    desk: "life",
+    urgent: false,
+    pattern: words("school (?:place|application|registration|starts)|start(?:s|ing)? school|enrolL|preschool|koulupaikL|esikoulL|kouluun|koulun alku|ilmoittautuL kouluun"),
   },
   {
     // Someone says what they are about to do, and it is the kind of thing that has rules: "I'll just bring ten cartons
