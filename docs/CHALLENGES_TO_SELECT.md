@@ -2,13 +2,13 @@
 
 Written Saturday 14 November, 20:09 Helsinki, from the challenge texts on the Junction platform. The platform lets one project enter several challenges. Tick a box here when you have selected it on the platform.
 
-Handover updated Sunday 15 November for #72 and #77: the refreshed landing replay has new measurements and no matching narration, and unconfigured chat offers text without voice controls. This does not complete the live voice work in #75/#76 or the calling work in #32/#73.
+Updated Sunday 15 November, 09:40 Helsinki: ElevenLabs moved to "Select now" after both live voice paths worked on the production server; the Nemotron note names the emergency rule. The same notes, with the final list of what to tick, are in [SUBMISSION_TEXT.md](SUBMISSION_TEXT.md).
 
 **The rule we follow:** select a challenge only when its technology does real work in the demo. A judge who opens the project and cannot find their product will mark it down, and that costs more than the entry gains.
 
 Demo address for every note below: <https://86.38.238.136.sslip.io>
 
-## 1. Select now (4)
+## 1. Select now (5)
 
 These work today. Each has a note you can paste into the form.
 
@@ -25,7 +25,7 @@ These work today. Each has a note you can paste into the form.
 
 - **Why it fits:** Nemotron 3.5 Super VL is AIDaddy's conversation model, in Telegram and on `/chat`.
 - **Required:** a text in the form naming the model, what it does, why it matters and how we improved its outputs. Paste this:
-  > **Model:** `nvidia/nemotron-3.5-super-vl-120b-a12b`, through the Hermes Agent runtime's NVIDIA provider. **What it does:** it is the whole conversation layer of AIDaddy. It decides whether a message in a group needs an answer, calls our research tool, writes drafts of letters for the household to send, sets reminders after approval, and reads photos of official letters with its own vision (no separate OCR model). **Why it matters:** one open model handles text, images and tool calls, so a newcomer can drop a photo of a Finnish letter into the chat and get a plan back. **How we improved its outputs:** (1) The model never states a figure itself. Deadlines and amounts come only from our research engine, which keeps a line only when its quoted sentence is found on the cited page; the model posts those lines unchanged. (2) A persona file and ten short skills give it exact procedures and the reasons behind each rule. (3) A local Gemma gate stops small talk before it reaches Nemotron, and the model answers `[SILENT]` when it is still unsure. (4) We rehearsed 12 scenarios from the command line and recorded live group runs, then fixed what failed: recovery when a case is missing, and duplicate reminders. Measured: first reply 3 to 12 seconds; a letter photo was read correctly in all six field groups with two street-name errors.
+  > **Model:** `nvidia/nemotron-3.5-super-vl-120b-a12b`, through the Hermes Agent runtime's NVIDIA provider. **What it does:** it is the whole conversation layer of AIDaddy. It decides whether a message in a group needs an answer, calls our research tool, writes drafts of letters for the household to send, sets reminders after approval, and reads photos of official letters with its own vision (no separate OCR model). **Why it matters:** one open model handles text, images and tool calls, so a newcomer can drop a photo of a Finnish letter into the chat and get a plan back. **How we improved its outputs:** (1) The model never states a figure itself. Deadlines and amounts come only from our research engine, which keeps a line only when its quoted sentence is found on the cited page; the model posts those lines unchanged. (2) A persona file and short skills give it exact procedures and the reason behind each rule. (3) A local Gemma gate stops small talk before it reaches Nemotron, and the model answers `[SILENT]` when it is still unsure. (4) An emergency rule wakes it and forbids silence; it then answers without tools, in fixed Red Cross words with 112 first. (5) We rehearsed scenarios from the command line and recorded live group runs, then fixed what failed: recovery when a case is missing, and duplicate reminders. Measured: first reply 3 to 12 seconds; a letter photo was read correctly in all six field groups with two street-name errors.
 - **Evidence:** `docs/HERMES_HANDOVER.md`, `hermes/SOUL.md`, `hermes/skills/`, `eval/bot/`.
 
 ### - [ ] Google DeepMind: Best Use of Gemma
@@ -42,23 +42,18 @@ These work today. Each has a note you can paste into the form.
 - **Note to paste:**
   > Everything runs on one Verda CPU instance in Finland (8 vCPU, 32 GB): the website and research engine, the Telegram bot, a second web-only bot instance, and Gemma 3 served by Ollama as the privacy gate. A laptop could not do this: the bot needs one always-on host, judges need case links that open on any phone, and the gate model has to sit next to the bot so small talk is judged on infrastructure we control, in Europe, before anything goes to a cloud model. Every merge to main is tested and then deployed to the instance automatically, with a rollback when the health check fails. Process and scaling path: docs/VERDA.md.
 
-## 2. Close: select only after the named step is done (7)
-
-Each of these needs work that is not done. The team's own feature freeze was 20:00, so starting any of them is a team decision. If the step is not done, do not select the challenge.
-
 ### - [ ] Major League Hacking: Best Use of ElevenLabs
 
-- **What exists:** case narration, chat speech and speech-to-text code, plus recorded pitch audio. The pitch files in `docs/pitch/voiceover/` use the premade George voice; do not describe them as the project's designed voice. The same eight lines in AIDaddy's own designed voice are in `docs/pitch/voiceover-aidaddy/`.
-- **Required for a live voice claim:** account configuration from #76, then the production checks in #75: the intended voice plays a reply and a short voice note becomes an editable draft. A configured-key flag or simulated browser audio does not prove either provider path works. Check case narration separately before claiming it in the demo. #37 remains open until the intended voice feature is demonstrated.
-- **Works on the server without a key:** the front page's "Hear the plan" button plays the current recorded run's plan in AIDaddy's designed voice (35 seconds, rendered from that case by the same route, checked by transcribing it back). The page offers it only for the case named in `src/data/plan-audio.json`, so a new recording is never narrated by old audio.
-- **The voice fits the case:** a case is read in its own language (Finnish, Swedish, German, Spanish, French, Ukrainian, Estonian), slower and steadier after bad news, with more movement after good news; a chat reply is spoken in the language of the reply. Measured on a Finnish dismissal case and the English pregnancy case (docs/DECISIONS.md, Sun 02:40). On the server this needs the key, like every live voice path.
-- **Current fallback:** `/chat` offers text and hides voice controls when the server has no ElevenLabs key.
-- **Note to paste only after the named live checks pass; remove any path not demonstrated:**
-  > ElevenLabs gives AIDaddy its spoken interface: case narration reads the stored plan, chat replies can be spoken while the avatar follows the audio, and Scribe turns a short voice note into an editable draft before sending. The voice fits the case: it reads in the case's language (Finnish, Swedish, German, Spanish, French, Ukrainian or Estonian), slower and steadier after bad news, lighter after good news, and it says only what the case file shows. The voice is our own, made with Voice Design, not a clone of anyone. We demonstrated these paths on the deployed app with the intended voice. Outbound phone calls are a separate controlled rehearsal and are not claimed here.
-- **Narrower note, true today without the server key:**
-  > On the front page, AIDaddy reads the recorded run's plan aloud in its own ElevenLabs voice, made with Voice Design. The audio was rendered from that case file by the product's own narration route and says only what the file shows.
-- **Recorded-only alternative:** if the final video uses the existing ElevenLabs voiceover, describe that exact use and listen to the final edit. Recorded assets alone do not establish a live voice feature; reconcile that narrower submission with [the challenge evidence](TECH_CHALLENGES.md).
-- **Evidence:** `src/lib/speech.ts`, `src/app/api/aidaddy/speak`, `src/app/api/aidaddy/listen`, `docs/pitch/voiceover.json`, `docs/pitch/voiceover/`, and the eventual #75 acceptance results.
+- **Why it fits:** ElevenLabs is AIDaddy's voice on the live site, and the voice paths were checked on the production server on Sunday at 09:35: `/api/aidaddy/speak` returned spoken audio in about one second, and `/api/aidaddy/listen` (Scribe) turned that audio back into "Hello, this is AIDaddy". `/api/health` reports `"voice":"elevenlabs"` and `"calls":"browser"`.
+- **Voice used live:** AIDaddy's own voice (Voice Design) when the server's account has it, otherwise the standard voice "Bill" (DECISIONS.md, Sun 04:36). The front page plan and the emergency clips are pre-rendered in AIDaddy's own voice. The pitch files in `docs/pitch/voiceover/` use the premade George voice; the same lines in AIDaddy's voice are in `docs/pitch/voiceover-aidaddy/`.
+- **Not claimed:** a real voice conversation on `/call` (#32 stays open until a person holds one on the deployed site), and phone calls over Twilio (not configured on the server).
+- **Note to paste:**
+  > ElevenLabs is AIDaddy's voice on the live site. Text to speech speaks the chat's replies and reads a case's plan aloud, in the case's own language (Finnish, Swedish, German, Spanish, French, Ukrainian, Estonian or English), slower and steadier after bad news; it says only what the case file shows. Scribe turns a short voice note into an editable draft before anything is sent. The emergency words on the listening page are clips in AIDaddy's voice, loaded when listening starts so they play without a tap or the network. AIDaddy's own voice is made with Voice Design, not a clone of anyone; live replies fall back to a standard ElevenLabs voice when the server's account lacks it. The `/call` page is a first version: after one confirmation, an ElevenLabs agent in AIDaddy's voice holds the call on a browser test line, and purchases discussed on a call are role-play.
+- **Evidence:** `src/lib/speech.ts`, `src/app/api/aidaddy/speak`, `src/app/api/aidaddy/listen`, `public/listen/emergency/`, `src/data/plan-audio.json`, `docs/DEMO_CALLS.md`.
+
+## 2. Close: select only after the named step is done (6)
+
+Each of these needs work that is not done. The team's own feature freeze was 20:00, so starting any of them is a team decision. If the step is not done, do not select the challenge.
 
 | | Challenge | What is there | What is missing | Rough effort |
 |---|---|---|---|---|
@@ -106,6 +101,6 @@ Selecting these would not help. One line each, so nobody has to wonder.
 
 - [ ] Every selected challenge has its note pasted where the form asks for one. Nemotron's is required.
 - [ ] The Verda summary link is posted in Verda's Discord channel.
-- [ ] The ElevenLabs note matches demonstrated audio: live acceptance under #75/#76, the front page's narration (the narrower note), or an accurately described voiceover actually included in the final video.
+- [ ] The ElevenLabs note matches what the live server does (checked Sun 09:35; recheck `/api/health` shows `"voice":"elevenlabs"` just before FINAL).
 - [ ] Any challenge from section 2 whose step was not done is unselected.
 - [ ] The numbers in the notes still match `src/data/scorecard.json` and `eval/results/gate-gemma3-1b.json` after the last test run.
