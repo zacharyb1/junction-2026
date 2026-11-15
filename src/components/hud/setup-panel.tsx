@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CONNECTIONS, type Connection } from "@/components/hud/setup-data";
 
 function Channel({ connection }: { connection: Connection }) {
-  const [on, setOn] = useState(connection.status === "live");
+  const router = useRouter();
   const live = connection.status === "live";
+  // A channel that starts on its own page is off until someone switches it on here.
+  const [on, setOn] = useState(live && !connection.opens);
+  const badge = live ? "Live" : connection.status === "built" ? "Built, not published" : "Concept";
   const titleId = `setup-${connection.id}`;
 
   return (
@@ -14,7 +18,7 @@ function Channel({ connection }: { connection: Connection }) {
       <div className="hud-panel-title">
         <span>{connection.label}</span>
         <span className={live ? "hud-setup-badge is-live" : "hud-setup-badge is-concept"}>
-          {live ? "Live" : "Concept"}
+          {badge}
         </span>
       </div>
       <div className="hud-setup-body">
@@ -28,7 +32,10 @@ function Channel({ connection }: { connection: Connection }) {
             aria-checked={on}
             aria-labelledby={titleId}
             className="hud-setup-switch"
-            onClick={() => setOn((v) => !v)}
+            onClick={() => {
+              if (!on && connection.opens) router.push(connection.opens);
+              setOn((v) => !v);
+            }}
           >
             <span className="hud-setup-knob" aria-hidden />
           </button>
@@ -38,12 +45,16 @@ function Channel({ connection }: { connection: Connection }) {
           <span className="hud-setup-dot" aria-hidden /> {on ? connection.whenOn : connection.whenOff}
         </p>
         <div className="hud-setup-links">
-          {connection.action && (
+          {connection.action?.internal ? (
+            <Link href={connection.action.href} className="hud-btn hud-btn--primary">
+              {connection.action.label}
+            </Link>
+          ) : connection.action ? (
             <a href={connection.action.href} target="_blank" rel="noreferrer" className="hud-btn hud-btn--primary">
               {connection.action.label}
               <span className="hud-sr"> (opens Telegram)</span>
             </a>
-          )}
+          ) : null}
           <Link href={connection.replay.href} className="hud-setup-replay">
             Watch the replay
             <span className="hud-sr"> of {connection.replay.of}</span>
@@ -55,7 +66,7 @@ function Channel({ connection }: { connection: Connection }) {
   );
 }
 
-/** The /setup mockup: three switches for what AIDaddy may follow. State lives only in this page. */
+/** The /setup screen: three switches for what AIDaddy may follow. The listening switch opens /listen; the others keep their state only in this page. */
 export function SetupPanel() {
   return (
     <ul className="hud-setup-grid">

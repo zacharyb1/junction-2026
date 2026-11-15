@@ -6,12 +6,19 @@ describe("setup screen connections", () => {
     expect(CONNECTIONS.map((c) => c.id)).toEqual(["telegram", "phone", "browser"]);
   });
 
-  // The page is a mockup. Judges must not read a concept as something that already works.
-  it("marks only the Telegram chat as live", () => {
-    expect(CONNECTIONS.filter((c) => c.status === "live").map((c) => c.id)).toEqual(["telegram"]);
-    for (const c of CONNECTIONS.filter((c) => c.status === "concept")) {
-      expect(c.whenOn, c.id).toMatch(/not built yet/i);
+  // Judges must not read something that is not switched on as something that already works.
+  it("marks as live only what a visitor can really switch on", () => {
+    expect(CONNECTIONS.filter((c) => c.status === "live").map((c) => c.id)).toEqual(["telegram", "phone"]);
+    for (const c of CONNECTIONS.filter((c) => c.status !== "live")) {
+      expect(c.whenOn, c.id).toMatch(/connects nothing|not built yet/i);
     }
+  });
+
+  it("starts listening on its own page, on the device where it is switched on", () => {
+    const phone = CONNECTIONS.find((c) => c.id === "phone");
+    expect(phone?.opens).toBe("/listen");
+    expect(phone?.action).toMatchObject({ href: "/listen", internal: true });
+    expect(phone?.whenOn).toMatch(/only while that page is open/i);
   });
 
   it("adds the bot to a group through Telegram's own link", () => {

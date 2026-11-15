@@ -5,7 +5,7 @@ import { SiteShell } from "@/components/site/site-shell";
 import "@/components/hud/hud.css";
 
 const title = "Set up AIDaddy";
-const description = "Choose what AIDaddy may follow: your Telegram chat today, your phone and browser as concepts.";
+const description = "Choose what AIDaddy may follow: your Telegram chat, the microphone of this device, and your browser.";
 
 export const metadata: Metadata = {
   // The name is already in the title, so the layout's " · AIDaddy" ending is left off.
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#05080d" };
 
-/** A mockup of the setup screen (issue #42). Only the Telegram channel is real; the page says so. */
+/** The setup screen (issue #42). Telegram and listening on this device are real; the browser extension is built but not published. The page says so. */
 export default function SetupPage() {
   return (
     <SiteShell>
@@ -27,7 +27,7 @@ export default function SetupPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/aidaddy-avatar.svg" alt="" width={64} height={64} className="hud-setup-avatar" />
             <div>
-              <p className="hud-label">Setup · mockup</p>
+              <p className="hud-label">Setup</p>
               <h1 className="hud-title hud-setup-h1">Give AIDaddy eyes and ears.</h1>
               <p className="hud-lede">
                 Choose what AIDaddy may follow. Nothing switches on without you, and you can switch any of it off again.
@@ -39,8 +39,9 @@ export default function SetupPage() {
 
           <div className="hud-setup-footer">
             <p className="hud-note">
-              Of these three, only the Telegram chat works today. Phone and browser are concepts shown for discussion:
-              switching them on here connects nothing. AIDaddy is an independent hackathon project, not an official service.
+              Of these three, the Telegram chat and listening work today. Listening runs as a web page on the device where
+              you start it, and stops when that page is closed. The browser extension is built but not published, so its
+              switch here connects nothing. AIDaddy is an independent hackathon project, not an official service.
             </p>
             <p className="hud-note">
               You can also <SiteLink href="/chat">talk to AIDaddy on the web</SiteLink>.
