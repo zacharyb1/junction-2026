@@ -283,7 +283,7 @@
         return;
       }
       const reasons = {
-        "no-code": "Add the access code on AIDaddy's settings page (right-click the AIDaddy icon, then Options).",
+        "no-code": "This AIDaddy server asks for an access code. Add it on AIDaddy's settings page (right-click the AIDaddy icon, then Options).",
         "bad-code": "The access code was not accepted. Check it on AIDaddy's settings page.",
         busy: "The demo is busy. Try again in a minute.",
         nothing: "Nothing on this page needs a plan.",
