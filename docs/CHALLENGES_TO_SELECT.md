@@ -48,9 +48,13 @@ Each of these needs work that is not done. The team's own feature freeze was 20:
 
 - **What exists:** case narration, chat speech and speech-to-text code, plus recorded pitch audio. The current pitch files use the premade George voice; do not describe them as the project's designed voice.
 - **Required for a live voice claim:** account configuration from #76, then the production checks in #75: the intended voice plays a reply and a short voice note becomes an editable draft. A configured-key flag or simulated browser audio does not prove either provider path works. Check case narration separately before claiming it in the demo. #37 remains open until the intended voice feature is demonstrated.
-- **Current fallback:** `/chat` offers text and hides voice controls when the server has no ElevenLabs key. The homepage's old "Hear the plan" button was removed because its narration belongs to the previous replay. Do not offer that audio as narration for the refreshed Case.
+- **Works on the server without a key:** the front page's "Hear the plan" button plays the current recorded run's plan in AIDaddy's designed voice (35 seconds, rendered from that case by the same route, checked by transcribing it back). The page offers it only for the case named in `src/data/plan-audio.json`, so a new recording is never narrated by old audio.
+- **The voice fits the case:** a case is read in its own language (Finnish, Swedish, German, Spanish, French, Ukrainian, Estonian), slower and steadier after bad news, with more movement after good news; a chat reply is spoken in the language of the reply. Measured on a Finnish dismissal case and the English pregnancy case (docs/DECISIONS.md, Sun 02:40). On the server this needs the key, like every live voice path.
+- **Current fallback:** `/chat` offers text and hides voice controls when the server has no ElevenLabs key.
 - **Note to paste only after the named live checks pass; remove any path not demonstrated:**
-  > ElevenLabs gives AIDaddy its spoken interface: case narration reads the stored plan, chat replies can be spoken while the avatar follows the audio, and Scribe turns a short voice note into an editable draft before sending. We demonstrated these paths on the deployed app with the intended voice. Outbound phone calls are a separate controlled rehearsal and are not claimed here.
+  > ElevenLabs gives AIDaddy its spoken interface: case narration reads the stored plan, chat replies can be spoken while the avatar follows the audio, and Scribe turns a short voice note into an editable draft before sending. The voice fits the case: it reads in the case's language (Finnish, Swedish, German, Spanish, French, Ukrainian or Estonian), slower and steadier after bad news, lighter after good news, and it says only what the case file shows. The voice is our own, made with Voice Design, not a clone of anyone. We demonstrated these paths on the deployed app with the intended voice. Outbound phone calls are a separate controlled rehearsal and are not claimed here.
+- **Narrower note, true today without the server key:**
+  > On the front page, AIDaddy reads the recorded run's plan aloud in its own ElevenLabs voice, made with Voice Design. The audio was rendered from that case file by the product's own narration route and says only what the file shows.
 - **Recorded-only alternative:** if the final video uses the existing ElevenLabs voiceover, describe that exact use and listen to the final edit. Recorded assets alone do not establish a live voice feature; reconcile that narrower submission with [the challenge evidence](TECH_CHALLENGES.md).
 - **Evidence:** `src/lib/speech.ts`, `src/app/api/aidaddy/speak`, `src/app/api/aidaddy/listen`, `docs/pitch/voiceover.json`, `docs/pitch/voiceover/`, and the eventual #75 acceptance results.
 
@@ -100,6 +104,6 @@ Selecting these would not help. One line each, so nobody has to wonder.
 
 - [ ] Every selected challenge has its note pasted where the form asks for one. Nemotron's is required.
 - [ ] The Verda summary link is posted in Verda's Discord channel.
-- [ ] The ElevenLabs note matches demonstrated audio: live acceptance under #75/#76, or an accurately described voiceover actually included in the final video. Do not point to the removed homepage button.
+- [ ] The ElevenLabs note matches demonstrated audio: live acceptance under #75/#76, the front page's narration (the narrower note), or an accurately described voiceover actually included in the final video.
 - [ ] Any challenge from section 2 whose step was not done is unselected.
 - [ ] The numbers in the notes still match `src/data/scorecard.json` and `eval/results/gate-gemma3-1b.json` after the last test run.
