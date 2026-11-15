@@ -3,7 +3,7 @@
 /**
  * The desktop start page: one big box to say what is on your mind, and four everyday photos to start from, so a
  * parent at a laptop begins the way they would in a chat app. A household job goes to Get it done; anything else
- * opens the chat with UKK.
+ * opens the chat with AIDaddy.
  */
 
 import Image from "next/image";
@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { Icon } from "@/components/home/ui";
 import { isJob } from "@/lib/home-demo";
-import { useDesk } from "./desk-shell";
+
 
 const STARTS: { href: string; photo: string; alt: string; label: string }[] = [
   { href: "/desk/feed", photo: "/assistant/family.jpg", alt: "Laura with Eino and Aino at home", label: "What is my family missing?" },
@@ -23,16 +23,13 @@ const STARTS: { href: string; photo: string; alt: string; label: string }[] = [
 
 export function DeskStart() {
   const router = useRouter();
-  const { code } = useDesk();
   const [text, setText] = useState("");
-  const [note, setNote] = useState("");
 
   function send(e: FormEvent) {
     e.preventDefault();
-    const job = text.trim();
-    if (!job) return;
-    if (isJob(job)) router.push(`/desk/tasks?job=${encodeURIComponent(job)}`);
-    else setNote("UKK answers this in the chat. To see agents at work, try “Kitchen tap is leaking”.");
+    const said = text.trim();
+    if (!said) return;
+    router.push(isJob(said) ? `/desk/tasks?job=${encodeURIComponent(said)}` : `/desk/chat?q=${encodeURIComponent(said)}`);
   }
 
   return (
@@ -63,14 +60,6 @@ export function DeskStart() {
           </button>
         </div>
       </form>
-      {note && (
-        <p role="status" className="m-0 flex max-w-[720px] flex-wrap items-center gap-2 text-sm text-[#5a4f47]">
-          {note}
-          <a href={code ? `/assistant?code=${encodeURIComponent(code)}` : "/assistant"} className="font-semibold">
-            Open the chat
-          </a>
-        </p>
-      )}
       <ul aria-label="Start from" className="m-0 grid w-full max-w-[720px] list-none grid-cols-[repeat(auto-fit,minmax(min(100%,160px),1fr))] gap-2.5 p-0">
         {STARTS.map((s) => (
           <li key={s.label}>

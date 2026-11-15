@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The frame every /desk page shares: UKK on a laptop, laid out like a chat app, so a parent at a desk gets the
+ * The frame every /desk page shares: AIDaddy on a laptop, laid out like a chat app, so a parent at a desk gets the
  * sections in a sidebar and the work in a wide column. It loads the household's live finds once, for every page.
  *
  * Every section has its own desktop page; they share their data and logic with the /home phone pages.
@@ -43,20 +43,19 @@ export function DeskShell({ children }: { children: ReactNode }) {
   const live = useLiveOpportunities(code);
   const value = useMemo(() => ({ live, code }), [live, code]);
   const found = EXAMPLES.length + live.rows.length;
-  const chat = code ? `/assistant?code=${encodeURIComponent(code)}` : "/assistant";
   const item = "flex min-h-10 items-center gap-2.5 rounded-lg px-2.5 text-sm no-underline";
 
   return (
     <DeskContext.Provider value={value}>
-      <div className="ukk flex min-h-dvh flex-wrap bg-[#fbf8f3] text-sm">
+      <div className="aidaddy flex min-h-dvh flex-wrap bg-[#fbf8f3] text-sm">
         <nav aria-label="Sections" className="box-border flex max-w-full flex-[1_1_260px] flex-col gap-[18px] bg-[#f3eee7] px-3 py-4 lg:sticky lg:top-0 lg:h-dvh">
           <Link href="/desk" className="px-2 text-lg font-bold text-[#c4572f] no-underline">
-            ukk
+            AIDaddy
           </Link>
-          <a href={chat} className={`${item} font-semibold`}>
+          <Link href="/desk/chat" aria-current={pathname === "/desk/chat" ? "page" : undefined} className={`${item} font-semibold ${pathname === "/desk/chat" ? "bg-white" : ""}`}>
             <Icon d="M12 5v14M5 12h14" size={18} width={2} />
             New chat
-          </a>
+          </Link>
           <div className="flex flex-col gap-0.5">
             {SECTIONS.map((s) => {
               const on = pathname === s.href;
