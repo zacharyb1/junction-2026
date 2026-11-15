@@ -1,7 +1,9 @@
 name: kaveri-gate
-version: 0.2.0
-description: "AIDaddy Telegram gate: wake on relevant messages, carry bounded recent chat context into the next trigger, and announce research in its originating conversation."
+version: 0.3.0
+description: "AIDaddy Telegram gate: retain bounded recent context, announce research, and require its sourced plan before next-action buttons."
 author: "AIDaddy team"
 provides_hooks:
   - pre_gateway_dispatch
   - pre_tool_call
+  - post_tool_call
+  - post_api_request
