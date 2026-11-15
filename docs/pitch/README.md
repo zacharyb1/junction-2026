@@ -37,4 +37,4 @@ The recordings of 15 November were not made with this recorder: its browser sess
 node scripts/make-deck.mjs
 ```
 
-The script photographs the live site into `deck/img`, reads every figure from the result files (`src/data/scorecard.json`, `eval/results/gate-gemma3-1b.json`, `src/data/replay.json`), writes `deck/deck.html` and prints the PDF. `--no-shots` keeps the existing pictures, `--base` points it at another server, and it reports any slide that is too full.
+The script photographs the live site into `deck/img`, reads every figure from the result files (`src/data/scorecard.json`, `eval/results/gate-gemma3-1b.json`, `src/data/replay.json`), writes `deck/deck.html` and prints the PDF. `--no-shots` keeps the existing pictures, `--no-story` leaves out the opening slide about Saturday night, `--base` points it at another server, and it reports any slide that is too full.
