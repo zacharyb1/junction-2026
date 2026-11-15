@@ -1,34 +1,39 @@
 "use client";
 
 /**
- * "Shopping from your chats": things the family needs, noticed in its messages, each a question for AIDaddy's chat, which
- * finds products and gifts with their shop pages. The messages behind them are examples in this demo.
+ * "Shopping from your chats" on the phone: search shops for what the family needs, with each product's price as its
+ * shop page states it. A gift knows who it is for and marks what would arrive late; a household job goes to Get it
+ * done and any other question to the chat (shop-search.ts). The desktop page shows the same.
  */
 
+import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
-import type { AppName } from "@/lib/home-demo";
-import { AppLogo, H1, Icon, ICON, Main, TabBar, TabHeader, useNav } from "./ui";
-
-export const QUICK = ["Gift for Eino", "Boots for Aino", "Weekend with kids", "Dinner ideas"];
-export const APPS: AppName[] = ["WhatsApp", "Telegram", "Gmail", "Calendar", "Wilma"];
-
-export const ROWS: [AppName, string, string, string][] = [
-  ["Calendar", "A gift for Eino's 5th birthday", "Eino turns 5 on 12 Dec", "A birthday present for Eino, he turns 5 and loves drawing, under €40"],
-  ["WhatsApp", "Winter boots for Aino", "“Her boots are too small again”", "Warm winter boots for a 9-month-old, size 20, in Helsinki"],
-  ["Wilma", "Rain clothes for daycare", "“Please bring rain clothes on Friday”", "Rain clothes for a 4-year-old for daycare"],
-  ["Telegram", "A babysitter for Saturday", "“Can anyone watch the kids Sat evening?”", "A babysitter in Kallio, Helsinki for Saturday evening"],
-  ["Gmail", "A cheaper electricity contract", "“Your fixed-price contract ends 31 Dec”", "A cheaper electricity contract in Helsinki for a family flat"],
-  ["Calendar", "Something for your jazz evening", "Thursday evening is free", "Jazz in Helsinki on Thursday evening"],
-];
+import { isJob } from "@/lib/home-demo";
+import { useLive } from "./home-app";
+import { APPS, arrival, NEEDS, type Need, QUICK, useShopSearch } from "./shop-search";
+import { AppLogo, H1, Icon, ICON, Main, Spinner, TabBar, TabHeader, useNav } from "./ui";
 
 export function SearchScreen() {
   const nav = useNav();
+  const router = useRouter();
+  const { code } = useLive();
+  const { found, search, searchText } = useShopSearch(code);
   const [draft, setDraft] = useState("");
-  const go = (q: string) => nav.say(`Demo: AIDaddy would look for “${q}” in shops, each with its price on the shop’s own page. It never buys.`);
+
+  function open(need: Need) {
+    if (need.to === "shop" && need.shop) void search(need.ask, need.shop);
+    else if (need.to === "job") nav.push({ s: "tasks", job: need.ask });
+    else router.push(nav.askHref(need.ask));
+  }
+
   function submit(e: FormEvent) {
     e.preventDefault();
-    if (draft.trim()) go(draft.trim());
+    const text = draft.trim();
+    if (!text) return;
+    if (isJob(text)) nav.push({ s: "tasks", job: text });
+    else searchText(text);
   }
+
   return (
     <>
       <TabHeader>
@@ -44,17 +49,51 @@ export function SearchScreen() {
             autoComplete="off"
             className="min-w-0 flex-1 border-0 bg-transparent text-[15px] outline-none placeholder:text-[#8f8379]"
           />
+          {found.status === "searching" && <Spinner />}
         </form>
         <div className="flex flex-wrap gap-2">
           {QUICK.map((q) => (
-            <button key={q} type="button" onClick={() => go(q)} className="h-[34px] rounded-full border border-[#ece6dc] bg-white px-3 text-[13px] font-medium">
-              {q}
+            <button key={q.label} type="button" onClick={() => open(q)} className="h-[34px] rounded-full border border-[#ece6dc] bg-white px-3 text-[13px] font-medium">
+              {q.label}
             </button>
           ))}
         </div>
       </TabHeader>
 
-      <Main className="pt-1.5">
+      <Main className="gap-1.5 pt-1.5">
+        {found.status !== "idle" && (
+          <section aria-label={`In shops for ${found.heading}`} aria-live="polite" className="flex flex-none flex-col gap-2 pb-3">
+            <h2 className="m-0 text-xs font-semibold uppercase tracking-[.04em] text-[#8f8379]">{found.heading}</h2>
+            {found.status === "searching" && <p className="m-0 text-sm text-[#7a6e66]">Reading shop pages for prices, about half a minute…</p>}
+            {found.status === "error" && <p className="m-0 text-sm text-[#a33417]">The search did not work this time: {found.error}.</p>}
+            {found.status === "ok" && found.ideas.length === 0 && <p className="m-0 text-sm text-[#7a6e66]">No shop page stated a price for this. Try other words.</p>}
+            {found.ideas.map((idea) => {
+              const when = arrival(idea);
+              return (
+                <a key={idea.url} href={idea.url} target="_blank" rel="noreferrer" className="flex flex-none gap-3 rounded-[14px] border border-[#ece6dc] bg-white p-2.5 no-underline">
+                  {idea.image ? (
+                    // The shop's own picture, on its own host: next/image would need every shop allowed in config.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={idea.image} alt="" className="size-16 flex-none rounded-lg bg-[#f1ebe2] object-contain" />
+                  ) : (
+                    <span aria-hidden className="flex size-16 flex-none items-center justify-center rounded-lg bg-[#f1ebe2] text-[#8f8379]">
+                      <Icon d={ICON.search} size={22} />
+                    </span>
+                  )}
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="line-clamp-2 text-sm font-semibold">{idea.name}</span>
+                    <span className="text-[15px] font-bold text-[#c4572f]">{idea.price}</span>
+                    {when && <span className={`text-xs font-semibold ${when.late ? "text-[#a33417]" : "text-[#2f6b4f]"}`}>{when.text}</span>}
+                    <span className="truncate text-xs text-[#7a6e66]">
+                      {idea.shop} ↗<span className="sr-only"> (opens the shop page in a new tab)</span>
+                    </span>
+                  </span>
+                </a>
+              );
+            })}
+          </section>
+        )}
+
         <div className="flex items-center justify-between pb-1.5">
           <h2 className="m-0 text-xs font-semibold uppercase tracking-[.04em] text-[#8f8379]">From your messages</h2>
           <span className="flex gap-1">
@@ -63,21 +102,23 @@ export function SearchScreen() {
             ))}
           </span>
         </div>
-        {ROWS.map(([app, title, from, ask]) => (
-          <button key={title} type="button" onClick={() => go(ask)} className="flex flex-none gap-3 border-b border-[#ece6dc] py-3 text-left">
-            <span className="box-border flex size-9 flex-none items-center justify-center rounded-[10px] border border-[#ece6dc] bg-white p-1.5">
-              <AppLogo app={app} size={24} />
-            </span>
+        {NEEDS.map((n) => (
+          <button key={n.label} type="button" onClick={() => open(n)} className="flex flex-none gap-3 border-b border-[#ece6dc] py-3 text-left">
+            {n.app && (
+              <span className="box-border flex size-9 flex-none items-center justify-center rounded-[10px] border border-[#ece6dc] bg-white p-1.5">
+                <AppLogo app={n.app} size={24} />
+              </span>
+            )}
             <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
-              <span className="text-[15px] font-semibold">{title}</span>
+              <span className="text-[15px] font-semibold">{n.label}</span>
               <span className="truncate text-xs text-[#7a6e66]">
-                {app} · {from}
+                {n.app} · {n.from}
               </span>
             </span>
-            <Icon d={ICON.chevron} size={18} stroke="#b0a99e" width={2} className="flex-none self-center" />
+            <span className="flex-none self-center text-[11px] font-semibold text-[#8f8379]">{n.to === "shop" ? "Shops" : n.to === "job" ? "Get it done" : "Chat"}</span>
           </button>
         ))}
-        <p className="m-0 py-2 text-[11px] text-[#8f8379]">Example messages for the demo family. In the full app each one is searched in shops, with sources. AIDaddy never buys.</p>
+        <p className="m-0 py-2 text-[11px] text-[#8f8379]">The messages are examples for the demo family; the searches are real. AIDaddy never buys.</p>
       </Main>
       <TabBar current="search" />
     </>
