@@ -76,7 +76,7 @@ The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are 
 
 ### The site, page by page
 
-AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try AIDaddy without setup, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
+AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try AIDaddy without setup, Talk to AIDaddy, Set up), the same footer and the same warm colours ([DESIGN.md](DESIGN.md)). A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
 
 | Page | What a visitor gets | What it is |
 |---|---|---|
@@ -189,7 +189,7 @@ This handover records implemented behavior, tests, limitations and earlier decis
 | [docs/PITCH.md](docs/PITCH.md), [docs/pitch/](docs/pitch/) | Preparing the story, script and voiceover; refresh dated claims before recording. |
 | [docs/CHALLENGES_TO_SELECT.md](docs/CHALLENGES_TO_SELECT.md), [docs/VERDA.md](docs/VERDA.md) | Filling in the submission form: which challenges to select, the note to paste for each, and the process summary the Verda challenge asks for. |
 | [docs/DEMO_PLAN.md](docs/DEMO_PLAN.md), [docs/BOT_PLAN.md](docs/BOT_PLAN.md) | Proposals of Saturday 09:05: the run of show on the new front page, and the order of bot work before the freeze. |
-| [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The dark front page on `/`: what each section shows and which data file it reads. |
+| [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The front page on `/` (planned in its earlier dark look; the sections are the same): what each section shows and which data file it reads. |
 | [docs/RESEARCH.md](docs/RESEARCH.md), [docs/research/](docs/research/) | Finding prior research and historical plans. |
 | [docs/PLAYBOOK.md](docs/PLAYBOOK.md) | Checking event rules and logistics before submission. |
 | [docs/STARTERS.md](docs/STARTERS.md) | Consulting the pre-product template catalogue; it is not the current architecture. |

@@ -63,7 +63,7 @@ const SPEECH = [
 ] as const;
 
 // 44 px tall, so a thumb hits it, and 16 px text on a phone, so iOS does not zoom into the field.
-const field = "h-11 w-full rounded-lg border border-input bg-input/30 px-3 text-base outline-none transition-colors focus-visible:border-ring md:text-sm";
+const field = "h-11 w-full rounded-lg border border-input bg-white px-3 text-base outline-none transition-colors focus-visible:border-ring md:text-sm";
 
 type Mic = "off" | "on" | "blocked" | "trouble";
 type Line = { id: number; text: string; noticed: boolean; why: Verdict["why"] | "same thought" };

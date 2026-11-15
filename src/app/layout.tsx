@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 import { baseUrl } from "@/lib/cases";
 import "./globals.css";
 
-const geistSans = Geist({
+// The household app's face: Inter for everything a person reads.
+const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
 });
@@ -39,14 +40,14 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "AIDaddy", description },
 };
 
-/** Every page is drawn on the control room's near-black ground, so a phone's address bar is too. */
-export const viewport: Viewport = { themeColor: "#05080d", colorScheme: "dark" };
+/** Every page is drawn on the same warm off-white ground, so a phone's address bar is too. */
+export const viewport: Viewport = { themeColor: "#fbf8f3", colorScheme: "light" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

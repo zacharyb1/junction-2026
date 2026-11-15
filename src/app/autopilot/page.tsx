@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fbf8f3" };
 
 export default async function Autopilot({ searchParams }: PageProps<"/autopilot">) {
   // The lawyer's step runs a live check: with the same access code as /try, or for everyone where the demo is open.

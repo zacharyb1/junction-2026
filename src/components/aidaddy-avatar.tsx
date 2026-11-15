@@ -1,18 +1,18 @@
 import { useId } from "react";
 
 /**
- * AIDaddy's face in the chat: the glowing core of the front page, with the rings of the still picture in
- * public/aidaddy-avatar.svg. The heart grows and glows with the loudness of the voice. The outer ring follows the
- * site's state code: dim at rest, amber while the microphone is live (the person's move), cyan while AIDaddy thinks
- * and while it speaks. `data-state` on the svg lets the stylesheet turn the two inner rings while it thinks, and only then.
+ * AIDaddy's face in the chat: the orb of the site (src/components/hud/core.tsx) as one drawing that can follow a
+ * voice. The light inside grows with the loudness of the voice. The ring around it follows the site's state code:
+ * faint at rest, honey while the microphone is live (the person's move), the accent while AIDaddy thinks and while
+ * it speaks. `data-state` on the svg lets the stylesheet turn the colours inside while it thinks, and only then.
  */
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking";
 
 const RING: Record<AvatarState, string> = {
-  idle: "#9db0c9",
-  listening: "#ffb547",
-  thinking: "#4fd8ff",
-  speaking: "#4fd8ff",
+  idle: "#e5dccf",
+  listening: "#c08a2e",
+  thinking: "#b84f2a",
+  speaking: "#b84f2a",
 };
 
 const LABEL: Record<AvatarState, string> = {
@@ -22,83 +22,50 @@ const LABEL: Record<AvatarState, string> = {
   speaking: "AIDaddy is speaking",
 };
 
-const CYAN = "#4fd8ff";
-
 export function AIDaddyAvatar({ state, level = 0, size = 112 }: { state: AvatarState; level?: number; size?: number }) {
   const open = state === "speaking" ? Math.min(1, Math.max(0, level)) : 0;
-  const glow = state === "idle" ? 0 : 0.35 + open * 0.5;
   // Each avatar names its own gradients, so two on one page never share one.
   const id = useId();
-  const ground = `${id}ground`;
-  const heart = `${id}heart`;
+  const blob = (name: string, cx: number, cy: number, colour: string) => (
+    <radialGradient id={`${id}${name}`} cx={cx} cy={cy} r="0.6">
+      <stop offset="0" stopColor={colour} />
+      <stop offset="1" stopColor={colour} stopOpacity="0" />
+    </radialGradient>
+  );
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 120 120"
-      role="img"
-      aria-label={LABEL[state]}
-      data-state={state}
-      className="shrink-0"
-    >
+    <svg width={size} height={size} viewBox="0 0 120 120" role="img" aria-label={LABEL[state]} data-state={state} className="shrink-0">
       <defs>
-        <radialGradient id={ground}>
-          <stop offset="0" stopColor="#0b2233" />
-          <stop offset="0.6" stopColor="#07111b" />
-          <stop offset="1" stopColor="#05080d" />
+        {blob("rose", 0.74, 0.22, "#f59aa8")}
+        {blob("apricot", 0.24, 0.76, "#ffb38a")}
+        {blob("butter", 0.7, 0.72, "#ffd76e")}
+        <radialGradient id={`${id}shine`} cx="0.32" cy="0.26" r="0.42">
+          <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
+          <stop offset="0.45" stopColor="#fff" stopOpacity="0.35" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id={heart}>
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset="0.25" stopColor="#bff0ff" />
-          <stop offset="0.6" stopColor={CYAN} stopOpacity="0.85" />
-          <stop offset="1" stopColor={CYAN} stopOpacity="0" />
+        <radialGradient id={`${id}voice`}>
+          <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </radialGradient>
+        <clipPath id={`${id}ball`}>
+          <circle cx="60" cy="60" r="50" />
+        </clipPath>
       </defs>
       {/* the ring that shows the state */}
-      <circle cx="60" cy="60" r="57" fill="none" stroke={RING[state]} strokeWidth="3" opacity={0.35 + glow} />
-      {/* the dark disc */}
-      <circle cx="60" cy="60" r="52" fill={`url(#${ground})`} />
-      {/* the glow behind the rings: it shows only with the voice */}
-      <circle cx="60" cy="60" r={34 + open * 16} fill={`url(#${heart})`} opacity={open * 0.45} />
-      {/* the rings of the core */}
-      <g fill="none" stroke={CYAN}>
-        <circle cx="60" cy="60" r="47.5" strokeWidth="0.8" strokeDasharray="0.8 2.93" opacity="0.55" />
+      <circle cx="60" cy="60" r="57" fill="none" stroke={RING[state]} strokeWidth={state === "idle" ? 1.5 : 3} />
+      {/* the ball: peach, with rose, apricot and butter inside. The three turn while AIDaddy thinks. */}
+      <g clipPath={`url(#${id}ball)`}>
+        <circle cx="60" cy="60" r="50" fill="#ffe3cf" />
         <g className="site-orb-boost">
-          <circle
-            cx="60"
-            cy="60"
-            r="42"
-            strokeWidth="2.2"
-            strokeDasharray="67.1 17.93 36.37 17.93 15.88 17.93 64.02 26.74"
-            opacity="0.9"
-            transform="rotate(-38 60 60)"
-          />
+          <circle cx="60" cy="60" r="62" fill={`url(#${id}rose)`} />
+          <circle cx="60" cy="60" r="62" fill={`url(#${id}apricot)`} />
+          <circle cx="60" cy="60" r="62" fill={`url(#${id}butter)`} />
         </g>
-        <circle cx="60" cy="60" r="35" strokeWidth="0.6" opacity="0.35" />
-        <circle
-          cx="60"
-          cy="60"
-          r="35"
-          strokeWidth="1.4"
-          strokeDasharray="16.23 203.68"
-          strokeLinecap="round"
-          transform="rotate(120 60 60)"
-        />
-        <circle cx="60" cy="60" r="29" strokeWidth="2.6" strokeDasharray="1.1 2.696" opacity="0.28" />
-        <g className="site-orb-boost site-orb-boost--back">
-          <circle
-            cx="60"
-            cy="60"
-            r="23"
-            strokeWidth="1"
-            strokeDasharray="30.67 17.5"
-            opacity="0.8"
-            transform="rotate(64 60 60)"
-          />
-        </g>
+        {/* the voice: a light in the middle that grows with the loudness */}
+        <circle cx="60" cy="60" r={14 + open * 30} fill={`url(#${id}voice)`} opacity={open * 0.9} />
+        <circle cx="60" cy="60" r="50" fill={`url(#${id}shine)`} />
       </g>
-      {/* the heart: bright at rest, larger with the voice */}
-      <circle cx="60" cy="60" r={18 + open * 8} fill={`url(#${heart})`} />
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#fff" strokeOpacity="0.85" strokeWidth="1.5" />
     </svg>
   );
 }

@@ -1,13 +1,2 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs>
-    <radialGradient id="g">
-      <stop offset="0" stop-color="#e6f9ff"/>
-      <stop offset="0.35" stop-color="#4fd8ff"/>
-      <stop offset="1" stop-color="#4fd8ff" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <rect width="32" height="32" rx="3" fill="#05080d"/>
-  <circle cx="16" cy="16" r="11.5" fill="none" stroke="#4fd8ff" stroke-width="2.6" stroke-dasharray="39 7.5 17 8.76" transform="rotate(-62 16 16)"/>
-  <circle cx="16" cy="16" r="7" fill="url(#g)"/>
-  <circle cx="16" cy="16" r="2.6" fill="#f2fcff"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><!-- AIDaddy's face at small sizes: the orb in peach, apricot, butter and rose (DESIGN.md, "The orb"). -->
+<defs><radialGradient id="c" cx="0.74" cy="0.22" r="0.6"><stop offset="0" stop-color="#f59aa8"/><stop offset="1" stop-color="#f59aa8" stop-opacity="0"/></radialGradient><radialGradient id="b" cx="0.24" cy="0.76" r="0.6"><stop offset="0" stop-color="#ffb38a"/><stop offset="1" stop-color="#ffb38a" stop-opacity="0"/></radialGradient><radialGradient id="a" cx="0.7" cy="0.72" r="0.55"><stop offset="0" stop-color="#ffd76e"/><stop offset="1" stop-color="#ffd76e" stop-opacity="0"/></radialGradient><radialGradient id="s" cx="0.32" cy="0.26" r="0.42"><stop offset="0" stop-color="#fff" stop-opacity="0.95"/><stop offset="0.45" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><circle cx="16.0" cy="16.0" r="15.04" fill="#ffe3cf"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#c)"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#b)"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#a)"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#s)"/><circle cx="16.0" cy="16.0" r="15.04" fill="none" stroke="#e9a17f" stroke-opacity="0.55" stroke-width="0.64"/></svg>

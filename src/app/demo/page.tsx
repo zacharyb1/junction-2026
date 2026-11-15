@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Five short scenes of AIDaddy at work: four scripted replays and one demo with a live check. Each says what in it comes from a real research run.",
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fbf8f3" };
 
 const SCENES: Scene[] = [...REPLAY_ORDER.map((slug) => REPLAYS[slug]), AUTOPILOT];
 

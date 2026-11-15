@@ -30,7 +30,7 @@ In a family group it is ambient: a life event can trigger research without a dir
 - A Telegram group chat where the bot is a member. The bot is a separate runtime that calls the research engine.
 - The case file at `/c/[id]`: steps, deadlines, money, numbered quotes with how each was checked, gaps and open questions. Tapping a source number opens the official page at the quoted sentence.
 - The browser demo at `/try`: the same engine without Telegram, with live progress. It needs an access code that the table's QR code carries, unless the deployment sets `DEMO_OPEN=1`, as the server does: then it is open to everyone and rate limited.
-- The front page at `/`, drawn as a control room: explains the product, links to the demo and a sample case file, and shows the scorecard's totals. `/scorecard` holds the full table, one row per scenario with its case file.
+- The front page at `/`: explains the product, links to the demo and a sample case file, and shows the scorecard's totals. `/scorecard` holds the full table, one row per scenario with its case file.
 - Pages this document does not yet cover: the chat with AIDaddy at `/chat`, `/setup`, `/demo` and its replays, `/autopilot`, and the browser extension.
 - The scorecard: a fixed set of everyday scenarios run through the live engine by `eval/run.mjs`, written to `src/data/scorecard.json`.
 - Official source lists per country in `src/data/official-sources.json`. Twelve countries have a checked list. Elsewhere it searches the open web and labels every source.

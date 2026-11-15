@@ -4,7 +4,7 @@ Open the HTTPS deployment in Chrome/Edge on Android or desktop and choose **Inst
 
 This is the demo scope of issue #57: home-screen installation and a standalone chat window. An internet connection is required. There is no offline case/conversation cache, background microphone, or push subscription.
 
-`src/app/manifest.ts` supplies the installation metadata. The PNGs in `public/icons/` are raster exports of the existing `public/aidaddy-avatar.svg`; the maskable export has a 384px mark centered on a 512px dark ground to keep it inside the safe area. Root metadata supplies the Apple home-screen icon and app title.
+`src/app/manifest.ts` supplies the installation metadata. The PNGs in `public/icons/` are raster exports of the existing `public/aidaddy-avatar.svg`; the maskable export has a 384px mark centered on a 512px ground in the site's paper colour to keep it inside the safe area. Root metadata supplies the Apple home-screen icon and app title.
 
 ## Browser check, 15 November 2026
 

@@ -6,22 +6,22 @@ import type { ReactNode } from "react";
  */
 
 /**
- * The site's dark palette (src/components/site/site.css) as hex, because the renderer does not read CSS variables.
+ * The site's warm palette (src/components/site/site.css) as hex, because the renderer does not read CSS variables.
  * A case link posted in a chat shows this card, so it is drawn in the same colours as the page it opens.
  */
 export const tone = {
-  background: "#05080d",
-  foreground: "#e6f1ff",
-  primary: "#4fd8ff",
-  primaryForeground: "#03131c",
-  muted: "#0e1a28",
-  // The site's dim text. A preview is shown small, and this is 9:1 on the ground.
-  soft: "#9db0c9",
-  // The site's hairline, cyan at 18%, mixed onto the ground.
-  border: "#122d39",
-  // The green and amber of the badges on the case page, as text on a dark tint of themselves.
-  found: { background: "#0c2b22", text: "#3ddc97" },
-  open: { background: "#33260f", text: "#ffb547" },
+  background: "#fbf8f3",
+  foreground: "#211b17",
+  primary: "#b84f2a",
+  primaryForeground: "#ffffff",
+  muted: "#f1ebe2",
+  // The site's dim text: 5.6:1 on the ground.
+  soft: "#6b625b",
+  // The site's hairline.
+  border: "#e5dccf",
+  // The green and honey of the badges on the case page, as text on a light tint of themselves.
+  found: { background: "#e3f1e8", text: "#23744a" },
+  open: { background: "#f6ead3", text: "#96600f" },
 };
 
 /** Line height and tracking of a large heading. */
@@ -40,18 +40,11 @@ const NO_GLYPH =
 export const printable = (text: string) => text.normalize("NFC").replace(NO_GLYPH, " ").replace(/\s+/g, " ").trim();
 
 /**
- * The small mark of DESIGN.md, AIDaddy's face for small sizes (the same drawing as src/app/icon.svg): one broken ring,
- * a soft heart and a white centre on the ground. Passed as an image, so the renderer draws the gradient as it is.
+ * The small mark of DESIGN.md, AIDaddy's face for small sizes (the same drawing as src/app/icon.svg): the orb in
+ * peach, apricot, butter and rose. Passed as an image, so the renderer draws the gradients as they are.
  */
 const MARK = `data:image/svg+xml,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
-    '<defs><radialGradient id="g"><stop offset="0" stop-color="#e6f9ff"/><stop offset="0.35" stop-color="#4fd8ff"/>' +
-    '<stop offset="1" stop-color="#4fd8ff" stop-opacity="0"/></radialGradient></defs>' +
-    '<rect width="32" height="32" rx="3" fill="#05080d"/>' +
-    '<circle cx="16" cy="16" r="11.5" fill="none" stroke="#4fd8ff" stroke-width="2.6" stroke-dasharray="39 7.5 17 8.76" transform="rotate(-62 16 16)"/>' +
-    '<circle cx="16" cy="16" r="7" fill="url(#g)"/>' +
-    '<circle cx="16" cy="16" r="2.6" fill="#f2fcff"/>' +
-    "</svg>",
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><radialGradient id="c" cx="0.74" cy="0.22" r="0.6"><stop offset="0" stop-color="#f59aa8"/><stop offset="1" stop-color="#f59aa8" stop-opacity="0"/></radialGradient><radialGradient id="b" cx="0.24" cy="0.76" r="0.6"><stop offset="0" stop-color="#ffb38a"/><stop offset="1" stop-color="#ffb38a" stop-opacity="0"/></radialGradient><radialGradient id="a" cx="0.7" cy="0.72" r="0.55"><stop offset="0" stop-color="#ffd76e"/><stop offset="1" stop-color="#ffd76e" stop-opacity="0"/></radialGradient><radialGradient id="s" cx="0.32" cy="0.26" r="0.42"><stop offset="0" stop-color="#fff" stop-opacity="0.95"/><stop offset="0.45" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><circle cx="16.0" cy="16.0" r="15.04" fill="#ffe3cf"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#c)"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#b)"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#a)"/><circle cx="16.0" cy="16.0" r="15.04" fill="url(#s)"/><circle cx="16.0" cy="16.0" r="15.04" fill="none" stroke="#e9a17f" stroke-opacity="0.55" stroke-width="0.64"/></svg>',
 )}`;
 
 /** The small mark at 60px, then the name with "AI" in the accent colour, as in the site's header. */

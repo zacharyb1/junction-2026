@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fbf8f3" };
 
 /**
  * The front page tells one story from top to bottom: quiet days, the moment that matters, the research,
