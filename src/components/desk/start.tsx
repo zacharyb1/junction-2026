@@ -11,12 +11,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { Icon } from "@/components/home/ui";
-import { isJob } from "@/lib/home-demo";
+import { FIRST_JOB, isJob } from "@/lib/home-demo";
 
 
 const STARTS: { href: string; photo: string; alt: string; label: string }[] = [
   { href: "/desk/feed", photo: "/assistant/family.jpg", alt: "Laura with Eino and Aino at home", label: "What is my family missing?" },
-  { href: "/desk/tasks", photo: "/home/photos/tap.jpg", alt: "A dripping kitchen tap", label: "Tap is leaking…" },
+  { href: `/desk/tasks?job=${encodeURIComponent(FIRST_JOB)}`, photo: "/home/photos/tap.jpg", alt: "A dripping kitchen tap", label: "Tap is leaking…" },
   { href: "/desk/feed", photo: "/home/photos/papers.jpg", alt: "Forms and bills on the table", label: "Kela forms…" },
   { href: "/desk/feed", photo: "/home/photos/winter.jpg", alt: "Kids on a sled in the snow", label: "Winter boots…" },
 ];

@@ -29,10 +29,11 @@ const money = (price?: number, currency?: string) => (price === undefined ? "" :
 export function TasksScreen({ job: asked }: { job?: string }) {
   const nav = useNav();
   const { code } = useLive();
-  const job = asked?.trim() || FIRST_JOB;
+  const job = asked?.trim() ?? "";
   const search = useCompanySearch(job, code);
   const { round, propose, confirm, reset } = useCallRound(code);
   const [draft, setDraft] = useState(job);
+  const empty = "Say what needs doing, then AIDaddy looks for companies near you.";
 
   function start(e: FormEvent) {
     e.preventDefault();
@@ -52,7 +53,7 @@ export function TasksScreen({ job: asked }: { job?: string }) {
           <label htmlFor="job" className="sr-only">
             What needs doing?
           </label>
-          <input id="job" value={draft} onChange={(e) => setDraft(e.target.value)} enterKeyHint="go" autoComplete="off" className="min-w-0 flex-1 border-0 bg-transparent text-[15px] font-medium outline-none" />
+          <input id="job" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={`What needs doing? e.g. ${FIRST_JOB}`} enterKeyHint="go" autoComplete="off" className="min-w-0 flex-1 border-0 bg-transparent text-[15px] font-medium outline-none" />
           <button type="submit" className="h-[38px] rounded-xl bg-[#c4572f] px-3.5 text-sm font-semibold text-white">
             Go
           </button>
@@ -70,8 +71,11 @@ export function TasksScreen({ job: asked }: { job?: string }) {
       </TabHeader>
 
       <Main className="gap-3 pb-3">
-        {isLeakingTap(job) && <Image src="/home/photos/tap.jpg" alt="Water running from a kitchen tap" width={342} height={120} className="h-[120px] w-full flex-none rounded-2xl object-cover" />}
+        {!job && <p className="m-0 text-sm text-[#7a6e66]">{empty}</p>}
+        {job && isLeakingTap(job) && <Image src="/home/photos/tap.jpg" alt="Water running from a kitchen tap" width={342} height={120} className="h-[120px] w-full flex-none rounded-2xl object-cover" />}
 
+        {job && (
+          <>
         <section aria-label="Companies" className="flex flex-none flex-col gap-1.5">
           <h2 className="m-0 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.04em] text-[#8f8379]">
             Companies near {HOUSEHOLD.city} {search.status === "searching" && <Spinner size={12} />}
@@ -162,6 +166,8 @@ export function TasksScreen({ job: asked }: { job?: string }) {
             </>
           )}
         </section>
+          </>
+        )}
         <p className="m-0 text-[11px] text-[#8f8379]">Companies, phones and prices come from their own pages; quotes come from the calls. AIDaddy never books or pays.</p>
       </Main>
       <TabBar current="tasks" />

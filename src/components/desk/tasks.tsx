@@ -30,7 +30,7 @@ const money = (price?: number, currency?: string) => (price === undefined ? "" :
 export function DeskTasks({ job: asked }: { job?: string }) {
   const router = useRouter();
   const { code } = useDesk();
-  const job = asked?.trim() || FIRST_JOB;
+  const job = asked?.trim() ?? "";
   const search = useCompanySearch(job, code);
   const { round, propose, confirm, reset } = useCallRound(code);
   const [draft, setDraft] = useState("");
@@ -54,15 +54,22 @@ export function DeskTasks({ job: asked }: { job?: string }) {
         </div>
         <form onSubmit={start} className="box-border flex h-11 flex-[0_1_420px] items-center gap-2 rounded-full border border-[#e4ddd3] bg-white pl-4 pr-1.5">
           <label htmlFor="job" className="sr-only">
-            A new job
+            What needs doing?
           </label>
-          <input id="job" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="A new job, e.g. washer broke" autoComplete="off" className="min-w-0 flex-1 border-0 bg-transparent text-sm outline-none" />
+          <input id="job" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={`What needs doing? e.g. ${FIRST_JOB}`} autoComplete="off" className="min-w-0 flex-1 border-0 bg-transparent text-sm outline-none" />
           <button type="submit" className="h-8 rounded-full bg-[#2a2420] px-3.5 text-[13px] font-semibold text-white">
             Start
           </button>
         </form>
       </div>
 
+      {!job && (
+        <p className="m-0 rounded-[18px] border border-dashed border-[#e4ddd3] p-6 text-[#7a6e66]">
+          Type a household job above, like a leaking tap or a broken washer. AIDaddy then finds companies near {HOUSEHOLD.city} on their own pages, and calls for quotes only when you say yes.
+        </p>
+      )}
+      {job && (
+        <>
       <section aria-label={job} className="flex flex-wrap items-center gap-5 rounded-[18px] border border-[#ece6dc] bg-white p-[18px]">
         {isLeakingTap(job) && <Image src="/home/photos/tap.jpg" alt="Water running from a kitchen tap" width={96} height={96} className="size-24 rounded-xl object-cover" />}
         <div className="flex flex-[1_1_240px] flex-col gap-1">
@@ -219,6 +226,8 @@ export function DeskTasks({ job: asked }: { job?: string }) {
           </div>
         )}
       </section>
+        </>
+      )}
     </div>
   );
 }

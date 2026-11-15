@@ -17,15 +17,17 @@ async function post(url: string, code: string, body: unknown): Promise<{ status:
   return { status: res.status, body: ((await res.json().catch(() => null)) ?? {}) as Json };
 }
 
-export type CompanySearch = { status: "searching" | "ok" | "error"; helpers: Helper[]; error: string };
+export type CompanySearch = { status: "idle" | "searching" | "ok" | "error"; helpers: Helper[]; error: string };
 
 /**
  * Real companies for the job, each with the phone and any price its own page lists. It searches once: the page keys
- * its component by the job, so another job starts with a fresh search.
+ * its component by the job, so another job starts with a fresh search. With no job yet it waits ("idle"), so opening
+ * the page searches nothing until the parent says what needs doing.
  */
 export function useCompanySearch(job: string, code: string): CompanySearch {
-  const [state, setState] = useState<CompanySearch>({ status: "searching", helpers: [], error: "" });
+  const [state, setState] = useState<CompanySearch>({ status: job ? "searching" : "idle", helpers: [], error: "" });
   useEffect(() => {
+    if (!job) return;
     let gone = false;
     post("/api/helpers", code, { job, city: HOUSEHOLD.city, country: HOUSEHOLD.country })
       .then(({ status, body }) => {
