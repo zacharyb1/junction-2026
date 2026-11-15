@@ -9,12 +9,11 @@
  */
 
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useAccessCode } from "@/components/site/access-code";
-import type { Opportunity, OpportunityScan } from "@/lib/engine/opportunities";
-import { HOUSEHOLD } from "@/lib/home-demo";
 import type { LiveOpps } from "./hidden";
-import { EXAMPLES, liveRow } from "./opportunities";
+import { useLiveOpportunities } from "./live-opportunities";
+import { EXAMPLES } from "./opportunities";
 import { hrefFor, type Nav, NavContext, Toast } from "./ui";
 import "./home.css";
 
@@ -24,29 +23,6 @@ const LiveContext = createContext<{ live: LiveOpps; code: string }>({ live: { st
 export const useLive = () => useContext(LiveContext);
 /** How many finds the family has: the worked examples plus the live ones. */
 export const useFound = () => EXAMPLES.length + useContext(LiveContext).live.rows.length;
-
-const subscribe = () => () => {};
-
-// One scan per tab every half hour: reloading during a demo shows the same finds and spends no more search credit.
-const SCAN_KEY = "ukk-home-opportunities";
-const SCAN_TTL_MS = 30 * 60 * 1000;
-
-function readScan(): Opportunity[] | null {
-  try {
-    const saved = JSON.parse(window.sessionStorage.getItem(SCAN_KEY) ?? "null") as { at: number; found: Opportunity[] } | null;
-    return saved && Date.now() - saved.at < SCAN_TTL_MS && Array.isArray(saved.found) ? saved.found : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveScan(found: Opportunity[]) {
-  try {
-    window.sessionStorage.setItem(SCAN_KEY, JSON.stringify({ at: Date.now(), found }));
-  } catch {
-    // Storage off: the next load scans again.
-  }
-}
 
 /** Where back goes when the page was opened directly, with nothing of the app behind it. */
 function parentOf(path: string): string {
@@ -60,14 +36,9 @@ export function HomeShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   // The demo's access code: from the address, or remembered by this tab from the page the QR opened.
   const code = useAccessCode();
-  const hydrated = useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
+  const live = useLiveOpportunities(code);
   const [kind, setKind] = useState<Kind>("tab");
   const [note, setNote] = useState("");
-  const [live, setLive] = useState<LiveOpps>({ status: "loading", rows: [], error: "" });
   const depth = useRef(0);
   const hide = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -80,36 +51,6 @@ export function HomeShell({ children }: { children: ReactNode }) {
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
-
-  // Hidden opportunities for the demo household, found live on the web. Waits for the browser, where a remembered
-  // code can be read, so the scan runs once.
-  useEffect(() => {
-    if (!hydrated) return;
-    let gone = false;
-    const cached = readScan();
-    const scan: Promise<Opportunity[]> = cached
-      ? Promise.resolve(cached)
-      : fetch("/api/opportunities", {
-          method: "POST",
-          headers: { "content-type": "application/json", "x-demo-code": code },
-          body: JSON.stringify(HOUSEHOLD),
-        }).then(async (res) => {
-          const body = (await res.json().catch(() => null)) as (OpportunityScan & { error?: string }) | null;
-          if (!res.ok || !body?.opportunities) throw new Error(res.status === 401 ? "it needs the demo's access code (open /home?code=…)" : (body?.error ?? `search failed (${res.status})`));
-          saveScan(body.opportunities);
-          return body.opportunities;
-        });
-    scan
-      .then((found) => {
-        if (!gone) setLive({ status: "ok", rows: found.map(liveRow), error: "" });
-      })
-      .catch((e: unknown) => {
-        if (!gone) setLive({ status: "error", rows: [], error: e instanceof Error ? e.message : "search failed" });
-      });
-    return () => {
-      gone = true;
-    };
-  }, [code, hydrated]);
 
   const go = useCallback(
     (href: string, how: Kind) => {
