@@ -25,6 +25,10 @@ services:
       # The UKK_ names predate the rename to AIDaddy; the server's .env.local sets them, so they stay.
       UKK_API_URL: ${UKK_API_URL:-}
       UKK_API_KEY: ${UKK_API_KEY:-}
+      # The /listen model check asks the bot profile's Gemma. Without the bot profile it answers 503 and the page
+      # lets such sentences pass as small talk.
+      KAVERI_GATE_URL: http://ollama:11434
+      KAVERI_GATE_MODEL: gemma3:1b
     ports:
       - "127.0.0.1:${KAVERI_HTTP_PORT:-3000}:3000"
     volumes:
