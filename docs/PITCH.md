@@ -1,5 +1,7 @@
 # Pitch kit: AIDaddy
 
+**Newest video script:** [pitch/VIDEO_SCRIPT.md](pitch/VIDEO_SCRIPT.md) (Sunday 04:00) presents the whole idea in two minutes, what runs today and what comes next, with the newest figures. It replaces the two-minute video table below.
+
 **Newer run of show:** [DEMO_PLAN.md](DEMO_PLAN.md) (Saturday 09:05) uses the new front page and the run 12 numbers. Its table replaces the two-minute video table below. The story, the criteria table and the judge answers here still hold.
 
 **Before using this kit:** this script and the generated voiceover contain earlier scorecard measurements and proposed demo beats. Reconcile them with [the current handover](../README.md#what-the-evidence-establishes) and [challenge status](TECH_CHALLENGES.md) for the selected build before recording or submitting.
