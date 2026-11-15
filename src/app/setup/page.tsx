@@ -46,9 +46,10 @@ export default function SetupPage() {
 
           <div className="hud-setup-footer">
             <p className="hud-note">
-              The Telegram chat runs on our server. Listening and the browser extension run on your own device and are first
-              versions. All three look things up and show them: AIDaddy never sends, files, books or pays. It is an
-              independent hackathon project, not an official service.
+              The Telegram chat runs on our server. Listening runs as a web page on the device where you start it, and stops
+              when that page is closed. The browser extension runs in your own browser and is a first version. All three
+              look things up and show them: AIDaddy never sends, files, books or pays. It is an independent hackathon
+              project, not an official service.
             </p>
             <p className="hud-note">
               You can also <SiteLink href="/chat">talk to AIDaddy on the web</SiteLink>.
