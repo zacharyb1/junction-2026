@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { nextListen, planTalk, type PresenceManifest, type PresenceSegment } from "@/lib/avatar/presence";
+import { answerSegment, nextListen, planTalk, SPEECH_SCENES, type PresenceManifest, type PresenceSegment, type PresenceTalking } from "@/lib/avatar/presence";
+import type { AvatarSpeechClock } from "@/lib/avatar/play-voice";
 
 const motionQuery = "(prefers-reduced-motion: reduce)";
 const subscribeMotion = (listener: () => void) => {
@@ -10,32 +11,47 @@ const subscribeMotion = (listener: () => void) => {
   return () => media.removeEventListener("change", listener);
 };
 
-/** A talk cut short may leave the hands raised, so its way back to a listen segment fades for longer. */
-export const EARLY_FADE_MS = 380;
+/** A talk cut off mid-gesture (Stop, a new message) dissolves into rest for this long. */
+export const INTERRUPT_FADE_MS = 340;
+/** When the voice stops this close to the end of a talk video, its own settle returns to rest. */
+export const SETTLE_WINDOW_MS = 1500;
+/** A prepared answer's picture is kept this close to its voice. */
+export const SYNC_TOLERANCE_MS = 80;
 /** The incoming video starts this long before its fade is due, so a decoded frame is ready on time. */
 const LEAD_MS = 60;
 /** A segment that cannot load, or keeps waiting for data, this long is skipped. */
 export const STALL_MS = 3000;
 /** Without a frame callback, a playing video with current data is revealed after this grace. */
 const REVEAL_GRACE_MS = 250;
-/** When talking stops this close to the end of a talk segment, its own ending returns to the hub. */
-const NATURAL_END_MS = 600;
 /** A plan that ends this much before the audio is extended with more talk. */
 const EXTEND_MS = 1000;
+/** How often a prepared answer's picture is compared with its voice. */
+const SYNC_TICK_MS = 100;
+/** A picture that has not advanced for this long while the voice runs makes the voice wait. */
+const FREEZE_MS = 160;
+/** After moving the picture to the voice, wait this long before moving it again. */
+const SEEK_COOLDOWN_MS = 400;
+/**
+ * Drift up to this is closed by playing the picture slightly faster or slower (at most NUDGE away from
+ * its rate); only a larger jump is a seek, because a seek freezes the picture while it decodes.
+ */
+export const SEEK_DRIFT_MS = 300;
+const NUDGE = 0.1;
 
-export type PresenceTalking = { id: string; durationMs: number } | null;
+export type { PresenceTalking };
 type Props = { manifest: PresenceManifest; talking: PresenceTalking; paused: boolean };
 type Snapshot = { segment: string | null; kind: PresenceSegment["kind"] | null; failed: boolean };
-type Incoming = {
-  index: number; segment: PresenceSegment; rate: number; fadeMs: number; token: number;
-  ready: boolean; due: boolean; started: boolean;
-};
+type Entry = { segment: PresenceSegment; rate: number; synced: boolean };
+type Incoming = Entry & { index: number; fadeMs: number; token: number; ready: boolean; due: boolean; started: boolean };
 
 /**
- * The filmed desk presence. Two stacked, muted videos: the visible segment plays while the next one
- * loads in the hidden element; the next starts crossfadeMs before the visible one ends and fades in on
- * top. Listen segments chain for as long as nobody speaks; while `talking` is set, a plan of talk
- * segments sized to the audio plays, then the chain returns to listening.
+ * The filmed desk presence. Two stacked, muted videos: the visible one plays while the next loads in
+ * the hidden element, starts crossfadeMs before the visible one ends and fades in on top. Every video
+ * starts and ends on the same rest frame, so a join is a short crossfade between two near-identical
+ * frames. Idle videos chain for as long as nobody speaks. While `talking` names a prepared answer with
+ * a performance video, that video plays once, started with the voice and kept within
+ * SYNC_TOLERANCE_MS of it; any other voice is covered by a plan of generic talk videos. A talk cut off
+ * mid-gesture dissolves into idle over INTERRUPT_FADE_MS.
  */
 export function PresenceStage({ manifest, talking, paused }: Props) {
   const first = useRef<HTMLVideoElement>(null);
@@ -54,15 +70,20 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
     const videos = [first.current!, second.current!];
     const segments = manifest.segments;
     const byId = new Map(segments.map((segment) => [segment.id, segment]));
+    const answers = new Map(SPEECH_SCENES.flatMap((scene) => {
+      const segment = answerSegment(manifest, scene);
+      return segment ? [[scene, segment] as const] : [];
+    }));
     const crossfade = manifest.crossfadeMs;
     const failed = new Set<string>();
     let disposed = false;
     let token = 0;
-    let shown: { index: number; segment: PresenceSegment; rate: number } | null = null;
+    let shown: (Entry & { index: number }) | null = null;
     let incoming: Incoming | null = null;
     let fading: { from: number | null; to: number; timer: ReturnType<typeof setTimeout> } | null = null;
-    let mode: "listen" | "talk" = "listen";
+    let mode: "listen" | "talk" | "answer" = "listen";
     let talkId: string | null = null;
+    let talk: NonNullable<PresenceTalking> | null = null;
     let queue: string[] = [];
     let queueRate = 1;
     let shortBy = 0;
@@ -75,19 +96,13 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
     let shownStall: ReturnType<typeof setTimeout> | undefined;
     let revealTimer: ReturnType<typeof setTimeout> | undefined;
     let frame: { video: HTMLVideoElement; id: number } | null = null;
+    // The voice of the current talk, and whether this stage is keeping it waiting.
+    let clock: AvatarSpeechClock | null = null;
+    let unsubscribe: (() => void) | null = null;
+    let voiceHeld = false;
+    let ticker: ReturnType<typeof setInterval> | undefined;
+    let follow = { lastMs: -1, frozenMs: 0, stallHeld: false, lastSeek: -Infinity };
 
-    /** The hub the visible segment ends on, when the manifest names hubs. */
-    const restingHub = () => shown?.segment.endHub ?? null;
-    /**
-     * A listen segment to follow the visible one, starting on the hub that one ends on where it can.
-     * After talk it always settles on that hub; idle sometimes moves to another (see nextListen).
-     */
-    const listenAfterShown = () => {
-      const hub = restingHub();
-      const listens = usable("listen");
-      const home = shown?.segment.kind === "talk" && hub !== null ? listens.filter((segment) => segment.startHub === hub) : [];
-      return nextListen(home.length ? home : listens, lastListen, Math.random, hub);
-    };
     const suspended = () => wanted.current.paused || wanted.current.reduced || document.hidden;
     const usable = (kind: PresenceSegment["kind"]) => segments.filter((segment) => segment.kind === kind && !failed.has(segment.id));
     const publish = () => {
@@ -100,6 +115,104 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
       const total = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : shown.segment.durationMs / 1000;
       return Math.max(0, (total - video.currentTime) * 1000 / (video.playbackRate || shown.rate || 1));
     };
+    /** Audio still to come after the visible video ends, or the planned shortfall without a clock. */
+    const audioAfterShown = () => {
+      if (!talk) return 0;
+      if (!clock) return shortBy;
+      return clock.finished() ? 0 : talk.durationMs - clock.timeMs() - timeLeft();
+    };
+
+    // ----- the voice of a prepared answer
+    const holdVoice = (held: boolean) => {
+      if (!clock || voiceHeld === held) return;
+      voiceHeld = held;
+      clock.hold(held);
+    };
+    const stopTicker = () => {
+      clearInterval(ticker);
+      ticker = undefined;
+      if (follow.stallHeld) holdVoice(false);
+      follow = { lastMs: -1, frozenMs: 0, stallHeld: false, lastSeek: -Infinity };
+    };
+    const seekTo = (video: HTMLVideoElement, ms: number) => {
+      follow.lastSeek = Date.now();
+      video.currentTime = Math.max(0, ms) / 1000;
+    };
+    const setRate = (video: HTMLVideoElement, rate: number) => { if (Math.abs(video.playbackRate - rate) > 0.004) video.playbackRate = rate; };
+    /** Our own seek is still decoding: the picture stands still, but it is not stuck. */
+    const ownSeek = (video: HTMLVideoElement) => video.seeking && Date.now() - follow.lastSeek < STALL_MS;
+    /** Keep the visible answer with its voice: follow its pauses, wait for a frozen picture, correct drift. */
+    const followVoice = () => {
+      if (!shown?.synced || !clock || suspended()) return;
+      const video = videos[shown.index];
+      if (clock.finished()) { release(); return; }
+      const audioMs = clock.timeMs();
+      const videoMs = video.currentTime * 1000;
+      const advancing = videoMs > follow.lastMs + 1;
+      follow.lastMs = videoMs;
+      if (follow.stallHeld) {
+        // The voice waits until the picture moves again and has caught up.
+        if (video.paused && !video.ended) void video.play().catch(() => { /* Reported by its error event. */ });
+        if (videoMs > audioMs + SYNC_TOLERANCE_MS && Date.now() - follow.lastSeek > SEEK_COOLDOWN_MS) seekTo(video, audioMs);
+        else if (advancing && videoMs >= audioMs - SYNC_TOLERANCE_MS / 2) { follow.stallHeld = false; follow.frozenMs = 0; holdVoice(false); }
+        else follow.frozenMs += SYNC_TICK_MS;
+        if (follow.frozenMs >= STALL_MS) failShown();
+        return;
+      }
+      if (!clock.running()) {
+        // Paused, buffering or not yet started: the picture waits with the voice.
+        if (!video.paused) video.pause();
+        follow.frozenMs = 0;
+        return;
+      }
+      if (video.paused && !video.ended) { void video.play().catch(() => { /* Reported by its error event. */ }); return; }
+      if (video.ended) return;
+      if (!advancing) {
+        // Holding the voice for our own short seek would put an audible gap in the sentence.
+        if (ownSeek(video)) return;
+        // A picture that does not move cannot be corrected by moving it; past a moment the voice waits.
+        follow.frozenMs += SYNC_TICK_MS;
+        if (follow.frozenMs >= FREEZE_MS) { setRate(video, shown.rate); follow.stallHeld = true; holdVoice(true); }
+        return;
+      }
+      follow.frozenMs = 0;
+      const drift = audioMs - videoMs;
+      if (Math.abs(drift) > SEEK_DRIFT_MS) {
+        if (Date.now() - follow.lastSeek > SEEK_COOLDOWN_MS) { setRate(video, shown.rate); seekTo(video, audioMs); }
+        return;
+      }
+      // Within SYNC_TOLERANCE_MS / 4 the picture plays at its own rate; otherwise it closes the drift in about a second.
+      setRate(video, Math.abs(drift) <= SYNC_TOLERANCE_MS / 4 ? shown.rate : shown.rate * (1 + Math.max(-NUDGE, Math.min(NUDGE, drift / 1000))));
+    };
+    const startTicker = () => {
+      if (ticker !== undefined || !shown?.synced || !clock) return;
+      ticker = setInterval(followVoice, SYNC_TICK_MS);
+    };
+    /** Let go of the voice: the visible answer plays on by itself to its end. */
+    const release = () => {
+      stopTicker();
+      holdVoice(false);
+      if (incoming) incoming.synced = false;
+      if (!shown?.synced) return;
+      shown.synced = false;
+      const video = videos[shown.index];
+      setRate(video, shown.rate);
+      if (video.paused && !video.ended && !suspended()) void video.play().catch(() => { /* Reported by its error event. */ });
+    };
+    const attach = (next: AvatarSpeechClock | null) => {
+      if (next === clock) return;
+      release();
+      unsubscribe?.();
+      unsubscribe = null;
+      clock = next;
+      voiceHeld = false;
+      if (clock) unsubscribe = clock.subscribe(() => {
+        if (disposed) return;
+        if (incoming?.synced && incoming.due && !incoming.started) tryStart();
+        else if (shown?.synced) followVoice();
+      });
+    };
+
     const cancelFrame = () => {
       if (frame) frame.video.cancelVideoFrameCallback?.(frame.id);
       frame = null;
@@ -132,6 +245,7 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
     const hideAll = () => {
       finishFade();
       cancelIncoming();
+      stopTicker();
       clearTimeout(handoffTimer);
       clearTimeout(shownStall);
       videos.forEach((video) => { video.pause(); video.classList.remove("is-shown", "is-entering"); });
@@ -139,28 +253,16 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
     };
     const giveUp = () => {
       hideAll();
+      attach(null);
       gaveUp = true;
       publish();
     };
 
-    /** The next segment the chain would play, advancing the talk plan. */
-    const chooseNext = (): { segment: PresenceSegment; rate: number } | null => {
-      if (mode === "talk") {
-        while (queue.length) {
-          const segment = byId.get(queue.shift()!);
-          if (segment && !failed.has(segment.id)) return { segment, rate: queueRate };
-        }
-        if (wanted.current.talking && shortBy >= EXTEND_MS && plan(shortBy)) return chooseNext();
-        mode = "listen";
-      }
-      const segment = listenAfterShown();
-      return segment ? { segment, rate: 1 } : null;
-    };
-    /** Plan talk for `durationMs` of audio from now. Joins overlap by a crossfade, so plan without them. */
+    /** Plan generic talk for `durationMs` of audio from now. Joins overlap by a crossfade, so plan without them. */
     const plan = (durationMs: number) => {
       const talks = usable("talk").map((segment) => ({ ...segment, durationMs: Math.max(1, segment.durationMs - crossfade) }));
       const target = Math.max(1, durationMs - crossfade);
-      const next = planTalk(talks, target, lastTalk, Math.random, restingHub());
+      const next = planTalk(talks, target, lastTalk);
       if (!next.ids.length) return false;
       const lengths = new Map(talks.map((segment) => [segment.id, segment.durationMs]));
       queue = next.ids;
@@ -168,6 +270,20 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
       shortBy = target - next.ids.reduce((sum, id) => sum + lengths.get(id)!, 0) / next.rate;
       mode = "talk";
       return true;
+    };
+    /** The next segment to play, advancing the talk plan. */
+    const chooseNext = (): Entry | null => {
+      if (mode === "talk") {
+        while (queue.length) {
+          const segment = byId.get(queue.shift()!);
+          if (segment && !failed.has(segment.id)) return { segment, rate: queueRate, synced: false };
+        }
+        const left = audioAfterShown();
+        if (wanted.current.talking && left >= EXTEND_MS && plan(left)) return chooseNext();
+      }
+      mode = "listen";
+      const segment = nextListen(usable("listen"), lastListen);
+      return segment ? { segment, rate: 1, synced: false } : null;
     };
 
     const scheduleHandoff = () => {
@@ -190,32 +306,41 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
       const current = incoming.token;
       incomingStall = setTimeout(() => { if (incoming?.token === current && !incoming.ready) failIncoming(); }, STALL_MS);
     };
-    const prepare = (segment: PresenceSegment, rate: number, { immediate, fadeMs }: { immediate: boolean; fadeMs: number }) => {
+    const prepare = (entry: Entry, { immediate, fadeMs }: { immediate: boolean; fadeMs: number }) => {
       finishFade();
       cancelIncoming();
       const index = shown ? 1 - shown.index : 0;
       const video = videos[index];
-      incoming = { index, segment, rate, fadeMs, token, ready: false, due: immediate, started: false };
+      incoming = { ...entry, index, fadeMs, token, ready: false, due: immediate, started: false };
       video.pause();
       video.classList.remove("is-shown", "is-entering");
       video.muted = true;
-      video.src = segment.src;
+      video.src = entry.segment.src;
       video.load();
-      video.defaultPlaybackRate = rate;
-      video.playbackRate = rate;
+      video.defaultPlaybackRate = entry.rate;
+      video.playbackRate = entry.rate;
       if (video.readyState >= 3) incoming.ready = true;
       watchIncoming();
       if (immediate) tryStart(); else scheduleHandoff();
     };
     const prepareNext = (options: { immediate: boolean; fadeMs: number }) => {
       const next = chooseNext();
-      if (next) prepare(next.segment, next.rate, options);
+      if (next) prepare(next, options);
       else if (!usable("listen").length) giveUp();
     };
     const tryStart = () => {
       if (disposed || !incoming || !incoming.ready || !incoming.due || incoming.started || suspended()) return;
       const entry = incoming;
       const video = videos[entry.index];
+      if (entry.synced && clock && !clock.finished()) {
+        // The picture is ready: let the voice go, and start with it once it actually plays.
+        clearTimeout(incomingStall);
+        incomingStall = undefined;
+        holdVoice(false);
+        if (!clock.running()) return;
+        const at = clock.timeMs();
+        if (at > SYNC_TOLERANCE_MS / 2) { video.currentTime = at / 1000; follow.lastSeek = Date.now(); }
+      }
       entry.started = true;
       video.playbackRate = entry.rate;
       // Loaded but never presenting a frame is a stall too.
@@ -247,10 +372,13 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
       incoming = null;
       const video = videos[entry.index];
       const previous = shown;
+      stopTicker();
       video.style.transitionDuration = `${entry.fadeMs}ms`;
       video.classList.add("is-entering", "is-shown");
-      shown = { index: entry.index, segment: entry.segment, rate: entry.rate };
-      if (entry.segment.kind === "listen") lastListen = entry.segment.id; else lastTalk = entry.segment.id;
+      shown = { index: entry.index, segment: entry.segment, rate: entry.rate, synced: entry.synced };
+      if (entry.segment.kind === "listen") lastListen = entry.segment.id;
+      else if (!entry.synced) lastTalk = entry.segment.id;
+      if (shown.synced) startTicker();
       publish();
       fading = {
         from: previous ? previous.index : null, to: entry.index,
@@ -261,21 +389,31 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
         }, entry.fadeMs),
       };
     };
+    /** The answer video cannot play: cover the rest of its voice with generic talk instead. */
+    const fallBackFromAnswer = () => {
+      release();
+      const left = !talk ? 0 : clock ? (clock.finished() ? 0 : talk.durationMs - clock.timeMs()) : talk.durationMs;
+      if (wanted.current.talking && left >= EXTEND_MS) plan(left); else mode = "listen";
+    };
     const failIncoming = () => {
       if (!incoming) return;
-      const { segment, due, fadeMs } = incoming;
+      const { segment, due, fadeMs, synced } = incoming;
       failed.add(segment.id);
       cancelIncoming();
-      if (failed.size >= segments.length) { giveUp(); return; }
+      if (synced || mode === "answer") fallBackFromAnswer();
+      if (usable("listen").length + usable("talk").length === 0) { giveUp(); return; }
       prepareNext({ immediate: due || !shown, fadeMs });
     };
     const failShown = () => {
       if (!shown) return;
+      const wasAnswer = shown.synced || mode === "answer";
       failed.add(shown.segment.id);
       clearTimeout(shownStall);
-      if (failed.size >= segments.length) { giveUp(); return; }
-      if (incoming) { incoming.due = true; tryStart(); }
-      else prepareNext({ immediate: true, fadeMs: crossfade });
+      stopTicker();
+      if (wasAnswer) fallBackFromAnswer();
+      if (usable("listen").length + usable("talk").length === 0) { giveUp(); return; }
+      if (incoming && !wasAnswer) { incoming.due = true; tryStart(); }
+      else prepareNext({ immediate: true, fadeMs: wasAnswer ? INTERRUPT_FADE_MS : crossfade });
     };
     const advance = () => {
       if (!shown || suspended()) return;
@@ -283,23 +421,42 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
       else if (!fading) prepareNext({ immediate: true, fadeMs: crossfade });
     };
 
-    const startTalk = (durationMs: number) => {
-      const fromTalk = shown?.segment.kind === "talk";
-      if (!plan(durationMs)) return;
+    /** A fade into new material: short between rest frames, longer out of a gesture. */
+    const fadeFromShown = () => shown?.segment.kind === "talk" && timeLeft() > crossfade * 2 ? INTERRUPT_FADE_MS : crossfade;
+    const startTalk = (requested: NonNullable<PresenceTalking>) => {
+      const fadeMs = fadeFromShown();
+      talk = requested;
+      attach(requested.clock ?? null);
+      queue = [];
+      const answer = requested.scene ? answers.get(requested.scene) : undefined;
+      if (answer && !failed.has(answer.id)) {
+        mode = "answer";
+        shortBy = 0;
+        // Keep a voice that has not started waiting until its picture is ready (tryStart lets it go).
+        const synced = Boolean(clock && !clock.finished());
+        if (synced && !clock!.running()) holdVoice(true);
+        prepare({ segment: answer, rate: 1, synced }, { immediate: true, fadeMs });
+        return;
+      }
+      const elapsed = clock && !clock.finished() ? clock.timeMs() : 0;
+      if (!plan(requested.durationMs - elapsed)) { mode = "listen"; return; }
       const next = chooseNext();
-      if (next) prepare(next.segment, next.rate, { immediate: true, fadeMs: fromTalk ? EARLY_FADE_MS : crossfade });
+      if (next) prepare(next, { immediate: true, fadeMs });
     };
     const endTalk = () => {
       mode = "listen";
       queue = [];
       shortBy = 0;
-      if (shown?.segment.kind === "talk" && timeLeft() > NATURAL_END_MS) {
-        // Cut mid-gesture: no hub is near, so any listen segment will do.
+      talk = null;
+      attach(null);
+      if (shown?.segment.kind === "talk" && timeLeft() > SETTLE_WINDOW_MS) {
+        // Cut off mid-gesture: dissolve into idle.
         const segment = nextListen(usable("listen"), lastListen);
-        if (segment) prepare(segment, 1, { immediate: true, fadeMs: EARLY_FADE_MS });
+        if (segment) prepare({ segment, rate: 1, synced: false }, { immediate: true, fadeMs: INTERRUPT_FADE_MS });
       } else if (incoming?.segment.kind === "talk") {
-        const segment = listenAfterShown();
-        if (segment) prepare(segment, 1, { immediate: !shown, fadeMs: crossfade });
+        // The talk that was to follow (or to start) is not needed; within its settle, the visible one ends by itself.
+        const segment = nextListen(usable("listen"), lastListen);
+        if (segment) prepare({ segment, rate: 1, synced: false }, { immediate: !shown, fadeMs: crossfade });
         else cancelIncoming();
       }
     };
@@ -307,21 +464,23 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
     const sync = () => {
       if (disposed) return;
       if (wanted.current.reduced) {
-        // The poster stands in. Talk is replanned from scratch if motion comes back mid-answer.
-        if (!wasReduced) { hideAll(); mode = "listen"; queue = []; talkId = null; publish(); }
+        // The poster stands in and the voice plays on its own. Talk is replanned if motion comes back mid-answer.
+        if (!wasReduced) { hideAll(); attach(null); mode = "listen"; queue = []; talkId = null; talk = null; publish(); }
+        wanted.current.talking?.clock?.hold(false);
         wasReduced = true;
         return;
       }
       wasReduced = false;
-      if (gaveUp) return;
+      if (gaveUp) { wanted.current.talking?.clock?.hold(false); return; }
       const requested = wanted.current.talking;
-      // A change of talking waits for a running fade (at most a crossfade): cutting it short would show a jump.
+      // A change of talking waits for a running fade (at most INTERRUPT_FADE_MS): cutting it short would show a jump.
       if ((requested?.id ?? null) !== talkId && !fading) {
         talkId = requested?.id ?? null;
-        if (requested) startTalk(requested.durationMs); else endTalk();
+        if (requested) startTalk(requested); else endTalk();
       }
       if (suspended()) {
         finishFade();
+        stopTicker();
         clearTimeout(handoffTimer);
         clearTimeout(shownStall);
         clearTimeout(incomingStall);
@@ -330,7 +489,8 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
         if (incoming?.started) { cancelFrame(); incoming.started = false; }
         return;
       }
-      if (shown) {
+      if (shown?.synced) { startTicker(); followVoice(); }
+      else if (shown) {
         const video = videos[shown.index];
         if (!video.ended && video.paused) void video.play().catch(() => { /* A failing segment reports through its error event. */ });
       }
@@ -353,7 +513,12 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
         if (incoming?.index === index) failIncoming();
         else if (shown?.index === index) failShown();
       };
-      const onEnded = () => { if (shown?.index === index) advance(); };
+      const onEnded = () => {
+        if (shown?.index !== index) return;
+        // A prepared answer has had its say once its video ends, even if the voice runs a moment longer.
+        if (shown.synced || mode === "answer") { release(); mode = "listen"; }
+        advance();
+      };
       const onWaiting = () => {
         if (shown?.index !== index || suspended() || shownStall !== undefined) return;
         shownStall = setTimeout(() => { shownStall = undefined; if (shown?.index === index && !suspended()) failShown(); }, STALL_MS);
@@ -382,6 +547,9 @@ export function PresenceStage({ manifest, talking, paused }: Props) {
       document.removeEventListener("visibilitychange", sync);
       listeners.forEach((remove) => remove());
       hideAll();
+      attach(null);
+      // Never leave a voice waiting for a picture that is gone.
+      wanted.current.talking?.clock?.hold(false);
       clearTimeout(handoffTimer);
       clearTimeout(shownStall);
       videos.forEach((video) => { video.removeAttribute("src"); video.load(); });

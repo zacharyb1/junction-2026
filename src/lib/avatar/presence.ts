@@ -1,12 +1,16 @@
 /**
- * The filmed "desk" presence: one locked-off stock clip cut into short segments that all begin and end
- * in the same rest pose (the hub). Any segment may follow any other with a short crossfade, so the
- * player only has to choose an order. "listen" segments chain while the companion waits; "talk"
- * segments play while a voice is heard, chosen so that together they last as long as the audio.
+ * The filmed "desk" presence: silent videos made from one locked-off stock clip, every one of which
+ * starts and ends on the same rest frame. Any video may therefore follow any other with a short
+ * crossfade between two practically identical frames, and the player only has to choose an order.
+ * "listen" videos are the idle (the rest frame brought to life); "talk" videos are generic speaking
+ * takes, planned to cover a live answer's audio. A prepared answer has its own performance video,
+ * timed to its recording and named in `speech`.
  *
- * The manifest is written by the asset script to public/avatar/desk/presence.json.
+ * The manifest is public/avatar/desk/presence.json; scripts/avatar/sync-desk-manifest.mjs refreshes
+ * every duration in it from the files.
  */
 import type { PreparedSceneId } from "./prepared-scenes";
+import type { AvatarSpeechClock } from "./play-voice";
 
 export type PresenceKind = "listen" | "talk";
 
@@ -17,20 +21,11 @@ export interface PresenceSegment {
   kind: PresenceKind;
   /** Duration of the encoded file. */
   durationMs: number;
-  /** Provenance in the source clip. */
+  /** The source clip it was made from. */
   sourceId: string;
-  sourceInMs: number;
-  sourceOutMs: number;
-  /** Speed the source interval was encoded at. */
-  speed: number;
-  /**
-   * Source frames of the rest pose (hub) the segment starts and ends on. A join between equal hubs
-   * shows no change of pose; a join between different hubs shows as a short dissolve. Optional: without
-   * hubs every join is treated alike.
-   */
-  startHub?: number;
-  endHub?: number;
 }
+
+export type PresenceLipSync = "musetalk" | "none";
 
 export interface PresenceSpeech {
   src: string;
@@ -38,6 +33,11 @@ export interface PresenceSpeech {
   transcript: string;
   provider: "elevenlabs";
   voice: string;
+  /** The performance filmed for this answer, played once with the audio. Without it, generic talk covers the audio. */
+  video?: string;
+  videoDurationMs?: number;
+  /** "musetalk": the mouth region of the video is generated to match this audio. */
+  lipSync?: PresenceLipSync;
 }
 
 export type PresenceSpeechSet = Partial<Record<PreparedSceneId, PresenceSpeech>>;
@@ -45,16 +45,21 @@ export type PresenceSpeechSet = Partial<Record<PreparedSceneId, PresenceSpeech>>
 export interface PresenceManifest {
   id: string;
   label: string;
-  /** A hub frame, shown under the videos until one can play. */
+  /** The rest frame, shown under the videos until one can play. */
   poster: string;
   width: number;
   height: number;
   fps: number;
+  /** Source frame every video starts and ends on. */
+  restFrame: number;
   crossfadeMs: number;
   segments: PresenceSegment[];
   speech: PresenceSpeechSet;
   attribution: { creator: string; sourceUrl: string; license: string; licenseUrl: string; note: string };
 }
+
+/** A voice the picture should talk with. `scene` names a prepared answer; `clock` is its playing audio. */
+export type PresenceTalking = { id: string; durationMs: number; scene?: PreparedSceneId; clock?: AvatarSpeechClock } | null;
 
 export interface TalkPlan {
   /** Talk segment ids in playing order. Empty when there is no talk segment. */
@@ -63,13 +68,19 @@ export interface TalkPlan {
   rate: number;
 }
 
-export const MIN_RATE = 0.9;
-export const MAX_RATE = 1.1;
-/** A plan fits when its length at the chosen rate is this close to the audio. */
+export const MIN_RATE = 0.92;
+export const MAX_RATE = 1.08;
+/** A plan fits when its length at the chosen rate is this close to the target. */
 export const FIT_TOLERANCE_MS = 150;
-/** How often idle leaves its rest pose for another one when it could stay; that join shows as a dissolve. */
-export const LEAVE_HUB = 0.3;
+/**
+ * A plan that ends before the audio leaves the voice over a resting face, so a shortfall costs this
+ * many times as much as the same overshoot (where the hands are still settling as the voice ends).
+ */
+export const SHORTFALL_WEIGHT = 3;
+/** A take played twice in a row repeats its gestures visibly; a plan pays this much per forced repeat. */
+export const REPEAT_COST_MS = 1000;
 export const SPEECH_SCENES = ["pregnancy", "clinic", "employer"] as const satisfies readonly PreparedSceneId[];
+export const LIP_SYNC = ["musetalk", "none"] as const satisfies readonly PresenceLipSync[];
 
 const isText = (value: unknown): value is string => typeof value === "string" && value.trim().length > 0;
 const isPositive = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value) && value > 0;
@@ -93,6 +104,7 @@ export function validatePresence(manifest: unknown): string[] {
   if (!isText(manifest.label)) problems.push("label is missing.");
   if (!presencePath(id, manifest.poster)) problems.push(`poster must be a file under /avatar/${id}/.`);
   for (const key of ["width", "height", "fps"] as const) if (!isPositive(manifest[key])) problems.push(`${key} must be a positive number.`);
+  if (!Number.isInteger(manifest.restFrame) || (manifest.restFrame as number) < 0) problems.push("restFrame must be a source frame number.");
   const crossfade = manifest.crossfadeMs;
   if (!isPositive(crossfade) || crossfade > 1000) problems.push("crossfadeMs must be between 1 and 1000.");
   const segments = Array.isArray(manifest.segments) ? manifest.segments : [];
@@ -109,15 +121,6 @@ export function validatePresence(manifest: unknown): string[] {
     if (!isPositive(segment.durationMs)) problems.push(`${label} durationMs must be positive.`);
     else if (isPositive(crossfade) && segment.durationMs <= crossfade * 2) problems.push(`${label} is too short for its crossfades.`);
     if (!isText(segment.sourceId)) problems.push(`${label} has no sourceId.`);
-    if (typeof segment.sourceInMs !== "number" || !Number.isFinite(segment.sourceInMs) || segment.sourceInMs < 0 ||
-        typeof segment.sourceOutMs !== "number" || !Number.isFinite(segment.sourceOutMs) || segment.sourceOutMs <= segment.sourceInMs) {
-      problems.push(`${label} source interval is invalid.`);
-    }
-    if (!isPositive(segment.speed)) problems.push(`${label} speed must be positive.`);
-    const hubs = [segment.startHub, segment.endHub];
-    if (hubs.some((hub) => hub !== undefined) && !hubs.every((hub) => Number.isInteger(hub) && (hub as number) >= 0)) {
-      problems.push(`${label} startHub and endHub must both be source frame numbers.`);
-    }
   });
   for (const kind of ["listen", "talk"] as const) {
     const count = segments.filter((segment: unknown) => isRecord(segment) && segment.kind === kind).length;
@@ -133,6 +136,12 @@ export function validatePresence(manifest: unknown): string[] {
       if (!isText(speech.transcript)) problems.push(`speech ${scene} has no transcript.`);
       if (speech.provider !== "elevenlabs") problems.push(`speech ${scene} must name its provider, elevenlabs.`);
       if (!isText(speech.voice)) problems.push(`speech ${scene} has no voice name.`);
+      if (speech.video !== undefined || speech.videoDurationMs !== undefined) {
+        if (!presencePath(id, speech.video)) problems.push(`speech ${scene} video must be a file under /avatar/${id}/.`);
+        if (!isPositive(speech.videoDurationMs)) problems.push(`speech ${scene} videoDurationMs must be positive.`);
+      }
+      if (speech.lipSync !== undefined && !(LIP_SYNC as readonly unknown[]).includes(speech.lipSync)) problems.push(`speech ${scene} lipSync must be musetalk or none.`);
+      if (speech.lipSync === "musetalk" && speech.video === undefined) problems.push(`speech ${scene} cannot be lip-synced without a video.`);
     }
   }
   const credit = manifest.attribution;
@@ -146,49 +155,37 @@ export function validatePresence(manifest: unknown): string[] {
   return problems;
 }
 
+/** The performance video of a prepared answer, as a segment the player can show; null when it has none. */
+export function answerSegment(manifest: Pick<PresenceManifest, "speech">, scene: PreparedSceneId): PresenceSegment | null {
+  const speech = manifest.speech[scene];
+  if (!speech?.video || !isPositive(speech.videoDurationMs)) return null;
+  return { id: `answer-${scene}`, src: speech.video, kind: "talk", durationMs: speech.videoDurationMs, sourceId: "answer" };
+}
+
+/** True when at least one prepared answer plays a lip-synced performance. */
+export const hasLipSync = (speech: PresenceSpeechSet) => Object.values(speech).some((entry) => entry?.lipSync === "musetalk" && entry.video);
+
 type Random = () => number;
 const pick = <T>(items: readonly T[], random: Random): T =>
   items[Math.min(items.length - 1, Math.floor(Math.max(0, random()) * items.length))];
 
-/**
- * The next listen segment: random, and never the one just played when there is another. Given the hub
- * the picture is resting on, it usually stays there (a seamless join) and sometimes, with probability
- * LEAVE_HUB, moves to another hub so that idle keeps its variety.
- */
-export function nextListen(segments: readonly PresenceSegment[], lastId: string | null, random: Random = Math.random, hub: number | null = null): PresenceSegment | null {
+/** The next listen segment: random, and never the one just played when there is another. */
+export function nextListen(segments: readonly PresenceSegment[], lastId: string | null, random: Random = Math.random): PresenceSegment | null {
   const listens = segments.filter((segment) => segment.kind === "listen");
   if (!listens.length) return null;
   const fresh = listens.filter((segment) => segment.id !== lastId);
-  const pool = fresh.length ? fresh : listens;
-  if (hub === null) return pick(pool, random);
-  const here = pool.filter((segment) => segment.startHub === hub);
-  const elsewhere = pool.filter((segment) => segment.startHub !== hub);
-  if (here.length && (!elsewhere.length || random() >= LEAVE_HUB)) return pick(here, random);
-  return pick(elsewhere.length ? elsewhere : pool, random);
+  return pick(fresh.length ? fresh : listens, random);
 }
 
 const clampRate = (rate: number) => Math.min(MAX_RATE, Math.max(MIN_RATE, rate));
-/** How far a sequence of this summed length, at its best rate, misses the audio. */
+/** The best rate for a summed length, and what the result costs against the target. */
 function fit(sum: number, durationMs: number) {
   const rate = clampRate(sum / durationMs);
-  return { rate, error: Math.abs(sum / rate - durationMs) };
-}
-const repeats = (ids: readonly string[], lastId: string | null) =>
-  ids.reduce((count, id, index) => count + (id === (index ? ids[index - 1] : lastId) ? 1 : 0), 0);
-
-type Candidate = { ids: string[]; rate: number; error: number; repeats: number; offHub?: boolean };
-/** Lower is better: fitting first, then no immediate repeats, then a rate near 1. */
-function better(a: Candidate, b: Candidate | null) {
-  if (!b) return true;
-  const aFits = a.error <= FIT_TOLERANCE_MS, bFits = b.error <= FIT_TOLERANCE_MS;
-  if (aFits !== bFits) return aFits;
-  if (!aFits) return a.error < b.error - 1 || (Math.abs(a.error - b.error) <= 1 && a.repeats < b.repeats);
-  if (a.repeats !== b.repeats) return a.repeats < b.repeats;
-  // Coarse buckets keep the random order of equally good plans.
-  return Math.round(Math.abs(a.rate - 1) * 40) < Math.round(Math.abs(b.rate - 1) * 40);
+  const length = sum / rate;
+  return { rate, cost: length >= durationMs ? length - durationMs : (durationMs - length) * SHORTFALL_WEIGHT };
 }
 
-/** Order a multiset of talk segments so that no segment follows itself, where that is possible. */
+/** Order a multiset of talk segments so that no segment follows itself (nor `lastId`), where that is possible. */
 function arrange(counts: Map<PresenceSegment, number>, lastId: string | null, random: Random): string[] {
   const left = new Map(counts);
   const ids: string[] = [];
@@ -206,122 +203,76 @@ function arrange(counts: Map<PresenceSegment, number>, lastId: string | null, ra
   }
   return ids;
 }
-
-/** Exhaustive fallback: any multiset whose summed length fits, found on a 10 ms grid. */
-function search(talks: readonly PresenceSegment[], durationMs: number, lastId: string | null, random: Random): Candidate | null {
-  const step = 10;
-  const limit = Math.ceil((durationMs * MAX_RATE + FIT_TOLERANCE_MS) / step);
-  const from = new Map<number, { previous: number; segment: PresenceSegment; sum: number }>();
-  const sums = new Map<number, number>([[0, 0]]);
-  for (let bucket = 0; bucket <= limit; bucket++) {
-    const sum = sums.get(bucket);
-    if (sum === undefined) continue;
-    for (const segment of talks) {
-      const next = bucket + Math.max(1, Math.round(segment.durationMs / step));
-      if (next > limit || sums.has(next)) continue;
-      sums.set(next, sum + segment.durationMs);
-      from.set(next, { previous: bucket, segment, sum: sum + segment.durationMs });
-    }
-  }
-  // Segments of equal length are interchangeable in a sum; spread each count over all of them.
-  const twins = new Map<number, PresenceSegment[]>();
-  for (const segment of talks) twins.set(segment.durationMs, [...(twins.get(segment.durationMs) ?? []), segment]);
-  let best: Candidate | null = null;
-  for (const [bucket, sum] of sums) {
-    if (!bucket) continue;
-    const { rate, error } = fit(sum, durationMs);
-    if (error > FIT_TOLERANCE_MS) continue;
-    const counts = new Map<PresenceSegment, number>();
-    const used = new Map<number, number>();
-    for (let at = bucket; at; at = from.get(at)!.previous) {
-      const { segment } = from.get(at)!;
-      const group = twins.get(segment.durationMs)!;
-      const turn = used.get(segment.durationMs) ?? Math.floor(random() * group.length);
-      used.set(segment.durationMs, turn + 1);
-      const member = group[turn % group.length];
-      counts.set(member, (counts.get(member) ?? 0) + 1);
-    }
-    const ids = arrange(counts, lastId, random);
-    const candidate = { ids, rate, error, repeats: repeats(ids, lastId) };
-    if (better(candidate, best)) best = candidate;
-  }
-  return best;
-}
+const repeats = (ids: readonly string[], lastId: string | null) =>
+  ids.reduce((count, id, index) => count + (id === (index ? ids[index - 1] : lastId) ? 1 : 0), 0);
 
 /**
- * A plan in which every segment starts on the hub the one before it ended on, so its joins show no
- * change of pose. Random walks from the given hub (and, less often, from any hub, since the first join
- * interrupts a listen segment anyway); null when no walk fits the audio.
+ * Talk segments that cover `durationMs` of audio when played at one rate inside [MIN_RATE, MAX_RATE].
+ * Every combination of segments is considered (on a 10 ms grid) and costs how far it misses the
+ * audio, a shortfall counting SHORTFALL_WEIGHT times an overshoot, plus REPEAT_COST_MS for every time
+ * no order can avoid playing a take twice in a row. A plan fits when that cost is within
+ * FIT_TOLERANCE_MS; among fitting plans the fewest segments win (every join is a return to rest), then
+ * the rate nearest 1. Otherwise the cheapest plan wins. Its order avoids repeats, also against
+ * `lastId`, the talk segment played last. The caller ends the talk when the audio ends.
  */
-function chain(talks: readonly PresenceSegment[], durationMs: number, lastId: string | null, startHub: number | null, random: Random): Candidate | null {
-  const ceiling = durationMs * MAX_RATE + FIT_TOLERANCE_MS;
-  const starts = [...new Set(talks.map((segment) => segment.startHub!))];
-  let best: Candidate | null = null;
-  for (let attempt = 0; attempt < 160; attempt++) {
-    const from = startHub !== null && attempt % 3 !== 2 ? startHub : pick(starts, random);
-    const ids: string[] = [];
-    let sum = 0;
-    let hub = from;
-    let previous = lastId;
-    while (sum < ceiling) {
-      const out = talks.filter((segment) => segment.startHub === hub);
-      if (!out.length) break;
-      const fresh = out.filter((segment) => segment.id !== previous);
-      const segment = pick(fresh.length ? fresh : out, random);
-      ids.push(segment.id);
-      sum += segment.durationMs;
-      previous = segment.id;
-      hub = segment.endHub!;
-      const { rate, error } = fit(sum, durationMs);
-      if (error > FIT_TOLERANCE_MS) continue;
-      const candidate = { ids: [...ids], rate, error, repeats: repeats(ids, lastId), offHub: startHub !== null && from !== startHub };
-      if (!best || (candidate.offHub !== best.offHub ? !candidate.offHub : better(candidate, best))) best = candidate;
-    }
-  }
-  return best;
-}
-
-/**
- * Talk segments whose summed durations, played at `rate`, last `durationMs` (within FIT_TOLERANCE_MS)
- * whenever some combination allows it inside [MIN_RATE, MAX_RATE]. When the segments name their hubs,
- * a plan whose joins all meet on the same hub comes first, starting from `startHub` when one fits.
- * Otherwise it prefers orders without immediate
- * repeats (also against `lastId`, the talk segment played last), and for long audio repeats segments
- * in varied order. When nothing fits it returns the closest plan; the caller ends the talk when the
- * audio ends.
- */
-export function planTalk(segments: readonly PresenceSegment[], durationMs: number, lastId: string | null, random: Random = Math.random, startHub: number | null = null): TalkPlan {
+export function planTalk(segments: readonly PresenceSegment[], durationMs: number, lastId: string | null, random: Random = Math.random): TalkPlan {
   const talks = segments.filter((segment) => segment.kind === "talk" && isPositive(segment.durationMs));
   if (!talks.length || !isPositive(durationMs)) return { ids: [], rate: 1 };
-  // With hubs, prefer a plan whose joins keep the pose; otherwise any order of segments.
-  if (talks.every((segment) => segment.startHub !== undefined && segment.endHub !== undefined)) {
-    const chained = chain(talks, durationMs, lastId, startHub, random);
-    if (chained) return { ids: chained.ids, rate: chained.rate };
-  }
-  const ceiling = durationMs * MAX_RATE + FIT_TOLERANCE_MS;
-  let best: Candidate | null = null;
-  for (let attempt = 0; attempt < 48; attempt++) {
-    const ids: string[] = [];
-    let sum = 0;
-    // Some attempts may open with the last segment: a repeat is better than missing the audio by seconds.
-    let previous = attempt % 4 === 3 ? null : lastId;
-    while (sum < ceiling) {
-      const fresh = talks.filter((segment) => segment.id !== previous);
-      const segment = pick(fresh.length ? fresh : talks, random);
-      ids.push(segment.id);
-      sum += segment.durationMs;
-      previous = segment.id;
-      const { rate, error } = fit(sum, durationMs);
-      const candidate = { ids: [...ids], rate, error, repeats: repeats(ids, lastId) };
-      if (better(candidate, best)) best = candidate;
+  const step = 10;
+  const shortest = Math.min(...talks.map((segment) => segment.durationMs));
+  // Longer than this cannot beat one more segment's worth of overshoot.
+  const limit = Math.ceil((durationMs * MAX_RATE + shortest + FIT_TOLERANCE_MS) / step);
+  type Cell = { count: number; sum: number; from: number; segment: PresenceSegment };
+  const cells = new Map<number, Cell>();
+  const start = { count: 0, sum: 0, from: -1, segment: talks[0] };
+  cells.set(0, start);
+  // Fewest segments for every reachable sum; ties keep variety by a random choice.
+  for (let bucket = 0; bucket <= limit; bucket++) {
+    const cell = cells.get(bucket);
+    if (!cell) continue;
+    for (const segment of talks) {
+      const next = bucket + Math.max(1, Math.round(segment.durationMs / step));
+      if (next > limit) continue;
+      const known = cells.get(next);
+      const candidate = { count: cell.count + 1, sum: cell.sum + segment.durationMs, from: bucket, segment };
+      if (!known || candidate.count < known.count || (candidate.count === known.count && random() < 0.5)) cells.set(next, candidate);
     }
-    if (best && best.error <= FIT_TOLERANCE_MS && !best.repeats && attempt >= 3) break;
   }
-  if (!best || best.error > FIT_TOLERANCE_MS || best.repeats) {
-    const found = search(talks, durationMs, lastId, random);
-    if (found && better(found, best)) best = found;
+  const countsAt = (bucket: number) => {
+    const counts = new Map<PresenceSegment, number>();
+    for (let at = bucket; at > 0; at = cells.get(at)!.from) {
+      const { segment } = cells.get(at)!;
+      counts.set(segment, (counts.get(segment) ?? 0) + 1);
+    }
+    return counts;
+  };
+  /** Repeats no order can avoid: the most frequent segment outnumbers the gaps between the others. */
+  const forced = (counts: Map<PresenceSegment, number>) => {
+    let total = 0, max = 0;
+    for (const count of counts.values()) { total += count; max = Math.max(max, count); }
+    return Math.max(0, 2 * max - total - 1);
+  };
+  type Choice = { bucket: number; cost: number; count: number; rate: number; fits: boolean };
+  const order = (a: Choice, b: Choice) => {
+    if (a.fits !== b.fits) return a.fits ? -1 : 1;
+    if (!a.fits && Math.abs(a.cost - b.cost) > 1) return a.cost - b.cost;
+    if (a.count !== b.count) return a.count - b.count;
+    return Math.abs(a.rate - 1) - Math.abs(b.rate - 1);
+  };
+  let best: Choice | null = null;
+  for (const [bucket, cell] of cells) {
+    if (!bucket) continue;
+    const { rate, cost: miss } = fit(cell.sum, durationMs);
+    // Repeats only add cost, so a plan that already misses by more than the best cannot win.
+    if (best && miss > Math.max(best.cost, FIT_TOLERANCE_MS) + 1) continue;
+    const cost = miss + forced(countsAt(bucket)) * REPEAT_COST_MS;
+    const choice = { bucket, cost, count: cell.count, rate, fits: cost <= FIT_TOLERANCE_MS };
+    if (!best || order(choice, best) < 0) best = choice;
   }
-  return { ids: best!.ids, rate: best!.rate };
+  const counts = countsAt(best!.bucket);
+  let ids = arrange(counts, lastId, random);
+  for (let attempt = 0; attempt < 8 && repeats(ids, lastId); attempt++) ids = arrange(counts, lastId, random);
+  return { ids, rate: best!.rate };
 }
 
 /** Summed length of a plan at its rate. */

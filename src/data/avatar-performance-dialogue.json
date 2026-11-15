@@ -1,13 +1,14 @@
 {
-  "voice": "Kore",
-  "model": "gemini-3.8-flash-tts",
-  "style": "A warm, attentive adult woman talking to one person across a desk. Clear conversational English. Natural pauses between thoughts; restrained, reassuring expression. Do not sound like an advert, announcer or audiobook. Read only the supplied words.",
+  "provider": "elevenlabs",
+  "voice": "Chris",
+  "voiceId": "iP95p4xoKVk53GoZ742B",
+  "note": "Rendered once per scene with ElevenLabs text-to-speech; the audio is public/avatar/desk/speech/<id>.mp3.",
   "researchRecordedAt": "2026-11-14T06:41:30.010Z",
   "scenes": [
     {
       "id": "pregnancy",
       "label": "A first step",
-      "speech": "Let's take this one step at a time. First, contact your local maternity clinic. Then we can work through leave from work and support from Kela. I've kept the official sources beside the plan. Would you like to start with the clinic, or with telling your employer?",
+      "speech": "Let's take this one step at a time. First, contact your local maternity clinic. Then we'll sort out leave from work and support from Kela. Shall we start with the clinic, or with your employer?",
       "citations": [1, 2, 3, 5, 8, 10]
     },
     {

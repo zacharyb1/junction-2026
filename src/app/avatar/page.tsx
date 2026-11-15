@@ -28,10 +28,16 @@ async function loadDesk(): Promise<Manifest | null> {
     if (presence?.id !== "desk" || validatePresence(presence).length) return null;
     const files = await Promise.all([presence.poster, ...presence.segments.map((segment) => segment.src)].map(deskFileExists));
     if (files.some((exists) => !exists)) return null;
-    // A prepared answer without its audio file falls back to the readable text.
+    // A prepared answer without its audio file falls back to the readable text; one without its
+    // performance video is covered by generic talk, and then nothing on the page claims lip-sync.
     const speech: PresenceSpeechSet = {};
     for (const [scene, entry] of Object.entries(presence.speech) as [keyof PresenceSpeechSet, NonNullable<PresenceSpeechSet[keyof PresenceSpeechSet]>][]) {
-      if (await deskFileExists(entry.src)) speech[scene] = entry;
+      if (!await deskFileExists(entry.src)) continue;
+      if (entry.video && await deskFileExists(entry.video)) speech[scene] = entry;
+      else {
+        const { src, durationMs, transcript, provider, voice } = entry;
+        speech[scene] = { src, durationMs, transcript, provider, voice, lipSync: "none" };
+      }
     }
     const { creator, sourceUrl, license, licenseUrl, note } = presence.attribution;
     return {

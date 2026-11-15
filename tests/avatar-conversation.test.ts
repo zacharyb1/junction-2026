@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { HOLD_LIMIT_MS } from "../src/lib/avatar/play-voice";
 import type { PresenceSpeechSet } from "../src/lib/avatar/presence";
 
 // The conversation hook on a minimal effect host, with a fake Audio element: what the visitor hears,
@@ -52,6 +53,9 @@ class FakeAudio {
   static all: FakeAudio[] = [];
   muted = false;
   paused = true;
+  preload = "";
+  currentTime = 0;
+  plays = 0;
   duration = Number.NaN;
   onplaying: (() => void) | null = null;
   onwaiting: (() => void) | null = null;
@@ -60,6 +64,7 @@ class FakeAudio {
   onerror: (() => void) | null = null;
   constructor(public src: string) { FakeAudio.all.push(this); }
   play() {
+    this.plays++;
     this.paused = false;
     queueMicrotask(() => { this.duration = 6.4; this.onplaying?.(); });
     return Promise.resolve();
@@ -69,7 +74,11 @@ class FakeAudio {
 }
 
 const speech: PresenceSpeechSet = {
-  clinic: { src: "/avatar/desk/speech/clinic.mp3", durationMs: 10_913, transcript: "Start with the maternity clinic.", provider: "elevenlabs", voice: "Bill" },
+  clinic: { src: "/avatar/desk/speech/clinic.mp3", durationMs: 7_338, transcript: "Start with the maternity clinic.", provider: "elevenlabs", voice: "Chris" },
+  employer: {
+    src: "/avatar/desk/speech/employer.mp3", durationMs: 10_031, transcript: "Kela says to inform your employer.", provider: "elevenlabs", voice: "Chris",
+    video: "/avatar/desk/answers/employer.mp4", videoDurationMs: 10_400, lipSync: "musetalk",
+  },
 };
 type Options = Parameters<typeof useAvatarConversation>[0];
 const cleanups: (() => void)[] = [];
@@ -109,18 +118,77 @@ afterEach(() => {
 });
 
 describe("avatar conversation voice", () => {
-  it("plays the prepared ElevenLabs answer and talks for its manifest duration once audio starts", async () => {
+  it("plays the prepared ElevenLabs answer and talks for its manifest duration, naming the scene, once audio starts", async () => {
     const chat = conversation();
     const done = chat.api.runExample("clinic");
     await chat.settle();
     const audio = FakeAudio.all.at(-1)!;
     expect(audio.src).toBe("/avatar/desk/speech/clinic.mp3");
-    expect(chat.api.voiceNote).toBe("Prepared answer · ElevenLabs voice");
+    expect(chat.api.voiceNote).toBe("Prepared answer · ElevenLabs voice Chris");
     expect(chat.api.voiceNote).not.toMatch(/Gemini/);
-    expect(chat.api.talking).toMatchObject({ durationMs: 10_913 });
+    expect(chat.api.talking).toMatchObject({ durationMs: 7_338, scene: "clinic" });
+    expect(chat.api.talking?.clock?.running()).toBe(true);
     audio.end();
     await done;
     expect(chat.render().talking).toBeNull();
+  });
+
+  it("announces a prepared performance before its voice starts, and starts the voice when the picture lets it go", async () => {
+    const chat = conversation({ holdForPicture: true });
+    const done = chat.api.runExample("employer");
+    await chat.settle();
+    const audio = FakeAudio.all.at(-1)!;
+    expect(audio.src).toBe("/avatar/desk/speech/employer.mp3");
+    // The picture knows which performance to load while the voice waits for it.
+    expect(chat.api.talking).toMatchObject({ durationMs: 10_031, scene: "employer" });
+    expect(audio.plays).toBe(0);
+    const clock = chat.api.talking!.clock!;
+    expect(clock.running()).toBe(false);
+    clock.hold(false);
+    await chat.settle();
+    expect(audio.plays).toBe(1);
+    expect(clock.running()).toBe(true);
+    // A picture that freezes holds the voice, and lets it go again.
+    clock.hold(true);
+    expect(audio.paused).toBe(true);
+    clock.hold(false);
+    await chat.settle();
+    expect(audio.paused).toBe(false);
+    audio.end();
+    await done;
+    expect(clock.finished()).toBe(true);
+    expect(chat.render().talking).toBeNull();
+  });
+
+  it("never lets a picture keep the voice waiting for long", async () => {
+    vi.useFakeTimers();
+    try {
+      const chat = conversation({ holdForPicture: true });
+      const done = chat.api.runExample("employer");
+      await chat.settle();
+      const audio = FakeAudio.all.at(-1)!;
+      expect(audio.plays).toBe(0);
+      await vi.advanceTimersByTimeAsync(HOLD_LIMIT_MS + 10);
+      expect(audio.plays).toBe(1);
+      audio.end();
+      await done;
+    } finally { vi.useRealTimers(); }
+  });
+
+  it("does not hold a prepared voice that has no performance video, nor without a stage that releases it", async () => {
+    const held = conversation({ holdForPicture: true });
+    const first = held.api.runExample("clinic");
+    await held.settle();
+    expect(FakeAudio.all.at(-1)!.plays).toBe(1);
+    FakeAudio.all.at(-1)!.end();
+    await first;
+    const plain = conversation({ holdForPicture: false });
+    const second = plain.api.runExample("employer");
+    await plain.settle();
+    expect(FakeAudio.all.at(-1)!.plays).toBe(1);
+    expect(plain.api.talking).toMatchObject({ scene: "employer" });
+    FakeAudio.all.at(-1)!.end();
+    await second;
   });
 
   it("pauses and resumes the voice with the picture, and mutes without stopping the talk", async () => {

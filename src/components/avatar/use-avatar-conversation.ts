@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, type SetStateAction } from "react";
 import { cancelAgentState, initialAgentState, readAvatarStream, reduceAgentEvent, replayRun } from "@/lib/avatar/events";
-import { playAvatarAudio, type AvatarAudioControl } from "@/lib/avatar/play-voice";
+import { playAvatarAudio, type AvatarAudioControl, type AvatarSpeechClock } from "@/lib/avatar/play-voice";
 import { RECORDED_EXAMPLE } from "@/lib/avatar/recorded-example";
 import { PREPARED_SCENES, type PreparedSceneId } from "@/lib/avatar/prepared-scenes";
-import type { PresenceSpeechSet } from "@/lib/avatar/presence";
+import type { PresenceSpeechSet, PresenceTalking } from "@/lib/avatar/presence";
 import type { AgentEvent } from "@/lib/avatar/types";
 
 export interface CompanionSettings {
@@ -24,19 +24,27 @@ export interface ConversationTurn {
   status: "streaming" | "complete" | "cancelled" | "error";
 }
 
-/** A voice that is audibly (or, when muted, silently) playing now; the picture talks for its duration. */
-export type ConversationTalking = { id: string; durationMs: number } | null;
+/**
+ * A voice that is audibly (or, when muted, silently) playing now; the picture talks for its duration.
+ * `scene` names a prepared answer, whose own performance video the picture plays; `clock` is the audio.
+ */
+export type ConversationTalking = PresenceTalking;
 
 export const VOICE_UNAVAILABLE = "Voice is unavailable on this server. The reply is ready to read.";
 /** Speech rate used only when a decoded file does not report its duration. */
 const estimateMs = (text: string) => Math.max(1500, text.length * 65);
 
-export function useAvatarConversation({ code, liveConfigured, voiceConfigured, settings, preparedSpeech = {}, paused = false }: {
+export function useAvatarConversation({ code, liveConfigured, voiceConfigured, settings, preparedSpeech = {}, paused = false, holdForPicture = false }: {
   code: string; liveConfigured: boolean; voiceConfigured: boolean; settings: CompanionSettings;
   /** Prepared ElevenLabs answers for the prepared scenes, from the presence manifest. */
   preparedSpeech?: PresenceSpeechSet;
   /** Pauses the playing voice together with the picture. */
   paused?: boolean;
+  /**
+   * A prepared answer with a performance video waits for the picture to release it (clock.hold), so the
+   * two start together. Only for a stage that does release it; play-voice caps the wait.
+   */
+  holdForPicture?: boolean;
 }) {
   const [talking, setTalking] = useState<ConversationTalking>(null);
   const [agent, setAgent] = useState(initialAgentState);
@@ -101,21 +109,33 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
       if (activeVoice.current !== voiceTask || (playing && signal.aborted)) return;
       emit({ type: playing ? "speech-start" : "speech-end" }, task);
     };
-    // The picture starts talking when the audio actually starts, for as long as the audio lasts.
-    const audio = (fallbackMs: number, knownMs?: number) => ({
-      signal, onSpeech, muted: !voicePreference.current, paused: pausedRef.current,
-      onControl: (control: AvatarAudioControl) => { if (activeVoice.current === voiceTask) audioControl.current = control; },
-      onStart: (decodedMs: number) => {
+    // The picture starts talking when the audio actually starts, for as long as the audio lasts. A held
+    // prepared answer is announced at once instead, so the picture can load its video and release it.
+    const audio = (fallbackMs: number, { knownMs, scene, held = false }: { knownMs?: number; scene?: PreparedSceneId; held?: boolean } = {}) => {
+      let clock: AvatarSpeechClock | undefined;
+      const announce = (durationMs: number) => {
         if (activeVoice.current !== voiceTask || signal.aborted) return;
-        setTalking({ id: talkId, durationMs: knownMs ?? (Number.isFinite(decodedMs) ? decodedMs : fallbackMs) });
-      },
-    });
+        setTalking({ id: talkId, durationMs, ...(scene ? { scene } : {}), ...(clock ? { clock } : {}) });
+      };
+      return {
+        signal, onSpeech, held, muted: !voicePreference.current, paused: pausedRef.current,
+        onControl: (control: AvatarAudioControl, playing: AvatarSpeechClock) => {
+          if (activeVoice.current !== voiceTask) return;
+          audioControl.current = control;
+          clock = playing;
+          if (held) announce(knownMs ?? fallbackMs);
+        },
+        onStart: (decodedMs: number) => {
+          if (!held) announce(knownMs ?? (Number.isFinite(decodedMs) ? decodedMs : fallbackMs));
+        },
+      };
+    };
     let objectUrl: string | undefined;
     try {
       const prepared = turn.scene ? preparedSpeech[turn.scene] : undefined;
       if (prepared) {
-        setVoiceNote("Prepared answer · ElevenLabs voice");
-        await playAvatarAudio(prepared.src, audio(prepared.durationMs, prepared.durationMs));
+        setVoiceNote(`Prepared answer · ElevenLabs voice ${prepared.voice}`);
+        await playAvatarAudio(prepared.src, audio(prepared.durationMs, { knownMs: prepared.durationMs, scene: turn.scene, held: holdForPicture && Boolean(prepared.video) }));
       } else if (turn.source === "recorded" && (!turn.scene || turn.scene === "pregnancy")) {
         setVoiceNote("Recorded voice for this example");
         await playAvatarAudio(RECORDED_EXAMPLE.audio, audio(estimateMs(turn.text)));

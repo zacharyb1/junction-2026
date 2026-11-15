@@ -5,114 +5,96 @@
   "width": 1280,
   "height": 720,
   "fps": 25,
-  "crossfadeMs": 240,
+  "restFrame": 406,
+  "crossfadeMs": 100,
   "segments": [
     {
-      "id": "listen-a",
-      "src": "/avatar/desk/listen-a.mp4",
+      "id": "idle-a",
+      "src": "/avatar/desk/idle-a.mp4",
       "kind": "listen",
-      "durationMs": 3560,
-      "sourceId": "pexels-5941016",
-      "sourceInMs": 2240,
-      "sourceOutMs": 4040,
-      "speed": 1,
-      "startHub": 100,
-      "endHub": 100
+      "durationMs": 24320,
+      "sourceId": "pexels-5941016"
     },
     {
-      "id": "listen-b",
-      "src": "/avatar/desk/listen-b.mp4",
+      "id": "idle-b",
+      "src": "/avatar/desk/idle-b.mp4",
       "kind": "listen",
-      "durationMs": 2680,
-      "sourceId": "pexels-5941016",
-      "sourceInMs": 5920,
-      "sourceOutMs": 7280,
-      "speed": 1,
-      "startHub": 181,
-      "endHub": 181
+      "durationMs": 24160,
+      "sourceId": "pexels-5941016"
     },
     {
-      "id": "listen-c",
-      "src": "/avatar/desk/listen-c.mp4",
+      "id": "idle-c",
+      "src": "/avatar/desk/idle-c.mp4",
       "kind": "listen",
-      "durationMs": 1320,
-      "sourceId": "pexels-5941016",
-      "sourceInMs": 15840,
-      "sourceOutMs": 16520,
-      "speed": 1,
-      "startHub": 396,
-      "endHub": 396
+      "durationMs": 24280,
+      "sourceId": "pexels-5941016"
     },
     {
-      "id": "listen-b-slow",
-      "src": "/avatar/desk/listen-b-slow.mp4",
-      "kind": "listen",
-      "durationMs": 5360,
-      "sourceId": "pexels-5941016",
-      "sourceInMs": 5920,
-      "sourceOutMs": 7280,
-      "speed": 0.5,
-      "startHub": 181,
-      "endHub": 181
-    },
-    {
-      "id": "listen-c-slow",
-      "src": "/avatar/desk/listen-c-slow.mp4",
-      "kind": "listen",
-      "durationMs": 2640,
-      "sourceId": "pexels-5941016",
-      "sourceInMs": 15840,
-      "sourceOutMs": 16520,
-      "speed": 0.5,
-      "startHub": 396,
-      "endHub": 396
-    },
-    {
-      "id": "talk-a",
-      "src": "/avatar/desk/talk-a.mp4",
+      "id": "talk-4s",
+      "src": "/avatar/desk/talk-4s.mp4",
       "kind": "talk",
-      "durationMs": 3280,
-      "sourceId": "pexels-5941016",
-      "sourceInMs": 4000,
-      "sourceOutMs": 7280,
-      "speed": 1,
-      "startHub": 100,
-      "endHub": 181
+      "durationMs": 3800,
+      "sourceId": "pexels-5941016"
     },
     {
-      "id": "talk-b",
-      "src": "/avatar/desk/talk-b.mp4",
+      "id": "talk-6s",
+      "src": "/avatar/desk/talk-6s.mp4",
       "kind": "talk",
-      "durationMs": 8640,
-      "sourceId": "pexels-5941016",
-      "sourceInMs": 7240,
-      "sourceOutMs": 15880,
-      "speed": 1,
-      "startHub": 181,
-      "endHub": 396
+      "durationMs": 6000,
+      "sourceId": "pexels-5941016"
+    },
+    {
+      "id": "talk-8s",
+      "src": "/avatar/desk/talk-8s.mp4",
+      "kind": "talk",
+      "durationMs": 8000,
+      "sourceId": "pexels-5941016"
+    },
+    {
+      "id": "talk-10s",
+      "src": "/avatar/desk/talk-10s.mp4",
+      "kind": "talk",
+      "durationMs": 10000,
+      "sourceId": "pexels-5941016"
+    },
+    {
+      "id": "talk-12s",
+      "src": "/avatar/desk/talk-12s.mp4",
+      "kind": "talk",
+      "durationMs": 12000,
+      "sourceId": "pexels-5941016"
     }
   ],
   "speech": {
     "pregnancy": {
       "src": "/avatar/desk/speech/pregnancy.mp3",
-      "durationMs": 17090,
-      "transcript": "Let's take this one step at a time. First, contact your local maternity clinic. Then we can work through leave from work and support from Kela. I've kept the official sources beside the plan. Would you like to start with the clinic, or with telling your employer?",
+      "durationMs": 11471,
+      "transcript": "Let's take this one step at a time. First, contact your local maternity clinic. Then we'll sort out leave from work and support from Kela. Shall we start with the clinic, or with your employer?",
       "provider": "elevenlabs",
-      "voice": "Bill"
+      "voice": "Chris",
+      "video": "/avatar/desk/answers/pregnancy.mp4",
+      "videoDurationMs": 12440,
+      "lipSync": "musetalk"
     },
     "clinic": {
       "src": "/avatar/desk/speech/clinic.mp3",
-      "durationMs": 10913,
+      "durationMs": 7338,
       "transcript": "Start with the maternity clinic or family centre in your area. That's the first step in the InfoFinland guide. I've opened the exact passage for you.",
       "provider": "elevenlabs",
-      "voice": "Bill"
+      "voice": "Chris",
+      "video": "/avatar/desk/answers/clinic.mp4",
+      "videoDurationMs": 8320,
+      "lipSync": "musetalk"
     },
     "employer": {
       "src": "/avatar/desk/speech/employer.mp3",
-      "durationMs": 12214,
+      "durationMs": 10031,
       "transcript": "Kela says to inform your employer at least two months before your pregnancy leave starts. The deadline is before your leave, not before the baby's due date. Here's the passage.",
       "provider": "elevenlabs",
-      "voice": "Bill"
+      "voice": "Chris",
+      "video": "/avatar/desk/answers/employer.mp4",
+      "videoDurationMs": 11120,
+      "lipSync": "musetalk"
     }
   },
   "attribution": {
@@ -120,6 +102,6 @@
     "sourceUrl": "https://www.pexels.com/video/5941016/",
     "license": "Pexels License",
     "licenseUrl": "https://www.pexels.com/license/",
-    "note": "Stock footage of a performer who is not part of the team. Cut into short loops; some loops play a stretch backwards. The voice is synthetic (ElevenLabs, voice Bill) and was not spoken by him; his lips are not synchronised to it."
+    "note": "Stock footage of a performer who is not part of the team, edited: the idle clips are his rest frame with breathing, slight head movement and blinks taken from the same clip, and the speaking clips reuse his real gestures. The voice is synthetic (ElevenLabs, voice Chris) and was not spoken by him."
   }
 }
