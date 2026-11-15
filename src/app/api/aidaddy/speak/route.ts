@@ -27,6 +27,8 @@ export async function POST(req: Request) {
     return new Response(new Uint8Array(audio), { headers: { "content-type": "audio/mpeg", "cache-control": "no-store" } });
   } catch (error) {
     console.error("AIDaddy speech failed", error);
-    return json({ error: "AIDaddy lost its voice for a moment. The reply is still in the chat." }, 502);
+    // The reason is ElevenLabs' short code, for the operator; the page shows only the sentence.
+    const reason = error instanceof Error ? error.message : "speech failed";
+    return json({ error: "AIDaddy lost its voice for a moment. The reply is still in the chat.", reason }, 502);
   }
 }

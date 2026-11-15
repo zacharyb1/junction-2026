@@ -15,7 +15,15 @@ const MODEL = "eleven_flash_v2_5";
  */
 export const AIDADDY_VOICE = "UWUOFJTWwuSmZFHzbMpM";
 const DEFAULT_VOICE = AIDADDY_VOICE;
-const voiceId = () => process.env.ELEVENLABS_VOICE_ID || DEFAULT_VOICE;
+/**
+ * ELEVENLABS_VOICE_ID as an operator typed it into an env file. Quotes, spaces and a line ending pasted along with
+ * it are dropped, and a value that still is not a voice id gives AIDaddy's own voice: a malformed id makes
+ * ElevenLabs refuse every request (400 invalid_uid), which took the server's voice down while the key was fine.
+ */
+const voiceId = () => {
+  const typed = (process.env.ELEVENLABS_VOICE_ID ?? "").trim().replace(/^["']+|["']+$/g, "").trim();
+  return /^[A-Za-z0-9]{16,32}$/.test(typed) ? typed : DEFAULT_VOICE;
+};
 
 export const SPOKEN_LIMIT = 1500;
 
@@ -123,6 +131,19 @@ export function speechHash(text: string, language?: string, delivery: Delivery =
   return createHash("sha256").update(named).digest("hex").slice(0, 16);
 }
 
+/**
+ * Why ElevenLabs said no, as "ElevenLabs answered 400 (voice_not_found)". The word in brackets is the short code
+ * of its answer: it names the cause (an unknown voice, a key without the permission, a spent quota) and holds
+ * nothing private, so the route may pass it on and the operator can read the reason without the server's logs.
+ */
+async function refusal(res: Response): Promise<string> {
+  const body = (await res.json().catch(() => null)) as { detail?: { status?: unknown; code?: unknown; type?: unknown } | string } | null;
+  const detail = body?.detail;
+  const code = typeof detail === "string" ? detail : (detail?.status ?? detail?.code ?? detail?.type);
+  const word = typeof code === "string" && /^[\w .:-]{1,60}$/.test(code) ? ` (${code})` : "";
+  return `ElevenLabs answered ${res.status}${word}`;
+}
+
 /** Text to speech with ElevenLabs, in the language and delivery given. Returns the MP3. */
 export async function renderSpeech(text: string, voice: { language?: string; delivery?: Delivery } = {}): Promise<Buffer> {
   const { language, delivery = "plain" } = voice;
@@ -141,7 +162,7 @@ export async function renderSpeech(text: string, voice: { language?: string; del
       signal: AbortSignal.timeout(20_000),
     },
   );
-  if (!res.ok) throw new Error(`ElevenLabs answered ${res.status}`);
+  if (!res.ok) throw new Error(await refusal(res));
   const audio = Buffer.from(await res.arrayBuffer());
   if (!audio.length) throw new Error("ElevenLabs sent no audio");
   return audio;
@@ -207,7 +228,7 @@ export async function transcribe(audio: Blob): Promise<string> {
     body: form,
     signal: AbortSignal.timeout(30_000),
   });
-  if (!res.ok) throw new Error(`ElevenLabs answered ${res.status}`);
+  if (!res.ok) throw new Error(await refusal(res));
   const body = (await res.json()) as { text?: string };
   return (body.text ?? "").trim();
 }
