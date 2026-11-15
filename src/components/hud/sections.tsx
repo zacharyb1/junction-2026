@@ -41,9 +41,9 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
               official page.
             </p>
             <div className="hud-actions">
-              <a href="#research" className="hud-btn hud-btn--primary">
-                Watch it work
-              </a>
+              <SiteLink href="/setup" className="hud-btn hud-btn--primary">
+                Set up AIDaddy
+              </SiteLink>
               <SiteLink href="/try" className="hud-btn">
                 Try AIDaddy without setup
               </SiteLink>
