@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { landingConfig } from "@/components/landing/config";
+import { landingConfig } from "@/components/site/config";
 import { SiteLink } from "@/components/site/site-link";
 import { Wordmark } from "@/components/site/wordmark";
 
@@ -58,7 +58,10 @@ export function SiteFooter() {
                 <Link href="/">Front page</Link>
               </li>
               <li>
-                <Link href="/reading">Front page, paper edition</Link>
+                <Link href="/scorecard">Scorecard</Link>
+              </li>
+              <li>
+                <Link href="/setup#privacy">Privacy and limits</Link>
               </li>
               {repoUrl ? (
                 <li>

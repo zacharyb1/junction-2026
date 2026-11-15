@@ -1,10 +1,10 @@
 "use client";
 
-import { CircleAlert, Loader2, Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
+import { Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { AIDaddyAvatar, type AvatarState } from "@/components/aidaddy-avatar";
 import { CopyButton } from "@/components/copy-button";
-import { linkButtonClasses } from "@/components/landing/link-button";
+import { linkButtonClasses } from "@/components/site/link-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,9 +17,19 @@ const LINK = /(https?:\/\/[^\s<>()]+[^\s<>().,;:!?])/g;
 /** What a visitor reads when the server refuses the access code, in the chat and in both voice paths. */
 const BAD_CODE = "That access code is not valid. Scan the QR code at our table again.";
 
-const BUBBLE = "rounded-lg border text-sm leading-relaxed whitespace-pre-wrap";
-const FROM_AIDADDY = `${BUBBLE} max-w-[92%] self-start bg-card p-3`;
-const FROM_YOU = `${BUBBLE} max-w-[85%] self-end border-primary/40 bg-primary/10 px-3 py-2`;
+const FROM_YOU = "site-bubble max-w-[85%] self-end whitespace-pre-wrap";
+const FROM_AIDADDY = "site-row site-row--roomy max-w-[92%] self-start whitespace-pre-wrap";
+
+/** The label above each of AIDaddy's items, the greeting included. */
+const SAYS = <span className="site-eyebrow mb-1 block">AIDaddy</span>;
+
+/** The word under the orb, in the site's state code. Hidden from screen readers: the avatar's label says it. */
+const STATE_WORD: Record<AvatarState, { className: string; text: string }> = {
+  idle: { className: "site-state", text: "Standing by" },
+  listening: { className: "site-state site-state--amber", text: "Listening" },
+  thinking: { className: "site-state site-state--cyan site-state--working", text: "Thinking" },
+  speaking: { className: "site-state site-state--cyan", text: "Speaking" },
+};
 
 // Pictures already asked for, by link, so a reply that re-renders while it streams asks the server once per link.
 const PICTURES = new Map<string, Promise<string | null>>();
@@ -34,6 +44,14 @@ function pictureFor(url: string): Promise<string | null> {
     PICTURES.set(url, found);
   }
   return found;
+}
+
+function pathOf(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return "";
+  }
 }
 
 /**
@@ -51,6 +69,8 @@ function ReplyLink({ url }: { url: string }) {
       clearTimeout(wait);
     };
   }, [url]);
+  // A case file reads as what it is; its address stays in the tooltip.
+  const caseFile = pathOf(url).startsWith("/c/");
   return (
     <>
       {picture && (
@@ -70,9 +90,15 @@ function ReplyLink({ url }: { url: string }) {
           className="my-1 block size-32 rounded-md border bg-white object-contain"
         />
       )}
-      <a href={url} target="_blank" rel="noreferrer" className="break-all text-primary underline underline-offset-2">
-        {url}
-      </a>
+      {caseFile ? (
+        <a href={url} target="_blank" rel="noreferrer" title={url} className="text-primary underline underline-offset-2">
+          Open the case file <span aria-hidden="true">↗</span>
+        </a>
+      ) : (
+        <a href={url} target="_blank" rel="noreferrer" className="break-all text-primary underline underline-offset-2">
+          {url}
+        </a>
+      )}
     </>
   );
 }
@@ -221,66 +247,66 @@ export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string;
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4 rounded-lg border bg-card p-3">
-        <AIDaddyAvatar state={avatarState} level={voice.level} size={72} />
-        <div className="flex flex-col gap-2 text-sm">
-          <p className="text-muted-foreground">
-            {!voiceAvailable
-              ? "Type your message to AIDaddy. Voice is unavailable in this demo."
-              : voice.recording
-                ? "Recording. Tap the square to stop."
-                : voice.transcribing
-                  ? "Turning your voice note into text."
-                  : voice.speaking
-                    ? "AIDaddy is reading its reply aloud."
-                    : "Talk to AIDaddy by voice or text. Its voice is made with ElevenLabs."}
-          </p>
-          {voiceAvailable && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={voice.toggleSpeech}
-              aria-pressed={voice.enabled}
-              // A full-size target on a phone, the compact one next to a mouse.
-              className="h-11 self-start px-3 sm:h-8"
-            >
-              {voice.enabled ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
-              {voice.enabled ? "Voice on" : "Voice off"}
-            </Button>
-          )}
+    <>
+      <div className="site-rail site-rail--sticky">
+        <div className="site-station">
+          <div className="site-orb">
+            <AIDaddyAvatar state={avatarState} level={voice.level} size={72} />
+          </div>
+          <div className="site-station-text">
+            <p aria-hidden="true" className={STATE_WORD[avatarState].className}>
+              {STATE_WORD[avatarState].text}
+            </p>
+            <p className="site-note">
+              {!voiceAvailable
+                ? "Type your message to AIDaddy. Voice is unavailable in this demo."
+                : voice.recording
+                  ? "Recording. Tap the square to stop."
+                  : voice.transcribing
+                    ? "Turning your voice note into text."
+                    : voice.speaking
+                      ? "AIDaddy is reading its reply aloud."
+                      : "Talk to AIDaddy by voice or text. Its voice is made with ElevenLabs."}
+            </p>
+            {voiceAvailable && (
+              <Button type="button" variant="outline" size="sm" onClick={voice.toggleSpeech} aria-pressed={voice.enabled}>
+                {voice.enabled ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
+                {voice.enabled ? "Voice on" : "Voice off"}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-      <ol className="flex flex-col gap-3" aria-live="polite">
-        {turns.length === 0 && (
-          <li className={FROM_AIDADDY}>
-            AIDaddy here. Tell me what is on your plate: a move, a new job, a letter you cannot read.
-          </li>
-        )}
-        {turns.map((turn, i) => (
-          <li key={i} className={turn.from === "you" ? FROM_YOU : FROM_AIDADDY}>
-            {turn.from === "aidaddy" && !turn.text ? (
-              <span className="inline-flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> AIDaddy is working on it
-              </span>
-            ) : (
-              <Linked text={turn.text} />
-            )}
-          </li>
-        ))}
-      </ol>
-      {/* The newest message stops above the message box, which stays at the bottom of the screen. */}
-      <div ref={last} className="scroll-mb-28" />
-      {/*
-        Kept at the bottom of the screen while the conversation is longer than the screen, so the message box is
-        always in reach. An error travels with it, so it is never hidden behind the box.
-      */}
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mx-0 sm:px-0">
-        {error && (
-          <p className="flex items-start gap-2 text-sm text-destructive" role="alert">
-            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
-            <span>
+      <div className="flex min-w-0 flex-col gap-4">
+        <ol className="flex flex-col gap-3" aria-live="polite">
+          {turns.length === 0 && (
+            <li className={FROM_AIDADDY}>
+              {SAYS}
+              AIDaddy here. Tell me what is on your plate: a move, a new job, a letter you cannot read.
+            </li>
+          )}
+          {turns.map((turn, i) => (
+            <li key={i} className={turn.from === "you" ? FROM_YOU : FROM_AIDADDY}>
+              {turn.from === "aidaddy" && SAYS}
+              {turn.from === "aidaddy" && !turn.text ? (
+                <span className="inline-flex items-center gap-2 text-muted-foreground">
+                  <span className="site-dot site-dot--cyan site-dot--working" aria-hidden="true" /> AIDaddy is working on it
+                </span>
+              ) : (
+                <Linked text={turn.text} />
+              )}
+            </li>
+          ))}
+        </ol>
+        {/* The newest message stops above the message box, which stays at the bottom of the screen. */}
+        <div ref={last} className="scroll-mb-28" />
+        {/*
+          Kept at the bottom of the screen while the conversation is longer than the screen, so the message box is
+          always in reach. An error travels with it, so it is never hidden behind the box.
+        */}
+        <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-(--hud-line-soft) bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mx-0 sm:px-0">
+          {error && (
+            <p className="site-row site-row--amber site-status" role="alert">
               {error}{" "}
               {badCode && (
                 // A plain link: it must open the page without the refused code, so the field for a new one shows.
@@ -288,50 +314,46 @@ export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string;
                   Or type the code
                 </a>
               )}
-            </span>
-          </p>
-        )}
-        <form onSubmit={send} className="flex items-end gap-2">
-          <Textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              // Enter also confirms a word in Chinese, Japanese or Korean input; that Enter must not send.
-              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) send(e);
-            }}
-            maxLength={1500}
-            rows={2}
-            placeholder="I just moved to Espoo. What do I register first?"
-            aria-label="Your message to AIDaddy"
-            className="max-h-40 min-h-11 px-3"
-          />
-          {voiceAvailable && (
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              onClick={listen}
-              disabled={voice.transcribing}
-              aria-pressed={voice.recording}
-              aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
-              // Green while the microphone is live, the same colour as the ring around the avatar.
-              className={`h-11 w-11 ${voice.recording ? "border-(--hud-green)/60 bg-(--hud-green)/10 text-(--hud-green) hover:bg-(--hud-green)/20 hover:text-(--hud-green)" : ""}`}
-            >
-              {voice.transcribing ? (
-                <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden />
-              ) : voice.recording ? (
-                <Square aria-hidden />
-              ) : (
-                <Mic aria-hidden />
-              )}
-            </Button>
+            </p>
           )}
-          <Button type="submit" size="lg" className="h-11 w-11" disabled={busy || !draft.trim()} aria-label="Send">
-            {busy ? <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden /> : <Send aria-hidden />}
-          </Button>
-        </form>
+          <form onSubmit={send} className="flex items-end gap-2">
+            <Textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                // Enter also confirms a word in Chinese, Japanese or Korean input; that Enter must not send.
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) send(e);
+              }}
+              maxLength={1500}
+              rows={2}
+              placeholder="I just moved to Espoo. What do I register first?"
+              aria-label="Your message to AIDaddy"
+              // On a phone the empty box is 66px tall and drops to 44px at the first key; 44px from 640px.
+              className="max-h-40 min-h-[4.25rem] px-3 sm:min-h-11"
+            />
+            {voiceAvailable && (
+              <Button
+                type="button"
+                size="icon-lg"
+                variant="outline"
+                onClick={listen}
+                disabled={voice.transcribing}
+                aria-pressed={voice.recording}
+                aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
+                // Amber while the microphone is live: the person's move, the same colour as the ring around the avatar.
+                data-tone="amber"
+                className="h-11 w-11"
+              >
+                {voice.recording ? <Square aria-hidden /> : <Mic aria-hidden />}
+              </Button>
+            )}
+            <Button type="submit" size="icon-lg" className="h-11 w-11" disabled={busy || !draft.trim()} aria-label="Send">
+              <Send aria-hidden />
+            </Button>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

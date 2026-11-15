@@ -29,7 +29,7 @@ export function SourceCheckPanel({ c, t }: { c: Case; t: Labels }) {
   return (
     <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 text-sm">
       {check.changed.length > 0 && (
-        <p className="flex gap-2 rounded-lg border border-(--hud-amber)/40 bg-(--hud-amber)/10 p-3 font-medium text-(--hud-amber)">
+        <p className="site-row site-row--amber flex gap-2 font-medium text-(--hud-amber)">
           <CircleAlert className="mt-0.5 size-4 shrink-0" /> {t.quotesGone(check.changed)}
         </p>
       )}

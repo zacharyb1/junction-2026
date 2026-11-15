@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleAlert, CircleCheck, Loader2 } from "lucide-react";
+import { CircleAlert, CircleCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import type { EngineEvent } from "@/lib/engine/research";
@@ -63,7 +63,7 @@ type State = "running" | "done" | "stopped";
 // role="img" makes every screen reader read the label: on a bare <svg> some of them skip it.
 function StateIcon({ state, className = "" }: { state: State; className?: string }) {
   if (state === "running") {
-    return <Loader2 className={`animate-spin text-muted-foreground motion-reduce:animate-none ${className}`} role="img" aria-label="Running" />;
+    return <span className={`site-dot site-dot--cyan ${className}`} role="img" aria-label="Running" />;
   }
   if (state === "stopped") return <CircleAlert className={`text-(--hud-amber) ${className}`} role="img" aria-label="Stopped" />;
   return <CircleCheck className={`text-(--hud-green) ${className}`} role="img" aria-label="Done" />;
@@ -143,7 +143,7 @@ export function Elapsed({ busy, final }: { busy: boolean; final?: number }) {
   }, [busy]);
   // Hidden from screen readers: a live region must not announce every tick.
   return (
-    <span aria-hidden className="font-mono text-xs tabular-nums text-muted-foreground">
+    <span aria-hidden className={final === undefined ? "site-clock" : "site-clock site-clock--done"}>
       {seconds(final ?? ms)}
     </span>
   );

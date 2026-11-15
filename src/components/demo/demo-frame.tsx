@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { DemoNav } from "@/components/demo/demo-nav";
 import { ReplayButton, ReplayProvider, ReplayStage } from "@/components/demo/replay";
-import { REPLAY_ORDER, REPLAYS, SCENE_COUNT, type SceneSlug } from "@/components/demo/scenes";
+import { REPLAY_ORDER, REPLAYS, type SceneSlug } from "@/components/demo/scenes";
+import { Slash } from "@/components/site/page-head";
 import { SiteShell } from "@/components/site/site-shell";
 import "@/components/demo/demo.css";
 
@@ -54,10 +55,14 @@ export function DemoFrame({
           <div className="site-wrap demo-body">
             <header className="demo-head">
               <p className="site-eyebrow">
-                Scene {REPLAY_ORDER.indexOf(scene) + 1} of {SCENE_COUNT} · scripted replay · {seconds} s
+                Scene {String(REPLAY_ORDER.indexOf(scene) + 1).padStart(2, "0")}
+                <Slash />
+                Scripted replay
+                <Slash />
+                {seconds} s
               </p>
-              <h1>{title}</h1>
-              <p className="demo-story">{story}</p>
+              <h1 className={shape === "wide" ? "site-title site-title--compact" : "site-title"}>{title}</h1>
+              <p className={shape === "wide" ? "demo-story" : "demo-story site-lede"}>{story}</p>
               <div className="demo-controls">
                 <span className={`demo-tag demo-tag--${tone}`}>{tag}</span>
                 <ReplayButton />
@@ -66,7 +71,7 @@ export function DemoFrame({
             <div className="demo-stage">
               <ReplayStage>{children}</ReplayStage>
             </div>
-            <p className="demo-caption">{caption}</p>
+            <p className="demo-caption site-note">{caption}</p>
           </div>
         </ReplayProvider>
       </main>

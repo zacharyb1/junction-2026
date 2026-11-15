@@ -1,279 +1,4 @@
-/* The listening post (/listen). It sits inside .hud and uses that page family's colours and panels. */
-
-.listen-page {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding-block: clamp(2.5rem, 6vw, 4rem) clamp(3.5rem, 9vw, 7rem);
-}
-.listen-page-head {
-  display: grid;
-  gap: 0.75rem;
-}
-.listen {
-  display: grid;
-  gap: 1.25rem;
-}
-
-/* ---------- the switch ---------- */
-
-.listen-main {
-  display: grid;
-  gap: 1.5rem;
-  justify-items: center;
-  padding: 1.5rem 1.1rem;
-}
-.listen-core {
-  width: min(11rem, 50vw);
-  transition: opacity 0.6s;
-}
-.listen-core.is-off {
-  opacity: 0.4;
-}
-.listen-main-text {
-  display: grid;
-  gap: 0.9rem;
-  width: 100%;
-  min-width: 0;
-}
-.listen-status {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font: 600 clamp(1.3rem, 4.5vw, 1.9rem) / 1.15 var(--font-sans), system-ui, sans-serif;
-  letter-spacing: -0.01em;
-}
-.listen-status i {
-  flex: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--hud-dim);
-}
-.listen-status[data-status="listening"] i {
-  background: #ff5d5d;
-  box-shadow: 0 0 14px #ff5d5d;
-  animation: hud-breathe 1.6s ease-in-out infinite;
-}
-.listen-status[data-status="paused"] i,
-.listen-status[data-status="trouble"] i {
-  background: var(--hud-amber);
-}
-.listen-note {
-  max-width: 62ch;
-  font-size: 0.92rem;
-  color: var(--hud-amber);
-}
-.listen-settings {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
-  gap: 0.75rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--hud-line-soft);
-}
-.listen label {
-  display: grid;
-  gap: 0.3rem;
-  font: 500 0.68rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--hud-dim);
-}
-.listen input,
-.listen select {
-  width: 100%;
-  min-width: 0;
-  min-height: 44px;
-  padding: 0 0.7rem;
-  border: 1px solid var(--hud-line);
-  border-radius: 3px;
-  background: #05080d;
-  color: var(--hud-text);
-  font: 400 1rem / 1.2 var(--font-sans), system-ui, sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
-}
-.listen input::placeholder {
-  color: #7f93ad;
-}
-.hud .listen .hud-btn:disabled {
-  cursor: default;
-  opacity: 0.5;
-}
-
-@media (min-width: 760px) {
-  .listen-main {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 2.5rem;
-    justify-items: start;
-    align-items: center;
-    padding: 2rem;
-  }
-  .listen-core {
-    width: 13rem;
-  }
-}
-
-/* ---------- heard, and the desks ---------- */
-
-.listen-grid {
-  display: grid;
-  gap: 1.25rem;
-  align-items: start;
-}
-@media (min-width: 900px) {
-  .listen-grid {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  }
-}
-
-.listen-heard {
-  display: grid;
-  gap: 0.9rem;
-  padding: 1rem;
-}
-.listen-heard ol {
-  display: grid;
-  gap: 0.7rem;
-}
-.listen-heard li {
-  display: grid;
-  gap: 0.2rem;
-  padding-left: 0.8rem;
-  border-left: 2px solid var(--hud-line);
-}
-.listen-heard li p {
-  overflow-wrap: anywhere;
-}
-.listen-heard li span {
-  font: 400 0.68rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--hud-dim);
-}
-.listen-heard li[data-tag="event"] {
-  border-left-color: var(--hud-amber);
-}
-.listen-heard li[data-tag="event"] span {
-  color: var(--hud-amber);
-}
-.listen-interim {
-  color: var(--hud-dim);
-  font-style: italic;
-}
-.listen-empty {
-  color: var(--hud-dim);
-}
-.listen-empty--desks {
-  padding: 1rem;
-}
-.listen-type {
-  display: grid;
-  gap: 0.4rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--hud-line-soft);
-}
-.listen-type > div {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.5rem;
-}
-
-.listen-jobs {
-  display: grid;
-}
-.listen-job {
-  display: grid;
-  gap: 0.6rem;
-  padding: 1rem;
-  border-bottom: 1px solid var(--hud-line-soft);
-}
-.listen-job:last-child {
-  border-bottom: 0;
-}
-.listen-job-head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.25rem 1rem;
-  font: 500 0.7rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--hud-cyan);
-}
-.listen-job-outcome {
-  color: var(--hud-dim);
-}
-.listen-job[data-state="working"] .listen-job-outcome,
-.listen-job[data-state="collecting"] .listen-job-outcome {
-  color: var(--hud-amber);
-}
-.listen-job[data-state="done"] .listen-job-outcome {
-  color: var(--hud-green);
-}
-.listen-job-heard {
-  color: var(--hud-dim);
-  overflow-wrap: anywhere;
-}
-.listen-job-progress {
-  padding: 0.5rem 0.7rem;
-  border-left: 2px solid var(--hud-cyan);
-  background: rgb(79 216 255 / 0.05);
-  font: 400 0.8rem / 1.45 var(--hud-mono);
-}
-.hud .listen-job h2 {
-  font-size: 1.1rem;
-  line-height: 1.3;
-  letter-spacing: 0;
-}
-.listen-job ol {
-  display: grid;
-  counter-reset: step;
-}
-.listen-job ol li {
-  display: grid;
-  grid-template-columns: 1.6rem minmax(0, 1fr);
-  gap: 0.35rem 0.25rem;
-  padding: 0.6rem 0;
-  border-top: 1px dashed var(--hud-line-soft);
-  counter-increment: step;
-}
-.listen-job ol li::before {
-  content: counter(step);
-  font: 500 0.85rem / 1.6 var(--hud-mono);
-  color: var(--hud-amber);
-}
-.listen-sources {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  grid-column: 2;
-}
-.hud .listen-sources a {
-  display: inline-grid;
-  place-items: center;
-  min-width: 44px;
-  height: 36px;
-  border: 1px solid var(--hud-green);
-  border-radius: 3px;
-  background: rgb(61 220 151 / 0.08);
-  color: var(--hud-green);
-  font: 500 0.8rem / 1 var(--hud-mono);
-  text-decoration: none;
-}
-.hud .listen-sources a:hover {
-  background: var(--hud-green);
-  color: #03140c;
-}
-.listen-job-foot {
-  font-size: 0.88rem;
-  color: var(--hud-dim);
-}
-.listen-job .hud-btn {
-  justify-self: start;
-}
-
-/* ---------- the call ---------- */
+/* The call screen of the listening page (/listen). Everything else on that page uses the site's own panels and buttons. */
 
 .listen-call {
   position: fixed;
@@ -282,33 +7,27 @@
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgb(3 6 10 / 0.92);
+  background: rgb(33 27 23 / 0.6);
 }
 .listen-call-box {
   display: grid;
-  gap: 0.9rem;
+  gap: 0.8rem;
   justify-items: center;
   width: min(26rem, 100%);
   padding: 2rem 1.25rem;
-  border: 1px solid var(--hud-amber);
-  border-radius: 6px;
-  background: #0a121d;
-  box-shadow: 0 0 60px rgb(255 181 71 / 0.25);
+  border: 1px solid var(--hud-line);
+  border-radius: 20px;
+  background: var(--hud-panel);
+  box-shadow: 0 24px 80px rgb(33 27 23 / 0.35);
   text-align: center;
+  overflow-wrap: anywhere;
 }
 .listen-call-core {
-  width: 9rem;
-}
-.hud .listen-call h2 {
-  font-size: clamp(1.6rem, 6vw, 2.1rem);
+  width: 8.5rem;
 }
 .listen-call-about {
   font-size: 1.1rem;
-}
-.listen-call-heard {
-  font-size: 0.9rem;
-  color: var(--hud-dim);
-  overflow-wrap: anywhere;
+  font-weight: 500;
 }
 .listen-call-buttons {
   display: grid;
@@ -317,46 +36,11 @@
   width: 100%;
   margin-top: 0.5rem;
 }
-.hud .listen-call .hud-btn {
+.listen-call .site-btn {
   min-height: 56px;
+  justify-content: center;
 }
-.hud .listen-call-end {
+.listen-call-wide {
   width: 100%;
   margin-top: 0.5rem;
-}
-
-/* ---------- what it does and does not do ---------- */
-
-.listen-facts {
-  display: grid;
-  gap: 1.25rem;
-}
-@media (min-width: 760px) {
-  .listen-facts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem;
-  }
-}
-.listen-facts h2 {
-  margin-bottom: 0.6rem;
-  font: 500 0.72rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--hud-cyan);
-}
-.hud .listen-facts h2 {
-  font-size: 0.72rem;
-}
-.listen-facts ul {
-  display: grid;
-  gap: 0.55rem;
-}
-.listen-facts li {
-  padding-left: 0.9rem;
-  border-left: 2px solid var(--hud-line);
-  color: var(--hud-dim);
-}
-.listen-facts strong {
-  font-weight: 500;
-  color: var(--hud-text);
 }

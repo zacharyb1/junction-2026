@@ -1,4 +1,4 @@
-import { highlightUrl, hostOf } from "@/components/landing/sample";
+import { highlightUrl, hostOf } from "@/components/site/sample";
 import replay from "@/data/replay.json";
 
 /**
