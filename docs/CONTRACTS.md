@@ -77,7 +77,7 @@ Request body, same fields for both:
 - `situation` required, 10 to 1500 characters, in the user's own words.
 - `country` required: ISO 3166-1 alpha-2 code or a country name in English, Finnish or Swedish. An unknown country returns 400, it is never guessed.
 - `region`, `language` (default `en`), `household`, `document` optional.
-- `depth`: `fast` (default, about 6 to 12 seconds) or `deep` (a fourth question and Exa deep search, slower). `deep` needs the bot secret. With the public demo code the request runs as `fast`.
+- `depth`: `fast` (default, about 6 to 12 seconds), `deep` (a fourth question and Exa deep search, slower) or `agent` (one Exa Agent run at effort `low` in place of the separate searches, about 30 to 60 seconds; if it fails or proposes fewer than three steps, the usual searches run as well). `deep` needs the bot secret: with the public demo code a `deep` request runs as `fast`. `agent` costs about the same as `fast`, so the public demo code may use it. Every mode ends in the same page check.
 - A step in the stored case can carry `conflict`: a sentence naming two different figures and their citation numbers.
 - Write `situation` in English when you can. Finnish and other languages work too.
 
@@ -138,6 +138,7 @@ name as `type`. `ms` is the time since the research started.
 |---|---|---|
 | `stage` | `{ "name": "plan" \| "search" \| "read" \| "verify" \| "publish", "detail": "…", "ms": 2 }` | when a stage starts; the same lines are stored as the research trail |
 | `search` | `{ "focus": "money and entitlements", "web": "official" \| "open", "status": "running" \| "done" \| "failed", "steps": 5, "pages": 4, "tookMs": 6118, "ms": 6130 }` | when one Exa search starts, and again when it returns or fails: `steps` it proposed, distinct `pages` those steps cite, and how long it took. The counts are 0 unless the status is `done` |
+| `glance` | `{ "pages": [{ "url": "…", "title": "…", "official": true }], "tookMs": 469, "ms": 471 }` | at most once, usually within a second: up to five pages from one Exa `lite` search on the same sites, sent while the research is still running. Pointers for the person waiting; nothing from them enters the plan. Clients that do not know the event ignore it |
 | `page` | `{ "url": "…", "title": "…", "official": true, "via": "live" \| "oxylabs" \| "exa" \| "none", "ms": 7185 }` | once per cited page, as soon as it has been read. `via` is the most direct reader that opened it: our own request, a live read through Oxylabs, Exa's copy, or `none` when nothing could open it |
 | `source` | `{ "url": "…", "title": "…", "official": true }` | once per cited page after all pages are read (kept for older clients; `page` says more) |
 | `verified` | `{ "verified": 6, "total": 6, "ms": 8884 }` | once the case is stored: how many quotes were confirmed on their pages |
