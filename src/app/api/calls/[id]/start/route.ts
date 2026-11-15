@@ -1,18 +1,18 @@
 import { z } from "zod";
-import { isAuthorised, mayResearch, readJson } from "@/lib/cases";
+import { baseUrl, mayResearch, readJson } from "@/lib/cases";
+import { startDemoCall, webCallsAvailable } from "@/lib/demo-calls";
 import { allow } from "@/lib/rate-limit";
-import { startSwarm } from "@/lib/swarm-calls";
 
+const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "cache-control": "no-store" } });
 const Input = z.object({ confirmed: z.literal(true) });
 
-/** Rings every test phone of a proposal the person confirmed on the page. A proposal starts at most once. */
-export async function POST(req: Request, ctx: RouteContext<"/api/calls/[id]/start">) {
-  if (!mayResearch(req)) return Response.json({ error: "unauthorised" }, { status: 401 });
-  const parsed = Input.safeParse(await readJson(req, 1_000).catch(() => null));
-  if (!parsed.success) return Response.json({ status: "needs_confirmation" }, { status: 400 });
-  if (!allow(req, isAuthorised(req))) return Response.json({ error: "The demo is busy. Please try again in a minute." }, { status: 429 });
-  const { id } = await ctx.params;
-  const result = await startSwarm(id, true);
-  const status = result.status === "not_found" ? 404 : result.status === "unavailable" ? 503 : result.status === "busy" ? 429 : 200;
-  return Response.json(result, { status });
+/** The approval button on the web page: the person read this exact proposal and pressed "Call". */
+export async function POST(req: Request, { params }: RouteContext<"/api/calls/[id]/start">) {
+  if (!mayResearch(req)) return json({ error: "unauthorised" }, 401);
+  if (!allow(req, false)) return json({ error: "AIDaddy is busy, try again in a minute." }, 429);
+  if (!webCallsAvailable()) return json({ error: "Calls are switched off on this server." }, 503);
+  if (!Input.safeParse(await readJson(req, 1_000).catch(() => null)).success) return json({ error: "Confirm the call to start it." }, 400);
+  const result = await startDemoCall((await params).id, true, baseUrl(req));
+  // `next` is advice for the chat model; the page has its own words, so it is left out of the answer.
+  return json({ ...result, next: undefined }, result.status === "not_found" ? 404 : 200);
 }

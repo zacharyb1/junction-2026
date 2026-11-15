@@ -18,7 +18,7 @@ Issue #39. One of AIDaddy's three specialist desks. It takes two kinds of matter
    - **Went wrong:** `situation` = the person's words, then "What am I entitled to, how do I claim it, and by when?"; `country` = where the journey started (for a flight into the EU on an EU airline, the airline's country if the start is outside the EU); `scope` `official`.
    - **Papers** (visa, passport validity, travel with a child): a second call with `country` = the destination and `scope` `official`. Only when the household asks or the destination is outside the Schengen area.
 4. Post one message: "From the travel desk:", then up to 5 plan lines or options exactly as returned, citation numbers included, "N of M quotes checked on their pages", unverified items as "AIDaddy could not confirm this: …", and the case link. A price is given only as the page states it, with the words "as the page said when I read it".
-5. Update this desk's memory line, save "Open case <id>: <title>" as `life-event-butler` step 5 does, and offer next steps with `clarify`: Draft the claim (went wrong) or Compare two options (planning), Set reminders, Not now.
+5. Update this desk's memory line, save "Open case <id>: <title>" as `life-event-butler` step 5 does, and offer next steps with `clarify`: Compare two options (planning), Set reminders, Not now. For a trip that went wrong, include Draft the claim only when `life-event-butler` step 4 confirms a supported letter/email route. Drafting follows that skill's step 6; otherwise show the verified official procedure or route gap.
 
 ## Memory (Telegram only)
 

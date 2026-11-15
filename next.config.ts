@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  * the chat with AIDaddy records a voice note between two taps on its microphone button, and with the microphone off
  * the browser refused it before asking the visitor. The header belongs to the first page a visitor loads, and the
  * site's own links do not load a new document, so allowing it on the chat page alone still refused everyone who
- * arrived through a link. Only /chat ever asks for it.
+ * arrived through a link. Only /chat and the page where a demo call is answered (/call/line/...) ever ask for it.
  */
 const permissions = "camera=(), microphone=(self), geolocation=(), payment=(), usb=()";
 

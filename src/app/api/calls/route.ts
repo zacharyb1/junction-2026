@@ -1,30 +1,19 @@
-import { z } from "zod";
-import { isAuthorised, mayResearch, readJson } from "@/lib/cases";
-import { prepareSwarm, swarmConfiguration } from "@/lib/swarm-calls";
+import { mayResearch, readJson } from "@/lib/cases";
+import { DemoCallInput, prepareDemoCall, webCallsAvailable } from "@/lib/demo-calls";
 import { allow } from "@/lib/rate-limit";
 
-const Input = z.object({ task: z.string().trim().min(3).max(1200) });
-
-const json = (body: unknown, status: number) => Response.json(body, { status });
+const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "cache-control": "no-store" } });
 
 /**
- * Calls for quotes from the Get it done page: the same swarm as the bot's (src/lib/swarm-calls.ts), reached with the
- * demo's access instead of the server secret, so the page can put a household job to the team's test phones.
- *
- * Only the operator's list in SWARM_CALL_RECIPIENTS is ever called, never a company found on the web; the swarm's
- * hourly limit and one-start guard hold. GET says whether calls are set up; POST proposes and dials nobody.
+ * The web page's first step: write down what AIDaddy would say on the call. Nothing rings yet.
+ * The visitor reads the proposal and starts it with POST /api/calls/<id>/start.
  */
-export function GET(req: Request) {
-  if (!mayResearch(req)) return json({ error: "unauthorised" }, 401);
-  const { ready, recipients, maxCalls, recorded } = swarmConfiguration();
-  return json({ ready, recipients, maxCalls, recorded }, 200);
-}
-
 export async function POST(req: Request) {
   if (!mayResearch(req)) return json({ error: "unauthorised" }, 401);
-  const parsed = Input.safeParse(await readJson(req, 5_000).catch(() => null));
-  if (!parsed.success) return json({ error: "Say what the job is in 3 to 1,200 characters." }, 400);
-  if (!allow(req, isAuthorised(req))) return json({ error: "The demo is busy. Please try again in a minute." }, 429);
-  const result = await prepareSwarm({ task: parsed.data.task });
-  return json(result, result.status === "unavailable" ? 503 : result.status === "proposed" ? 201 : 200);
+  if (!allow(req, false)) return json({ error: "AIDaddy is busy, try again in a minute." }, 429);
+  if (!webCallsAvailable()) return json({ error: "Calls are switched off on this server." }, 503);
+  const parsed = DemoCallInput.safeParse(await readJson(req, 10_000).catch(() => null));
+  if (!parsed.success) return json({ error: "Describe the call in 3 to 1,200 characters. Preferences take up to 800." }, 400);
+  // `next` is advice for the chat model; the page has its own words, so it is left out of the answer.
+  return json({ ...(await prepareDemoCall(parsed.data)), next: undefined });
 }

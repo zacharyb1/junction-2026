@@ -161,10 +161,10 @@ def main():
     agent = AIAgent(
         provider="nvidia", base_url="https://integrate.api.nvidia.com/v1", api_key=os.environ["NVIDIA_API_KEY"],
         model=config["model"]["default"], enabled_toolsets=["skills", "memory", "clarify"] + (["casefile_fixture"] if calling or proactive else []),
-        max_iterations=9, quiet_mode=True, skip_context_files=True, load_soul_identity=True, skip_background_review=True,
+        max_iterations=9, quiet_mode=True, skip_context_files=False, load_soul_identity=True, skip_background_review=True,
         platform="telegram", chat_id="-100101", chat_type="group", user_id="111111", user_name="Test Person",
         clarify_callback=clarify if not calling else None, reasoning_config={"effort": "low"}, run_budget_seconds=120,
-        cwd=str(args.repo),
+        cwd=str(home),
     )
     if args.scenario == "routine":
         message = "AIDaddy, thanks, that weekly lunch menu check is finished."
@@ -183,6 +183,17 @@ def main():
         message = "AIDaddy, call and order my usual dinner." if args.scenario == "call" else "AIDaddy, call and arrange collection of my broken washing machine for Friday morning."
         history = []
         system = "This is the controlled test household's Telegram chat -100101. The phone tools are available for a demo call."
+    from agent.system_prompt import build_system_prompt
+    from rehearsal_prompt import verify_skill_prompt
+    expected_skills = {
+        name: next((args.repo / "hermes/skills").rglob(name + "/SKILL.md")).read_text()
+        for name in auto_load
+    }
+    built_prompt = build_system_prompt(agent, system_message=system)
+    loaded_result = getattr(agent, "_auto_load_skills_result", None)
+    skill_preflight = verify_skill_prompt(
+        built_prompt, expected_skills, list(loaded_result[1]) if loaded_result else [],
+    )
     started = time.monotonic()
     result = agent.run_conversation(message, system_message=system, conversation_history=history)
     turns = [result]
@@ -199,7 +210,8 @@ def main():
     active = list((home / "skills").rglob("SKILL.md"))
     replies = [r.get("final_response", "") for r in turns]
     tool_names = [[t.get("function", {}).get("name") for m in r.get("messages", []) for t in m.get("tool_calls", [])] for r in turns]
-    report = {"scenario": args.scenario, "seconds": round(time.monotonic() - started, 1), "replies": replies,
+    report = {"scenario": args.scenario, "skill_preflight": skill_preflight,
+              "seconds": round(time.monotonic() - started, 1), "replies": replies,
               "tools": tool_names, "tool_inputs": [[t.get("function", {}) for m in r.get("messages", []) for t in m.get("tool_calls", [])] for r in turns],
               "calls": calls, "questions": questions, "memory": memory,
               "pending_count": len(pending), "active_skill_count": len(active)}

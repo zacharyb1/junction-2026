@@ -3,9 +3,8 @@ import { z } from "zod";
 import { CaseInput, CasePatch } from "@/lib/case";
 import { baseUrl, isAuthorised, loadCase, publishCase, recheckCase, updateCase } from "@/lib/cases";
 import { findGifts, GiftInput } from "@/lib/engine/gifts";
-import { findOpportunities, HouseholdProfile } from "@/lib/engine/opportunities";
 import { EngineError, ResearchInput, researchCase } from "@/lib/engine/research";
-import { cancelSwarm, getSwarm, prepareSwarm, startSwarm, SwarmInput } from "@/lib/swarm-calls";
+import { DemoCallInput, getDemoCall, prepareDemoCall, startDemoCall } from "@/lib/demo-calls";
 
 export const maxDuration = 300;
 
@@ -20,6 +19,49 @@ const text = (value: unknown) => ({
  */
 function handlerFor(origin: string) {
   return createMcpHandler((server) => {
+    server.registerTool(
+      "prepare_demo_call",
+      {
+        title: "Prepare a demo phone call",
+        description: "Prepare a real voice call that AIDaddy makes for the person to the operator's configured test recipient, for any everyday task or important update. " +
+          "Purchases, bookings and payments are role-play. Pass relevant preferences from this chat's memory or conversation. " +
+          "This does not dial. Show the returned proposal and wait for the person's next reply confirming it; do not start in the same turn. " +
+          "If unavailable, report the missing configuration instead of pretending to call.",
+        inputSchema: DemoCallInput,
+      },
+      async (input) => text(await prepareDemoCall(input)),
+    );
+    server.registerTool(
+      "start_demo_call",
+      {
+        title: "Start the confirmed demo call",
+        description: "Use only after the person has replied Yes to the exact prepare_demo_call proposal in a subsequent turn. " +
+          "An initial request to call is not confirmation. For changes, prepare and confirm a new proposal. " +
+          "Dials only the configured test phone; purchases/payments remain simulated. Never retry an unknown result with a new proposal. " +
+          "Where no phone number is set up the result is `ringing` with an answerUrl: the test line rings in a browser. " +
+          "Post that link and say that whoever opens it and taps Answer talks to AIDaddy.",
+        inputSchema: z.object({ id: z.string(), confirmed: z.boolean().describe("True only after the person confirmed this exact proposal in their next reply.") }),
+      },
+      async ({ id, confirmed }) => text(await startDemoCall(id, confirmed, origin)),
+    );
+    server.registerTool(
+      "get_demo_call",
+      {
+        title: "Read a demo call result",
+        description: "Read the real calling provider's status and conversation summary. After starting, acknowledge dialing then call this with wait_seconds=60. " +
+          "Report finished only when returned; always explain that any purchase or payment was simulated. If still ringing or in progress, offer to check again.",
+        inputSchema: z.object({ id: z.string(), wait_seconds: z.number().int().min(0).max(60).default(0) }),
+      },
+      async ({ id, wait_seconds }) => {
+        const until = Date.now() + wait_seconds * 1000;
+        let result = await getDemoCall(id);
+        while ((result.status === "in_progress" || result.status === "ringing") && Date.now() + 3000 < until) {
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          result = await getDemoCall(id);
+        }
+        return text(result);
+      },
+    );
     server.registerTool(
       "research_case",
       {
@@ -63,28 +105,6 @@ function handlerFor(origin: string) {
         } catch (error) {
           const message = error instanceof Error ? error.message : "product search failed";
           return { ...text(`find_products failed: ${message}. Tell the user you could not find products right now.`), isError: true };
-        }
-      },
-    );
-
-    server.registerTool(
-      "find_opportunities",
-      {
-        title: "Find hidden opportunities for a household",
-        description:
-          "Find money, support, free tickets, events and discounts a household did not think to look for, from what is " +
-          "known about it: `city`, `members` (one line each, with ages), `situation` (what is going on: a lost job, a " +
-          "baby on the way, renting) and `interests` (jazz, bouldering). Runs several searches at once and keeps only " +
-          "findings whose sentence is on the page it cites. Returns title, value, why it fits, deadline, the quoted " +
-          "sentence and the URL. Typically 10 to 30 seconds. Use it when the household changes, or to check in unasked.",
-        inputSchema: HouseholdProfile,
-      },
-      async (input) => {
-        try {
-          return text(await findOpportunities(input));
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "opportunity scan failed";
-          return { ...text(`find_opportunities failed: ${message}.`), isError: true };
         }
       },
     );
@@ -145,55 +165,6 @@ function handlerFor(origin: string) {
           ? text({ id, changed: result.changed, unreachable: result.unreachable, url: `${origin}/c/${id}` })
           : text(`No case with id ${id}.`);
       },
-    );
-
-    server.registerTool(
-      "prepare_swarm_call",
-      {
-        title: "Prepare calls to several recipients at once",
-        description:
-          "Prepare one task to be asked of several people at the same time by phone, so their answers can be compared " +
-          "(\"ask the three test shops whether they have it in stock\"). AIDaddy's voice agent makes every call. " +
-          "Recipients come only from the operator's list; pass their names in `recipients` or omit it to call everyone. " +
-          "Nothing rings yet. Show the returned task, preferences and recipients, say purchases and payments are simulated, " +
-          "and wait for a new Yes before start_swarm_call.",
-        inputSchema: SwarmInput,
-      },
-      async (input) => text(await prepareSwarm(input)),
-    );
-
-    server.registerTool(
-      "start_swarm_call",
-      {
-        title: "Start a confirmed swarm of calls",
-        description:
-          "Ring every recipient of a prepared swarm at once. Only after the person confirmed that exact proposal in a new " +
-          "message; set `confirmed` to true. A proposal starts at most once: never call this again to retry.",
-        inputSchema: z.object({ id: z.string(), confirmed: z.boolean() }),
-      },
-      async ({ id, confirmed }) => text(await startSwarm(id, confirmed)),
-    );
-
-    server.registerTool(
-      "get_swarm_call",
-      {
-        title: "Read a swarm's results",
-        description:
-          "Progress of a swarm of calls and, when every call ended, each recipient's answer side by side in `comparison`. " +
-          "Results come from the calls themselves. Set `transcript` for what was said.",
-        inputSchema: z.object({ id: z.string(), transcript: z.boolean().optional() }),
-      },
-      async ({ id, transcript }) => text(await getSwarm(id, { transcript })),
-    );
-
-    server.registerTool(
-      "cancel_swarm_call",
-      {
-        title: "Cancel a swarm of calls",
-        description: "Cancel a prepared swarm, or stop the calls of a running one that have not ended. Use when the person says stop.",
-        inputSchema: z.object({ id: z.string() }),
-      },
-      async ({ id }) => text(await cancelSwarm(id)),
     );
   });
 }

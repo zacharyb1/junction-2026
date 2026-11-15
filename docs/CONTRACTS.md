@@ -52,9 +52,11 @@ On the first `research_case`, `find_products` or `case_recheck` call in a Telegr
 
 The notice uses Finnish when the tool supplies `language: fi`, otherwise English. Product searches and source rechecks currently use that English fallback because their tool schemas carry no language field; the model's result still follows the conversation language.
 
-The sourced plan or product results are the completion message, posted before `clarify` offers next actions. Telegram interim messages stay enabled so the result appears before a button prompt waits for an answer. A failed tool result produces an explicit failure, not a success notice. Drafts can be prepared autonomously; sending, filing, booking and payment still require the existing approval boundary.
+The sourced plan or product results are the completion message, posted before `clarify` offers next actions. Telegram interim messages stay enabled so the result appears before a button prompt waits for an answer. A failed tool result produces an explicit failure, not a success notice. Drafts can be prepared autonomously; sending, filing, booking and payment still require the existing approval boundary. The bot's submission-route check in `life-event-butler` governs notices, applications and claims: a letter/email requires evidence that written correspondence is accepted. A required official form or portal is linked instead. Optional preparation notes use explicit `kind: checklist`, which creates no send proposal; an unknown route is reported as a gap. This is a model instruction, not an Engine guarantee about a document's legal validity.
 
 The live acceptance procedure is [Telegram demo](TELEGRAM_DEMO.md). Isolated model or container checks do not establish Telegram delivery.
+
+After a successful `research_case`, a Telegram-only guard holds the returned plan lines and Case URL for that session/turn. It rejects `clarify` until those lines and that exact URL appear in visible assistant text before an accepted tool call. For the configured NVIDIA model, the synchronous response hook and matching API-request ID establish that the text reached Hermes' interim-message path; reasoning text, tool arguments, discarded responses and other turns do not count. Hermes attempts to flush its queued interim text before showing clarification buttons. This enforces emitted-message ordering with interim messages enabled, not network delivery. Providers with separate structured commentary need their own validation before this guarantee is extended to them. The guard sends no duplicate result. Its process-local cache is bounded to 1,024 turns for one hour; unrelated clarification remains unaffected, and failed research creates no new guard.
 
 ## `POST /api/research` and MCP tool `research_case`
 
@@ -75,7 +77,7 @@ Request body, same fields for both:
 - `situation` required, 10 to 1500 characters, in the user's own words.
 - `country` required: ISO 3166-1 alpha-2 code or a country name in English, Finnish or Swedish. An unknown country returns 400, it is never guessed.
 - `region`, `language` (default `en`), `household`, `document` optional.
-- `depth`: `fast` (default, about 6 to 12 seconds) or `deep` (a fourth question and Exa deep search, slower). `deep` needs the bot secret. With the public demo code the request runs as `fast`.
+- `depth`: `fast` (default, about 6 to 12 seconds), `deep` (a fourth question and Exa deep search, slower) or `agent` (one Exa Agent run at effort `low` in place of the separate searches, about 30 to 60 seconds; if it fails or proposes fewer than three steps, the usual searches run as well). `deep` needs the bot secret: with the public demo code a `deep` request runs as `fast`. `agent` costs about the same as `fast`, so the public demo code may use it. Every mode ends in the same page check.
 - A step in the stored case can carry `conflict`: a sentence naming two different figures and their citation numbers.
 - Write `situation` in English when you can. Finnish and other languages work too.
 
@@ -121,6 +123,8 @@ Response `200`:
 
 - `plan`: at most 5 short lines, ready to paste into a chat message. Numbers in brackets are citation numbers on the case page.
 - Lines whose quote failed verification are not in `plan`. They appear under `unverified`.
+- Quote verification establishes that the words were on the page, not that every rule applies to the family. Research extraction receives the full situation and household. A separate, conservative prerequisite check recognises English current-residence and arrival wording in claims and source titles: it excludes unsupported first-arrival processes from an ordinary move when the supplied facts establish current residence in that same country. Mixed domestic/international guidance and explicit address-change rules remain usable. It does not infer a city's country, citizenship, permanent residence or benefit eligibility. International/return moves, explicit immigration work and unrecognised wording require the ordinary extraction/review path; this is not a general eligibility check. If a claim is discarded, its extracted summary is replaced with a neutral description of the supplied situation.
+- A time period enters Money only when its verified sentence supports an entitlement, payment/leave duration, or someone else's duty. Unrelated photo-age and document-validity periods stay out of Money; quote verification and same-page numeric support still apply.
 - `evidence`: the sentence behind every citation number of the case, so a client can show the quote under the plan line
   it supports without loading the case. `quote` is the stored sentence, in the page's own words. `sourceType` is `official`
   or `secondary`. `verification` and `checkedVia` are the marks described under "Case tools"; `checkedVia` is absent
@@ -136,6 +140,7 @@ name as `type`. `ms` is the time since the research started.
 |---|---|---|
 | `stage` | `{ "name": "plan" \| "search" \| "read" \| "verify" \| "publish", "detail": "…", "ms": 2 }` | when a stage starts; the same lines are stored as the research trail |
 | `search` | `{ "focus": "money and entitlements", "web": "official" \| "open", "status": "running" \| "done" \| "failed", "steps": 5, "pages": 4, "tookMs": 6118, "ms": 6130 }` | when one Exa search starts, and again when it returns or fails: `steps` it proposed, distinct `pages` those steps cite, and how long it took. The counts are 0 unless the status is `done` |
+| `glance` | `{ "pages": [{ "url": "…", "title": "…", "official": true }], "tookMs": 469, "ms": 471 }` | at most once, usually within a second: up to five pages from one Exa `lite` search on the same sites, sent while the research is still running. Pointers for the person waiting; nothing from them enters the plan. Clients that do not know the event ignore it |
 | `page` | `{ "url": "…", "title": "…", "official": true, "via": "live" \| "oxylabs" \| "exa" \| "none", "ms": 7185 }` | once per cited page, as soon as it has been read. `via` is the most direct reader that opened it: our own request, a live read through Oxylabs, Exa's copy, or `none` when nothing could open it |
 | `source` | `{ "url": "…", "title": "…", "official": true }` | once per cited page after all pages are read (kept for older clients; `page` says more) |
 | `verified` | `{ "verified": 6, "total": 6, "ms": 8884 }` | once the case is stored: how many quotes were confirmed on their pages |
@@ -238,6 +243,30 @@ Response `200`:
 - `delivery` is the page's own sentence. `arrivesBy` is worked out from it (working days skip weekends) and is absent when the sentence gives no number of days. `late` is absent when either date is unknown.
 - `image` is the product page's own preview image from the same Exa result (https only), absent when the page has none. `GET /api/gifts/image?url=<product url>` returns it for a product the search found (no access code: it only reads what the search stored, in memory until a restart); the `/chat` page shows it above that product link.
 - Products that arrive in time come first. The bot never orders or pays: `url` is for the person to open.
+
+## Demo call tools
+
+AIDaddy makes a confirmed call for the person through an ElevenLabs agent. The call goes to one operator-configured test phone (Twilio), or, where no phone number is set up, rings at a web address and is answered in a browser. It does not place real orders or move money. [Setup and rehearsal](DEMO_CALLS.md).
+
+Authenticated MCP tools:
+
+| Tool | Input | Returns |
+|---|---|---|
+| `prepare_demo_call` | `{ task, preferences? }`; task max 1,200 characters, preferences max 800 | A persisted `proposed` call with id, `line` (`phone` or `browser`), exact task/preferences, recipient label, phone ending (phone line) and demo notice; or `unavailable` with missing configuration. Does not dial. |
+| `start_demo_call` | `{ id, confirmed }` | Starts only a confirmed proposal for the currently configured line. Phone line: `in_progress`, `failed` or `unknown`. Browser line: `ringing` with `answerUrl`, the address where the call is answered. May return `needs_confirmation`, `needs_new_proposal`, `not_found`, `already_started`, `busy` (the hour's calls are used up; the proposal stays valid) or `unavailable`. |
+| `get_demo_call` | `{ id, wait_seconds? }`; 0–60, default 0 | Stored status, optionally waiting for the provider's summary. Terminal states are `finished` or `failed`, with provider `outcome` (`success`, `failure`, `unknown`) and summary when available. A finished call is not proof of a real purchase. |
+
+The `/call` page uses REST equivalents. They are open to the demo's visitors (`x-demo-code`, or everyone where `DEMO_OPEN=1`) on the browser line, and on the phone line only with `DEMO_CALLS_WEB=1`; otherwise they answer `503`.
+
+| Route | Does |
+|---|---|
+| `POST /api/calls` `{ task, preferences? }` | `prepare_demo_call`. |
+| `POST /api/calls/<id>/start` `{ "confirmed": true }` | `start_demo_call`. The visitor's button press is the confirmation. |
+| `GET /api/calls/<id>` | `get_demo_call`, plus `transcript` (`[{ speaker: "aidaddy" \| "recipient", text }]`) once the call has ended. The id is the key. |
+| `GET /api/calls/line/<answerId>` | For the answering page: `{ status, recipient, notice, maxSeconds }`. Never the task, preferences or result. |
+| `POST /api/calls/line/<answerId>` | Answers a ringing call once: adds `signedUrl` (a one-time ElevenLabs conversation link) and `dynamicVariables` for the agent. Later calls return the state without a link. |
+
+Confirmation in the chat is conversational: the runtime must show the exact proposal and wait for a new Yes before passing `confirmed: true`. It is not an independently authenticated human approval endpoint. The full phone number and provider conversation ID stay in private `.data/demo-calls`. An exclusive persisted claim prevents starting the same proposal twice, and a second one prevents answering it twice; an uncertain provider response is never automatically redialed. Setup remains opt-in, and web chat tools require the additional `KAVERI_DEMO_CALLS=1` setting.
 
 ## Case tools
 

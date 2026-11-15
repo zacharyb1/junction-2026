@@ -15,7 +15,7 @@ Review [the event rules](PLAYBOOK.md#rules-that-disqualify) before submission: p
 - [ ] Source code link (GitHub repo, MIT license file present). The repo is private while we build: make it public, or add the organizers as collaborators, before setting the submission to FINAL.
 - [ ] Source code publicity answered
 - [ ] "Do you want to be credited?" answered
-- [ ] Pitch deck (PDF)
+- [ ] Pitch deck (PDF): [pitch/aidaddy-pitch-deck.pdf](pitch/aidaddy-pitch-deck.pdf). Name, punchline, description and technologies to paste: [SUBMISSION_TEXT.md](SUBMISSION_TEXT.md)
 - [ ] Phone numbers of all team members
 - [ ] Discord usernames
 

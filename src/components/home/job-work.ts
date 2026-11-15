@@ -2,7 +2,7 @@
 
 /**
  * The two real halves of Get it done on /desk: finding local companies for a job on their own pages (/api/helpers),
- * and a round of phone calls to the team's test phones that stand in for them (/api/calls, a swarm). Nothing here is
+ * and a round of phone calls to the team's test phones that stand in for them (/api/quote-calls, a swarm). Nothing here is
  * simulated; what a test phone's person says on the call is what comes back.
  */
 
@@ -72,7 +72,7 @@ export function useCallRound(code: string) {
   const propose = useCallback(
     async (task: string) => {
       setRound({ ...IDLE, phase: "proposing" });
-      const { status, body } = await post("/api/calls", code, { task });
+      const { status, body } = await post("/api/quote-calls", code, { task });
       if (status === 201 && typeof body.id === "string") {
         id.current = body.id;
         setRound({ ...IDLE, phase: "proposed", recipients: (body.recipients as CallRound["recipients"]) ?? [], recorded: Boolean(body.recorded) });
@@ -86,7 +86,7 @@ export function useCallRound(code: string) {
 
   const confirm = useCallback(async () => {
     setRound((r) => ({ ...r, phase: "starting" }));
-    const { status, body } = await post(`/api/calls/${id.current}/start`, code, { confirmed: true });
+    const { status, body } = await post(`/api/quote-calls/${id.current}/start`, code, { confirmed: true });
     if (status === 200 && (body.status === "calling" || body.status === "starting" || body.status === "already_started")) {
       setRound((r) => ({ ...r, phase: "calling" }));
       return;
@@ -100,7 +100,7 @@ export function useCallRound(code: string) {
     if (round.phase !== "calling") return;
     let gone = false;
     const read = async () => {
-      const res = await fetch(`/api/calls/${id.current}`, { headers: { "x-demo-code": code } }).catch(() => null);
+      const res = await fetch(`/api/quote-calls/${id.current}`, { headers: { "x-demo-code": code } }).catch(() => null);
       const body = ((await res?.json().catch(() => null)) ?? {}) as Json & {
         status?: string;
         calls?: CallProgress[];

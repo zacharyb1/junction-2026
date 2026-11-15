@@ -17,6 +17,7 @@
     "@ai-sdk/react": "^4.0.176",
     "@ai-sdk/xai": "^5.0.45",
     "@base-ui/react": "^1.9.0",
+    "@elevenlabs/client": "^1.36.1",
     "@modelcontextprotocol/server": "^2.4.0",
     "@vercel/blob": "^2.9.0",
     "ai": "^7.0.172",
