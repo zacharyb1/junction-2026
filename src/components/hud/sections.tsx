@@ -45,7 +45,7 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
                 Watch it work
               </a>
               <SiteLink href="/try" className="hud-btn">
-                Try it live
+                Try AIDaddy without setup
               </SiteLink>
               {botUrl ? (
                 <a href={botUrl} className="hud-btn" target="_blank" rel="noopener noreferrer">
@@ -417,7 +417,7 @@ export function Start({ botUrl, caseHref }: { botUrl: string | null; caseHref: s
             </p>
             <div className="hud-actions">
               <SiteLink href="/try" className="hud-btn hud-btn--primary">
-                Try it live
+                Try AIDaddy without setup
               </SiteLink>
               {botUrl ? (
                 <a href={botUrl} className="hud-btn" target="_blank" rel="noopener noreferrer">

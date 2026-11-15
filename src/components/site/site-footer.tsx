@@ -18,7 +18,7 @@ export function SiteFooter() {
             <h2 id="footer-use">Use it</h2>
             <ul>
               <li>
-                <SiteLink href="/try">Try it live</SiteLink>
+                <SiteLink href="/try">Try AIDaddy without setup</SiteLink>
               </li>
               <li>
                 <SiteLink href="/chat">Talk to AIDaddy</SiteLink>
