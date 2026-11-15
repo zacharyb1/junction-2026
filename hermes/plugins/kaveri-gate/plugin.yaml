@@ -1,6 +1,7 @@
 name: kaveri-gate
-version: 0.1.0
-description: "AIDaddy privacy gate: a small local Gemma decides whether a group message may wake the cloud model. Small talk is dropped on this machine."
+version: 0.2.0
+description: "AIDaddy Telegram gate: wake on relevant messages, carry bounded recent chat context into the next trigger, and announce research in its originating conversation."
 author: "AIDaddy team"
 provides_hooks:
   - pre_gateway_dispatch
+  - pre_tool_call

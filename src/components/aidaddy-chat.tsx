@@ -355,17 +355,29 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
   const [transcribing, setTranscribing] = useState(false);
   const context = useRef<AudioContext | null>(null);
   const source = useRef<AudioBufferSourceNode | null>(null);
+  const stopPlayback = useRef<(() => void) | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
   const finished = useRef<((text: string) => void) | null>(null);
+  const mounted = useRef(true);
+  const speechRequest = useRef<AbortController | null>(null);
+  const transcriptionRequest = useRef<AbortController | null>(null);
 
-  useEffect(
-    () => () => {
-      source.current?.stop();
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      wanted.current = false;
+      speechRequest.current?.abort();
+      transcriptionRequest.current?.abort();
+      stopPlayback.current?.();
+      if (recorder.current?.state === "recording") recorder.current.stop();
       recorder.current?.stream.getTracks().forEach((track) => track.stop());
+      finished.current?.("");
+      finished.current = null;
       void context.current?.close();
-    },
-    [],
-  );
+      context.current = null;
+    };
+  }, []);
 
   function audio(): AudioContext {
     // Created inside a tap, so phones allow it to play later.
@@ -375,8 +387,12 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
 
   function toggleSpeech() {
     if (enabled) {
-      source.current?.stop();
       wanted.current = false;
+      speechRequest.current?.abort();
+      speechRequest.current = null;
+      stopPlayback.current?.();
+      setSpeaking(false);
+      setLevel(0);
       setEnabled(false);
       return;
     }
@@ -386,42 +402,68 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
   }
 
   async function speak(text: string) {
-    if (!wanted.current || !text.trim()) return;
+    if (!mounted.current || !wanted.current || !text.trim()) return;
+    // Muting, leaving the chat or requesting another reply makes this request stale,
+    // even when the browser has already received its response and is decoding audio.
+    speechRequest.current?.abort();
+    const request = new AbortController();
+    speechRequest.current = request;
+    const current = () => mounted.current && wanted.current && speechRequest.current === request && !request.signal.aborted;
     try {
       const res = await fetch("/api/aidaddy/speak", {
         method: "POST",
         headers: { "content-type": "application/json", "x-demo-code": code },
         body: JSON.stringify({ text }),
+        signal: request.signal,
       });
+      if (!current()) return;
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
+        if (!current()) return;
         if (res.status === 401) onError(BAD_CODE, true);
         else onError(typeof body.error === "string" ? body.error : "AIDaddy could not read that aloud.");
         return;
       }
       const ctx = audio();
       const buffer = await ctx.decodeAudioData(await res.arrayBuffer());
+      if (!current()) return;
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 512;
       const node = ctx.createBufferSource();
       node.buffer = buffer;
       node.connect(analyser);
       analyser.connect(ctx.destination);
-      source.current?.stop();
+      stopPlayback.current?.();
       source.current = node;
       const samples = new Uint8Array(analyser.fftSize);
       let frame = 0;
       const tick = () => {
+        if (!mounted.current || source.current !== node) return;
         analyser.getByteTimeDomainData(samples);
         let sum = 0;
         for (const value of samples) sum += ((value - 128) / 128) ** 2;
         setLevel(Math.min(1, Math.sqrt(sum / samples.length) * 4));
         frame = requestAnimationFrame(tick);
       };
-      node.onended = () => {
+      const disconnect = () => {
         cancelAnimationFrame(frame);
+        node.disconnect();
+        analyser.disconnect();
+        if (stopPlayback.current === stop) stopPlayback.current = null;
+      };
+      const stop = () => {
+        // Closing AudioContext can suppress onended. Release the animation and
+        // nodes here rather than relying on that event during navigation.
+        node.onended = null;
+        node.stop();
+        disconnect();
+        if (source.current === node) source.current = null;
+      };
+      stopPlayback.current = stop;
+      node.onended = () => {
+        disconnect();
         // A reply that was cut off by the next one ends after the next one has started: that one is still speaking.
-        if (source.current !== node) return;
+        if (!mounted.current || source.current !== node) return;
         source.current = null;
         setLevel(0);
         setSpeaking(false);
@@ -430,8 +472,11 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
       node.start();
       tick();
     } catch {
+      if (!current()) return;
       setSpeaking(false);
       onError("AIDaddy could not read that aloud.");
+    } finally {
+      if (speechRequest.current === request) speechRequest.current = null;
     }
   }
 
@@ -457,7 +502,16 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
         } catch {
           starting.current = false;
           finished.current = null;
-          onError("The microphone is blocked. Allow it in the browser, or type instead.");
+          if (mounted.current) onError("The microphone is blocked. Allow it in the browser, or type instead.");
+          resolve("");
+          return;
+        }
+        // Permission can be granted after a client-side navigation. Release that
+        // stream immediately instead of starting a recording on the next page.
+        if (!mounted.current) {
+          stream.getTracks().forEach((track) => track.stop());
+          starting.current = false;
+          finished.current = null;
           resolve("");
           return;
         }
@@ -480,16 +534,25 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
           window.clearTimeout(timer);
           stream.getTracks().forEach((track) => track.stop());
           recorder.current = null;
-          setRecording(false);
           const done = finished.current ?? (() => {});
           finished.current = null;
+          if (!mounted.current) return done("");
+          setRecording(false);
           const type = (rec.mimeType || "audio/webm").split(";")[0];
           const blob = new Blob(chunks, { type });
           if (!blob.size) return done("");
           setTranscribing(true);
+          const request = new AbortController();
+          transcriptionRequest.current = request;
           try {
-            const res = await fetch("/api/aidaddy/listen", { method: "POST", headers: { "content-type": type, "x-demo-code": code }, body: blob });
+            const res = await fetch("/api/aidaddy/listen", {
+              method: "POST",
+              headers: { "content-type": type, "x-demo-code": code },
+              body: blob,
+              signal: request.signal,
+            });
             const body = await res.json().catch(() => ({}));
+            if (!mounted.current || request.signal.aborted) return done("");
             if (!res.ok || typeof body.text !== "string") {
               if (res.status === 401) onError(BAD_CODE, true);
               else onError(typeof body.error === "string" ? body.error : "AIDaddy could not hear that. Please type it instead.");
@@ -498,10 +561,11 @@ function useVoice(code: string, onError: (message: string, refused?: boolean) =>
               done(body.text);
             }
           } catch {
-            onError("The connection dropped. Please type your message instead.");
+            if (mounted.current && !request.signal.aborted) onError("The connection dropped. Please type your message instead.");
             done("");
           } finally {
-            setTranscribing(false);
+            if (transcriptionRequest.current === request) transcriptionRequest.current = null;
+            if (mounted.current) setTranscribing(false);
           }
         };
         recorder.current = rec;

@@ -57,7 +57,7 @@ flowchart TD
     Bot --> Followup[Approved drafts and Hermes reminders]
 ```
 
-The gate filters group text before a cloud call. Direct messages, addressed messages and media take rule-based wake paths; an active conversation also has a three-minute open window. This means neither all small talk nor all photos stay local. The measured limits are in the handover.
+The gate filters group text before a cloud call. Authorized Telegram messages can wait in a small recent-context buffer for the same chat and topic; the next trigger carries those earlier facts into the conversation so the family need not repeat them. Direct messages, addressed messages and media take rule-based wake paths; an active topic also has a three-minute open window. This means neither all small talk nor all photos stay local. The runtime posts a start notice for research, then the bot posts its sourced result before offering next actions. See [the Telegram contract](docs/CONTRACTS.md#telegram-context-and-work-notices) and [the live demo procedure](docs/TELEGRAM_DEMO.md).
 
 | Part / tool | Role and code |
 |---|---|
@@ -76,7 +76,7 @@ The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are 
 
 ### The site, page by page
 
-AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page except `/reading` is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try it live, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
+AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page except `/reading` is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try AIDaddy without setup, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
 
 | Page | What a visitor gets | What it is |
 |---|---|---|
@@ -84,7 +84,8 @@ AIDaddy is both the product and the butler, one thing with one name. It sits in 
 | `/try` | The research form: describe what happened and get a plan with sources. Open to everyone on the server (`DEMO_OPEN=1`), rate limited; elsewhere it needs the access code. | Live. |
 | `/c/[id]` | The case file: steps, deadlines, quotes, drafts and the log of what AIDaddy did, with the click that approves. | Live. A case exists only in the store it was researched into. |
 | `/chat` | A chat with AIDaddy by text or voice. Open like `/try`; needs the web-only Hermes instance. | Live on the server. |
-| `/setup` | What AIDaddy may follow: the Telegram chat today, the phone and the browser as concepts. | Mockup. |
+| `/setup` | What AIDaddy may follow: the Telegram chat, the microphone of this device, and the browser. | Telegram and listening are live; the browser extension is built but not published, so its switch connects nothing. |
+| `/listen` | The listening post: a page left open on a phone or laptop. It hears the room through the browser's speech-to-text, keeps small talk on the device, researches a life event on its own and comes back with a call (a deadline or an urgent matter) or a ping. | Live in Chrome, Edge and Safari, while the page is open and on screen. The call rings on that device; it cannot ring a phone number. |
 | `/demo` | The list of replays. | Index page. |
 | `/demo/chat`, `/demo/browser`, `/demo/talk`, `/demo/calendar` | Scripted replays built from real case files. Add `?loop=1` to repeat one without the site's header and footer on the screen at the table, or `?bare=1` to play it once that way for a recording. | Scripted replays. The browser, kitchen-table and calendar scenes show concepts. |
 | `/autopilot` | A fixed script of specialist agents with one live check through the Engine. | Scripted demo. |

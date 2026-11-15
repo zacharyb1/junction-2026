@@ -2,8 +2,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Core } from "@/components/hud/core";
 import type { PlanRow } from "@/components/hud/data";
+import { HearPlan } from "@/components/hud/hear-plan";
 import type { Scorecard } from "@/components/landing/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
+import planAudio from "@/data/plan-audio.json";
 
 const oneDecimal = (ms: number) => (ms / 1000).toFixed(1);
 
@@ -41,11 +43,11 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
               official page.
             </p>
             <div className="hud-actions">
-              <a href="#research" className="hud-btn hud-btn--primary">
-                Watch it work
-              </a>
+              <SiteLink href="/setup" className="hud-btn hud-btn--primary">
+                Set up AIDaddy
+              </SiteLink>
               <SiteLink href="/try" className="hud-btn">
-                Try it live
+                Try AIDaddy without setup
               </SiteLink>
               {botUrl ? (
                 <a href={botUrl} className="hud-btn" target="_blank" rel="noopener noreferrer">
@@ -202,6 +204,8 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
           Tap a number: the official page opens at the quoted sentence.{" "}
           <Link href={caseHref}>Open the full case file for this run →</Link>
         </p>
+        {/* The narration belongs to one case. After a new recording it is not offered until it is rendered again. */}
+        {caseHref === `/c/${planAudio.caseId}` && <HearPlan src={planAudio.file} seconds={planAudio.seconds} />}
       </div>
       <ul className="hud-rules">
         {RULES.map((rule) => (
@@ -244,10 +248,13 @@ const PLACES: Place[] = [
     links: [{ href: "/demo/browser", label: "Watch the replay", of: "the browser" }],
   },
   {
-    status: "Concept",
+    status: "Live",
     name: "At the kitchen table",
-    text: "The phone lies on the table. Say \"AIDaddy\", and it looks things up while you keep talking. It cannot listen yet.",
-    links: [{ href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" }],
+    text: "A phone or a laptop lies on the table with the listening page open. It hears a life event, researches it on its own, and comes back with a call or a ping. It listens only while that page is open.",
+    links: [
+      { href: "/listen", label: "Start listening" },
+      { href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" },
+    ],
   },
   {
     status: "Concept",
@@ -264,7 +271,7 @@ const PLACES: Place[] = [
   {
     status: "Concept",
     name: "What it may follow",
-    text: "You choose what AIDaddy may read or hear. A mockup of the setup screen: of its three channels, only Telegram works today.",
+    text: "You choose what AIDaddy may read or hear. Of the setup screen's three channels, Telegram and listening on this device work today.",
     links: [{ href: "/setup", label: "Open the setup" }],
   },
 ];
@@ -417,7 +424,7 @@ export function Start({ botUrl, caseHref }: { botUrl: string | null; caseHref: s
             </p>
             <div className="hud-actions">
               <SiteLink href="/try" className="hud-btn hud-btn--primary">
-                Try it live
+                Try AIDaddy without setup
               </SiteLink>
               {botUrl ? (
                 <a href={botUrl} className="hud-btn" target="_blank" rel="noopener noreferrer">

@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Case, type Evidence, type Step, verifiedCount } from "@/lib/case";
 import { type Labels, labels, langOf } from "@/lib/i18n";
+import { spokenDelivery } from "@/lib/speech";
 import { loadCase } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
@@ -303,7 +304,13 @@ function Header({ c, t }: { c: Case; t: Labels }) {
       <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{c.title}</h1>
       <p className="leading-relaxed text-muted-foreground">{c.summary}</p>
       {process.env.ELEVENLABS_API_KEY && (
-        <ListenButton src={`/api/cases/${c.id}/audio`} label={t.listen} loadingLabel={t.listenLoading} errorLabel={t.listenError} />
+        <ListenButton
+          src={`/api/cases/${c.id}/audio`}
+          label={t.listen}
+          loadingLabel={t.listenLoading}
+          errorLabel={t.listenError}
+          note={{ plain: undefined, gentle: t.listenGentle, bright: t.listenBright }[spokenDelivery(c)]}
+        />
       )}
       <dl className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
         {[

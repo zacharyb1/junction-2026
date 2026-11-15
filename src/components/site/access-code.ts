@@ -20,7 +20,7 @@ function current(): string {
 /**
  * The demo's access code, as this browser tab knows it.
  *
- * The QR at the table opens one page with ?code=...; /try, /chat and /autopilot read the code from their address.
+ * The QR at the table opens one page with ?code=...; /try, /chat, /autopilot and /listen read the code from their address.
  * The tab remembers it, so a link in the header still carries it after a visit to a page that had no use for it.
  * It is the public demo code, not a secret. Empty on the server and before the script loads.
  */
@@ -38,7 +38,7 @@ export function useAccessCode(): string {
 }
 
 /** The pages that read ?code=... from their address. */
-const TAKES_CODE = /^\/(try|chat|autopilot)(?=$|[/?#])/;
+const TAKES_CODE = /^\/(try|chat|autopilot|listen)(?=$|[/?#])/;
 
 /** Adds the access code to a site path that reads one. Every other address comes back unchanged. */
 export function withCode(href: string, code: string): string {

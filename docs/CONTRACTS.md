@@ -42,6 +42,20 @@ other sites never see it), `X-Frame-Options: DENY` with `Content-Security-Policy
 `Permissions-Policy` that turns off camera, location, payment and USB and allows the microphone to the site's own
 pages only, because `/chat` records voice notes (`next.config.ts`).
 
+## Telegram context and work notices
+
+The `kaveri-gate` plugin runs before Hermes dispatch. It uses the pinned gateway's authorization check before collecting Telegram group text. Pending context is separate for each platform, profile, chat and topic. It holds at most eight messages, 4,000 text characters total, 1,000 per message, for 30 minutes, across at most 128 scopes. Bot messages, internal events and commands are excluded.
+
+When a message wakes the bot, earlier pending text enters Hermes through its native `channel_context` field as quoted background. The triggering text, sender and approval routing stay unchanged. Current corrections take precedence; quoted background never grants approval. The pending buffer is in process memory only; once forwarded, its contents become part of normal Hermes conversation history. `/new` and `/reset` clear pending context for that topic. “Forget everything” clears pending context across that chat's topics and reaches the bot to remove labelled household memory and reminders. These operations leave other chats alone.
+
+On the first `research_case`, `find_products` or `case_recheck` call in a Telegram turn, the plugin attempts one short start notice through Hermes' session-bound `post_message` API. It never selects a different recipient. Delivery is best effort: a failed or slow Telegram send does not prevent research, and an uncertain send is not retried. Web/CLI calls do not get this notice.
+
+The notice uses Finnish when the tool supplies `language: fi`, otherwise English. Product searches and source rechecks currently use that English fallback because their tool schemas carry no language field; the model's result still follows the conversation language.
+
+The sourced plan or product results are the completion message, posted before `clarify` offers next actions. Telegram interim messages stay enabled so the result appears before a button prompt waits for an answer. A failed tool result produces an explicit failure, not a success notice. Drafts can be prepared autonomously; sending, filing, booking and payment still require the existing approval boundary.
+
+The live acceptance procedure is [Telegram demo](TELEGRAM_DEMO.md). Isolated model or container checks do not establish Telegram delivery.
+
 ## `POST /api/research` and MCP tool `research_case`
 
 Request body, same fields for both:
@@ -321,10 +335,22 @@ address straight to Telegram as a voice message, and the case page plays it behi
   No summary, no advice, nothing rephrased. A step with a `conflict` gets the fixed sentence
   "Two different figures were found for this step. See the case file." The connecting words are Finnish for a Finnish case.
 - At most 1,500 characters. A longer plan loses whole steps from the end, never part of a sentence.
-- Model `eleven_flash_v2_5`. A Finnish case is sent with `language_code: "fi"`, so the voice does not change language
-  on its own for an English phrase quoted inside the plan. Other cases are sent without a language.
+- The voice fits the case (`spokenLanguage`, `spokenDelivery` in `src/lib/speech.ts`), chosen from the stored case,
+  never by a model:
+  - **Language.** A case in Finnish, Swedish, German, Spanish, French, Ukrainian or Estonian is sent with its
+    `language_code`, so the voice does not change language on its own for an English phrase quoted inside the plan.
+    English cases are sent without a language. Model `eleven_flash_v2_5`; Estonian uses `eleven_v4_turbo`, because
+    the fast model answers 400 for it.
+  - **Delivery.** `gentle` (stability 0.7, speed 0.92) when the event or title names bad news: a dismissal, a fine,
+    an eviction, an illness, a cancellation. `bright` (stability 0.4, speed 1.02) for good news: a baby, a wedding,
+    a new job. `plain`, the voice as designed, for everything else. Bad news wins when a case holds both. The case
+    page says "Read slowly and calmly." or "Read in a lighter voice." under the button.
+  - **The name.** "AIDaddy" is sent to the voice as "AI Daddy": as one word it was heard as "Hey, Daddy" in English
+    and "iDaddy" in Finnish.
+  - The answer carries `x-spoken-language` (a code, or `as written`) and `x-spoken-delivery`.
 - Each version of the spoken text is rendered once and stored next to the case (`audio/<id>-<hash>.mp3`), so a second
-  request costs nothing. An updated case gets new audio on the next request.
+  request costs nothing. An updated case gets new audio on the next request, and so does a case whose language,
+  model or delivery is now different.
 - Supports `Range` requests. Sends `cache-control: private, max-age=3600`.
 - Errors: `404` unknown case, or `ELEVENLABS_API_KEY` is not set (the button is then not shown), `429` rate limited
   (only requests that would render new audio count), `502` ElevenLabs failed or took longer than 20 seconds.

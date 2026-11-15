@@ -42,7 +42,7 @@ export default async function ChatPage({ searchParams }: PageProps<"/chat">) {
         <AIDaddyChat code={code} needsCode={demoCodeRequired()} voiceAvailable={Boolean(process.env.ELEVENLABS_API_KEY)} />
         <p className="text-sm leading-relaxed text-muted-foreground">
           Prefer Telegram?{" "}
-          <a href={`https://t.me/${bot}`} target="_blank" rel="noreferrer" className={link}>
+          <a href={`https://t.me/${bot}?startgroup=true`} target="_blank" rel="noreferrer" className={link}>
             Add AIDaddy to your group
             <span className="sr-only"> (opens in a new tab)</span>
           </a>

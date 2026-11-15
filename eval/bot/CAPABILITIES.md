@@ -37,3 +37,19 @@ pnpm exec vitest run tests/proactive-route.test.ts tests/case-actions.test.ts te
 ```
 
 It executes the real scheduled route and Case functions with an in-memory store and synthetic page-verification results. It checks scheduled change logging, independent once-only notification state for the bot watcher, preservation after unreachable pages, and repeated-run suppression. It does not send a Telegram alert or establish production scheduler operation.
+
+## Telegram context and work notices
+
+`rehearse_telegram_context.py` feeds two ordinary household messages and a later moving-house trigger through the real gate hook and pinned Hermes prompt formatter, then runs the real NVIDIA model. Memory starts with a privacy-note marker only: city and household facts must come from the retained messages. The gate's first two classifications, Engine tools and Telegram delivery are fixtures. The runtime start hook uses a fake session-bound adapter, not the live bot.
+
+Run it with the same isolated container command above, replacing the final script invocation with:
+
+```sh
+/workspace/eval/bot/rehearse_telegram_context.py --output /results/telegram-context.json
+```
+
+The [recorded passing run](../results/telegram-context-20261115.json) took 41.7 seconds. It kept Helsinki as the origin and Tampere as the destination, two adults without children, and 1 December 2026. One start notice preceded research. The model attached an unrequested landlord draft, then showed the sourced fixture plan, Case link and sending-approval wording before offering next actions. It answered the actual **Not now** option. A malformed draft-tool attempt was rejected and corrected before the successful attachment; only the successful saved draft counts.
+
+The regression checker rejects missing context, reversed cities, changed dates, unsupported residence-tenure assumptions, duplicate starts, missing or premature drafts, hidden plans, invented button answers and irreversible action choices. Run its 26 deterministic checks with `python3 -m unittest discover -s eval/bot -p test_rehearse_telegram_context.py`.
+
+Separately, all 50 gate/plugin tests pass inside the pinned Hermes image, including the real inbound dispatch, prompt formatting and `PluginContext.post_message` routing through a fake Telegram adapter. CI runs these offline on both architectures and fails if any native test is skipped. These establish runtime integration and selected model behavior; [the live group procedure](../../docs/TELEGRAM_DEMO.md) remains required for #103.
