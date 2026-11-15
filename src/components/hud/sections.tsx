@@ -244,10 +244,13 @@ const PLACES: Place[] = [
     links: [{ href: "/demo/browser", label: "Watch the replay", of: "the browser" }],
   },
   {
-    status: "Concept",
+    status: "Live",
     name: "At the kitchen table",
-    text: "The phone lies on the table. Say \"AIDaddy\", and it looks things up while you keep talking. It cannot listen yet.",
-    links: [{ href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" }],
+    text: "A phone or a laptop lies on the table with the listening page open. It hears a life event, researches it on its own, and comes back with a call or a ping. It listens only while that page is open.",
+    links: [
+      { href: "/listen", label: "Start listening" },
+      { href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" },
+    ],
   },
   {
     status: "Concept",
@@ -264,7 +267,7 @@ const PLACES: Place[] = [
   {
     status: "Concept",
     name: "What it may follow",
-    text: "You choose what AIDaddy may read or hear. A mockup of the setup screen: of its three channels, only Telegram works today.",
+    text: "You choose what AIDaddy may read or hear. Of the setup screen's three channels, Telegram and listening on this device work today.",
     links: [{ href: "/setup", label: "Open the setup" }],
   },
 ];
