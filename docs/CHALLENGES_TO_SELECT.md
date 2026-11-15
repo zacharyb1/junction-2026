@@ -16,8 +16,15 @@ These work today. Each has a note you can paste into the form.
 
 - **Why it fits:** this is the challenge the product was built for.
 - **Note to paste:**
-  > AIDaddy is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web: 19 of 19 scenarios, 98 of 98 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 5.6 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
-- **Evidence:** `src/data/scorecard.json`, `eval/results/latest.md`, the front page replay.
+  > AIDaddy is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it first takes a look with Exa's lite search, which names the official pages in well under a second, then runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web: 19 of 19 scenarios, 98 of 98 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 5.6 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
+- **Which parts of Exa do what** (issue 109; say this when a judge asks how Exa is used):
+  - **Search, lite:** the first look. Official pages named in about half a second while the research runs (measured 0.4 to 0.7 s).
+  - **Search, auto, with structured output:** the plan. Three searches at once, each with an `objective`, a `systemPrompt`, an `outputSchema`, highlights, the user's country and the country's official sites as `includeDomains`.
+  - **Search with a date filter:** a fourth search for pages the official sites published in the last four months (`startPublishedDate`): what a model's memory cannot hold.
+  - **Search, deep:** the same plan search at `depth: "deep"`, when a case asks for it.
+  - **Contents:** a second reading of every cited page, also for PDFs and pages that refuse our own request, so each quote is checked on its page.
+  - **Not used, and why:** past versions of pages (Exa Snapshot) answered "not on the current plan" for our account (tried Sun 04:40; a top-up unlocks a trial), so the idea of marking a sentence that was not on its page a while ago is not built. The Agent API, Monitors, Answer and Websets have no job here yet: the plan needs a quote checked on its page within seconds, and the daily source check already runs on our own scheduler.
+- **Evidence:** `src/data/scorecard.json`, `eval/results/latest.md`, the front page replay, `src/lib/engine/research.ts` (`firstLook`, `search`, `searchNews`), `src/lib/verify.ts` (`fetchViaExa`).
 
 ### - [ ] NVIDIA: Best Use of Nemotron
 
