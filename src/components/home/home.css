@@ -1,0 +1,132 @@
+/* The /home phone app: Sunday-morning palette, app-like screen transitions and the small motions from the design. */
+
+.ukk {
+  --ukk-bg: #fbf8f3;
+  --ukk-ink: #2a2420;
+  --ukk-muted: #7a6e66;
+  --ukk-faint: #8f8379;
+  --ukk-line: #efe7dc;
+  --ukk-line2: #ece6dc;
+  --ukk-accent: #c4572f;
+  --ukk-peach: #ffe8d6;
+  --ukk-sand: #f1ebe2;
+  /* Room for the status bar and the home indicator: real ones on a phone, a drawn frame on a laptop. */
+  --ukk-top: max(env(safe-area-inset-top), 14px);
+  --ukk-bottom: max(env(safe-area-inset-bottom), 10px);
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  color: var(--ukk-ink);
+  background: var(--ukk-bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ukk-stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  background: var(--ukk-bg);
+}
+
+.ukk-phone {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: var(--ukk-bg);
+}
+
+.ukk-caption {
+  display: none;
+}
+
+/* On a laptop or a projector the app sits in a phone, with what the presenter says beside it. */
+@media (min-width: 760px) and (min-height: 560px) {
+  .ukk-stage {
+    background: #f6efe6;
+    align-items: center;
+    justify-content: center;
+    gap: 6vw;
+    padding: 24px 6vw;
+  }
+  .ukk-phone {
+    flex: none;
+    width: 390px;
+    height: min(844px, calc(100dvh - 48px));
+    border-radius: 48px;
+    box-shadow:
+      0 0 0 12px #1d1a18,
+      0 40px 90px rgba(60, 40, 20, 0.28);
+    --ukk-top: 44px;
+    --ukk-bottom: 24px;
+  }
+  .ukk-caption {
+    display: block;
+    max-width: 520px;
+    order: -1;
+  }
+}
+
+.ukk-layer {
+  position: absolute;
+  inset: 0;
+  background: var(--ukk-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* push: the new screen slides in from the right, the old one drifts left and dims. pop: the reverse. tab: a crossfade. */
+.ukk-enter-push { z-index: 2; animation: ukk-from-right 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; box-shadow: -8px 0 30px rgba(60, 40, 20, 0.08); }
+.ukk-exit-push { z-index: 1; animation: ukk-to-left 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.ukk-enter-pop { z-index: 1; animation: ukk-from-left 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.ukk-exit-pop { z-index: 2; animation: ukk-to-right 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; box-shadow: -8px 0 30px rgba(60, 40, 20, 0.08); }
+.ukk-enter-tab { z-index: 2; animation: ukk-fade-in 0.28s ease both; }
+.ukk-exit-tab { z-index: 1; animation: ukk-fade-out 0.28s ease both; }
+
+@keyframes ukk-from-right { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes ukk-to-left { from { transform: none; filter: none; } to { transform: translateX(-30%); filter: brightness(0.92); } }
+@keyframes ukk-from-left { from { transform: translateX(-30%); filter: brightness(0.92); } to { transform: none; filter: none; } }
+@keyframes ukk-to-right { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes ukk-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ukk-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* Small motions from the design. */
+@keyframes ukk-ring { 0% { box-shadow: 0 0 0 0 rgba(196, 87, 47, 0.45); } 100% { box-shadow: 0 0 0 12px rgba(196, 87, 47, 0); } }
+@keyframes ukk-talk { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes ukk-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes ukk-spin { to { transform: rotate(360deg); } }
+@keyframes ukk-blink { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+@keyframes ukk-swirl { to { transform: rotate(360deg); } }
+@keyframes ukk-drift { 0%, 100% { transform: translate(-50%, -50%) rotate(var(--r)) translateY(0); } 50% { transform: translate(-50%, -50%) rotate(var(--r)) translateY(-3px); } }
+
+.ukk-ring { animation: ukk-ring 1.2s ease-out infinite; }
+.ukk-rise { animation: ukk-rise 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.ukk-spin { animation: ukk-spin 0.9s linear infinite; }
+.ukk-bar { display: block; width: 3px; height: 14px; border-radius: 2px; background: var(--ukk-accent); animation: ukk-talk 0.8s ease-in-out infinite; }
+.ukk-dot { display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--ukk-accent); animation: ukk-blink 1s infinite; }
+.ukk-wave { display: block; width: 6px; border-radius: 3px; background: #e0705a; animation: ukk-talk 1.8s ease-in-out infinite; transform-origin: center; }
+.ukk-orb.still .ukk-wave { animation-duration: 3.2s; }
+.ukk-phrase { animation: ukk-drift 6s ease-in-out infinite; }
+.ukk-logo { transition: width 0.3s, height 0.3s, opacity 0.4s, filter 0.4s; }
+.ukk-toast { animation: ukk-rise 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.ukk-orb .glow { position: absolute; inset: -26px; border-radius: 50%; filter: blur(22px); opacity: 0.75; background: conic-gradient(from 90deg, #ffb38a, #ffd76e, #f59aa8, #ffe3cf, #ffb38a); }
+.ukk-orb .swirl { position: absolute; inset: -20%; filter: blur(18px); opacity: 0.8; background: conic-gradient(from 0deg, #ffe3cf, #ffb38a, #ffd76e, #f59aa8, #ffe3cf); animation: ukk-swirl 14s linear infinite; }
+
+.ukk-scroll { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.ukk-scroll::-webkit-scrollbar { display: none; }
+
+.ukk a:focus-visible,
+.ukk button:focus-visible,
+.ukk input:focus-visible {
+  outline: 2px solid var(--ukk-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ukk *,
+  .ukk *::before,
+  .ukk *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+  }
+}

@@ -96,10 +96,10 @@ export function lensesFor(raw: HouseholdProfile): Lens[] {
 
 export type ProposedOpportunity = { title?: string; value?: string; why?: string; deadline?: string; quote?: string; url?: string };
 
-/** The model writes `""`, "Empty" or "none" for a field the page does not fill. Those are no value at all. */
+/** The model writes `""`, "Empty", "none" or "None stated" for a field the page does not fill. Those are no value at all. */
 export const blank = (value: string | undefined) => {
   const v = (value ?? "").trim();
-  return /^("{2}|'{2}|empty|none|n\/?a|null|-|—)$/i.test(v) ? "" : v;
+  return /^("{2}|'{2}|empty|none|n\/?a|null|-|—|(none|not) (stated|given|specified|mentioned))\.?$/i.test(v) ? "" : v;
 };
 
 const sourceOf = (url: string) => {
