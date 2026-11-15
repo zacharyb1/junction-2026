@@ -5,7 +5,7 @@
  * opportunities found in the background open first, the chat is one tab away, and the household profile they come
  * from sits in the sidebar.
  *
- * The chat talks to the same /api/ukk as the /ukk page and renders replies with the same links and product pictures.
+ * The chat talks to the same /api/aidaddy as the /ukk page and renders replies with the same links and product pictures.
  * Household photo: Unsplash (free licence), a mother with her two children at home.
  */
 
@@ -102,7 +102,7 @@ export function ChatScreen({ code }: { code: string }) {
       setDraft((d) => d || text);
     };
     try {
-      const res = await fetch("/api/ukk", {
+      const res = await fetch("/api/aidaddy", {
         method: "POST",
         headers: { "content-type": "application/json", "x-demo-code": code },
         body: JSON.stringify({ message: text }),
