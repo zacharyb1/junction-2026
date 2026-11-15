@@ -25,7 +25,7 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
         {/* The head, the form and the result in the left column; the run panel at the right from the top. */}
         <div className="site-split site-split--three wrap-anywhere">
           <PageHead
-            label="Try it live"
+            label="Try AIDaddy without setup"
             title="Try it on your own life"
             lede="The same engine AIDaddy uses in the family chat. It searches the live web with Exa, official sites first, opens every page it cites, and keeps only what it can point at."
           >

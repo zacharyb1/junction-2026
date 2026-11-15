@@ -63,7 +63,7 @@ export default function DemoHub() {
           <p>These are scenes. The research itself is open to try.</p>
           <div>
             <SiteLink href="/try" className="demo-btn demo-btn--primary">
-              Try it live
+              Try AIDaddy without setup
             </SiteLink>
             <SiteLink href="/chat" className="demo-btn">
               Talk to AIDaddy
