@@ -53,6 +53,38 @@ describe("Money assembled from source-supported time periods", () => {
     expect(caseFile.money).toEqual([{ label: "Apply for parental allowance", amount: "160 working days", evidence: [1] }]);
   });
 
+  it("keeps the period an allowance is available for", async () => {
+    const quote = "Parental allowance is available for up to 160 working days per parent.";
+    const { caseFile } = await assemble("Apply for parental allowance", quote, "160 working days", "https://www.kela.fi/parental-allowance");
+    expect(caseFile.money).toEqual([{ label: "Apply for parental allowance", amount: "160 working days", evidence: [1] }]);
+  });
+
+  it("does not borrow paid-leave context for a photo-age requirement", async () => {
+    const quote = "To apply for paid parental leave, your passport photo must be no more than 6 months old.";
+    const { caseFile } = await assemble("Apply for paid parental leave", quote, "6 months", "https://www.kela.fi/photo-example");
+    expect(caseFile.evidence[0].verification).toBe("verified");
+    expect(caseFile.money).toEqual([]);
+  });
+
+  it("does not borrow paid-leave context for passport validity", async () => {
+    const quote = "To apply for paid parental leave, your passport must be valid for at least 6 months.";
+    const { caseFile } = await assemble("Apply for paid parental leave", quote, "6 months", "https://www.kela.fi/passport-example");
+    expect(caseFile.money).toEqual([]);
+  });
+
+  it("keeps a warranty coverage period", async () => {
+    const quote = "The product warranty is valid for two years.";
+    const { caseFile } = await assemble("Check the product warranty", quote, "two years", "https://www.kkv.fi/warranty-example");
+    expect(caseFile.money).toEqual([{ label: "Check the product warranty", amount: "two years", evidence: [1] }]);
+  });
+
+  it.each([["160 working days", true], ["6 months", false]] as const)("classifies the selected period in a mixed sentence: %s", async (amount, retained) => {
+    const quote = "Parental allowance is available for 160 working days, but your passport photo must be no more than 6 months old.";
+    const { caseFile } = await assemble("Apply for parental allowance", quote, amount, "https://www.kela.fi/mixed-example");
+    expect(caseFile.evidence[0].verification).toBe("verified");
+    expect(caseFile.money).toEqual(retained ? [{ label: "Apply for parental allowance", amount, evidence: [1] }] : []);
+  });
+
   it("does not infer the live photo age limit when the model leaves amount empty", async () => {
     const quote = "For an identity card application, you will need one passport photo which has been taken no longer than 6 months earlier.";
     const { caseFile } = await assemble("Apply for Finnish ID card at police station", quote, "");

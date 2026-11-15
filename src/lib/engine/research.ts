@@ -520,15 +520,36 @@ const MONEY = /[€$£%]|\b(eur|euros?|euroa|usd|dollars?|pounds?|gbp|sek|nok|dk
 const TIMING =
   /\b(before|after|within|no later|at the latest|deadline|by the end|prior to|as soon as|week \d|weeks? of|ennen|viimeistään|kuluessa|menness|jälkeen|senast|innan|inom|efter)\b/i;
 
-// A duration belongs in Money only when its verified sentence states a payment,
-// leave entitlement or someone else's duty. A photo age or document validity is
-// still useful source text, but being a verified period does not make it money.
+// Classify the matching period in its own clause: a payment mentioned elsewhere
+// in the sentence cannot turn a photo age or document validity into an entitlement.
 const ENTITLEMENT_PERIOD =
-  /\b(paid|payable|entitled|entitlement|maksetaan|betalas|gezahlt|bezahlt)\b|\b(receive|get|grant)\w*\b[^.;:!?]{0,80}\b(allowances?|benefits?|compensation|leave)\b|\b(parental|maternity|paternity|annual|sick|paid) leave\b/i;
+  /\b(paid|payable|entitled|maksetaan|betalas|gezahlt|bezahlt)\b|\b(receive|get|grant)\w*\b[^.;:!?]{0,80}\b(allowances?|benefits?|compensation|leave)\b|\b(allowances?|benefits?|compensation|leave|warrant(?:y|ies))\b[^.;:!?]{0,60}\b(available|lasts?|valid|covers?|continues?|for)\b|\breturn (window|period|right)\b/i;
+const DOCUMENT_AGE = /\b(photos?|photographs?|passports?|identity cards?|documents?|certificates?)\b[^.;:!?]{0,100}\b(valid|validity|issued|dated|taken|older|old|recent)\b/i;
 
 function moneyContext(value: string, sentence: string): boolean {
-  if (MONEY.test(value) || !["day", "week", "month", "year"].includes(unitOf(value))) return true;
-  return ENTITLEMENT_PERIOD.test(sentence) || (OTHERS_DUTY.test(sentence) && !OWN_DUTY.test(sentence)) || WAITING.test(sentence);
+  const unit = unitOf(value);
+  if (MONEY.test(value) || !["day", "week", "month", "year"].includes(unit)) return true;
+  const numbers = new Set(numbersIn(value));
+  let supported = false;
+  const clauses = sentence.replace(/\s+/g, " ").split(/,(?!\d)|[;:]|\b(?:but|whereas|while|if|when|and (?=your\b|the\b|you\b))\b/i);
+  for (const clause of clauses) {
+    let cursor = 0;
+    for (const figure of figuresIn(clause)) {
+      const at = clause.indexOf(figure, cursor);
+      cursor = at + figure.length;
+      if (unitOf(figure) !== unit || !numbersIn(figure).every((n) => numbers.has(n))) continue;
+      const before = clause.slice(0, at);
+      const after = clause.slice(cursor);
+      if (DOCUMENT_AGE.test(before) || /^\s*(old|earlier|ago|of age)\b/i.test(after)) return false;
+      const entitlement = ENTITLEMENT_PERIOD.test(before)
+        || /^\s*(?:of\s+)?(?:(?:paid|parental|maternity|paternity|annual|sick)\s+)+leave\b/i.test(after)
+        || (OTHERS_DUTY.test(clause) && !OWN_DUTY.test(clause)) || WAITING.test(clause);
+      // An ambiguous repeated figure is withheld rather than borrowing its other occurrence's role.
+      if (!entitlement) return false;
+      supported = true;
+    }
+  }
+  return supported;
 }
 
 /** Reject malformed or duplicate amounts here; classify periods against their verified sentence later. */
