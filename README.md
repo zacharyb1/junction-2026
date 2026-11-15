@@ -84,6 +84,7 @@ AIDaddy is both the product and the butler, one thing with one name. It sits in 
 | `/try` | The research form: describe what happened and get a plan with sources. Open to everyone on the server (`DEMO_OPEN=1`), rate limited; elsewhere it needs the access code. | Live. |
 | `/c/[id]` | The case file: steps, deadlines, quotes, drafts and the log of what AIDaddy did, with the click that approves. | Live. A case exists only in the store it was researched into. |
 | `/chat` | A chat with AIDaddy by text or voice. Open like `/try`; needs the web-only Hermes instance. | Live on the server. |
+| `/call` | AIDaddy makes a call for the visitor: they write the task, approve the exact proposal, and read what was agreed. The call rings a test line that is answered in a browser, or the operator's test phone. [Demo calls](docs/DEMO_CALLS.md). | Built and checked with a fake provider and the real account's agent. Off until the server sets `DEMO_CALLS_ENABLED=1`; no real voice conversation has been held yet. |
 | `/setup` | What AIDaddy may follow: the Telegram chat today, the phone and the browser as concepts. | Mockup. |
 | `/demo` | The list of replays. | Index page. |
 | `/demo/chat`, `/demo/browser`, `/demo/talk`, `/demo/calendar` | Scripted replays built from real case files. Add `?loop=1` to repeat one without the site's header and footer on the screen at the table, or `?bare=1` to play it once that way for a recording. | Scripted replays. The browser, kitchen-table and calendar scenes show concepts. |

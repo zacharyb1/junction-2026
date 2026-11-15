@@ -225,17 +225,29 @@ Response `200`:
 - `image` is the product page's own preview image from the same Exa result (https only), absent when the page has none. `GET /api/gifts/image?url=<product url>` returns it for a product the search found (no access code: it only reads what the search stored, in memory until a restart); the `/chat` page shows it above that product link.
 - Products that arrive in time come first. The bot never orders or pays: `url` is for the person to open.
 
-## Demo phone tools
+## Demo call tools
 
-These authenticated MCP tools call one operator-configured test phone through ElevenLabs/Twilio. They do not place real orders or move money. [Setup and rehearsal](DEMO_CALLS.md).
+AIDaddy makes a confirmed call for the person through an ElevenLabs agent. The call goes to one operator-configured test phone (Twilio), or, where no phone number is set up, rings at a web address and is answered in a browser. It does not place real orders or move money. [Setup and rehearsal](DEMO_CALLS.md).
+
+Authenticated MCP tools:
 
 | Tool | Input | Returns |
 |---|---|---|
-| `prepare_demo_call` | `{ task, preferences? }`; task max 1,200 characters, preferences max 800 | A persisted `proposed` call with id, exact task/preferences, recipient label, phone ending and demo notice; or `unavailable` with missing configuration. Does not dial. |
-| `start_demo_call` | `{ id, confirmed }` | Starts only a confirmed proposal for the currently configured test number. Returns `in_progress`, `failed` or `unknown`; may return `needs_confirmation`, `needs_new_proposal`, `not_found`, `already_started` or `unavailable`. |
+| `prepare_demo_call` | `{ task, preferences? }`; task max 1,200 characters, preferences max 800 | A persisted `proposed` call with id, `line` (`phone` or `browser`), exact task/preferences, recipient label, phone ending (phone line) and demo notice; or `unavailable` with missing configuration. Does not dial. |
+| `start_demo_call` | `{ id, confirmed }` | Starts only a confirmed proposal for the currently configured line. Phone line: `in_progress`, `failed` or `unknown`. Browser line: `ringing` with `answerUrl`, the address where the call is answered. May return `needs_confirmation`, `needs_new_proposal`, `not_found`, `already_started`, `busy` (the hour's calls are used up; the proposal stays valid) or `unavailable`. |
 | `get_demo_call` | `{ id, wait_seconds? }`; 0–60, default 0 | Stored status, optionally waiting for the provider's summary. Terminal states are `finished` or `failed`, with provider `outcome` (`success`, `failure`, `unknown`) and summary when available. A finished call is not proof of a real purchase. |
 
-Confirmation is conversational: the runtime must show the exact proposal and wait for a new Yes before passing `confirmed: true`. It is not an independently authenticated human approval endpoint. The full phone number and provider conversation ID stay in private `.data/demo-calls`. An exclusive persisted claim prevents dialing the same proposal twice; an uncertain provider response is never automatically redialed. Setup remains opt-in, and web tools require the additional `KAVERI_DEMO_CALLS=1` setting.
+The `/call` page uses REST equivalents. They are open to the demo's visitors (`x-demo-code`, or everyone where `DEMO_OPEN=1`) on the browser line, and on the phone line only with `DEMO_CALLS_WEB=1`; otherwise they answer `503`.
+
+| Route | Does |
+|---|---|
+| `POST /api/calls` `{ task, preferences? }` | `prepare_demo_call`. |
+| `POST /api/calls/<id>/start` `{ "confirmed": true }` | `start_demo_call`. The visitor's button press is the confirmation. |
+| `GET /api/calls/<id>` | `get_demo_call`, plus `transcript` (`[{ speaker: "aidaddy" \| "recipient", text }]`) once the call has ended. The id is the key. |
+| `GET /api/calls/line/<answerId>` | For the answering page: `{ status, recipient, notice, maxSeconds }`. Never the task, preferences or result. |
+| `POST /api/calls/line/<answerId>` | Answers a ringing call once: adds `signedUrl` (a one-time ElevenLabs conversation link) and `dynamicVariables` for the agent. Later calls return the state without a link. |
+
+Confirmation in the chat is conversational: the runtime must show the exact proposal and wait for a new Yes before passing `confirmed: true`. It is not an independently authenticated human approval endpoint. The full phone number and provider conversation ID stay in private `.data/demo-calls`. An exclusive persisted claim prevents starting the same proposal twice, and a second one prevents answering it twice; an uncertain provider response is never automatically redialed. Setup remains opt-in, and web chat tools require the additional `KAVERI_DEMO_CALLS=1` setting.
 
 ## Case tools
 
