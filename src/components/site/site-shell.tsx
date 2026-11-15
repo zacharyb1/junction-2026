@@ -4,15 +4,15 @@ import { SiteHeader } from "@/components/site/site-header";
 import "@/components/site/site.css";
 
 /**
- * The frame every page of the site shares: the dark ground, the header and the footer.
+ * The frame every page of the site shares: the warm ground, the header and the footer.
  *
- * `dark` switches the shared components to their dark variants; the colours themselves come from site.css.
+ * The colours come from site.css. The shared components are drawn in their light variants.
  * `bare` leaves the header and footer out. The demo replays use it when they run on the screen at the table
  * (?loop=1) or are being recorded (?bare=1), where only the replay should be in the picture.
  */
 export function SiteShell({ children, bare = false }: { children: ReactNode; bare?: boolean }) {
   return (
-    <div className="site dark">
+    <div className="site">
       {bare ? null : <SiteHeader />}
       {children}
       {bare ? null : <SiteFooter />}

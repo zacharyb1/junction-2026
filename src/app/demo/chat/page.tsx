@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fbf8f3" };
 
 /** Issue #33: a replay for the demo video and the screen at the table. ?loop=1 repeats it; ?bare=1 shows it without the site around it. */
 export default async function ChatDemoPage({ searchParams }: PageProps<"/demo/chat">) {

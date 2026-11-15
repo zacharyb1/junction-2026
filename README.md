@@ -57,7 +57,7 @@ flowchart TD
     Bot --> Followup[Approved drafts and Hermes reminders]
 ```
 
-The gate filters group text before a cloud call. Direct messages, addressed messages and media take rule-based wake paths; an active conversation also has a three-minute open window. This means neither all small talk nor all photos stay local. The measured limits are in the handover.
+The gate filters group text before a cloud call. Authorized Telegram messages can wait in a small recent-context buffer for the same chat and topic; the next trigger carries those earlier facts into the conversation so the family need not repeat them. Direct messages, addressed messages and media take rule-based wake paths; an active topic also has a three-minute open window. This means neither all small talk nor all photos stay local. The runtime posts a start notice for research, then the bot posts its sourced result before offering next actions. See [the Telegram contract](docs/CONTRACTS.md#telegram-context-and-work-notices) and [the live demo procedure](docs/TELEGRAM_DEMO.md).
 
 | Part / tool | Role and code |
 |---|---|
@@ -76,7 +76,7 @@ The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are 
 
 ### The site, page by page
 
-AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page except `/reading` is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try AIDaddy without setup, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
+AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try AIDaddy without setup, Talk to AIDaddy, Set up), the same footer and the same warm colours ([DESIGN.md](DESIGN.md)). A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
 
 | Page | What a visitor gets | What it is |
 |---|---|---|
@@ -84,11 +84,12 @@ AIDaddy is both the product and the butler, one thing with one name. It sits in 
 | `/try` | The research form: describe what happened and get a plan with sources. Open to everyone on the server (`DEMO_OPEN=1`), rate limited; elsewhere it needs the access code. | Live. |
 | `/c/[id]` | The case file: steps, deadlines, quotes, drafts and the log of what AIDaddy did, with the click that approves. | Live. A case exists only in the store it was researched into. |
 | `/chat` | A chat with AIDaddy by text or voice. Open like `/try`; needs the web-only Hermes instance. | Live on the server. |
-| `/setup` | What AIDaddy may follow: the Telegram chat today, the phone and the browser as concepts. | Mockup. |
+| `/setup` | Get your own AIDaddy: three connections. Add the bot to a Telegram group, let it listen (`/listen`), download the browser extension (`public/aidaddy-extension.zip`). The front page's main button leads here. | Telegram live; the other two are first versions. |
+| `/listen` | The listening post: a page left open on a phone or laptop. It hears the room through the browser's speech-to-text, keeps small talk on the device, researches a life event on its own and comes back with a call (a deadline or an urgent matter) or a ping. | Live in Chrome, Edge and Safari, while the page is open and on screen. The call rings on that device; it cannot ring a phone number. |
 | `/demo` | The list of replays. | Index page. |
 | `/demo/chat`, `/demo/browser`, `/demo/talk`, `/demo/calendar` | Scripted replays built from real case files. Add `?loop=1` to repeat one without the site's header and footer on the screen at the table, or `?bare=1` to play it once that way for a recording. | Scripted replays. The browser, kitchen-table and calendar scenes show concepts. |
 | `/autopilot` | A fixed script of specialist agents with one live check through the Engine. | Scripted demo. |
-| `/reading` | The reading-table edition of the front page, in its own paper design ([DESIGN.md](DESIGN.md)). | Live page, outside the shared frame on purpose. |
+| `/scorecard` | Every scenario of the latest scorecard run, with its result and its case file, and how a quote is checked. | Live page; the rows link to case files on the production server. |
 
 ## Main decisions and why
 
@@ -188,7 +189,7 @@ This handover records implemented behavior, tests, limitations and earlier decis
 | [docs/PITCH.md](docs/PITCH.md), [docs/pitch/](docs/pitch/) | Preparing the story, script and voiceover; refresh dated claims before recording. |
 | [docs/CHALLENGES_TO_SELECT.md](docs/CHALLENGES_TO_SELECT.md), [docs/VERDA.md](docs/VERDA.md) | Filling in the submission form: which challenges to select, the note to paste for each, and the process summary the Verda challenge asks for. |
 | [docs/DEMO_PLAN.md](docs/DEMO_PLAN.md), [docs/BOT_PLAN.md](docs/BOT_PLAN.md) | Proposals of Saturday 09:05: the run of show on the new front page, and the order of bot work before the freeze. |
-| [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The dark front page on `/`: what each section shows and which data file it reads. The reading-table page is at `/reading`. |
+| [docs/FRONT_PAGE_PLAN.md](docs/FRONT_PAGE_PLAN.md) | The front page on `/` (planned in its earlier dark look; the sections are the same): what each section shows and which data file it reads. |
 | [docs/RESEARCH.md](docs/RESEARCH.md), [docs/research/](docs/research/) | Finding prior research and historical plans. |
 | [docs/PLAYBOOK.md](docs/PLAYBOOK.md) | Checking event rules and logistics before submission. |
 | [docs/STARTERS.md](docs/STARTERS.md) | Consulting the pre-product template catalogue; it is not the current architecture. |

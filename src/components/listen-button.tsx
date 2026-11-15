@@ -54,7 +54,7 @@ export function ListenButton({
       )}
       {note && <p className="text-sm text-muted-foreground">{note}</p>}
       {state === "error" && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="site-row site-row--amber site-status">
           {errorLabel}
         </p>
       )}

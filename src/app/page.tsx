@@ -3,8 +3,8 @@ import { officialSites, planRows, quiet, replayData } from "@/components/hud/dat
 import { QuietDays } from "@/components/hud/quiet-days";
 import { ResearchReplay } from "@/components/hud/research-replay";
 import { GateFigures, Hero, Places, PlanPanel, Readouts, Schematic, Section, Start } from "@/components/hud/sections";
-import { landingConfig } from "@/components/landing/config";
-import { loadScorecard } from "@/components/landing/scorecard-data";
+import { landingConfig } from "@/components/site/config";
+import { loadScorecard } from "@/components/site/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
 import "@/components/hud/hud.css";
@@ -20,14 +20,13 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fbf8f3" };
 
 /**
  * The front page tells one story from top to bottom: quiet days, the moment that matters, the research,
  * the plan, the places AIDaddy works, the proof. It is also the entrance to every other page of the site.
  * Every figure on it is read from a file a script wrote:
  * src/data/replay.json (one recorded run, see scripts/make-replay.mjs) and src/data/scorecard.json (the eval harness).
- * The calmer "reading table" edition of this page lives at /reading.
  */
 export default async function Home() {
   const { botUsername, sampleCaseHref } = landingConfig();
@@ -81,7 +80,7 @@ export default async function Home() {
             index="04"
             label="Where it works"
             title="One butler, wherever the household is."
-            lede="Today AIDaddy works in the Telegram group chat and in a chat on this site. The other places are ideas. Each one is shown as a scripted replay or a mockup, and says so."
+            lede="Today AIDaddy works in the Telegram group chat, in a chat on this site, and as a listening page you leave open on a device. The browser extension is a first version you can download. The calendar is an idea, shown as a scripted replay that says so."
           >
             <Places />
           </Section>

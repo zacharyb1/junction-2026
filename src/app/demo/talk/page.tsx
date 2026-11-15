@@ -6,11 +6,11 @@ import "@/components/talk-demo/talk-demo.css";
 export const metadata: Metadata = {
   // The name is already in the title, so the layout's " · AIDaddy" ending is left off.
   title: { absolute: "AIDaddy in the background: demo replay" },
-  description: "A scripted replay of AIDaddy solving a problem while two people keep talking. Concept; the research is a real run.",
+  description: "A scripted replay of AIDaddy solving a problem while two people keep talking. Listening itself works at /listen; the research is a real run.",
   robots: { index: false },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fbf8f3" };
 
 /** Issue #35: a replay for the demo video. ?loop=1 repeats it; ?bare=1 shows it without the site around it. */
 export default async function TalkDemoPage({ searchParams }: PageProps<"/demo/talk">) {
@@ -22,7 +22,8 @@ export default async function TalkDemoPage({ searchParams }: PageProps<"/demo/ta
       bare={bare}
       caption={
         <>
-          Concept demo: AIDaddy cannot listen on the phone yet. The research and its quotes are a <a href={CASE_URL}>real run</a>{" "}
+          Scripted replay. Listening itself works on the <a href="/listen">listening page</a>, left open on a device. The research
+          and its quotes are a <a href={CASE_URL}>real run</a>{" "}
           on kkv.fi, the Finnish consumer authority.
         </>
       }

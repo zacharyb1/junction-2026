@@ -18,7 +18,7 @@ Someone shares a photo, screenshot or PDF of an official letter or document: lan
 
 ## Procedure
 
-1. Acknowledge in one line, in the user's language, in the same assistant message as your first tool call: "A difficult letter. Taking it to the sauna. Back shortly." For a frightening letter (eviction, a debt, a deportation or illness matter) say it plainly instead: "Reading it now. I'll tell you what it asks and by when."
+1. Follow SOUL's work-notice rule: the Telegram runtime announces research; elsewhere acknowledge briefly with the first tool call. Use plain, calm wording for frightening news.
 2. Read the document.
    - Photo or screenshot: read it directly. If the text is too small, call `vision_analyze` with the saved image path and a `region` to zoom in.
    - PDF or other file: this bot has no file tools. Ask for a photo or screenshot of each page, then stop.
@@ -28,7 +28,7 @@ Someone shares a photo, screenshot or PDF of an official letter or document: lan
    - `situation`: who sent what, the demand, then "Is this correct and what can we do?", plus the user's words
    - `document`: the transcribed text, at most 6000 characters, without identity numbers or bank details
    - `country`, `region`, `language`, `household` as in `life-event-butler`
-6. Continue with `life-event-butler` steps 4 to 6: plan lines, the checked-quotes line, the case link, then the buttons, with Draft a reply in place of Draft the notice.
+6. Continue with `life-event-butler` steps 4 to 6: prepare any useful draft first, then show the plan, checked-quotes line and case link before the buttons. Offer Draft a reply only when no draft is already attached.
 
 ## Pitfalls
 

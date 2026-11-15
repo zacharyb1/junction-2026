@@ -4,10 +4,15 @@
   "short_name": "AIDaddy",
   "version": "0.1.0",
   "description": "Looks at the page you have open and tells you what to do, by when, with the official sentence that says so. It fills a form only when you click.",
+  "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
   "permissions": ["storage"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js" },
-  "action": { "default_title": "AIDaddy", "default_popup": "popup.html" },
+  "action": {
+    "default_title": "AIDaddy",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png" }
+  },
   "options_page": "welcome.html",
   "content_scripts": [
     {

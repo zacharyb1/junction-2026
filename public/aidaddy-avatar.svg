@@ -1,27 +1,2 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="AIDaddy">
-  <!-- AIDaddy's face: the glowing core of the front page (src/components/hud/core.tsx), as a still picture. -->
-  <defs>
-    <radialGradient id="ground" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#0b2233"/>
-      <stop offset="0.6" stop-color="#07111b"/>
-      <stop offset="1" stop-color="#05080d"/>
-    </radialGradient>
-    <radialGradient id="heart" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.25" stop-color="#bff0ff"/>
-      <stop offset="0.6" stop-color="#4fd8ff" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="#4fd8ff" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <circle cx="200" cy="200" r="200" fill="url(#ground)"/>
-  <g fill="none" stroke="#4fd8ff">
-    <circle cx="200" cy="200" r="188" stroke-width="1.5" stroke-dasharray="1.5 9.31" opacity="0.55"/>
-    <circle cx="200" cy="200" r="164" stroke-width="7" stroke-dasharray="262 70 142 70 62 70 250 104.4" opacity="0.9" transform="rotate(-38 200 200)"/>
-    <circle cx="200" cy="200" r="138" stroke-width="1" opacity="0.35"/>
-    <circle cx="200" cy="200" r="138" stroke-width="3.5" stroke-dasharray="64 803.1" stroke-linecap="round" transform="rotate(120 200 200)"/>
-    <circle cx="200" cy="200" r="114" stroke-width="9" stroke-dasharray="3 6.95" opacity="0.28"/>
-    <circle cx="200" cy="200" r="90" stroke-width="2" stroke-dasharray="120 68.5" opacity="0.8" transform="rotate(64 200 200)"/>
-  </g>
-  <circle cx="200" cy="200" r="176" fill="none" stroke="#ffb547" stroke-width="3" stroke-dasharray="46 1059.8" stroke-linecap="round" transform="rotate(205 200 200)"/>
-  <circle cx="200" cy="200" r="70" fill="url(#heart)"/>
-</svg>
+<svg role="img" aria-label="AIDaddy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><!-- AIDaddy's face: the orb of the site (src/components/hud/core.tsx), as a still picture. -->
+<defs><radialGradient id="c" cx="0.74" cy="0.22" r="0.6"><stop offset="0" stop-color="#f59aa8"/><stop offset="1" stop-color="#f59aa8" stop-opacity="0"/></radialGradient><radialGradient id="b" cx="0.24" cy="0.76" r="0.6"><stop offset="0" stop-color="#ffb38a"/><stop offset="1" stop-color="#ffb38a" stop-opacity="0"/></radialGradient><radialGradient id="a" cx="0.7" cy="0.72" r="0.55"><stop offset="0" stop-color="#ffd76e"/><stop offset="1" stop-color="#ffd76e" stop-opacity="0"/></radialGradient><radialGradient id="s" cx="0.32" cy="0.26" r="0.42"><stop offset="0" stop-color="#fff" stop-opacity="0.95"/><stop offset="0.45" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><circle cx="200.0" cy="200.0" r="188" fill="#ffe3cf"/><circle cx="200.0" cy="200.0" r="188" fill="url(#c)"/><circle cx="200.0" cy="200.0" r="188" fill="url(#b)"/><circle cx="200.0" cy="200.0" r="188" fill="url(#a)"/><circle cx="200.0" cy="200.0" r="188" fill="url(#s)"/><circle cx="200.0" cy="200.0" r="188" fill="none" stroke="#e9a17f" stroke-opacity="0.55" stroke-width="8"/></svg>

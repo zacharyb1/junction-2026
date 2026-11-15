@@ -9,21 +9,23 @@
   /* --demo-chrome is how much of the screen's height the frame around the phone takes. The scene line above the phone and this caption's third line take 5rem more. */
   height: min(800px, calc(100dvh - var(--demo-chrome, 4rem) - 5rem));
   min-height: min(480px, 100dvh);
-  border: 1px solid rgb(79 216 255 / 0.18);
+  border: 1px solid #e5dccf;
   flex-direction: column;
   overflow: hidden;
   border-radius: 30px;
-  background: #0f1720;
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.55);
-  color: #eef3f8;
+  background: #fbf8f3;
+  box-shadow:
+    0 1px 2px rgb(60 40 25 / 0.06),
+    0 30px 80px rgb(60 40 25 / 0.18);
+  color: #211b17;
 }
 .tdemo-status {
   display: flex;
   align-items: center;
   gap: 0.55rem;
   padding: 2.2rem 1rem 0.9rem;
-  border-bottom: 1px solid rgb(255 255 255 / 0.08);
-  color: #a9b8c7;
+  border-bottom: 1px solid #efe8dd;
+  color: #6b625b;
   /* At this size the listening line, with the name in it, fits on one line in a phone 390px wide, so the bar keeps its height when the status changes. */
   font-size: 0.8rem;
 }
@@ -32,11 +34,10 @@
   height: 10px;
   flex: none;
   border-radius: 50%;
-  background: #5b6b7b;
+  background: #a39685;
 }
 .tdemo-ear.is-awake {
-  background: #3ddc97;
-  box-shadow: 0 0 10px rgb(61 220 151 / 0.8);
+  background: #23744a;
   animation: tdemo-pulse 1.2s ease-in-out infinite;
 }
 .tdemo-lines {
@@ -56,53 +57,54 @@
   max-width: 88%;
   padding: 0.5rem 0.75rem;
   border-radius: 14px;
-  background: rgb(255 255 255 / 0.07);
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(60 40 25 / 0.06);
   font-size: 0.92rem;
   line-height: 1.38;
   animation: tdemo-in 0.35s ease-out;
 }
 .tdemo-line--mikko {
   align-self: flex-end;
-  background: rgb(255 181 71 / 0.12);
+  background: rgb(176 120 30 / 0.12);
 }
 .tdemo-line--aidaddy {
   align-self: center;
   max-width: 80%;
-  background: rgb(61 220 151 / 0.16);
+  background: rgb(46 139 87 / 0.16);
   text-align: center;
 }
 .tdemo-who {
-  color: #8fa3b8;
+  color: #6b625b;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
 }
 .tdemo-line--aidaddy .tdemo-who {
-  color: #3ddc97;
+  color: #23744a;
 }
 .tdemo-task {
   margin: 0 0.8rem 0.8rem;
   padding: 0.7rem 0.85rem;
-  border: 1px solid rgb(61 220 151 / 0.35);
+  border: 1px solid rgb(46 139 87 / 0.35);
   border-radius: 12px;
-  background: rgb(61 220 151 / 0.06);
+  background: rgb(46 139 87 / 0.06);
   font-size: 0.8rem;
   animation: tdemo-in 0.35s ease-out;
 }
 .tdemo-task-title {
   margin-bottom: 0.3rem;
-  color: #3ddc97;
+  color: #23744a;
   font-weight: 600;
 }
 .tdemo-step {
-  color: #c9d6e2;
+  color: #3d342e;
   animation: tdemo-in 0.35s ease-out;
 }
 .tdemo-card {
   margin: 0 0.8rem 0.9rem;
   padding: 0.85rem 0.9rem;
   border-radius: 16px;
-  background: #f4f7fa;
-  color: #15202b;
+  background: #fff;
+  color: #211b17;
   animation: tdemo-drop 0.5s ease-out;
   transition: transform 0.4s ease;
 }
@@ -124,7 +126,7 @@
   font-weight: 650;
 }
 .tdemo-card-sub {
-  color: #4b5a68;
+  color: #6b625b;
   font-size: 0.8rem;
 }
 .tdemo-card-lines {
@@ -137,7 +139,7 @@
   list-style: decimal;
 }
 .tdemo-card-meta {
-  color: #4b5a68;
+  color: #6b625b;
   font-size: 0.75rem;
 }
 .tdemo-card-buttons {
@@ -149,15 +151,15 @@
   flex: 1;
   padding: 0.45rem 0.3rem;
   border-radius: 8px;
-  background: #e2e9f0;
-  color: #24547d;
+  background: #f1ebe2;
+  color: #9d4122;
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
 }
 .tdemo-card-buttons span.is-done {
-  background: #dff6e9;
-  color: #1f7a4b;
+  background: #e3f1e8;
+  color: #23744a;
 }
 .site .tdemo-lines:focus-visible {
   outline-offset: -3px;

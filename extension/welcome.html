@@ -4,11 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AIDaddy in your browser</title>
+    <link rel="icon" href="icons/icon-32.png" />
     <link rel="stylesheet" href="ui.css" />
   </head>
   <body>
     <main>
-      <p class="label">AIDaddy · one step ahead</p>
+      <p class="label"><img src="icons/icon-48.png" width="24" height="24" alt="" /><span class="mark"><b>AI</b>Daddy</span> · one step ahead</p>
       <h1>May AIDaddy look at the pages you open?</h1>
       <p class="lede">
         Say yes once. From then on AIDaddy looks at every page you open in this browser and steps in when a page is about a
@@ -38,7 +39,7 @@
       <section class="panel">
         <h2>Connection</h2>
         <label>Engine address <input id="engine" type="url" autocomplete="off" /></label>
-        <label>Access code <input id="code" type="text" autocomplete="off" placeholder="the code from the team's QR" /></label>
+        <label>Access code, if the server asks for one <input id="code" type="text" autocomplete="off" placeholder="leave empty for the team's server" /></label>
         <label>
           Your country, when a page does not tell
           <select id="country">

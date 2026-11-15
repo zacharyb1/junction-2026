@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/chat",
     scope: "/",
     display: "standalone",
-    background_color: "#05080d",
-    theme_color: "#05080d",
+    background_color: "#fbf8f3",
+    theme_color: "#fbf8f3",
     icons: [
       { src: "/icons/app-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/app-512.png", sizes: "512x512", type: "image/png", purpose: "any" },

@@ -1,7 +1,0 @@
-{
-  "tool": "image_gen.imagegen",
-  "prompt": "Use case: illustration-story. Draw a fresh production ink decoration: a thin dark cranberry pen slash rising diagonally from lower left toward upper right on genuine transparent background. It is an underline for a handwritten annotation. Match the reference's general upward angle and sparse composition, while draw a fresh slightly irregular pen stroke with a delicate tapered left end and a small natural kink halfway along, rather than copying source pixels. Color #a82640, no shadows, halos, text, page ground, paper, or checkerboard. Keep only the ink. Canvas aspect 78:35, line runs from about 12 percent across at 80 percent down to 86 percent across at 17 percent down. Preserve clear margins on every side. Native transparent PNG.",
-  "reference": ".impeccable/build/ink-assets/bracket-underline-ref.png",
-  "transparent_background": true,
-  "approved": false
-}
