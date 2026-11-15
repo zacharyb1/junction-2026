@@ -4,7 +4,7 @@
  * The avatar is a set of pre-rendered clips. Every clip starts on one named pose and ends on one
  * named pose, with the same reference image for each shared pose. This permits pose-compatible
  * scheduling; generated clips still need a visual review for natural motion and seams. What the avatar does is decided by
- * what the agent is really doing, read from the reply stream of `/api/ukk`.
+ * what the agent is really doing, read from the reply stream of `/api/aidaddy`.
  *
  * Three layers, each knowing nothing about the next:
  *   AgentEvent  what happened (a tool started, text arrived, audio is playing)

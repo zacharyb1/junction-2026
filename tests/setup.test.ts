@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { CONNECTIONS } from "@/components/hud/setup-data";
 
 describe("setup screen connections", () => {
-  it("offers the three ways UKK can follow along", () => {
+  it("offers the three ways AIDaddy can follow along", () => {
     expect(CONNECTIONS.map((c) => c.id)).toEqual(["telegram", "phone", "browser"]);
   });
 

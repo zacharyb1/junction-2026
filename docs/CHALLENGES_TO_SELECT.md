@@ -2,11 +2,13 @@
 
 Written Saturday 14 November, 20:09 Helsinki, from the challenge texts on the Junction platform. The platform lets one project enter several challenges. Tick a box here when you have selected it on the platform.
 
+Handover updated Sunday 15 November for #72 and #77: the refreshed landing replay has new measurements and no matching narration, and unconfigured chat offers text without voice controls. This does not complete the live voice work in #75/#76 or the calling work in #32/#73.
+
 **The rule we follow:** select a challenge only when its technology does real work in the demo. A judge who opens the project and cannot find their product will mark it down, and that costs more than the entry gains.
 
 Demo address for every note below: <https://86.38.238.136.sslip.io>
 
-## 1. Select now (5)
+## 1. Select now (4)
 
 These work today. Each has a note you can paste into the form.
 
@@ -14,14 +16,14 @@ These work today. Each has a note you can paste into the form.
 
 - **Why it fits:** this is the challenge the product was built for.
 - **Note to paste:**
-  > UKK is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web: 19 of 19 scenarios, 98 of 98 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 5.6 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
+  > AIDaddy is a butler in a household's Telegram group, on the web and in the browser. It stays silent on small talk. On a life event or an official letter it runs four Exa structured searches on the official sites of the right country, opens every page it wants to cite again (our own request plus Exa Contents), and keeps a plan line only when its quoted sentence is found on that page. Each source number opens the official page at that sentence. Latest test run on the live web: 19 of 19 scenarios, 98 of 98 quotes found on their pages, 6 of 6 messages with nothing to research refused, median 5.6 s, about $0.03 of Exa search per case. Judges can ask their own question at /try.
 - **Evidence:** `src/data/scorecard.json`, `eval/results/latest.md`, the front page replay.
 
 ### - [ ] NVIDIA: Best Use of Nemotron
 
-- **Why it fits:** Nemotron 3.5 Super VL is UKK's conversation model, in Telegram and on `/ukk`.
+- **Why it fits:** Nemotron 3.5 Super VL is AIDaddy's conversation model, in Telegram and on `/chat`.
 - **Required:** a text in the form naming the model, what it does, why it matters and how we improved its outputs. Paste this:
-  > **Model:** `nvidia/nemotron-3.5-super-vl-120b-a12b`, through the Hermes Agent runtime's NVIDIA provider. **What it does:** it is the whole conversation layer of UKK. It decides whether a message in a group needs an answer, calls our research tool, writes drafts of letters for the household to send, sets reminders after approval, and reads photos of official letters with its own vision (no separate OCR model). **Why it matters:** one open model handles text, images and tool calls, so a newcomer can drop a photo of a Finnish letter into the chat and get a plan back. **How we improved its outputs:** (1) The model never states a figure itself. Deadlines and amounts come only from our research engine, which keeps a line only when its quoted sentence is found on the cited page; the model posts those lines unchanged. (2) A persona file and ten short skills give it exact procedures and the reasons behind each rule. (3) A local Gemma gate stops small talk before it reaches Nemotron, and the model answers `[SILENT]` when it is still unsure. (4) We rehearsed 12 scenarios from the command line and recorded live group runs, then fixed what failed: recovery when a case is missing, and duplicate reminders. Measured: first reply 3 to 12 seconds; a letter photo was read correctly in all six field groups with two street-name errors.
+  > **Model:** `nvidia/nemotron-3.5-super-vl-120b-a12b`, through the Hermes Agent runtime's NVIDIA provider. **What it does:** it is the whole conversation layer of AIDaddy. It decides whether a message in a group needs an answer, calls our research tool, writes drafts of letters for the household to send, sets reminders after approval, and reads photos of official letters with its own vision (no separate OCR model). **Why it matters:** one open model handles text, images and tool calls, so a newcomer can drop a photo of a Finnish letter into the chat and get a plan back. **How we improved its outputs:** (1) The model never states a figure itself. Deadlines and amounts come only from our research engine, which keeps a line only when its quoted sentence is found on the cited page; the model posts those lines unchanged. (2) A persona file and ten short skills give it exact procedures and the reasons behind each rule. (3) A local Gemma gate stops small talk before it reaches Nemotron, and the model answers `[SILENT]` when it is still unsure. (4) We rehearsed 12 scenarios from the command line and recorded live group runs, then fixed what failed: recovery when a case is missing, and duplicate reminders. Measured: first reply 3 to 12 seconds; a letter photo was read correctly in all six field groups with two street-name errors.
 - **Evidence:** `docs/HERMES_HANDOVER.md`, `hermes/SOUL.md`, `hermes/skills/`, `eval/bot/`.
 
 ### - [ ] Google DeepMind: Best Use of Gemma
@@ -31,14 +33,6 @@ These work today. Each has a note you can paste into the form.
   > Gemma 3 (1B) runs with Ollama next to the bot, on our own server in Finland. Every group message goes to it first, after simple rules and wake patterns. It decides one thing: is this a life event or small talk? Small talk stops there and never reaches the cloud model. If Gemma is unsure it wakes the bot; if it is down, the patterns take over. Measured on our labelled set of 60 messages in English and Finnish: 0 of 20 life events missed, 1 of 40 small-talk messages woke the bot. Patterns alone missed 3 of 20, and so did the model alone, so the combination is what works. It is a development set, not a blind test. Photos, and messages in the three minutes after a wake, go on to the conversation model.
 - **Evidence:** `eval/results/gate-gemma3-1b.json`, `eval/gate/`, `hermes/plugins/kaveri-gate/`.
 
-### - [ ] Major League Hacking: Best Use of ElevenLabs
-
-- **Why it fits:** UKK has his own voice, and it is used in four places.
-- **Do first:** the server has no ElevenLabs key yet (`/api/health` says `"voice":"none"`), so `/ukk` shows "Voice is not set up on this server". Add `ELEVENLABS_API_KEY` to the server's `.env.local` (Milan). The front page's "Hear the plan" works without it.
-- **Note to paste:**
-  > UKK's voice was made with ElevenLabs Voice Design from a text description (a calm older statesman with a light Nordic accent). It is not a clone of anyone. ElevenLabs is used in four places: (1) every case file can be read aloud, and the audio says only what the file shows; (2) on /ukk each reply is spoken while a drawn avatar moves its mouth with the audio; (3) the microphone button sends speech to ElevenLabs Scribe and puts the words in the message box to check before sending; (4) the front page's "Hear the plan" and the pitch voiceover. We checked the spoken words by transcribing the audio back to text.
-- **Evidence:** `src/lib/speech.ts`, `src/app/api/ukk/speak`, `src/app/api/ukk/listen`, `public/hud/plan.mp3`, `docs/pitch/voiceover/`.
-
 ### - [ ] Verda: Verda Compute Track
 
 - **Why it fits:** the whole product runs on one Verda CPU instance, which their brief lists ("CPU instances for hosting agentic applications", and "Keep sensitive data in Europe. Run open-weight models on infrastructure you control").
@@ -46,9 +40,19 @@ These work today. Each has a note you can paste into the form.
 - **Note to paste:**
   > Everything runs on one Verda CPU instance in Finland (8 vCPU, 32 GB): the website and research engine, the Telegram bot, a second web-only bot instance, and Gemma 3 served by Ollama as the privacy gate. A laptop could not do this: the bot needs one always-on host, judges need case links that open on any phone, and the gate model has to sit next to the bot so small talk is judged on infrastructure we control, in Europe, before anything goes to a cloud model. Every merge to main is tested and then deployed to the instance automatically, with a rollback when the health check fails. Process and scaling path: docs/VERDA.md.
 
-## 2. Close: select only after the named step is done (6)
+## 2. Close: select only after the named step is done (7)
 
 Each of these needs work that is not done. The team's own feature freeze was 20:00, so starting any of them is a team decision. If the step is not done, do not select the challenge.
+
+### - [ ] Major League Hacking: Best Use of ElevenLabs
+
+- **What exists:** case narration, chat speech and speech-to-text code, plus recorded pitch audio. The current pitch files use the premade George voice; do not describe them as the project's designed voice.
+- **Required for a live voice claim:** account configuration from #76, then the production checks in #75: the intended voice plays a reply and a short voice note becomes an editable draft. A configured-key flag or simulated browser audio does not prove either provider path works. Check case narration separately before claiming it in the demo. #37 remains open until the intended voice feature is demonstrated.
+- **Current fallback:** `/chat` offers text and hides voice controls when the server has no ElevenLabs key. The homepage's old "Hear the plan" button was removed because its narration belongs to the previous replay. Do not offer that audio as narration for the refreshed Case.
+- **Note to paste only after the named live checks pass; remove any path not demonstrated:**
+  > ElevenLabs gives AIDaddy its spoken interface: case narration reads the stored plan, chat replies can be spoken while the avatar follows the audio, and Scribe turns a short voice note into an editable draft before sending. We demonstrated these paths on the deployed app with the intended voice. Outbound phone calls are a separate controlled rehearsal and are not claimed here.
+- **Recorded-only alternative:** if the final video uses the existing ElevenLabs voiceover, describe that exact use and listen to the final edit. Recorded assets alone do not establish a live voice feature; reconcile that narrower submission with [the challenge evidence](TECH_CHALLENGES.md).
+- **Evidence:** `src/lib/speech.ts`, `src/app/api/aidaddy/speak`, `src/app/api/aidaddy/listen`, `docs/pitch/voiceover.json`, `docs/pitch/voiceover/`, and the eventual #75 acceptance results.
 
 | | Challenge | What is there | What is missing | Rough effort |
 |---|---|---|---|---|
@@ -75,7 +79,7 @@ Selecting these would not help. One line each, so nobody has to wonder.
 | Bahn: Spread | A simulation game with its own leaderboard. |
 | AfterQuery: Break the Agent | A reinforcement-learning environment. Our scorecard is a test set, not an environment. |
 | Valio Aimo: Trusted Trade Agents | A purchasing interface for a wholesaler. |
-| City of Espoo: Rethinking Recruitment | About recruitment events. UKK helps newcomers with paperwork, not with hiring. |
+| City of Espoo: Rethinking Recruitment | About recruitment events. AIDaddy helps newcomers with paperwork, not with hiring. |
 | S-Pankki: Personal Economic Trainer | Built on their bank-transaction dataset. Our finance desk gives rules and sources, not spending analysis. |
 | MariaDB: Wikipedia Through Time | Needs MariaDB and Wikipedia data. |
 | Stoa: Make Blueprints Talk | Construction drawings. |
@@ -96,6 +100,6 @@ Selecting these would not help. One line each, so nobody has to wonder.
 
 - [ ] Every selected challenge has its note pasted where the form asks for one. Nemotron's is required.
 - [ ] The Verda summary link is posted in Verda's Discord channel.
-- [ ] `ELEVENLABS_API_KEY` is on the server, or the ElevenLabs note says where voice can be heard (the front page).
+- [ ] The ElevenLabs note matches demonstrated audio: live acceptance under #75/#76, or an accurately described voiceover actually included in the final video. Do not point to the removed homepage button.
 - [ ] Any challenge from section 2 whose step was not done is unselected.
 - [ ] The numbers in the notes still match `src/data/scorecard.json` and `eval/results/gate-gemma3-1b.json` after the last test run.

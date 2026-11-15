@@ -1,4 +1,4 @@
-/* The toolbar popup: is UKK looking, pause everywhere, pause on this site. */
+/* The toolbar popup: is AIDaddy looking, pause everywhere, pause on this site. */
 
 const $ = (id) => document.getElementById(id);
 
@@ -17,7 +17,7 @@ async function draw() {
   const siteOff = pausedHosts.includes(host);
 
   if (!consent) {
-    $("state").textContent = "UKK is not looking. You have not said yes yet.";
+    $("state").textContent = "AIDaddy is not looking. You have not said yes yet.";
     $("toggle").textContent = "Set it up";
     $("toggle").onclick = () => chrome.runtime.openOptionsPage();
     $("site").hidden = true;

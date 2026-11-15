@@ -22,7 +22,7 @@ node scripts/avatar/make-stock-clips.mjs --source /path/to/pexels-8643569.mp4
 node scripts/avatar/make-stock-clips.mjs --download
 ```
 
-Running without arguments only prints usage. The original is not committed; the script stores a downloaded original under the repository's already-ignored `.data/` directory. Rendered clips and their manifest live in `public/avatar/studio/`.
+Running without arguments only prints usage. The original is not committed; the script stores a downloaded original under the repository's already-ignored `.data/` directory. The rendered clips are no longer committed: no page uses this profile, and its frames include bystanders. The script writes them to `public/avatar/studio/` when run.
 
 Every regenerated poster embeds a JPEG COM provenance comment (`impeccable:prompt`) naming the source frame, creator, source and license URLs, editing script and original SHA-256. This preserves origin information inside the asset as well as in the manifest. The comment does not label the stock photograph as generated imagery.
 

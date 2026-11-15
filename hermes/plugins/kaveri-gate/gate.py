@@ -58,8 +58,16 @@ SHOTS = [
     ("miten rekisteröin osoitteeni DVV:hen?", "trigger"),
 ]
 
-# The bot's name, as people type it: UKK. Its earlier names, AIDaddy and Kaveri, still wake it.
-BOT_NAME = re.compile(r"(?<!\w)(ukk|ai ?daddy|kaveri)(?!\w)", re.IGNORECASE)
+# The bot's name, as people type it: AIDaddy, in one word or two, and with a common Finnish case ending
+# written straight after it ("AIDaddyn", "AIDaddylle", "AIDaddylta" or "AIDaddyltä", "AIDaddya").
+# After the name or its ending, Finnish chat adds one small particle: "AIDaddykin" (AIDaddy too), "AIDaddyhan",
+# "AIDaddyko?", "AIDaddyllekin". A longer word that only begins with the name ("AIDaddykoodi") is not the name.
+# Its earlier names, UKK and Kaveri, still wake it. A word that only contains the letters does not.
+BOT_NAME = re.compile(
+    r"(?<!\w)(ai ?daddy(n|a|ä|lle|lla|llä|lta|ltä|ssa|ssä|sta|stä|yn|na|nä|ksi)?(kin|kaan|kään|han|hän|ko|kö|pa|pä)?"
+    r"|ukk|kaveri)(?!\w)",
+    re.IGNORECASE,
+)
 
 
 @dataclass

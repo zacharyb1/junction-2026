@@ -1,4 +1,4 @@
-# UKK in the browser
+# AIDaddy in the browser
 
 A Chrome extension. It looks at the page you have open and, when the page is about a deadline, a benefit or an official form, shows what to do and by when, with the official sentence for every line. Issue [#26](https://github.com/zacharyb1/junction-2026/issues/26).
 
@@ -9,7 +9,9 @@ A Chrome extension. It looks at the page you have open and, when the page is abo
 3. Click **Load unpacked** and choose this `extension/` folder.
 4. A welcome page opens. Type the **access code** (the same code as for `/try`), then click **Yes, look at my pages**.
 
-That is the only permission question. From then on UKK looks at every page you open.
+That is the only permission question. From then on AIDaddy looks at every page you open.
+
+Already installed? After the files in this folder change, click the reload arrow on the extension's card in `chrome://extensions`, then refresh the pages that are already open: they keep the old copy until then. Your yes, the access code and what you saved are kept. Without the reload Chrome keeps running the old background worker. When that worker no longer answers, the corner pill says "AIDaddy needs a reload" instead of going quiet.
 
 ## What it does, exactly
 
@@ -27,7 +29,7 @@ A page counts as "about life admin" when it is on one of the Engine's official s
 
 ## Files
 
-- `manifest.json`: Manifest V3. Chrome's install prompt lists "read and change data on all websites"; UKK still stays off until you say yes on its welcome page.
+- `manifest.json`: Manifest V3. Chrome's install prompt lists "read and change data on all websites"; AIDaddy still stays off until you say yes on its welcome page.
 - `gate.js`: the local decisions (read or not, relevant or not, which country, which fields may be filled). Unit tests in `tests/extension-gate.test.ts`.
 - `content.js`: reads the page, shows the panel, fills on a click.
 - `background.js`: the only part that calls the Engine. Keeps answers for a day per page.

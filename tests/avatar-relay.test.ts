@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DELETE, POST } from "@/app/api/avatar/chat/route";
-import { POST as localChat } from "@/app/api/ukk/route";
+import { POST as localChat } from "@/app/api/aidaddy/route";
 import { mayResearch } from "@/lib/cases";
 import { allow } from "@/lib/rate-limit";
 
-vi.mock("@/app/api/ukk/route", () => ({ POST: vi.fn(async () => Response.json({ local: true })) }));
+vi.mock("@/app/api/aidaddy/route", () => ({ POST: vi.fn(async () => Response.json({ local: true })) }));
 vi.mock("@/lib/cases", async (original) => ({
   ...(await original<typeof import("@/lib/cases")>()), mayResearch: vi.fn(() => true),
 }));
@@ -188,16 +188,16 @@ describe("avatar chat relay", () => {
   it("uses the same persona and isolated session mapping for the local handler", async () => {
     vi.stubEnv("AVATAR_UPSTREAM", "");
     const req = request({ message: "Hello", persona });
-    req.headers.set("cookie", `ukk_session=other-chat; avatar_session=${session}; private=value`);
+    req.headers.set("cookie", `aidaddy_session=other-chat; avatar_session=${session}; private=value`);
     vi.mocked(localChat).mockResolvedValueOnce(new Response("data: [DONE]\n\n", {
-      headers: { "content-type": "text/event-stream", "set-cookie": `ukk_session=${session}; Path=/api/ukk; HttpOnly` },
+      headers: { "content-type": "text/event-stream", "set-cookie": `aidaddy_session=${session}; Path=/api/aidaddy; HttpOnly` },
     }));
     const response = await POST(req);
     const forwarded = vi.mocked(localChat).mock.calls[0][0];
-    expect(forwarded.headers.get("cookie")).toBe(`ukk_session=${session}`);
+    expect(forwarded.headers.get("cookie")).toBe(`aidaddy_session=${session}`);
     expect((await forwarded.json()).message).toContain('Your display name is "Noor"');
     expect(response.headers.get("set-cookie")).toContain(`avatar_session=${session}; Path=/api/avatar/chat;`);
-    expect(response.headers.get("set-cookie")).not.toContain("Path=/api/ukk;");
+    expect(response.headers.get("set-cookie")).not.toContain("Path=/api/aidaddy;");
     expect(fetch).not.toHaveBeenCalled();
   });
 });

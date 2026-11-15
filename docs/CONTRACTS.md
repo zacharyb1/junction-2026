@@ -40,7 +40,7 @@ A JSON body larger than 1 MB is not read and is answered `400` like any other in
 Every response carries `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin` (a case link is a secret, so
 other sites never see it), `X-Frame-Options: DENY` with `Content-Security-Policy: frame-ancestors 'none'`, and a
 `Permissions-Policy` that turns off camera, location, payment and USB and allows the microphone to the site's own
-pages only, because `/ukk` records voice notes (`next.config.ts`).
+pages only, because `/chat` records voice notes (`next.config.ts`).
 
 ## `POST /api/research` and MCP tool `research_case`
 
@@ -219,10 +219,10 @@ Response `200`:
 ```
 
 - Each Exa search has a structured output that proposes products. A product is kept only when its URL is one product's page (not a guide, blog, category, search or front page), its price's figures are on that page and `priceQuote` is the page's own sentence; `dropped` counts the rest. At most 8 are returned.
-- Any product, not only gifts: the MCP tool `find_products` (used by UKK's `product-finder` skill) runs the same search.
+- Any product, not only gifts: the MCP tool `find_products` (used by AIDaddy's `product-finder` skill) runs the same search.
 - Fewer than 5 kept products after a search: it searches again with a different query (a prompt as written, then as a shop search, then for product pages with a price; clues all together, then one at a time) and skips pages it already returned, at most 3 searches. `attempts` says how many it took.
 - `delivery` is the page's own sentence. `arrivesBy` is worked out from it (working days skip weekends) and is absent when the sentence gives no number of days. `late` is absent when either date is unknown.
-- `image` is the product page's own preview image from the same Exa result (https only), absent when the page has none. `GET /api/gifts/image?url=<product url>` returns it for a product the search found (no access code: it only reads what the search stored, in memory until a restart); the /ukk chat shows it above that product link.
+- `image` is the product page's own preview image from the same Exa result (https only), absent when the page has none. `GET /api/gifts/image?url=<product url>` returns it for a product the search found (no access code: it only reads what the search stored, in memory until a restart); the `/chat` page shows it above that product link.
 - Products that arrive in time come first. The bot never orders or pays: `url` is for the person to open.
 
 ## Case tools
@@ -371,7 +371,7 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `DEMO_RATE_TOTAL_PER_MINUTE` | Vercel, optional | all public requests per minute, default 40 |
 | `OXYLABS_API_KEY` | Vercel, optional | third page reader for sites that refuse our request |
 | `ELEVENLABS_API_KEY` | Vercel, optional | turns on the spoken plan: `GET /api/cases/:id/audio` and the button on the case page |
-| `ELEVENLABS_VOICE_ID` | Vercel, optional | voice for the spoken plan, default `JBFqnCBsd6RMkjVDRZzb` (George) |
+| `ELEVENLABS_VOICE_ID` | Vercel, optional | voice for everything the app speaks: the spoken plan and AIDaddy's replies on `/chat`. Default `UWUOFJTWwuSmZFHzbMpM`, AIDaddy's own designed voice, which lives in the team's ElevenLabs account: set it when the key belongs to another account |
 | `BLOB_READ_WRITE_TOKEN` | Vercel, set by the Blob store | case storage |
 | `PUBLIC_BASE_URL` | Vercel, optional | overrides the origin used in case links |
 | `NEXT_PUBLIC_BOT_USERNAME` | Vercel | QR code and links to the Telegram bot |

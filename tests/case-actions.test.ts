@@ -3,6 +3,7 @@ import { CaseInput, CasePatch, type Case } from "@/lib/case";
 import { approveCaseAction, publishCase, recheckCase, updateCase } from "@/lib/cases";
 import { loadCase } from "@/lib/store";
 import { verifyEvidence } from "@/lib/verify";
+import proactiveRehearsal from "../eval/results/proactive-20261115.json";
 
 // The case store without files, and the verifier without the network.
 const stored = new Map<string, Case>();
@@ -31,7 +32,7 @@ beforeEach(() => stored.clear());
 
 describe("the action log on a case", () => {
   it("records the research, the draft and a waiting proposal when a case is published", async () => {
-    const { id } = await publishCase(input, "https://ukk.example", undefined, trail);
+    const { id } = await publishCase(input, "https://aidaddy.example", undefined, trail);
     const actions = (await loadCase(id))!.actions!;
     expect(actions.map((a) => [a.kind, a.status])).toEqual([
       ["read", "done"],
@@ -43,7 +44,7 @@ describe("the action log on a case", () => {
   });
 
   it("logs only new drafts on update, plus what the bot reports doing", async () => {
-    const { id } = await publishCase(input, "https://ukk.example");
+    const { id } = await publishCase(input, "https://aidaddy.example");
     const before = (await loadCase(id))!.actions!.length;
     const patch = CasePatch.parse({
       drafts: [
@@ -52,7 +53,7 @@ describe("the action log on a case", () => {
       ],
       log: [{ kind: "read", trigger: "deadline", summary: "Reminder sent: daycare application closes Friday" }],
     });
-    await updateCase(id, patch, "https://ukk.example");
+    await updateCase(id, patch, "https://aidaddy.example");
     const added = (await loadCase(id))!.actions!.slice(before);
     expect(added.map((a) => [a.kind, a.trigger])).toEqual([
       ["draft", "message"],
@@ -64,8 +65,28 @@ describe("the action log on a case", () => {
     expect(CasePatch.safeParse({ log: [{ kind: "irreversible", trigger: "message", summary: "Sent it" }] }).success).toBe(false);
   });
 
+  it("keeps sending an unsolicited draft waiting for approval after later case work", async () => {
+    const { id } = await publishCase({ ...input, drafts: [] }, "https://aidaddy.example");
+    const update = proactiveRehearsal.calls.find((call) => call.tool === "case_update");
+    if (!update || !("patch" in update.input)) throw new Error("Recorded agent did not attach a draft");
+    // Replay the real agent's synthetic tool payload through the real Case schema and storage path.
+    await updateCase(id, CasePatch.parse(update.input.patch), "https://aidaddy.example");
+    const draft = (await loadCase(id))!.drafts[0];
+    await recheckCase(id, "cron");
+    await updateCase(id, CasePatch.parse({
+      drafts: [{ title: draft.title, body: "Please review this notice before sending it." }],
+    }), "https://aidaddy.example");
+
+    const actions = (await loadCase(id))!.actions!;
+    expect(actions.filter((a) => a.kind === "irreversible")).toEqual([
+      expect.objectContaining({ status: "waiting", trigger: "message", draftId: draft.id }),
+    ]);
+    expect(actions.some((a) => a.approvedAt)).toBe(false);
+    expect(actions.find((a) => a.kind === "draft")).toMatchObject({ status: "done", draftId: draft.id });
+  });
+
   it("logs a scheduled re-check, and a page change when a quote is gone", async () => {
-    const { id } = await publishCase(input, "https://ukk.example");
+    const { id } = await publishCase(input, "https://aidaddy.example");
     vi.mocked(verifyEvidence).mockImplementationOnce(async (items) =>
       items.map((e) => ({ ...e, sourceType: "official", verification: "not_found", match: 0.2, fetchedAt: new Date().toISOString(), checkedVia: "live" })) as never,
     );
@@ -75,7 +96,7 @@ describe("the action log on a case", () => {
   });
 
   it("approves a waiting proposal once", async () => {
-    const { id } = await publishCase(input, "https://ukk.example");
+    const { id } = await publishCase(input, "https://aidaddy.example");
     const index = (await loadCase(id))!.actions!.findIndex((a) => a.status === "waiting");
     const first = await approveCaseAction(id, index);
     expect(first?.action.status).toBe("approved");

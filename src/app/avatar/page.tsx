@@ -4,7 +4,7 @@ import path from "node:path";
 import { SiteShell } from "@/components/site/site-shell";
 import { AvatarDemo } from "@/components/avatar/avatar-demo";
 import { demoCodeRequired } from "@/lib/cases";
-import { ukkConfigured } from "@/lib/ukk";
+import { aidaddyConfigured } from "@/lib/aidaddy";
 import { validateManifest } from "@/lib/avatar/scheduler";
 import type { Manifest } from "@/lib/avatar/types";
 import type { PerformanceManifest } from "@/lib/avatar/performance";
@@ -87,7 +87,7 @@ export default async function AvatarPage({ searchParams }: PageProps<"/avatar">)
   } catch { /* A generated profile is optional; the offline walkthrough is always available. */ }
   return (
     <SiteShell bare>
-      <AvatarDemo profiles={profiles} preparedMedia={preparedMedia} code={typeof params.code === "string" ? params.code : ""} needsCode={demoCodeRequired()} liveConfigured={Boolean(process.env.AVATAR_UPSTREAM || ukkConfigured())} voiceConfigured={Boolean(process.env.ELEVENLABS_API_KEY)} />
+      <AvatarDemo profiles={profiles} preparedMedia={preparedMedia} code={typeof params.code === "string" ? params.code : ""} needsCode={demoCodeRequired()} liveConfigured={Boolean(process.env.AVATAR_UPSTREAM || aidaddyConfigured())} voiceConfigured={Boolean(process.env.ELEVENLABS_API_KEY)} />
     </SiteShell>
   );
 }

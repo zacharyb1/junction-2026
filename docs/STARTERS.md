@@ -1,6 +1,6 @@
 # Starter repos: what to copy once the challenge is known
 
-**Historical catalogue from before the product was chosen.** For the current architecture, tools and setup, start with [README.md](../README.md). The options below are references, not instructions to install or replace components in Kaveri.
+**Historical catalogue from before the product was chosen.** For the current architecture, tools and setup, start with [README.md](../README.md). The options below are references, not instructions to install or replace components in AIDaddy.
 
 Rule of thumb: **this repo is already the default starter** (Next.js 16 + TypeScript + Tailwind 4 + shadcn/ui + Vercel AI SDK, deployed on Vercel). Only pull in another template when the challenge needs something this one lacks. Copy *patterns and files*, not whole repos, unless noted.
 

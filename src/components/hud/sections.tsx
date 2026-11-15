@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Core } from "@/components/hud/core";
 import type { PlanRow } from "@/components/hud/data";
-import { HearPlan } from "@/components/hud/hear-plan";
 import type { Scorecard } from "@/components/landing/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
 
@@ -37,9 +36,9 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
               <em>it matters.</em>
             </h1>
             <p className="hud-lede">
-              AIDaddy puts a butler in your family&apos;s group chat. His name is UKK. He lets the small talk pass. When life
-              happens, he researches the live web with Exa and comes back with a plan in which every line points at a sentence
-              on an official page.
+              AIDaddy is a butler for your family&apos;s group chat. It lets the small talk pass. When life happens, it
+              researches the live web with Exa and comes back with a plan in which every line points at a sentence on an
+              official page.
             </p>
             <div className="hud-actions">
               <a href="#research" className="hud-btn hud-btn--primary">
@@ -143,7 +142,7 @@ export function GateFigures({ gate }: { gate: Gate }) {
           <dd>
             {gate.falseWakes}/{gate.smallTalk}
           </dd>
-          <dt>small-talk messages that woke him by mistake</dt>
+          <dt>small-talk messages that woke it by mistake</dt>
         </div>
       </dl>
       <p className="hud-note">
@@ -165,8 +164,8 @@ const RULES = [
     text: "When two official pages give different figures, the case file shows both with their sources. It does not pick one for you in silence.",
   },
   {
-    title: "He never acts for you",
-    text: "UKK researches and prepares. He never sends, files, books or pays. He may write a draft ahead of time, but nothing is sent and no reminder is set until the family says yes.",
+    title: "AIDaddy never acts for you",
+    text: "It researches and prepares. It never sends, files, books or pays. It may write a draft ahead of time, but nothing is sent and no reminder is set until the family says yes.",
   },
 ];
 
@@ -175,7 +174,7 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
     <div className="hud-plan">
       <div className="hud-panel hud-answer hud-reveal">
         <p className="hud-panel-title">
-          <span>UKK · in the chat</span>
+          <span>AIDaddy · in the chat</span>
           <span>the same recorded run</span>
         </p>
         <h3>{title}</h3>
@@ -203,7 +202,6 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
           Tap a number: the official page opens at the quoted sentence.{" "}
           <Link href={caseHref}>Open the full case file for this run →</Link>
         </p>
-        <HearPlan src="/hud/plan.mp3" seconds={40} />
       </div>
       <ul className="hud-rules">
         {RULES.map((rule) => (
@@ -226,47 +224,47 @@ type Place = {
 };
 
 /**
- * Where UKK meets a household, each with what it is today. "Live" works now, "Concept" is an idea shown as a
+ * Where AIDaddy meets a household, each with what it is today. "Live" works now, "Concept" is an idea shown as a
  * scripted replay or a mockup, "Replay" is a recording or a fixed script. The words match /setup and the demo pages.
  */
 const PLACES: Place[] = [
   {
     status: "Live",
     name: "In the group chat",
-    text: "UKK is one more member of your family's Telegram group. You can also talk to him here on the web.",
+    text: "AIDaddy is one more member of your family's Telegram group. You can also talk to it here on the web.",
     links: [
       { href: "/demo/chat", label: "Watch the replay", of: "the group chat" },
-      { href: "/ukk", label: "Talk to UKK" },
+      { href: "/chat", label: "Talk to AIDaddy" },
     ],
   },
   {
     status: "Concept",
     name: "In the browser",
-    text: "When someone is stuck on an official form, UKK points at the rule that applies.",
+    text: "When someone is stuck on an official form, AIDaddy points at the rule that applies.",
     links: [{ href: "/demo/browser", label: "Watch the replay", of: "the browser" }],
   },
   {
     status: "Concept",
     name: "At the kitchen table",
-    text: "The phone lies on the table. Say his name, and UKK looks things up while you keep talking. He cannot listen yet.",
+    text: "The phone lies on the table. Say \"AIDaddy\", and it looks things up while you keep talking. It cannot listen yet.",
     links: [{ href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" }],
   },
   {
     status: "Concept",
     name: "In the calendar",
-    text: "A birthday is coming up, and UKK comes back with three options. The birthday planner is a skill of the Telegram bot.",
+    text: "A birthday is coming up, and AIDaddy comes back with three options. The birthday planner is a skill of the Telegram bot.",
     links: [{ href: "/demo/calendar", label: "Watch the replay", of: "the calendar" }],
   },
   {
     status: "Replay",
     name: "One step ahead",
-    text: "UKK notices a situation and suggests a next step. A scripted demo with one live check on official sources.",
+    text: "AIDaddy notices a situation and suggests a next step. A scripted demo with one live check on official sources.",
     links: [{ href: "/autopilot", label: "Play the demo" }],
   },
   {
     status: "Concept",
-    name: "What he may follow",
-    text: "You choose what UKK may read or hear. A mockup of the setup screen: of its three channels, only Telegram works today.",
+    name: "What it may follow",
+    text: "You choose what AIDaddy may read or hear. A mockup of the setup screen: of its three channels, only Telegram works today.",
     links: [{ href: "/setup", label: "Open the setup" }],
   },
 ];
@@ -384,7 +382,7 @@ export function Readouts({ card }: { card: Scorecard }) {
 }
 
 const FLOW = [
-  { name: "Family group chat", tech: "Telegram", text: "UKK is one more member. Nobody has to open another app." },
+  { name: "Family group chat", tech: "Telegram", text: "AIDaddy is one more member. Nobody has to open another app." },
   { name: "Gate", tech: "Gemma, on our own server", text: "Decides whether a message is a life event. Small talk stops here." },
   { name: "Conversation", tech: "Hermes Agent + Nemotron", text: "Reads the letter photo, asks what is missing and drafts the notice. Sends nothing, and reminds only with a yes." },
   { name: "Research engine", tech: "Exa search", text: "Four searches per case, official sites of the right country first." },

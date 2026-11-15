@@ -98,7 +98,7 @@ export function useAvatarConversation({ code, liveConfigured, voiceConfigured, s
         await playAvatarAudio(RECORDED_EXAMPLE.audio, { signal, onSpeech });
       } else if (voiceConfigured) {
         setVoiceNote("Preparing voice…");
-        const response = await fetch("/api/ukk/speak", {
+        const response = await fetch("/api/aidaddy/speak", {
           method: "POST", headers: { "content-type": "application/json", "x-demo-code": code },
           body: JSON.stringify({ text: turn.text.slice(0, 5000) }), signal,
         });

@@ -100,7 +100,7 @@ class ConfigureAdminTest(unittest.TestCase):
         self.assertEqual(settings["api_server.max_concurrent_runs"], "4")
 
     def test_web_runtime_can_research_and_read_cases_only(self):
-        # Anonymous web visitors must not be able to talk UKK into changing someone else's case.
+        # Anonymous web visitors must not be able to talk AIDaddy into changing someone else's case.
         self.environment["KAVERI_RUNTIME"] = "web"
         result = self.run_script()
         self.assertEqual(result.returncode, 0, result.stderr)

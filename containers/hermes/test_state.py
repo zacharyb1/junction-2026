@@ -83,7 +83,7 @@ class ContainerStateTests(unittest.TestCase):
 
 
 class WebRuntimeTests(unittest.TestCase):
-    """The web instance serves /ukk through the API server and must never hold the Telegram token."""
+    """The web instance serves /chat through the API server and must never hold the Telegram token."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

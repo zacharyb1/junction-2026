@@ -26,7 +26,7 @@ export default function NotFound() {
             Research your own question
           </SiteLink>
           <Link href="/demo" className={linkButtonClasses({ variant: "outline", size: "cta" })}>
-            See UKK at work
+            See AIDaddy at work
           </Link>
           <Link href="/" className={linkButtonClasses({ variant: "outline", size: "cta" })}>
             Front page

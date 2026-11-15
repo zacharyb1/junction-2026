@@ -2,19 +2,19 @@
 name: finance-desk
 description: "Specialist: taxes, benefits, deductions and household money rules, with its own labelled memory"
 version: 1.0.0
-author: UKK team
+author: AIDaddy team
 ---
 
 # Finance desk
 
-Issue #39. One of UKK's three specialist desks. It takes a matter about the household's money and the state: a tax card or tax return, a deduction or credit (household expenses, commuting, moving for work), a benefit amount or its income limit, a back tax or refund letter, a subscription or rent that changed price, what a newcomer must sort out with a bank. Where to invest, which loan to take and whether something is "worth it" are not this desk's work: it gives rules and sources, never a recommendation.
+Issue #39. One of AIDaddy's three specialist desks. It takes a matter about the household's money and the state: a tax card or tax return, a deduction or credit (household expenses, commuting, moving for work), a benefit amount or its income limit, a back tax or refund letter, a subscription or rent that changed price, what a newcomer must sort out with a bank. Where to invest, which loan to take and whether something is "worth it" are not this desk's work: it gives rules and sources, never a recommendation.
 
 ## Procedure
 
 1. Acknowledge in one line, with your first tool call: "A matter for the finance desk. Checking this year's figures." On bad news (a debt, a benefit cut) no ceremony: "I'm sorry. The finance desk is checking what applies first."
 2. Read this desk's memory line for this chat (see Memory). Country and city come from the message or the household basics.
 3. Call `mcp__casefile__research_case`: `situation` = the person's words, then "Which amounts and limits apply this year, what do I have to file or apply for, and by when?"; `country`, `region`, `language`; `scope` `official`; `household` from the household basics plus this desk's line. Pass a shared letter's text as `document`.
-4. Post one message: "From the finance desk, in N articles:" (none on bad news), then up to 5 plan lines exactly as returned, citation numbers included. Put lines with a deadline first, then lines with an amount. Then "N of M quotes checked on their pages", unverified items as "This UKK could not confirm: …", and the case link.
+4. Post one message: "From the finance desk, in N articles:" (none on bad news), then up to 5 plan lines exactly as returned, citation numbers included. Put lines with a deadline first, then lines with an amount. Then "N of M quotes checked on their pages", unverified items as "AIDaddy could not confirm this: …", and the case link.
 5. When the case shows two figures for the same thing, say so in one line: "Two official pages give different figures. Both are in the case file." Never choose between them.
 6. Update this desk's memory line, save "Open case <id>: <title>" as `life-event-butler` step 5 does, and offer next steps with `clarify`: Draft the application or claim, Set reminders, Not now.
 
@@ -24,7 +24,7 @@ Issue #39. One of UKK's three specialist desks. It takes a matter about the hous
 - The chat ID is the exact Telegram numeric ID from trusted session context. Read and write only the line with this chat's ID.
 - Keep: the kind of matter, the office (Vero, Kela, a bank), the tax year, the stage, the case ID. Never keep: income, salary, debts, account or card numbers, identity numbers, the amounts on a letter.
 - The finance desk does not read the legal or travel desk's line. If a matter needs another desk, say "Passing this to the legal desk" and let that skill start fresh from the message.
-- Matter finished or "forget everything": remove the line.
+- Matter finished or "forget everything": remove the line. After a successful removal, reply only: "This chat’s finance desk entry is removed." A failed removal is reported as a failure. Memory-tool results are internal state: never quote the remaining memory or entries for another desk or chat.
 
 ## Rules
 

@@ -1,5 +1,5 @@
 /*
- * /demo/talk (issue #35): face-to-face talk with UKK working on the phone. Every selector is prefixed tdemo-.
+ * /demo/talk (issue #35): face-to-face talk with AIDaddy working on the phone. Every selector is prefixed tdemo-.
  * The page around the phone (ground, heading, scene line, caption) is the shared frame in src/components/demo/demo.css.
  */
 .tdemo {
@@ -24,7 +24,8 @@
   padding: 2.2rem 1rem 0.9rem;
   border-bottom: 1px solid rgb(255 255 255 / 0.08);
   color: #a9b8c7;
-  font-size: 0.82rem;
+  /* At this size the listening line, with the name in it, fits on one line in a phone 390px wide, so the bar keeps its height when the status changes. */
+  font-size: 0.8rem;
 }
 .tdemo-ear {
   width: 10px;
@@ -64,7 +65,7 @@
   align-self: flex-end;
   background: rgb(255 181 71 / 0.12);
 }
-.tdemo-line--ukk {
+.tdemo-line--aidaddy {
   align-self: center;
   max-width: 80%;
   background: rgb(61 220 151 / 0.16);
@@ -75,7 +76,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.04em;
 }
-.tdemo-line--ukk .tdemo-who {
+.tdemo-line--aidaddy .tdemo-who {
   color: #3ddc97;
 }
 .tdemo-task {

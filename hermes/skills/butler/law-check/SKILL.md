@@ -2,7 +2,7 @@
 name: law-check
 description: "Is it allowed? Customs and legal rules at a destination, answered with the sentence that applies"
 version: 1.0.0
-author: UKK team
+author: AIDaddy team
 ---
 
 # Law check
@@ -11,7 +11,7 @@ Issue #29. Someone asks whether something is allowed where they are going or whe
 
 ## Procedure
 
-1. Acknowledge in one line, in UKK's voice: "A question of law. UKK is reading the official pages of <country>."
+1. Acknowledge in one line, in AIDaddy's voice: "A question of law. AIDaddy is reading the official pages of <country>."
 2. The country is the **destination** (or where the act happens), not the household's home country. "Flying from Stockholm to Helsinki" → Finland. "Taking codeine to Dubai" → United Arab Emirates. If the destination is unclear, ask once.
 3. Call `mcp__casefile__research_case` with `situation` phrased as the question ("Is it allowed to bring snus from Sweden into Finland as a traveller, and how much?"), `country` = the destination, and the trigger's `language`.
 4. Post one message:

@@ -5,8 +5,8 @@
  *
  *   CASEFILE_SECRET=... node --experimental-strip-types scripts/make-examples.mjs --base https://86.38.238.136.sslip.io
  *
- * The cases are stored wherever that server stores cases. Run it against a server that writes to the
- * production store (the same BLOB_READ_WRITE_TOKEN) if the links should open on production.
+ * The cases are stored wherever that server stores cases. To record against an isolated local Engine,
+ * include the exact resulting Case objects in the deployment seed (docs/ARCHIVE_RECOVERY.md).
  * Writes src/data/example-cases.json. One call at a time: Exa limits searches per second.
  */
 import { writeFile } from "node:fs/promises";

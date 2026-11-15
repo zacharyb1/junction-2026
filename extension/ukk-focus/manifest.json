@@ -1,9 +1,0 @@
-{
-  "manifest_version": 3,
-  "name": "UKK Focus (prototype)",
-  "version": "0.1.0",
-  "description": "UKK notices when you leave a half-done tax return or other official form for social media, and nudges you back. Nothing leaves your browser.",
-  "permissions": ["tabs", "notifications", "storage", "alarms"],
-  "background": { "service_worker": "background.js" },
-  "icons": { "48": "icon-48.png", "128": "icon-128.png" }
-}

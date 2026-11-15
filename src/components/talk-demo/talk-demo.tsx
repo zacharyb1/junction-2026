@@ -4,21 +4,21 @@ import { useEffect, useRef } from "react";
 import { scrollToEnd, useReplayClock } from "@/components/demo/replay";
 
 /**
- * Issue #35: a scripted replay of a face-to-face conversation while UKK, on the phone on the table,
- * works in the background. Concept: UKK cannot listen on the phone yet, and in the concept he hears
- * nothing before his name. The research is a real run: kkv.fi, 3 of 3 quotes checked, 7.4 seconds,
+ * Issue #35: a scripted replay of a face-to-face conversation while AIDaddy, on the phone on the table,
+ * works in the background. Concept: AIDaddy cannot listen on the phone yet, and in the concept it hears
+ * nothing before its name. The research is a real run: kkv.fi, 3 of 3 quotes checked, 7.4 seconds,
  * https://86.38.238.136.sslip.io/c/awE0ewNWNgPE_nmE (the drafted complaint is on that case).
  */
 export const CASE_URL = "https://86.38.238.136.sslip.io/c/awE0ewNWNgPE_nmE";
 export const DURATION = 38000;
 
-type Line = { at: number; who: "Aino" | "Mikko" | "UKK"; text: string };
+type Line = { at: number; who: "Aino" | "Mikko" | "AIDaddy"; text: string };
 
 const LINES: Line[] = [
   { at: 800, who: "Aino", text: "The landlord emailed. Rent goes up 8 % from January." },
   { at: 3000, who: "Mikko", text: "Eight percent? Is that even allowed?" },
-  { at: 5200, who: "Aino", text: "UKK, check that while we talk." },
-  { at: 6300, who: "UKK", text: "On it, in the background." },
+  { at: 5200, who: "Aino", text: "AIDaddy, check that while we talk." },
+  { at: 6300, who: "AIDaddy", text: "On it, in the background." },
   { at: 7800, who: "Mikko", text: "Anyway. Sauna tonight or tomorrow?" },
   { at: 10200, who: "Aino", text: "Tonight. I'm exhausted." },
   { at: 12600, who: "Mikko", text: "Deal. I'll heat it at seven." },
@@ -26,8 +26,8 @@ const LINES: Line[] = [
   { at: 22000, who: "Mikko", text: "Read it out?" },
   { at: 23600, who: "Aino", text: "“The landlord does not have the right to increase the rent unilaterally during the tenancy.”" },
   { at: 27400, who: "Mikko", text: "So it depends on our lease. Let's look tonight." },
-  { at: 29600, who: "Aino", text: "UKK, draft the complaint. I'll check it later." },
-  { at: 30900, who: "UKK", text: "Drafted. It waits on the case page. I won't send it." },
+  { at: 29600, who: "Aino", text: "AIDaddy, draft the complaint. I'll check it later." },
+  { at: 30900, who: "AIDaddy", text: "Drafted. It waits on the case page. I won't send it." },
 ];
 
 const STEPS: [number, string][] = [
@@ -45,7 +45,7 @@ export function TalkDemo({ loop = false }: { loop?: boolean }) {
   const steps = STEPS.filter(([at]) => now >= at);
   const answered = now >= 14200;
   const drafted = now >= 30900;
-  // UKK is at work from his name until the answer lands, and again from the request for a draft until the draft is there.
+  // AIDaddy is at work from its name until the answer lands, and again from the request for a draft until the draft is there.
   const awake = working || (now >= 29600 && now < 30900);
 
   // The task card and the answer card take room from the list when they appear, so the last line is brought back into view then too.
@@ -57,21 +57,21 @@ export function TalkDemo({ loop = false }: { loop?: boolean }) {
     <div className="tdemo">
       <div className="tdemo-status">
         <span className={`tdemo-ear${awake ? " is-awake" : ""}`} aria-hidden />
-        {awake ? "UKK is working" : "Listening for “UKK” · nothing is heard before his name"}
+        {awake ? "AIDaddy is working" : "Listening for “AIDaddy” · nothing is heard before its name"}
       </div>
 
       {/* No aria-live: a screen reader would read the whole script aloud, unasked. The list takes focus so the keyboard can scroll it. */}
       <ol ref={list} className="tdemo-lines" tabIndex={0} aria-label="What is said at the table">
         {said.map((l) => (
           <li key={l.at} className={`tdemo-line tdemo-line--${l.who.toLowerCase()}`}>
-            <span className="tdemo-who">{l.who === "UKK" ? "UKK" : `${l.who} · spoken`}</span>
+            <span className="tdemo-who">{l.who === "AIDaddy" ? "AIDaddy" : `${l.who} · spoken`}</span>
             <span>{l.text}</span>
           </li>
         ))}
       </ol>
 
       {working && (
-        <div className="tdemo-task" aria-label="UKK working in the background">
+        <div className="tdemo-task" aria-label="AIDaddy working in the background">
           <p className="tdemo-task-title">In the background: rent increase</p>
           {steps.map(([at, text]) => (
             <p key={at} className="tdemo-step">
@@ -85,9 +85,9 @@ export function TalkDemo({ loop = false }: { loop?: boolean }) {
         <div className={`tdemo-card${drafted ? " is-small" : ""}`}>
           <div className="tdemo-card-head">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ukk-avatar.jpg" alt="" />
+            <img src="/aidaddy-avatar.svg" alt="" />
             <div>
-              <p className="tdemo-card-name">UKK</p>
+              <p className="tdemo-card-name">AIDaddy</p>
               <p className="tdemo-card-sub">Rent increase: what the rules say</p>
             </div>
           </div>

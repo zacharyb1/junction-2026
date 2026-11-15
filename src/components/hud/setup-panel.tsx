@@ -55,7 +55,7 @@ function Channel({ connection }: { connection: Connection }) {
   );
 }
 
-/** The /setup mockup: three switches for what UKK may follow. State lives only in this page. */
+/** The /setup mockup: three switches for what AIDaddy may follow. State lives only in this page. */
 export function SetupPanel() {
   return (
     <ul className="hud-setup-grid">

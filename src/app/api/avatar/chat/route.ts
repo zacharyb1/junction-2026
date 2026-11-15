@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { POST as localChat } from "@/app/api/ukk/route";
+import { POST as localChat } from "@/app/api/aidaddy/route";
 import { mayResearch, readJson } from "@/lib/cases";
 import { allow } from "@/lib/rate-limit";
 
@@ -14,7 +14,7 @@ const Input = z.object({ message: z.string().trim().min(1).max(1500), persona: P
 const json = (error: string, status: number) => Response.json({ error }, { status });
 const AVATAR_COOKIE = "avatar_session";
 const REMOTE_COOKIE = "aidaddy_session";
-const LOCAL_COOKIE = "ukk_session";
+const LOCAL_COOKIE = "aidaddy_session";
 // Shape only: the chat server remains the authority that verifies this signature.
 const SESSION_VALUE = /^[A-Za-z0-9_-]{1,128}\.[A-Za-z0-9_-]{43}$/;
 
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
   const session = avatarSession(req);
 
   if (!configured) {
-    // Keep this concept's conversation separate from a visitor's normal /ukk chat.
+    // Keep this concept's conversation separate from a visitor's normal /chat conversation.
     const headers = new Headers(req.headers);
     headers.delete("cookie");
     headers.delete("content-length");

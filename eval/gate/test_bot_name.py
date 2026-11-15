@@ -14,17 +14,51 @@ class BotNameTest(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertTrue(gate.BOT_NAME.search(text), f"should wake: {text!r}")
 
-    def test_ukk_wakes(self):
-        # Finnish case endings follow a colon: "UKK:lta" is "from UKK".
-        self.assert_wakes("UKK, we got a letter", "hei ukk", "@UKK help", "kysyin UKK:lta")
-
-    def test_old_names_still_wake(self):
-        self.assert_wakes("AIDaddy?", "ai daddy help", "Kaveri, katso tämä")
-
-    def test_lookalikes_do_not_wake(self):
-        for text in ("ukko tulee kotiin", "Ukkonen soitti", "joulupukki", "bukk"):
+    def assert_silent(self, *texts):
+        for text in texts:
             with self.subTest(text=text):
                 self.assertIsNone(gate.BOT_NAME.search(text), f"should not wake: {text!r}")
+
+    def test_aidaddy_wakes(self):
+        self.assert_wakes("AIDaddy, we got a letter", "hei aidaddy", "AI Daddy help", "ai daddy help",
+                          "@AIDaddy help", "AIDaddy?")
+
+    def test_aidaddy_with_a_finnish_case_ending_wakes(self):
+        # A Finnish case ending is written straight after the name: "AIDaddylta" is "from AIDaddy".
+        self.assert_wakes("AIDaddyn suunnitelma", "kerro AIDaddylle", "kysyin AIDaddylta", "odotetaan AIDaddya")
+        # People also type the endings with front vowels, and the other common cases.
+        self.assert_wakes("kysyin AIDaddyltä", "odotetaan AIDaddyä", "AIDaddylla on suunnitelma",
+                          "luotan AIDaddyyn", "kerro AI Daddylle")
+
+    def test_aidaddy_with_a_finnish_particle_wakes(self):
+        # Finnish chat adds one small particle to a name: "AIDaddykin" is "AIDaddy too", "AIDaddyko?" asks about it.
+        self.assert_wakes("AIDaddykin tietää", "tietääkö AIDaddykaan", "AIDaddykään ei tiedä",
+                          "AIDaddyhan sen sanoi", "AIDaddyhän sen sanoi", "AIDaddyko?", "AIDaddykö sen teki?",
+                          "AIDaddypa tiesi", "AIDaddypä tiesi")
+        # The particle also follows a case ending: "AIDaddyltakin" is "from AIDaddy too".
+        self.assert_wakes("kysytään AIDaddyltakin", "AIDaddynkin mielestä", "AIDaddyllekin",
+                          "ei AIDaddyllakaan ole vastausta", "eikö AIDaddyltäkään tullut mitään",
+                          "AIDaddynhan piti muistuttaa", "AIDaddyssäkö vika on?")
+        # In two words and in capitals, like the name itself.
+        self.assert_wakes("AI Daddykin tietää", "AIDADDYLLEKIN!")
+
+    def test_earlier_names_still_wake(self):
+        # After an abbreviation the case ending follows a colon: "UKK:lta" is "from UKK".
+        self.assert_wakes("UKK, we got a letter", "hei ukk", "@UKK help", "kysyin UKK:lta")
+        self.assert_wakes("Kaveri, katso tämä", "kaveri?")
+
+    def test_lookalikes_do_not_wake(self):
+        self.assert_silent("ukko tulee kotiin", "Ukkonen soitti", "joulupukki", "bukk", "raidaddy",
+                           "daddy is home", "AI is everywhere", "kaverit tulevat kylään")
+
+    def test_a_longer_word_that_begins_with_the_name_does_not_wake(self):
+        # The second part begins with the letters of a particle or an ending and then goes on: it is another word.
+        self.assert_silent("AIDaddykoodi on valmis", "AIDaddyhanke etenee", "AIDaddypaita päällä", "AIDaddykone",
+                           "AIDaddynkino", "AIDaddypalvelu")
+
+    def test_a_particle_wakes_only_on_the_name_aidaddy(self):
+        self.assert_silent("daddykin on kotona", "raidaddykin", "AIkin on kaikkialla", "kaverikin tulee",
+                           "ukkokin tulee")
 
 
 if __name__ == "__main__":

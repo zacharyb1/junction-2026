@@ -1,8 +1,10 @@
-import replay from "@/data/replay.json";
+import replay from "@/data/avatar-recorded-run.json";
 import type { RecordedRun, TimedEvent } from "./types";
 
 /**
  * A public, committed Engine recording, adapted to the avatar event vocabulary.
+ * It is the avatar's own frozen copy of the 14 November run: the front page's `replay.json` now holds a
+ * newer run whose plan and citation numbers differ from the prepared spoken answers.
  * The tool names below are playback aliases, not recorded Hermes tool calls.
  * Only search entries with explicit running/done events become tool events;
  * stage/page entries do not establish individual tool execution intervals.

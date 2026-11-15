@@ -30,7 +30,7 @@ Local MuseTalk/TAESD probes were rejected for these public scenes. A three-secon
 
 ## Conversation and personalization
 
-`/api/avatar/chat` uses the branch's local `/api/ukk` handler unless `AVATAR_UPSTREAM` selects an HTTPS origin; remote requests use the fixed `/api/aidaddy` path. Normal demo-code and rate limits remain active. `DEMO_OPEN=1` opens the configured demo. Live questions consume the existing service's credits; prepared scenes require no new search, TTS or model call during playback.
+`/api/avatar/chat` uses the local `/api/aidaddy` handler unless `AVATAR_UPSTREAM` selects an HTTPS origin; remote requests use the fixed `/api/aidaddy` path. Normal demo-code and rate limits remain active. `DEMO_OPEN=1` opens the configured demo. Live questions consume the existing service's credits; prepared scenes require no new search, TTS or model call during playback.
 
 The server validates name, focus and tone, then maps them to bounded presentation instructions while preserving research checks and tool limits. Messages may contain up to 1,200 characters. These settings affect new live requests; they do not generate another room, change the prepared script, create professional credentials or train a specialist. Changing the appearance cancels the current playback and request.
 
@@ -42,7 +42,7 @@ Live voice uses the local ElevenLabs endpoint when configured, otherwise an inst
 
 ## Saved evidence
 
-The main scene replays the public pregnancy question and Engine events from `src/data/replay.json`, recorded **14 November 2026**. Its search events are recorded playback, not a fresh Hermes trace. All **11 evidence entries** retain their original numbers, URLs and quotations, including distinct quotations from the same page. Citation markers link to their corresponding sources.
+The main scene replays the public pregnancy question and Engine events from `src/data/avatar-recorded-run.json` (the run the front page showed until main replaced `src/data/replay.json`), recorded **14 November 2026**. Its search events are recorded playback, not a fresh Hermes trace. All **11 evidence entries** retain their original numbers, URLs and quotations, including distinct quotations from the same page. Citation markers link to their corresponding sources.
 
 The clinic follow-up opens saved InfoFinland citation **[1]**. The employer follow-up opens saved Kela citation **[3]**. The short spoken summaries are authored in `src/data/avatar-performance-dialogue.json`, and their transcripts accompany the prepared performances. They do not replace the full written plan or establish a new verification of the sources. The earlier `public/hud/plan.mp3` recording remains a legacy asset; the three current scenes use their own Gemini speech.
 
@@ -52,6 +52,6 @@ On 15 November, the full Vitest suite passed: **263 tests in 25 files**, includi
 
 Chromium checks at widths **1440, 1024, 768, 390 and 320** passed the controls, network-failure fallback and reduced-motion checks. Desktop playback confirmed a stable playhead during pause, resume, mute, replacement by the clinic scene, and cancellation of the old voice. Prepared playback made zero API requests. The adopted mobile-height adjustment was rechecked at **320 and 390** with real reply text: prose remained visible, controls did not overlap, and deliberate scrolling to older messages was preserved. These browser checks establish media and interface state, not audible voice quality or lip alignment.
 
-Earlier live checks established the selected display name and follow-up memory, and the remote relay fix restored a nonempty HTTP 200 SSE response after PR #64 renamed `/api/ukk` to `/api/aidaddy`. The previous UI revision was inspected at six viewport widths and its old recorded walkthrough completed without sampled blank frames. Those are historical results, not a validation of the new office media or its transitions.
+Earlier live checks established the selected display name and follow-up memory, and the remote relay fix restored a nonempty HTTP 200 SSE response after PR #64 moved the chat endpoint to `/api/aidaddy`. The previous UI revision was inspected at six viewport widths and its old recorded walkthrough completed without sampled blank frames. Those are historical results, not a validation of the new office media or its transitions.
 
 No paid generation or cloud-resource purchase was used for these assets. Generated identities, role-specific cabinets, open-ended synchronized speech and natural transitions over an unlimited conversation remain unfinished. The team still needs to judge whether the prepared experience supports making the avatar central to the project.

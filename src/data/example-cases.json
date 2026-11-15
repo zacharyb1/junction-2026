@@ -1,45 +1,45 @@
 {
-  "generatedAt": "2026-11-14T04:30:23.177Z",
+  "generatedAt": "2026-11-14T23:20:46.768Z",
   "cases": [
     {
       "label": "Expecting a baby",
       "situation": "I just found out I am pregnant. We both work full time. What do we need to do and when?",
-      "id": "03FXUO3o-nIhJl8L",
-      "title": "Pregnancy and Parental Leave Planning",
-      "evidenceVerified": 11,
-      "evidenceTotal": 11
-    },
-    {
-      "label": "Rent increase",
-      "situation": "Our landlord wants to raise the rent by 15 percent from next month. Is that allowed and what can we do?",
-      "id": "AL-9KIJO4W4o_tBL",
-      "title": "Contesting a Rental Increase",
-      "evidenceVerified": 6,
-      "evidenceTotal": 6
-    },
-    {
-      "label": "Flight cancelled",
-      "situation": "Our flight tomorrow morning was just cancelled. We are a family of three. What are we entitled to?",
-      "id": "vs6yntI3_T2CuLuU",
-      "title": "Managing a cancelled flight",
-      "evidenceVerified": 9,
-      "evidenceTotal": 9
-    },
-    {
-      "label": "Lost my job",
-      "situation": "I was laid off today after three years at the company. What do I have to do this week and what support can I get?",
-      "id": "ZYbXiKWfd_ofx_4c",
-      "title": "Post-layoff actions",
+      "id": "YFIVlk7ZbgdkHg9j",
+      "title": "Checklist for Pregnancy",
       "evidenceVerified": 7,
       "evidenceTotal": 7
     },
     {
+      "label": "Rent increase",
+      "situation": "Our landlord wants to raise the rent by 15 percent from next month. Is that allowed and what can we do?",
+      "id": "k8MqZRTgt_iTjzRU",
+      "title": "Handling an Unilateral Rent Increase",
+      "evidenceVerified": 4,
+      "evidenceTotal": 4
+    },
+    {
+      "label": "Flight cancelled",
+      "situation": "Our flight tomorrow morning was just cancelled. We are a family of three. What are we entitled to?",
+      "id": "y6YYq4bUCdm1Imo7",
+      "title": "Flight Cancellation Rights for Families",
+      "evidenceVerified": 7,
+      "evidenceTotal": 7
+    },
+    {
+      "label": "Lost my job",
+      "situation": "I was laid off today after three years at the company. What do I have to do this week and what support can I get?",
+      "id": "hEPWCj8qzJJerciH",
+      "title": "Registering for unemployment",
+      "evidenceVerified": 5,
+      "evidenceTotal": 5
+    },
+    {
       "label": "Moving home",
       "situation": "We are moving to another city next month. Who do we have to notify and by when?",
-      "id": "ReaS-6jlm62EHE3R",
-      "title": "Moving Checklist for Espoo Residents",
-      "evidenceVerified": 8,
-      "evidenceTotal": 8
+      "id": "UZd1CN9xIJWK7zz-",
+      "title": "Moving house in Espoo checklist",
+      "evidenceVerified": 4,
+      "evidenceTotal": 4
     }
   ]
 }
