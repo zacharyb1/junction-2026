@@ -1,104 +1,48 @@
 "use client";
 
 /**
- * "Get it done": AI agents find local companies for a household job, reach them all at once and pick the cheapest
- * quote that fits the parent's week, for the parent to approve.
- *
- * The recorded job (a leaking kitchen tap) replays a scripted run so the demo is the same every time. Any other job
- * searches real companies through /api/helpers; their calls and quotes are still simulated, and the screen says so.
+ * "Get it done" on the phone: AIDaddy finds real companies for a household job on their own pages, then, when the
+ * parent says yes, rings the team's test phones (standing in for the companies) all at once and shows each answer and
+ * price. Real companies are never called, and nothing is booked or paid. The desktop page plays the same flow.
  */
 
+import Image from "next/image";
 import { type FormEvent, useState } from "react";
-import { CHANNEL, DEMO_JOB, type Firm, type FirmRow } from "@/lib/home-demo";
-import { useTaskRun } from "./task-run";
-import { AppLogo, H1, Icon, ICON, Main, Spinner, TabBar, TabHeader, useNav } from "./ui";
+import { FIRST_JOB, HOUSEHOLD, isLeakingTap } from "@/lib/home-demo";
 import { useLive } from "./home-app";
+import { useCallRound, useCompanySearch } from "./job-work";
+import { H1, Main, Spinner, TabBar, TabHeader, useNav } from "./ui";
 
-function RowView({ row, picked, best, searching }: { row: FirmRow; picked: boolean; best: Firm | null; searching: boolean }) {
-  const f = row.firm;
-  const isBest = f === best;
-  const apps = f.channels.map((c) => CHANNEL[c].app).filter((a): a is NonNullable<typeof a> => Boolean(a));
-  const dot =
-    row.state === "reaching"
-      ? { bg: "#ffe3cf", fg: "#c4572f" }
-      : row.state === "talking"
-        ? { bg: "#c4572f", fg: "#fff" }
-        : row.state === "quoted" && isBest
-          ? { bg: "#c4572f", fg: "#fff" }
-          : { bg: "#f1ebe2", fg: "#2a2420" };
-  const icon = { pin: ICON.pin, clock: ICON.clock, phone: ICON.phone, message: ICON.chat, check: ICON.check }[row.icon];
-  const greyed = row.state === "closed" && !searching;
-  const lineColor = row.state === "talking" ? "#2a2420" : row.state === "quoted" && !f.fits ? "#b3261e" : "#7a6e66";
-  return (
-    <div
-      className="aidaddy-rise box-border flex min-h-[58px] flex-none items-center gap-3 rounded-[14px] border border-[#ece6dc] bg-white px-3 py-2"
-      style={{ opacity: greyed ? 0.6 : picked && row.state === "quoted" ? 0.75 : 1 }}
-    >
-      <span aria-hidden className={`relative flex size-[34px] flex-none items-center justify-center rounded-full ${row.state === "reaching" ? "aidaddy-ring" : ""}`} style={{ background: dot.bg, color: dot.fg }}>
-        <Icon d={icon} size={16} width={2} />
-        {row.via && row.state !== "found" && row.state !== "closed" && (
-          <AppLogo app={row.via} size={16} className="absolute -bottom-[3px] -right-[3px] rounded-full bg-white p-px" />
-        )}
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
-        {f.url ? (
-          <a href={f.url} target="_blank" rel="noreferrer" className="truncate text-sm font-semibold no-underline">
-            {f.name}
-            <span className="sr-only"> (company page, opens in a new tab)</span>
-          </a>
-        ) : (
-          <span className="truncate text-sm font-semibold">{f.name}</span>
-        )}
-        <span className="flex min-w-0 items-center gap-[5px]">
-          {(row.state === "found" || row.state === "closed") && apps.map((a) => <AppLogo key={a} app={a} size={14} label={a} />)}
-          <span className="truncate text-xs" style={{ color: lineColor }}>
-            {row.line}
-          </span>
-        </span>
-      </span>
-      {row.state === "talking" &&
-        (row.via ? (
-          <span aria-label="Replying" className="flex h-4 flex-none items-center gap-[3px]">
-            <span className="aidaddy-dot" />
-            <span className="aidaddy-dot" style={{ animationDelay: ".15s" }} />
-            <span className="aidaddy-dot" style={{ animationDelay: ".3s" }} />
-          </span>
-        ) : (
-          <span aria-label="On the call" className="flex h-4 flex-none items-center gap-0.5">
-            <span className="aidaddy-bar" />
-            <span className="aidaddy-bar" style={{ animationDelay: "-.2s" }} />
-            <span className="aidaddy-bar" style={{ animationDelay: "-.45s" }} />
-            <span className="aidaddy-bar" style={{ animationDelay: "-.1s" }} />
-          </span>
-        ))}
-      {row.state === "found" && <span className="flex-none rounded-full bg-[#ffe3cf] px-2 py-[3px] text-[11px] font-semibold text-[#c4572f]">{f.url ? "Has phone" : "Open now"}</span>}
-      {row.state === "closed" && (
-        <span className="flex-none rounded-full bg-[#efebe5] px-2 py-[3px] text-[11px] font-semibold text-[#7a6e66]">
-          {f.url ? "No phone listed" : searching ? "Closed" : "Emailed · Mon"}
-        </span>
-      )}
-      {row.state === "quoted" && <span className="flex-none text-[15px] font-bold">€{f.price}</span>}
-    </div>
-  );
-}
+const CALL_STATUS: Record<string, string> = {
+  pending: "Waiting",
+  dispatched: "Dialling",
+  initiated: "Ringing",
+  in_progress: "On the line",
+  completed: "Answered",
+  failed: "Failed",
+  cancelled: "Cancelled",
+  voicemail: "Voicemail",
+};
 
-export function TasksScreen({ job: initial }: { job?: string }) {
+const money = (price?: number, currency?: string) => (price === undefined ? "" : `${currency === "EUR" || !currency ? "€" : `${currency} `}${price}`);
+
+export function TasksScreen({ job: asked }: { job?: string }) {
   const nav = useNav();
   const { code } = useLive();
-  const run = useTaskRun(initial, code);
-  const [draft, setDraft] = useState(run.job);
-  const [approved, setApproved] = useState(false);
+  const job = asked?.trim() || FIRST_JOB;
+  const search = useCompanySearch(job, code);
+  const { round, propose, confirm, reset } = useCallRound(code);
+  const [draft, setDraft] = useState(job);
 
-  function start(e?: FormEvent) {
-    e?.preventDefault();
-    const job = draft.trim();
-    if (job.length < 5) return;
-    setApproved(false);
-    run.start(job);
+  function start(e: FormEvent) {
+    e.preventDefault();
+    const text = draft.trim();
+    if (text.length < 5 || text === job) return;
+    nav.push({ s: "tasks", job: text });
   }
 
-  const { frame, live, searchingLive, failed, headline, slot, pitch } = run;
-  const best = frame.best;
+  const stage = round.phase === "done" ? 2 : round.phase === "calling" || round.phase === "starting" ? 1 : 0;
+  const button = "h-11 rounded-xl text-[15px] font-semibold";
 
   return (
     <>
@@ -109,82 +53,116 @@ export function TasksScreen({ job: initial }: { job?: string }) {
             What needs doing?
           </label>
           <input id="job" value={draft} onChange={(e) => setDraft(e.target.value)} enterKeyHint="go" autoComplete="off" className="min-w-0 flex-1 border-0 bg-transparent text-[15px] font-medium outline-none" />
-          <button type="submit" aria-label="Run again" className="h-[38px] rounded-xl bg-[#c4572f] px-3.5 text-sm font-semibold text-white">
+          <button type="submit" className="h-[38px] rounded-xl bg-[#c4572f] px-3.5 text-sm font-semibold text-white">
             Go
           </button>
         </form>
         <ol aria-label="Progress" className="m-0 grid list-none grid-cols-3 gap-1.5 p-0">
-          {["Search", "Call", "Pick"].map((label, i) => (
-            <li key={label} aria-current={i === frame.stage ? "step" : undefined} className="flex flex-col gap-1.5">
-              <span className="h-1 rounded-sm transition-colors duration-300" style={{ background: i <= frame.stage && !failed ? "#c4572f" : "#e5ddd0" }} />
-              <span className="text-xs font-semibold" style={{ color: i <= frame.stage ? "#2a2420" : "#8f8379" }}>
+          {["Find", "Call", "Compare"].map((label, i) => (
+            <li key={label} aria-current={i === stage ? "step" : undefined} className="flex flex-col gap-1.5">
+              <span className="h-1 rounded-sm transition-colors duration-300" style={{ background: i <= stage ? "#c4572f" : "#e5ddd0" }} />
+              <span className="text-xs font-semibold" style={{ color: i <= stage ? "#2a2420" : "#8f8379" }}>
                 {label}
               </span>
             </li>
           ))}
         </ol>
-        <div className="flex items-center justify-between gap-2">
-          <span className="flex min-w-0 items-center gap-2 text-[15px] font-semibold" aria-live="polite">
-            {(frame.busy || searchingLive) && !failed && <Spinner />}
-            <span className="truncate">{headline}</span>
-          </span>
-          <span className="text-[13px] tabular-nums text-[#7a6e66]">{searchingLive ? "" : frame.clock}</span>
-        </div>
       </TabHeader>
 
-      <Main className="gap-1.5 pb-3">
-        {best && (
-          <section className="aidaddy-rise flex flex-none flex-col gap-3 rounded-[20px] bg-[#ffe8d6] p-4 text-[#4a2a1a]">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 flex-col gap-[3px]">
-                <span className="text-xs opacity-80">Best fit · cheapest that fits your week</span>
-                <span className="truncate text-[19px] font-semibold">{best.name}</span>
-                <span className="text-[13px] opacity-85">{pitch}</span>
-              </div>
-              <span className="text-4xl font-bold leading-none">€{best.price}</span>
-            </div>
-            {approved ? (
-              <div className="flex flex-col gap-2">
-                <p role="status" className="m-0 rounded-xl bg-white/70 px-3 py-2.5 text-[13px] leading-[1.4]">
-                  You said yes to {best.name}, {slot}. In this demo nothing is booked: AIDaddy would confirm with them and put it in your calendar.
-                </p>
-                <button type="button" onClick={() => nav.push({ s: "household" })} className="h-11 rounded-xl bg-[#2a2420] text-[15px] font-semibold text-white">
-                  That&apos;s not all: see your household →
-                </button>
-              </div>
-            ) : (
-              <button type="button" onClick={() => setApproved(true)} className="h-11 rounded-xl bg-[#c4572f] text-[15px] font-semibold text-white">
-                Yes, book {slot}
-              </button>
-            )}
-          </section>
-        )}
+      <Main className="gap-3 pb-3">
+        {isLeakingTap(job) && <Image src="/home/photos/tap.jpg" alt="Water running from a kitchen tap" width={342} height={120} className="h-[120px] w-full flex-none rounded-2xl object-cover" />}
 
-        {failed && (
-          <div className="flex flex-col gap-2 rounded-[14px] border border-[#ece6dc] bg-white p-4 text-sm">
-            <p className="m-0">Could not find companies for “{run.job}”: {run.error}.</p>
-            <button
-              type="button"
-              onClick={() => {
-                setDraft(DEMO_JOB);
-                run.start(DEMO_JOB);
-              }}
-              className="h-10 self-start rounded-xl border border-[#ece6dc] px-3 text-sm font-semibold"
-            >
-              Play the leaking-tap demo
+        <section aria-label="Companies" className="flex flex-none flex-col gap-1.5">
+          <h2 className="m-0 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.04em] text-[#8f8379]">
+            Companies near {HOUSEHOLD.city} {search.status === "searching" && <Spinner size={12} />}
+          </h2>
+          {search.status === "searching" && <p className="m-0 text-sm text-[#7a6e66]">Looking for companies on their own pages…</p>}
+          {search.status === "error" && <p className="m-0 text-sm text-[#a33417]">The search did not work this time: {search.error}.</p>}
+          {search.status === "ok" && search.helpers.length === 0 && <p className="m-0 text-sm text-[#7a6e66]">No company page listed this service. Try other words.</p>}
+          {search.helpers.map((h) => (
+            <a key={h.url} href={h.url} target="_blank" rel="noreferrer" className="flex flex-none flex-col gap-0.5 rounded-[14px] border border-[#ece6dc] bg-white px-3.5 py-2.5 no-underline">
+              <span className="flex items-baseline justify-between gap-2">
+                <span className="truncate text-sm font-semibold">{h.name}</span>
+                {h.price && <span className="flex-none text-sm font-bold">{h.price}</span>}
+              </span>
+              <span className="truncate text-xs text-[#7a6e66]">
+                {h.phone || "No phone on its page"} · {h.site}
+              </span>
+              <span className="sr-only">(company page, opens in a new tab)</span>
+            </a>
+          ))}
+        </section>
+
+        <section aria-label="Calls for quotes" className="flex flex-none flex-col gap-2.5 rounded-[20px] bg-[#ffe8d6] p-4 text-[#4a2a1a]">
+          <span className="text-[15px] font-semibold">Call for quotes</span>
+          <span className="text-[13px] leading-[1.4]">AIDaddy rings our test phones at once, each standing in for a company. The companies above are not called.</span>
+          {round.phase === "idle" && (
+            <button type="button" onClick={() => void propose(`${job}. Please give your total price in euros and the earliest time you can come.`)} className={`${button} bg-[#c4572f] text-white`}>
+              Prepare the calls
             </button>
-          </div>
-        )}
-
-        {frame.rows.map((r) => (
-          <RowView key={r.firm.name} row={r} picked={frame.stage === 2} best={best} searching={frame.stage === 0} />
-        ))}
-        <p className="m-0 mt-1 text-[11px] text-[#8f8379]">
-          {live
-            ? "Companies, phone numbers and listed prices come from their own pages. Calls and quotes are simulated in this demo."
-            : "Demo: search, calls and quotes are simulated."}{" "}
-          AIDaddy never books or pays without your yes.
-        </p>
+          )}
+          {(round.phase === "proposing" || round.phase === "starting") && (
+            <span className="flex items-center gap-2 text-sm">
+              <Spinner /> {round.phase === "proposing" ? "Preparing the calls…" : "Dialling…"}
+            </span>
+          )}
+          {round.phase === "proposed" && (
+            <>
+              <span className="text-[13px] leading-[1.4]">
+                These phones ring at once: <strong>{round.recipients.map((r) => `${r.name} (••${r.phoneEnding})`).join(", ")}</strong>.
+                {round.recorded && " The calls are recorded, and each person hears so first."}
+              </span>
+              <button type="button" onClick={() => void confirm()} className={`${button} bg-[#c4572f] text-white`}>
+                Yes, call {round.recipients.length} phones
+              </button>
+              <button type="button" onClick={reset} className={`${button} bg-white/70`}>
+                Not now
+              </button>
+            </>
+          )}
+          {round.phase === "error" && (
+            <>
+              <p role="alert" className="m-0 text-sm text-[#a33417]">
+                {round.error}
+              </p>
+              <button type="button" onClick={reset} className={`${button} bg-white/70`}>
+                Start over
+              </button>
+            </>
+          )}
+          {(round.phase === "calling" || round.phase === "done") &&
+            round.calls.map((c) => (
+              <div key={c.name} aria-live="polite" className={`flex flex-col gap-0.5 rounded-xl px-3 py-2 ${round.cheapest?.names.includes(c.name) ? "bg-white" : "bg-white/60"}`}>
+                <span className="flex items-baseline justify-between gap-2">
+                  <span className="text-sm font-semibold">
+                    {c.name} <span className="font-normal opacity-70">••{c.phoneEnding}</span>
+                  </span>
+                  <span className="text-[15px] font-bold">{money(c.price, c.currency)}</span>
+                </span>
+                <span className="text-xs opacity-80">{c.answer ?? CALL_STATUS[c.status] ?? c.status}</span>
+              </div>
+            ))}
+          {round.phase === "calling" && (
+            <span className="flex items-center gap-2 text-sm">
+              <Spinner /> The phones are ringing.
+            </span>
+          )}
+          {round.phase === "done" && (
+            <>
+              <span className="text-sm font-semibold">
+                {round.cheapest
+                  ? `Cheapest: ${round.cheapest.names.join(" and ")} at ${money(round.cheapest.price, round.cheapest.currency)}.`
+                  : round.answered.length
+                    ? "No two prices could be compared."
+                    : "Nobody answered this time."}
+              </span>
+              <button type="button" onClick={() => nav.push({ s: "household" })} className={`${button} bg-[#2a2420] text-white`}>
+                That&apos;s not all: see your household →
+              </button>
+            </>
+          )}
+        </section>
+        <p className="m-0 text-[11px] text-[#8f8379]">Companies, phones and prices come from their own pages; quotes come from the calls. AIDaddy never books or pays.</p>
       </Main>
       <TabBar current="tasks" />
     </>

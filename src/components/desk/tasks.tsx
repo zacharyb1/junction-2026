@@ -10,9 +10,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { Spinner } from "@/components/home/ui";
-import { DEMO_JOB, HOUSEHOLD, isDemoJob } from "@/lib/home-demo";
+import { FIRST_JOB, HOUSEHOLD, isLeakingTap } from "@/lib/home-demo";
 import { useDesk } from "./desk-shell";
-import { useCallRound, useCompanySearch } from "./job-work";
+import { useCallRound, useCompanySearch } from "@/components/home/job-work";
 
 const CALL_STATUS: Record<string, string> = {
   pending: "Waiting",
@@ -30,7 +30,7 @@ const money = (price?: number, currency?: string) => (price === undefined ? "" :
 export function DeskTasks({ job: asked }: { job?: string }) {
   const router = useRouter();
   const { code } = useDesk();
-  const job = asked?.trim() || DEMO_JOB;
+  const job = asked?.trim() || FIRST_JOB;
   const search = useCompanySearch(job, code);
   const { round, propose, confirm, reset } = useCallRound(code);
   const [draft, setDraft] = useState("");
@@ -64,7 +64,7 @@ export function DeskTasks({ job: asked }: { job?: string }) {
       </div>
 
       <section aria-label={job} className="flex flex-wrap items-center gap-5 rounded-[18px] border border-[#ece6dc] bg-white p-[18px]">
-        {isDemoJob(job) && <Image src="/home/photos/tap.jpg" alt="Water running from a kitchen tap" width={96} height={96} className="size-24 rounded-xl object-cover" />}
+        {isLeakingTap(job) && <Image src="/home/photos/tap.jpg" alt="Water running from a kitchen tap" width={96} height={96} className="size-24 rounded-xl object-cover" />}
         <div className="flex flex-[1_1_240px] flex-col gap-1">
           <span className="text-xs text-[#7a6e66]">Near your home in {HOUSEHOLD.city}</span>
           <h2 className="m-0 text-xl font-bold">{job}</h2>

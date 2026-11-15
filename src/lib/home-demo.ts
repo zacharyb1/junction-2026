@@ -1,15 +1,15 @@
 /**
- * The pure parts of the /home phone app: the example household, the simulated "Get it done" calls and the household
- * map. No network, no React, so the timelines can be tested and replay the same way in every demo.
+ * The pure parts of the /home and /desk app: the example household, its jobs and the household map. No network, no
+ * React, so they can be tested on their own.
  *
- * What is real and what is simulated:
+ * What is real and what is an example:
  * - Real (from the Engine, each with the page it came from): live hidden opportunities (/api/opportunities), companies
- *   for a typed job (/api/helpers), and community threads for a typed question (/api/communities).
- * - Simulated, and labelled so on screen: the connected apps, the facts read from them, the calls, quotes and slots.
+ *   for a job (/api/helpers), community threads for a question (/api/communities), and the calls for quotes, which
+ *   ring the team's test phones (/api/calls).
+ * - Examples, and labelled so on screen: the connected apps and the facts read from them.
  */
 
 import type { Community } from "@/lib/engine/communities";
-import type { Helper } from "@/lib/engine/helpers";
 
 export const ACCENT = "#c4572f";
 
@@ -41,185 +41,15 @@ export const logo = (app: AppName) => `/home/logos/${app.toLowerCase()}.${app ==
 
 // ---------------------------------------------------------------- Get it done
 
-export type Channel = "phone" | "wa" | "mail";
-export const CHANNEL: Record<Channel, { name: string; app?: AppName }> = {
-  phone: { name: "Phone" },
-  wa: { name: "WhatsApp", app: "WhatsApp" },
-  mail: { name: "Gmail", app: "Gmail" },
-};
-
-export type Firm = {
-  name: string;
-  /** As shown while searching: masked in the scripted demo, as the page writes it in a live search. */
-  phone: string;
-  hours: string;
-  open: boolean;
-  /** Ticks (0.95 s each) at which the firm is found, answers and gives its quote. 99 means never. */
-  found: number;
-  answer: number;
-  quote: number;
-  price: number | null;
-  /** What AIDaddy hears on the call. */
-  heard: string;
-  /** The line under the name once the quote is in. */
-  result: string;
-  /** Whether the offered time fits the parent's week. */
-  fits: boolean;
-  /** How the company can be reached; the first is the one AIDaddy uses. */
-  channels: Channel[];
-  /** A live search's company page, where its phone number and any listed price come from. */
-  url?: string;
-  listed?: string;
-};
-
-const firm = (
-  name: string,
-  phone: string,
-  hours: string,
-  open: boolean,
-  [found, answer, quote]: [number, number, number],
-  price: number | null,
-  heard: string,
-  result: string,
-  fits: boolean,
-  channels: Channel[],
-): Firm => ({ name, phone, hours, open, found, answer, quote, price, heard, result, fits, channels });
-
-/** The scripted run from the design: six plumbers near Kallio, five quotes, about 17 seconds. */
-export const DEMO_JOB = "Kitchen tap is leaking";
-export const DEMO_FIRMS: Firm[] = [
-  firm("Wirmax", "040 ••• 45 21", "7–20", true, [1, 8, 13], 51, "“Tuesday 16:00 works, and 15% off.”", "Tue 16:00 · got 15% off", true, ["wa", "phone", "mail"]),
-  firm("Tinko Finland", "010 ••• 20 00", "8–16", true, [2, 9, 12], 99, "“We can do Tuesday morning.”", "Tue 10:00", true, ["phone", "mail"]),
-  firm("KH-Suomi Putki", "044 ••• 73 10", "24/7", true, [3, 7, 11], 113, "“About an hour and a half.”", "about 1.5 h", true, ["phone", "wa"]),
-  firm("Vintek", "050 ••• 18 64", "8–17", true, [4, 10, 14], 120, "“Only Monday 9:00.”", "during your shift", false, ["mail", "phone"]),
-  firm("Putkimies Helsinki", "045 ••• 90 02", "7–22", true, [5, 8, 15], 128, "“Tuesday 16:00 is free.”", "Tue 16:00", true, ["wa", "phone"]),
-  firm("Putkityö Nieminen", "040 ••• 33 87", "8–16, opens Mon", false, [6, 99, 99], null, "", "closed now", false, ["mail", "phone"]),
-];
+/** The job Get it done starts with: the leaking kitchen tap from the family's Telegram. */
+export const FIRST_JOB = "Kitchen tap is leaking";
 
 /** Is a job one of the household jobs AIDaddy rings companies for, rather than a question for the chat? */
 export const isJob = (text: string) =>
   /\b(leak|leaking|drip|broke|broken|fix|repair|clean|cleaning|plumb|plumber|tap|washer|washing machine|babysit|babysitter|electrician|paint|move|moving)\w*/i.test(text);
 
-/** The scripted run plays for the job it was recorded with; anything else is searched live. */
-export const isDemoJob = (text: string) => /\btap\b/i.test(text) && /leak|drip/i.test(text);
-
-// The same company always gets the same simulated answer, so a replay matches the last one.
-function seed(text: string) {
-  let h = 7;
-  for (const c of text) h = (h * 31 + c.charCodeAt(0)) % 9973;
-  return h;
-}
-
-const SLOTS: [string, boolean][] = [
-  ["Tue 16:00", true],
-  ["Tue 10:00", true],
-  ["Mon 9:00", false],
-  ["Wed 17:30", true],
-  ["Thu 13:00", false],
-  ["Fri 15:00", true],
-];
-
-/**
- * Real companies from /api/helpers, with simulated calls: a quote that starts from the price the company lists, when
- * it lists one. Companies without a phone number on their page are shown but not called.
- */
-export function firmsFromHelpers(helpers: Helper[]): Firm[] {
-  return helpers.slice(0, 6).map((h, i) => {
-    const s = seed(h.name);
-    const listed = Number(h.price.match(/\d+(?:[.,]\d+)?/)?.[0]?.replace(",", ".")) || 0;
-    const hourly = /\/\s*h|tunti|hour/i.test(h.price);
-    const discount = s % 3 === 0 ? 0 : s % 2 ? 10 : 15;
-    const base = listed ? (hourly ? listed * 1.5 + 20 : listed) : 80 + (s % 60);
-    const price = Math.round(base * (1 - discount / 100));
-    const [slot, fits] = SLOTS[s % SLOTS.length];
-    const callable = Boolean(h.phone);
-    const found = i + 1;
-    return {
-      name: h.name,
-      phone: h.phone || h.site,
-      hours: h.price ? `listed ${h.price}` : h.service || "price not listed",
-      open: callable,
-      found,
-      answer: callable ? 7 + ((s + i) % 3) : 99,
-      quote: callable ? 11 + ((s + i * 2) % 5) : 99,
-      price: callable ? price : null,
-      heard: `“${slot.replace("Tue", "Tuesday").replace("Wed", "Wednesday").replace("Mon", "Monday").replace("Thu", "Thursday").replace("Fri", "Friday")} works${discount ? `, and ${discount}% off` : ""}.”`,
-      result: fits ? `${slot}${discount ? ` · got ${discount}% off` : ""}` : `${slot} · during your shift`,
-      fits,
-      channels: ["phone"],
-      url: h.url,
-      listed: h.price,
-    };
-  });
-}
-
-export type FirmRow = {
-  firm: Firm;
-  state: "found" | "closed" | "reaching" | "talking" | "quoted";
-  icon: "pin" | "clock" | "phone" | "message" | "check";
-  line: string;
-  /** Which channel AIDaddy uses, when it is an app. */
-  via?: AppName;
-};
-
-export type TaskFrame = {
-  stage: 0 | 1 | 2;
-  busy: boolean;
-  headline: string;
-  clock: string;
-  rows: FirmRow[];
-  best: Firm | null;
-};
-
-/** Everything the "Get it done" screen shows at tick `t`: search (1–6), calls (7–16), pick (17+). */
-export function taskFrame(t: number, firms: Firm[], place = "Kallio", trade = "plumbers"): TaskFrame {
-  const searching = t <= 6;
-  const picked = t >= 17;
-  const calling = !searching && !picked;
-  const rows: FirmRow[] = firms
-    .filter((f) => t >= f.found)
-    .map((f) => {
-      const ch = CHANNEL[f.channels[0]];
-      if (searching || !f.open) {
-        return { firm: f, state: f.open ? "found" : "closed", icon: f.open ? "pin" : "clock", line: `${f.phone} · ${f.hours}` };
-      }
-      const isCall = ch.name === "Phone";
-      if (t < f.answer) {
-        const line = isCall ? `Calling ${f.phone}…` : ch.name === "WhatsApp" ? "Messaged on WhatsApp…" : "Emailed from Gmail…";
-        return { firm: f, state: "reaching", icon: isCall ? "phone" : "message", line, via: ch.app };
-      }
-      if (t < f.quote) return { firm: f, state: "talking", icon: isCall ? "phone" : "message", line: f.heard, via: ch.app };
-      return { firm: f, state: "quoted", icon: "check", line: f.result, via: ch.app };
-    });
-  const quoted = rows.filter((r) => r.state === "quoted");
-  const best = picked ? ([...quoted].filter((r) => r.firm.fits).sort((a, b) => (a.firm.price ?? 1e9) - (b.firm.price ?? 1e9))[0]?.firm ?? null) : null;
-  const ordered = picked
-    ? [
-        ...quoted.filter((r) => r.firm !== best).sort((a, b) => (a.firm.price ?? 0) - (b.firm.price ?? 0)),
-        ...rows.filter((r) => r.state !== "quoted"),
-      ]
-    : rows;
-  const live = rows.filter((r) => r.state === "talking").length;
-  const reachable = firms.filter((f) => f.open).length;
-  const headline =
-    t === 0
-      ? `Searching ${trade} near ${place}…`
-      : searching
-        ? `Found ${rows.length} · phones, chats, hours`
-        : calling
-          ? live
-            ? `${live} talking · ${quoted.length} quotes in`
-            : `Reaching ${reachable} by call, WhatsApp, email`
-          : `${quoted.length} quotes in · ${best ? "best one picked" : "none fits your week"}`;
-  return {
-    stage: picked ? 2 : calling ? 1 : 0,
-    busy: !picked,
-    headline,
-    clock: `0:${String(Math.min(t, 18) * 3).padStart(2, "0")}`,
-    rows: ordered,
-    best,
-  };
-}
+/** The first job has a photo of its own. */
+export const isLeakingTap = (text: string) => /\btap\b/i.test(text) && /leak|drip/i.test(text);
 
 // ---------------------------------------------------------------- Your household
 
