@@ -6,8 +6,9 @@
  */
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
-import { type Detail, EXAMPLES, type Row } from "@/components/home/opportunities";
+import { calendarHref, type Detail, EXAMPLES, type Row } from "@/components/home/opportunities";
 import { AppLogo, Spinner } from "@/components/home/ui";
 import { useDesk } from "./desk-shell";
 
@@ -24,7 +25,12 @@ function Actions({ d }: { d: Detail }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
-        {d.primaryHref ? (
+        {d.primaryHref?.startsWith("/") ? (
+          // A page of this app: the desktop has its own version of every /home page.
+          <Link href={d.primaryHref.replace(/^\/home\//, "/desk/")} className={`${button} flex items-center bg-[#c4572f] text-white no-underline`}>
+            {d.primary}
+          </Link>
+        ) : d.primaryHref ? (
           <a href={d.primaryHref} target="_blank" rel="noreferrer" className={`${button} flex items-center bg-[#c4572f] text-white no-underline`}>
             {d.primary} ↗
           </a>
@@ -33,10 +39,18 @@ function Actions({ d }: { d: Detail }) {
             {d.primary}
           </button>
         )}
-        {d.secondaryNote && (
-          <button type="button" onClick={() => setNote(d.secondaryNote)} className={`${button} border border-[#e4ddd3] bg-white`}>
+        {d.remind ? (
+          <a href={calendarHref(d.remind)} download={`${d.remind.title}.ics`} className={`${button} flex items-center border border-[#e4ddd3] bg-white no-underline`}>
+            {d.secondary}
+          </a>
+        ) : d.secondaryNote ? (
+          <button type="button" onClick={() => setNote(d.secondaryNote ?? "")} className={`${button} border border-[#e4ddd3] bg-white`}>
             {d.secondary}
           </button>
+        ) : (
+          <Link href={`/desk/chat?q=${encodeURIComponent(`Tell me more about this: ${d.title}${d.url ? ` (${d.url})` : ""}`)}`} className={`${button} flex items-center border border-[#e4ddd3] bg-white no-underline`}>
+            {d.secondary}
+          </Link>
         )}
       </div>
       {note && (

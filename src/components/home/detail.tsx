@@ -3,7 +3,8 @@
 /** One opportunity: who it is for, the estimate, why the family fits, the source, and what AIDaddy can prepare. */
 
 import Image from "next/image";
-import { EXAMPLES, TINT } from "./opportunities";
+import Link from "next/link";
+import { calendarHref, EXAMPLES, TINT } from "./opportunities";
 import { AppLogo, BackButton, Icon, ICON, Main, Spinner, useNav } from "./ui";
 import { useLive } from "./home-app";
 
@@ -103,7 +104,11 @@ export function DetailScreen({ id }: { id: string }) {
       </Main>
 
       <footer className="flex flex-none flex-col gap-2.5 px-6 pb-[calc(var(--aidaddy-bottom)+10px)] pt-3">
-        {d.primaryHref ? (
+        {d.primaryHref?.startsWith("/") ? (
+          <Link href={d.primaryHref} className="flex h-[52px] items-center justify-center rounded-2xl bg-[#c4572f] text-base font-semibold text-white no-underline">
+            {d.primary}
+          </Link>
+        ) : d.primaryHref ? (
           <a href={d.primaryHref} target="_blank" rel="noreferrer" className="flex h-[52px] items-center justify-center rounded-2xl bg-[#c4572f] text-base font-semibold text-white no-underline">
             {d.primary} ↗
           </a>
@@ -112,12 +117,16 @@ export function DetailScreen({ id }: { id: string }) {
             {d.primary}
           </button>
         )}
-        {d.secondaryNote ? (
-          <button type="button" onClick={() => say(d.secondaryNote)} className="h-11 rounded-[14px] border border-[#efe7dc] bg-white text-[15px] font-semibold">
+        {d.remind ? (
+          <a href={calendarHref(d.remind)} download={`${d.remind.title}.ics`} className="flex h-11 items-center justify-center rounded-[14px] border border-[#efe7dc] bg-white text-[15px] font-semibold no-underline">
+            {d.secondary}
+          </a>
+        ) : d.secondaryNote ? (
+          <button type="button" onClick={() => say(d.secondaryNote ?? "")} className="h-11 rounded-[14px] border border-[#efe7dc] bg-white text-[15px] font-semibold">
             {d.secondary}
           </button>
         ) : (
-          <a href={nav.askHref()} className="flex h-11 items-center justify-center rounded-[14px] border border-[#efe7dc] bg-white text-[15px] font-semibold no-underline">
+          <a href={nav.askHref(`Tell me more about this: ${d.title}${d.url ? ` (${d.url})` : ""}`)} className="flex h-11 items-center justify-center rounded-[14px] border border-[#efe7dc] bg-white text-[15px] font-semibold no-underline">
             {d.secondary}
           </a>
         )}

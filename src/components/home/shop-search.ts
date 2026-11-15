@@ -9,7 +9,7 @@
  * anything else to the chat. The messages are the demo family's examples; every search is real.
  */
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { GiftIdea, GiftInput, GiftResult } from "@/lib/engine/gifts";
 import type { AppName } from "@/lib/home-demo";
 
@@ -66,7 +66,7 @@ export function useShopSearch(code: string) {
   const [found, setFound] = useState<ShopFound>({ status: "idle", heading: "", ideas: [], error: "" });
   const latest = useRef(0);
 
-  async function search(heading: string, input: GiftInput) {
+  const search = useCallback(async (heading: string, input: GiftInput) => {
     const run = ++latest.current;
     setFound({ status: "searching", heading, ideas: [], error: "" });
     try {
@@ -82,13 +82,16 @@ export function useShopSearch(code: string) {
     } catch (e) {
       if (latest.current === run) setFound({ status: "error", heading, ideas: [], error: e instanceof Error ? e.message : "search failed" });
     }
-  }
+  }, [code]);
 
   /** A typed search is a plain product search. */
-  const searchText = (text: string) => {
-    const prompt = text.trim().slice(0, 300);
-    if (prompt.length >= 3) void search(prompt, { prompt, country: "FI" });
-  };
+  const searchText = useCallback(
+    (text: string) => {
+      const prompt = text.trim().slice(0, 300);
+      if (prompt.length >= 3) void search(prompt, { prompt, country: "FI" });
+    },
+    [search],
+  );
 
   return { found, search, searchText };
 }

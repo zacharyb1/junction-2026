@@ -7,17 +7,25 @@
  */
 
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { APPS, arrival, NEEDS, type Need, QUICK, useShopSearch } from "@/components/home/shop-search";
 import { AppLogo, Icon, ICON, Spinner } from "@/components/home/ui";
 import { isJob } from "@/lib/home-demo";
 import { useDesk } from "./desk-shell";
 
-export function DeskSearch() {
+export function DeskSearch({ first }: { first?: string }) {
   const router = useRouter();
   const { code } = useDesk();
   const { found, search, searchText } = useShopSearch(code);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(first ?? "");
+
+  // A search asked for in the address runs once, when the page opens with it.
+  const asked = useRef(false);
+  useEffect(() => {
+    if (!first || asked.current) return;
+    asked.current = true;
+    searchText(first);
+  }, [first, searchText]);
 
   function open(need: Need) {
     if (need.to === "shop" && need.shop) void search(need.ask, need.shop);

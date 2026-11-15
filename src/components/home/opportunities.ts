@@ -33,14 +33,52 @@ export type Detail = {
   url?: string;
   quote?: string;
   primary: string;
-  /** Where the primary button goes: outside (a real page) or a note about what AIDaddy would prepare. */
+  /** Where the primary button goes: a real page outside, or a page of this app (a path starting with /home/). */
   primaryHref?: string;
   primaryNote?: string;
   secondary: string;
-  secondaryNote: string;
+  secondaryNote?: string;
+  /** The secondary button saves this to the parent's own calendar. */
+  remind?: Reminder;
   promise: string;
   demo: boolean;
 };
+
+/** A calendar event the parent saves: on the next `weekday` (0 Sunday … 6 Saturday), local time. */
+export type Reminder = { title: string; weekday: number; start: string; end: string; weekly?: boolean; where?: string };
+
+const stamp = (d: Date, time: string) =>
+  `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}T${time.replace(":", "")}00`;
+
+/**
+ * The reminder as a calendar file (.ics) the browser saves, so the parent's own calendar reminds them; nothing is
+ * stored or sent by AIDaddy. The event is on the next such weekday after today, an hour's alarm before.
+ */
+export function calendarHref(r: Reminder, today = new Date()): string {
+  const day = new Date(today);
+  day.setDate(day.getDate() + (((r.weekday - day.getDay() + 7) % 7) || 7));
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//AIDaddy//EN",
+    "BEGIN:VEVENT",
+    `UID:${stamp(day, r.start)}-${r.title.replace(/\W+/g, "-")}@aidaddy`,
+    `DTSTAMP:${stamp(today, "00:00")}`,
+    `DTSTART:${stamp(day, r.start)}`,
+    `DTEND:${stamp(day, r.end)}`,
+    `SUMMARY:${r.title}`,
+    ...(r.where ? [`LOCATION:${r.where}`] : []),
+    ...(r.weekly ? ["RRULE:FREQ=WEEKLY"] : []),
+    "BEGIN:VALARM",
+    "TRIGGER:-PT1H",
+    "ACTION:DISPLAY",
+    `DESCRIPTION:${r.title}`,
+    "END:VALARM",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+  return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
+}
 
 export type Row = {
   id: string;
@@ -82,12 +120,12 @@ export const EXAMPLES: Row[] = [
       ],
       source: "kela.fi · General housing allowance",
       sourceNote: "Example: the estimate is not a Kela decision",
-      url: "https://www.kela.fi/",
-      primary: "Prepare the application",
-      primaryNote: "AIDaddy would fill in the form for you to check. In this demo nothing is filled in or sent.",
+      url: "https://www.kela.fi/general-housing-allowance",
+      primary: "Apply on Kela's page",
+      primaryHref: "https://www.kela.fi/general-housing-allowance#how-to-apply-for-housing-allowance",
       secondary: "Remind me on Friday",
-      secondaryNote: "A reminder needs your yes in the family chat. In this demo none is set.",
-      promise: "AIDaddy fills in the form for you to check. Nothing is sent without your yes.",
+      remind: { title: "Apply for housing allowance in OmaKela", weekday: 5, start: "09:00", end: "09:30" },
+      promise: "You apply in OmaKela yourself; Kela's page shows how. AIDaddy sends nothing for you.",
     },
   },
   {
@@ -119,10 +157,10 @@ export const EXAMPLES: Row[] = [
       ],
       source: "Shop page · Kids winter boots",
       sourceNote: "Example: price and stock are not checked in this demo",
-      primary: "Open the shop page",
-      primaryNote: "In this demo there is no real shop page behind the example.",
+      primary: "Find boots in shops",
+      primaryHref: `/home/search?q=${encodeURIComponent("Warm winter boots for a 9-month-old, size 20")}`,
       secondary: "Remind me on Saturday",
-      secondaryNote: "A reminder needs your yes in the family chat. In this demo none is set.",
+      remind: { title: "Buy winter boots for Aino, size 20", weekday: 6, start: "10:00", end: "10:30" },
       promise: "AIDaddy never buys anything. You decide and pay yourself.",
     },
   },
@@ -154,12 +192,12 @@ export const EXAMPLES: Row[] = [
       ],
       source: "hel.fi · Free activities for children",
       sourceNote: "Example: times and places are not checked in this demo",
-      url: "https://www.hel.fi/",
-      primary: "Sign Eino up",
-      primaryNote: "AIDaddy would prepare the sign-up for you to check. In this demo nothing is sent.",
+      url: "https://www.hel.fi/en/culture-and-leisure/libraries-in-helsinki",
+      primary: "Find it on Helsinki's events",
+      primaryHref: "https://tapahtumat.hel.fi/en/search?keyword=children",
       secondary: "Add to calendar",
-      secondaryNote: "Calendar entries need your yes. In this demo none is added.",
-      promise: "AIDaddy prepares the sign-up for you to check. Nothing is sent without your yes.",
+      remind: { title: "Art club for Eino", weekday: 2, start: "16:00", end: "17:00", weekly: true, where: "Kallio library, Helsinki" },
+      promise: "You sign up on the city's own pages. AIDaddy sends nothing for you.",
     },
   },
   { id: "jazz", title: "Afterwork jazz, Manala", sub: "Thursdays 17–19", value: "Free", money: false, who: "Laura", icon: ICON.music },
