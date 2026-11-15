@@ -41,9 +41,9 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
               official page.
             </p>
             <div className="hud-actions">
-              <a href="#research" className="hud-btn hud-btn--primary">
-                Watch it work
-              </a>
+              <SiteLink href="/setup" className="hud-btn hud-btn--primary">
+                Get your own AIDaddy
+              </SiteLink>
               <SiteLink href="/try" className="hud-btn">
                 Try it live
               </SiteLink>
@@ -216,7 +216,7 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
 }
 
 type Place = {
-  status: "Live" | "Concept" | "Replay";
+  status: "Live" | "First version" | "Concept" | "Replay";
   name: string;
   text: string;
   /** `of` finishes a label for screen readers where several rows carry the same words. */
@@ -224,8 +224,9 @@ type Place = {
 };
 
 /**
- * Where AIDaddy meets a household, each with what it is today. "Live" works now, "Concept" is an idea shown as a
- * scripted replay or a mockup, "Replay" is a recording or a fixed script. The words match /setup and the demo pages.
+ * Where AIDaddy meets a household, each with what it is today. "Live" works now, "First version" works on the
+ * person's own device and is new, "Concept" is an idea shown as a scripted replay, "Replay" is a recording or a
+ * fixed script. The words match /setup and the demo pages.
  */
 const PLACES: Place[] = [
   {
@@ -238,16 +239,22 @@ const PLACES: Place[] = [
     ],
   },
   {
-    status: "Concept",
+    status: "First version",
     name: "In the browser",
-    text: "When someone is stuck on an official form, AIDaddy points at the rule that applies.",
-    links: [{ href: "/demo/browser", label: "Watch the replay", of: "the browser" }],
+    text: "A browser extension looks at the page you have open. On an official page or a form, it points at the rule that applies, without being asked.",
+    links: [
+      { href: "/demo/browser", label: "Watch the replay", of: "the browser" },
+      { href: "/setup#browser", label: "Get the extension" },
+    ],
   },
   {
-    status: "Concept",
+    status: "First version",
     name: "At the kitchen table",
-    text: "The phone lies on the table. Say \"AIDaddy\", and it looks things up while you keep talking. It cannot listen yet.",
-    links: [{ href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" }],
+    text: "A phone or a laptop stays open in the room. AIDaddy follows the talk, lets small talk pass, and looks things up when it hears a matter. It listens while its page is open.",
+    links: [
+      { href: "/demo/talk", label: "Watch the replay", of: "the kitchen table" },
+      { href: "/listen", label: "Let it listen" },
+    ],
   },
   {
     status: "Concept",
@@ -262,14 +269,14 @@ const PLACES: Place[] = [
     links: [{ href: "/autopilot", label: "Play the demo" }],
   },
   {
-    status: "Concept",
-    name: "What it may follow",
-    text: "You choose what AIDaddy may read or hear. A mockup of the setup screen: of its three channels, only Telegram works today.",
-    links: [{ href: "/setup", label: "Open the setup" }],
+    status: "Live",
+    name: "Your own AIDaddy",
+    text: "You choose what AIDaddy may read, hear or see. Three connections, each with its own off switch: the Telegram group, the microphone, the browser.",
+    links: [{ href: "/setup", label: "Get your own AIDaddy" }],
   },
 ];
 
-const STATUS_TONE = { Live: "hud-label--green", Concept: "hud-label--amber", Replay: "" };
+const STATUS_TONE = { Live: "hud-label--green", "First version": "", Concept: "hud-label--amber", Replay: "" };
 
 export function Places() {
   return (

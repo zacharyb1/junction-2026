@@ -84,7 +84,8 @@ AIDaddy is both the product and the butler, one thing with one name. It sits in 
 | `/try` | The research form: describe what happened and get a plan with sources. Open to everyone on the server (`DEMO_OPEN=1`), rate limited; elsewhere it needs the access code. | Live. |
 | `/c/[id]` | The case file: steps, deadlines, quotes, drafts and the log of what AIDaddy did, with the click that approves. | Live. A case exists only in the store it was researched into. |
 | `/chat` | A chat with AIDaddy by text or voice. Open like `/try`; needs the web-only Hermes instance. | Live on the server. |
-| `/setup` | What AIDaddy may follow: the Telegram chat today, the phone and the browser as concepts. | Mockup. |
+| `/setup` | Get your own AIDaddy: three connections. Add the bot to a Telegram group, let it listen (`/listen`), download the browser extension (`public/aidaddy-extension.zip`). The front page's main button leads here. | Telegram live; the other two are first versions. |
+| `/listen` | The microphone connection. The browser's speech recognition turns the talk in the room into sentences; `src/lib/listen.ts` lets small talk pass on the page and sends a noticed matter to the Engine as one research question, unasked. Chrome, Edge and Safari, while the page is open. | First version. Checked with a scripted microphone and typed sentences against live research; not yet with a real microphone. |
 | `/demo` | The list of replays. | Index page. |
 | `/demo/chat`, `/demo/browser`, `/demo/talk`, `/demo/calendar` | Scripted replays built from real case files. Add `?loop=1` to repeat one without the site's header and footer on the screen at the table, or `?bare=1` to play it once that way for a recording. | Scripted replays. The browser, kitchen-table and calendar scenes show concepts. |
 | `/autopilot` | A fixed script of specialist agents with one live check through the Engine. | Scripted demo. |

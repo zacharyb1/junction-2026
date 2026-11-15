@@ -38,7 +38,7 @@ export default async function Autopilot({ searchParams }: PageProps<"/autopilot"
           >
             <AutopilotDemo code={code} needsCode={demoCodeRequired()} />
             <p className="hud-note hud-autopilot-after">
-              What AIDaddy may follow is the family&apos;s choice. <Link href="/setup">See the setup screen</Link>, a mockup.
+              What AIDaddy may follow is the family&apos;s choice. <Link href="/setup">Choose it on the setup page</Link>.
             </p>
           </Section>
         </main>

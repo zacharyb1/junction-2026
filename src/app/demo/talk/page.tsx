@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import { DemoFrame, demoMode } from "@/components/demo/demo-frame";
 import { CASE_URL, TalkDemo } from "@/components/talk-demo/talk-demo";
 import "@/components/talk-demo/talk-demo.css";
@@ -22,8 +23,8 @@ export default async function TalkDemoPage({ searchParams }: PageProps<"/demo/ta
       bare={bare}
       caption={
         <>
-          Concept demo: AIDaddy cannot listen on the phone yet. The research and its quotes are a <a href={CASE_URL}>real run</a>{" "}
-          on kkv.fi, the Finnish consumer authority.
+          Concept demo: a phone that wakes on its name is not built yet. A <Link href="/listen">first version</Link> listens while its
+          page is open. The research and its quotes are a <a href={CASE_URL}>real run</a> on kkv.fi, the Finnish consumer authority.
         </>
       }
     >

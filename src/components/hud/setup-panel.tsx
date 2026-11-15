@@ -1,66 +1,78 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
 import { CONNECTIONS, type Connection } from "@/components/hud/setup-data";
+import { SiteLink } from "@/components/site/site-link";
 
-function Channel({ connection }: { connection: Connection }) {
-  const [on, setOn] = useState(connection.status === "live");
-  const live = connection.status === "live";
-  const titleId = `setup-${connection.id}`;
-
+function Action({ action }: { action: Connection["action"] }) {
+  if (action.kind === "page") {
+    return (
+      <SiteLink href={action.href} className="hud-btn hud-btn--primary">
+        {action.label}
+      </SiteLink>
+    );
+  }
+  if (action.kind === "download") {
+    return (
+      <a href={action.href} download className="hud-btn hud-btn--primary">
+        {action.label}
+        <span className="hud-sr"> (a zip file)</span>
+      </a>
+    );
+  }
   return (
-    <li className={`hud-panel hud-setup-card${on ? " is-on" : ""}`}>
+    <a href={action.href} target="_blank" rel="noreferrer" className="hud-btn hud-btn--primary">
+      {action.label}
+      <span className="hud-sr"> (opens Telegram)</span>
+    </a>
+  );
+}
+
+function Card({ connection }: { connection: Connection }) {
+  const live = connection.status === "live";
+  return (
+    <li id={connection.id} className="hud-panel hud-setup-card is-on">
       <div className="hud-panel-title">
         <span>{connection.label}</span>
-        <span className={live ? "hud-setup-badge is-live" : "hud-setup-badge is-concept"}>
-          {live ? "Live" : "Concept"}
-        </span>
+        <span className={live ? "hud-setup-badge is-live" : "hud-setup-badge is-new"}>{live ? "Live" : "First version"}</span>
       </div>
       <div className="hud-setup-body">
-        <div className="hud-setup-head">
-          <h2 id={titleId} className="hud-setup-title">
-            {connection.title}
-          </h2>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={on}
-            aria-labelledby={titleId}
-            className="hud-setup-switch"
-            onClick={() => setOn((v) => !v)}
-          >
-            <span className="hud-setup-knob" aria-hidden />
-          </button>
-        </div>
+        <h2 className="hud-setup-title">{connection.title}</h2>
         <p className="hud-setup-desc">{connection.description}</p>
-        <p className="hud-setup-state" aria-live="polite">
-          <span className="hud-setup-dot" aria-hidden /> {on ? connection.whenOn : connection.whenOff}
-        </p>
         <div className="hud-setup-links">
-          {connection.action && (
-            <a href={connection.action.href} target="_blank" rel="noreferrer" className="hud-btn hud-btn--primary">
-              {connection.action.label}
-              <span className="hud-sr"> (opens Telegram)</span>
-            </a>
-          )}
+          <Action action={connection.action} />
           <Link href={connection.replay.href} className="hud-setup-replay">
             Watch the replay
             <span className="hud-sr"> of {connection.replay.of}</span>
             <span aria-hidden="true">→</span>
           </Link>
         </div>
+        {connection.steps ? (
+          <ol className="hud-setup-steps">
+            {connection.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        ) : null}
+        <dl className="hud-setup-facts">
+          <div>
+            <dt>In your hands</dt>
+            <dd>{connection.control}</dd>
+          </div>
+          <div>
+            <dt>Where it works</dt>
+            <dd>{connection.limits}</dd>
+          </div>
+        </dl>
       </div>
     </li>
   );
 }
 
-/** The /setup mockup: three switches for what AIDaddy may follow. State lives only in this page. */
+/** The three connections of /setup. Each button does what it says: nothing on this page is a switch that only pretends. */
 export function SetupPanel() {
   return (
     <ul className="hud-setup-grid">
       {CONNECTIONS.map((connection) => (
-        <Channel key={connection.id} connection={connection} />
+        <Card key={connection.id} connection={connection} />
       ))}
     </ul>
   );
