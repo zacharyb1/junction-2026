@@ -4,7 +4,7 @@
  * The frame every /desk page shares: UKK on a laptop, laid out like a chat app, so a parent at a desk gets the
  * sections in a sidebar and the work in a wide column. It loads the household's live finds once, for every page.
  *
- * Sections the desktop has no page for yet (community, search, household, apps) open the /home phone pages.
+ * Every section has its own desktop page; they share their data and logic with the /home phone pages.
  */
 
 import Image from "next/image";
@@ -31,10 +31,10 @@ const SECTIONS: Item[] = [
     badge: (found) => <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#c4572f] px-1.5 text-[11px] font-bold text-white">{found}</span>,
   },
   { href: "/desk/tasks", label: "Get it done", icon: ICON.phone },
-  { href: "/home/community", label: "Ask parents like you", icon: ICON.people },
-  { href: "/home/search", label: "Search", icon: ICON.search },
-  { href: "/home/household", label: "Household", icon: ICON.home },
-  { href: "/home/connect", label: "Connected apps", icon: ICON.link },
+  { href: "/desk/community", label: "Ask parents like you", icon: ICON.people },
+  { href: "/desk/search", label: "Search", icon: ICON.search },
+  { href: "/desk/household", label: "Household", icon: ICON.home },
+  { href: "/desk/apps", label: "Connected apps", icon: ICON.link },
 ];
 
 export function DeskShell({ children }: { children: ReactNode }) {
@@ -69,7 +69,7 @@ export function DeskShell({ children }: { children: ReactNode }) {
               );
             })}
           </div>
-          <Link href="/home/household" className="mt-auto flex items-center gap-2.5 rounded-xl px-2.5 py-2 no-underline">
+          <Link href="/desk/household" className="mt-auto flex items-center gap-2.5 rounded-xl px-2.5 py-2 no-underline">
             <Image src="/assistant/family.jpg" alt="" width={32} height={32} className="size-8 rounded-full object-cover" />
             <span className="flex flex-col">
               <span className="font-semibold">Laura</span>
