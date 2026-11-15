@@ -16,8 +16,8 @@ import { type FormEvent, type KeyboardEvent, useEffect, useRef, useState } from 
 import { CommunityView } from "@/components/community-view";
 import { AboutYou, OpportunityView, type Palette, useOpportunities } from "@/components/opportunity-panel";
 import { TaskView } from "@/components/task-view";
-import { Linked } from "@/components/ukk-chat";
-import { readCompletionStream } from "@/lib/ukk-stream";
+import { Linked } from "@/components/aidaddy-chat";
+import { readCompletionStream } from "@/lib/chat-stream";
 
 type Turn = { from: "you" | "ukk"; text: string };
 type View = "opportunities" | "tasks" | "communities" | "chat";
