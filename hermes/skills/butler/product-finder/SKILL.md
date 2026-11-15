@@ -17,7 +17,7 @@ Issue #30, widened from gifts to any product. Someone wants to buy something ("I
 
 ## Steps
 
-1. Acknowledge in one line, in AIDaddy's voice, in the same turn as the tool call. For a gift: "A matter of the gift registry. AIDaddy is visiting the shops." For anything else: "A matter of procurement. AIDaddy is visiting the shops."
+1. Follow SOUL's work-notice rule: the Telegram runtime announces the search; elsewhere acknowledge briefly with the first tool call.
 2. Call `mcp__casefile__find_products` with `prompt`: the person's own words, with what they need, who it is for and what they like, plus a price limit if they gave one ("electric kettle under 40 euros", "gift for Sem who likes cars"). Add `budget` when they named a highest price, `occasion` (YYYY-MM-DD) when they named a date it must arrive by, and `country` when it is not Finland.
 3. Post up to 6 products as the tool returned them, one line each: name, price exactly as returned, the shop, and the full shop URL (the web page shows the product picture above that URL). Add the delivery sentence when there is one. A product with `late: true` arrives after the date: say so plainly on its line, and list it last.
 4. Add nothing the tool did not return: no other products, no prices of your own, no "probably in stock".

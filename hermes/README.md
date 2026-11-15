@@ -334,9 +334,9 @@ Differences from Mode A:
 
 Back to Mode A: `hermes config unset telegram.require_mention`, and the same for `telegram.observe_unmentioned_group_messages`, `telegram.reactions` and `telegram.mention_patterns` (`cli-commands.md:1376`). Restart, `/new --yes`.
 
-## The gate: small talk never leaves the laptop
+## The gate: silence with recent context
 
-A Hermes plugin on the `pre_gateway_dispatch` hook decides, on this machine, whether a group message may reach the cloud model. Small talk is dropped before any model call, any transcript entry and any network request. Direct messages are never gated.
+A Hermes plugin on the `pre_gateway_dispatch` hook decides, on the bot host, whether a group message wakes the cloud model. Authorized Telegram text can wait in a bounded same-chat/topic buffer. When a later message wakes the bot, recent context goes with it so household facts need not be repeated; forwarded context becomes part of the normal Hermes conversation history. The pending buffer expires after 30 minutes and is not written to disk. Direct messages are never gated. See the [context and work-notice contract](../docs/CONTRACTS.md#telegram-context-and-work-notices) for limits and reset behavior.
 
 Order of the decision (`hermes/plugins/kaveri-gate/gate.py`):
 
@@ -345,7 +345,7 @@ Order of the decision (`hermes/plugins/kaveri-gate/gate.py`):
 3. **Local Gemma** (`gemma3:1b` through Ollama, JSON-schema output) labels the rest `trigger`, `small_talk` or `unsure`. Only `small_talk` is dropped. Unsure wakes the bot.
 4. **Gate down or slower than 8 seconds:** the wake patterns alone have decided. Never "let everything through".
 
-After a wake the chat stays open to the bot for 180 seconds (`KAVERI_GATE_OPEN_SECONDS`), so answers to its questions and taps on its buttons reach it. A woken bot still applies its own silence rule.
+After a wake the same chat and topic stay open to the bot for 180 seconds (`KAVERI_GATE_OPEN_SECONDS`), so answers to its questions and taps on its buttons reach it. A woken bot still applies its own silence rule.
 
 ```bash
 bash hermes/install-gate.sh        # copy the plugin into the Hermes home and enable it
