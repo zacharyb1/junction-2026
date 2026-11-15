@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions -- playwright-cli evaluates this function expression. */
 /**
  * Browser regression for the chat's voice lifecycle. No provider calls or real microphone.
- * Start the built app with DEMO_OPEN=1, ELEVENLABS_API_KEY=test,
- * UKK_API_URL=http://127.0.0.1:1 and UKK_API_KEY=test; then:
+ * Start the built app with DEMO_OPEN=1 and ELEVENLABS_API_KEY=test; then:
  *   playwright-cli -s=chat-voice open http://127.0.0.1:3000/chat
  *   playwright-cli -s=chat-voice run-code --filename=scripts/check-chat-voice.js
  *   playwright-cli -s=chat-voice close
