@@ -14,6 +14,8 @@ export type Progress = {
   /** One entry per search, replaced when the search returns. */
   searches: Of<"search">[];
   pages: Of<"page">[];
+  /** The first pages on the topic, from Exa lite. Pointers, not part of the plan. */
+  glance?: Of<"glance">;
   verified?: Of<"verified">;
 };
 
@@ -30,6 +32,8 @@ export function advance(p: Progress, e: EngineEvent): Progress {
     }
     case "page":
       return { ...p, pages: [...p.pages.filter((page) => page.url !== e.url), e] };
+    case "glance":
+      return { ...p, glance: e };
     case "verified":
       return { ...p, verified: e };
     default:
@@ -78,6 +82,8 @@ function searchHeading(searches: Of<"search">[]) {
   const done = searches.filter((s) => s.status === "done");
   if (!done.length) return "No Exa search came back";
   const steps = done.reduce((sum, s) => sum + s.steps, 0);
+  // In the agent mode the one row is an Exa Agent run, not a search.
+  if (done.every((s) => s.focus.startsWith("Exa Agent"))) return `Exa Agent proposed ${count(steps, "step")}`;
   return `${done.length} Exa search${done.length === 1 ? "" : "es"} proposed ${count(steps, "step")}`;
 }
 
@@ -111,6 +117,32 @@ function SearchRow({ search, busy }: { search: Of<"search">; busy: boolean }) {
         </span>
       </div>
     </li>
+  );
+}
+
+/** What Exa lite found before the research was back: where the answer is likely to be, shown while the checking runs. */
+function FirstLook({ glance }: { glance: Of<"glance"> }) {
+  return (
+    <div className="flex animate-in flex-col gap-1 fade-in motion-reduce:animate-none">
+      <p className="text-xs text-muted-foreground">
+        First look from Exa lite after {seconds(glance.tookMs)}. Pointers only: the plan uses checked quotes.
+      </p>
+      <ul className="flex flex-col gap-1">
+        {glance.pages.slice(0, 3).map((page) => {
+          const host = hostOf(page.url);
+          return (
+            <li key={page.url} className="flex items-center gap-2">
+              <Badge variant={page.official ? "secondary" : "outline"}>{page.official ? "Official" : "Secondary"}</Badge>
+              <a href={page.url} target="_blank" rel="noreferrer" className="relative min-w-0 flex-1 truncate py-0.5 hover:underline">
+                {host}
+                {page.title !== host && <span className="text-muted-foreground"> · {page.title}</span>}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
@@ -191,6 +223,7 @@ export function Timeline({ progress, busy, finished }: { progress: Progress; bus
                   <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{seconds(took)}</span>
                 )}
               </div>
+              {name === "plan" && progress.glance && <FirstLook glance={progress.glance} />}
               {name === "search" && progress.searches.length > 0 && (
                 <ul className="flex flex-col gap-1">
                   {progress.searches.map((s) => (

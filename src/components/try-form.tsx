@@ -27,6 +27,12 @@ const COUNTRIES = [
   ["CA", "Canada"],
 ] as const;
 
+// Two ways to research, both checked the same way afterwards.
+const MODES = [
+  ["fast", "Exa search: three searches at once, about 10 seconds"],
+  ["agent", "Exa Agent: searches, reads and reasons in steps, about 40 seconds"],
+] as const;
+
 const LANGUAGES = [
   ["en", "English"],
   ["fi", "Suomi"],
@@ -46,6 +52,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
   const [otherCountry, setOtherCountry] = useState("");
   const [region, setRegion] = useState("");
   const [language, setLanguage] = useState("en");
+  const [depth, setDepth] = useState<(typeof MODES)[number][0]>("fast");
   const [document, setDocument] = useState("");
   const [code, setCode] = useState(initialCode);
   const [busy, setBusy] = useState(false);
@@ -79,6 +86,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
           region: region || undefined,
           language,
           document: document || undefined,
+          depth,
         }),
       });
       if (res.status === 401) setRejected(true);
@@ -216,6 +224,19 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
               ))}
             </select>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="depth" className="text-sm font-medium">
+            Research with
+          </label>
+          <select id="depth" className={field} value={depth} onChange={(e) => setDepth(e.target.value as typeof depth)}>
+            {MODES.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <details className="rounded-lg border text-sm">

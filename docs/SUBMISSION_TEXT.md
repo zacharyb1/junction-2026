@@ -20,6 +20,8 @@ A silent butler in your family chat that turns life events into source-checked p
 
 **How it works.** A small Gemma model on our own server decides whether a message is a life event; small talk stops there. Hermes Agent with NVIDIA Nemotron holds the conversation and reads letter photos. The research engine runs structured Exa searches on the country's official sites and asks for steps, deadlines, amounts and quoted sentences in a schema we define. Then a verifier opens every cited page again, with our own request and with Exa Contents, and looks for the quoted sentence and its numbers on that page. A line whose sentence is not found is removed and listed as unconfirmed. The family gets a case file link with the plan, the quotes and the gaps.
 
+**How we use Exa.** Exa Search `auto` with an output schema runs the structured searches on official sites, plus one search limited to pages published in the last four months. Exa Search `lite` gives a first look at the official pages in under a second, shown while the research runs. Exa Contents is the second reader of every cited page. Exa Agent is a second research mode on `/try`: one agent run searches, reads and reasons in steps, and its quotes pass the same page check.
+
 **What is real in the demo.** The website, the research engine, the verifier and the case files are live at https://86.38.238.136.sslip.io, on one Verda server; anyone can type a situation at `/try` and get a checked plan in a few seconds. The Telegram bot runs on the same server. In the latest run of our own test set, 19 of 19 life events were researched correctly, 98 of 98 quotes were found on the pages they cite, 6 of 6 messages with nothing to research got no made-up plan, and the median time was 5.6 seconds. The web is live, so runs differ: recent runs passed 17 to 19 of 19. On 60 labelled messages the gate missed 0 of 20 life events and woke by mistake on 1 of 40 small-talk messages; that is our own development set, not a blind test. The listening page and the browser extension are first versions. The chat replays on the site use a fictional family with plans from real runs, and say so.
 
 **What is next.** A watch on every cited page, so a rule change reaches the family the day it happens. Calendar and mail behind the same approval step. More countries: official site lists exist for 12, and Finland is tested in depth. A phone app, so listening works with the screen off.
@@ -28,7 +30,7 @@ This is research with sources, not legal advice.
 
 ## Technologies used
 
-Exa (structured search, Exa Contents), Next.js 16, React 19, TypeScript, Tailwind CSS, Hermes Agent, NVIDIA Nemotron (`nvidia/nemotron-3.5-super-vl-120b-a12b`), Gemma 3 1B on Ollama, ElevenLabs, Telegram Bot API, Docker Compose and Caddy on a Verda server, Playwright, Vitest.
+Exa (Search `auto` with output schema, Search `lite`, Exa Contents, Exa Agent), Next.js 16, React 19, TypeScript, Tailwind CSS, Hermes Agent, NVIDIA Nemotron (`nvidia/nemotron-3.5-super-vl-120b-a12b`), Gemma 3 1B on Ollama, ElevenLabs, Telegram Bot API, Docker Compose and Caddy on a Verda server, Playwright, Vitest.
 
 ## Note for the NVIDIA Nemotron challenge
 

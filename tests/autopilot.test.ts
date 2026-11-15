@@ -54,6 +54,16 @@ describe("the autopilot lawyer's check", () => {
       "Could not open kkv.fi",
     );
     expect(progressLine({ type: "source", url: "https://www.kkv.fi/en/a", title: "Lease", official: true })).toBeNull();
+    // The first look from Exa lite names the sites, once each, and no more than three.
+    const look = (url: string) => ({ url, title: "t", official: true });
+    expect(
+      progressLine({
+        type: "glance",
+        pages: ["https://www.kela.fi/a", "https://www.kela.fi/b", "https://www.suomi.fi/c", "https://tem.fi/d", "https://vero.fi/e"].map(look),
+        tookMs: 469,
+        ms: 471,
+      }),
+    ).toBe("First look: kela.fi, suomi.fi, tem.fi");
   });
 });
 
@@ -88,5 +98,14 @@ describe("reading the Engine's event stream", () => {
     expect(refusal(429, "The demo is busy. Please try again in a minute.")).toBe("The demo is busy.");
     expect(refusal(500, "EXA_API_KEY is not configured on the server.")).toBe("EXA_API_KEY is not configured on the server.");
     expect(refusal(502)).toBe("The Engine answered 502.");
+  });
+});
+
+describe("research depth", () => {
+  it("accepts the Exa Agent mode and keeps fast as the default", () => {
+    const base = { situation: "My landlord raised the rent by 12 percent.", country: "FI" };
+    expect(ResearchInput.parse(base).depth).toBe("fast");
+    expect(ResearchInput.parse({ ...base, depth: "agent" }).depth).toBe("agent");
+    expect(ResearchInput.safeParse({ ...base, depth: "ultra" }).success).toBe(false);
   });
 });

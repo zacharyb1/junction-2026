@@ -212,10 +212,10 @@ const slides = [
     `<h2>Exa finds it. Our server proves it.</h2>
     <ol class="flow">${FLOW.map(([name, tech, text]) => `<li><h3>${esc(name)}</h3><p class="tech">${esc(tech)}</p><p>${esc(text)}</p></li>`).join("")}</ol>
     <ul class="exa">
-      <li><strong>Structured search.</strong> Exa returns steps, deadlines, amounts and the quoted sentence in a schema we define.</li>
-      <li><strong>Official sites first.</strong> Site lists for ${facts.countries} countries. For Finland, ${facts.finland} Finnish and EU sites go to Exa as the domains to search.</li>
-      <li><strong>This year's rules.</strong> A separate search asks only for pages published in the last four months.</li>
-      <li><strong>Exa Contents</strong> is the second reader of every cited page, next to our own request.</li>
+      <li><strong>Exa Search, auto.</strong> Steps, deadlines, amounts and the quoted sentence, in a schema we define, from ${facts.finland} Finnish and EU official sites. One more search asks only for pages from the last four months.</li>
+      <li><strong>Exa Search, lite.</strong> A first look at the official pages in under a second, on screen while the research runs.</li>
+      <li><strong>Exa Contents.</strong> The second reader of every cited page, next to our own request.</li>
+      <li><strong>Exa Agent.</strong> A second research mode: one agent searches, reads and reasons in steps. Its quotes pass the same check.</li>
     </ul>`,
   ),
   slide(
