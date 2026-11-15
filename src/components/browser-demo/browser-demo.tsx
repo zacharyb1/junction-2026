@@ -1,6 +1,7 @@
 "use client";
 
 import { useReplayClock } from "@/components/demo/replay";
+import { ORB_MARK } from "@/components/demo/orb-mark";
 
 /**
  * Issue #34: a scripted replay of AIDaddy noticing that someone is stuck on a tax return, fixing the
@@ -80,7 +81,7 @@ export function BrowserDemo({ loop = false }: { loop?: boolean }) {
         <aside className={`bdemo-panel${panel ? " is-open" : ""}`} aria-hidden={!panel}>
           <div className="bdemo-panel-head">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/aidaddy-avatar.svg" alt="" />
+            <img src={ORB_MARK} alt="" />
             <div>
               <p className="bdemo-panel-name">AIDaddy</p>
               <p className="bdemo-panel-sub">reading along in your browser</p>

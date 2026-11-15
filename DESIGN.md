@@ -1,303 +1,267 @@
 ---
-name: AIDaddy — Family reading table
-description: An annotated ivory reading surface for a family plan and its official evidence.
+name: AIDaddy — The family reading table
+description: Ivory paper, cranberry annotations and useful words that a family can read and check together.
 colors:
-  cranberry: '#98112c'
-  cranberry-hover: '#740b22'
-  paper: '#fffaf1'
-  ink: '#211b1d'
-  muted: '#65544e'
-  rule: '#dfcdb8'
-  specimen: '#f5ecdd'
-  selection: '#f5c7cd'
-  source-rule: '#e4d0b6'
-  qr-white: '#fff'
+  primary: "#98112c"
+  primary-hover: "#740b22"
+  paper: "#fffaf1"
+  panel: "#fffdf8"
+  ink: "#211b1d"
+  muted-ink: "#65544e"
+  rule: "#dfcdb8"
+  rule-soft: "#eaded0"
+  inset: "#f5ecdd"
+  rose: "#f7e9e5"
+  rose-ink: "#741129"
+  selection: "#f5c7cd"
+  confirmed: "#38604a"
+  confirmed-fill: "#e8eee3"
+  waiting: "#86551b"
+  invalid: "#a12424"
+  field-edge: "#a08b79"
+  placeholder: "#756157"
 typography:
   display:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 9.62cqw
-    fontWeight: 700
-    lineHeight: 1.12
-    letterSpacing: -0.035em
-  display-wide:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(48px, 4.8vw, 60px)
+    fontFamily: "Chiron Sung HK, serif"
+    fontSize: "clamp(44px, 4.4vw, 66px)"
+    fontWeight: 400
+    lineHeight: 1.13
+    letterSpacing: "-0.035em"
+  headline:
+    fontFamily: "Chiron Sung HK, serif"
+    fontSize: "clamp(2.4rem, 4.6vw, 3.6rem)"
     fontWeight: 700
     lineHeight: 1.15
-    letterSpacing: -0.035em
-  headline:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(2rem, 5vw, 3.5rem)
-    fontWeight: 700
-    lineHeight: 1.12
-    letterSpacing: -0.035em
-  title:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 1.5rem
-    fontWeight: 700
-    lineHeight: 1.25
-    letterSpacing: -0.02em
-  body:
-    fontFamily: Lora, serif
-    fontSize: 1rem
+    letterSpacing: "-0.035em"
+  section:
+    fontFamily: "Chiron Sung HK, serif"
+    fontSize: "clamp(30px, 3vw, 42px)"
     fontWeight: 400
-    lineHeight: 1.5
-  lead:
-    fontFamily: Lora, serif
-    fontSize: 1.05rem
+    lineHeight: 1.22
+    letterSpacing: "-0.035em"
+  title:
+    fontFamily: "Chiron Sung HK, serif"
+    fontSize: "1.3rem"
+    fontWeight: 700
+  body:
+    fontFamily: "Lora, serif"
+    fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.8
-  statement:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(1.5rem, 2.4vw, 2rem)
-    fontWeight: 700
-    lineHeight: 1.35
-    letterSpacing: -0.02em
-  evidence-figure:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: clamp(2rem, 3.4vw, 2.75rem)
-    fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: -0.02em
-  hint:
-    fontFamily: Lora, serif
-    fontSize: 1.05rem
+  lede:
+    fontFamily: "Lora, serif"
+    fontSize: "1.06rem"
     fontWeight: 400
-    lineHeight: 1.75
+    lineHeight: 1.8
   label:
-    fontFamily: Inter, sans-serif
-    fontSize: .8rem
-    fontWeight: 400
-    lineHeight: 1.7
-  navigation:
-    fontFamily: Inter, sans-serif
-    fontSize: .875rem
+    fontFamily: "Inter, sans-serif"
+    fontSize: "0.84rem"
     fontWeight: 500
-    lineHeight: 1.5
+  control:
+    fontFamily: "Inter, sans-serif"
+    fontSize: "0.95rem"
+    fontWeight: 600
   note:
-    fontFamily: Kalam, cursive
-    fontSize: 1.25rem
+    fontFamily: "Kalam, cursive"
+    fontSize: "20px"
     fontWeight: 400
     lineHeight: 1.5
-  action:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 1.2rem
-    fontWeight: 700
-    lineHeight: 1.3
-  plan-title:
-    fontFamily: Chiron Sung HK, serif
-    fontSize: 1.1rem
-    fontWeight: 700
-    lineHeight: 1.35
-  quote:
-    fontFamily: Lora, serif
-    fontSize: 1.05rem
-    fontWeight: 400
-    lineHeight: 1.7
 rounded:
-  specimen: 4px
-  action: 14px
-  hero-action: 4cqw
-  hero-action-wide: 16px
+  evidence: "4px"
+  tag: "8px"
+  suggestion: "10px"
+  control: "12px"
+  field: "0.8rem"
+  form: "14px"
+  conversation: "16px"
+  avatar: "22%"
+  circle: "50%"
 spacing:
-  compact: .75rem
-  base: 1rem
-  inset: 1.25rem
-  room: 1.5rem
-  group: 2rem
-  chapter-head: 2.5rem
-  reading-gap: 3.5rem
-  spread-gap: 4rem
-  section: 4.5rem
-  section-wide: 5rem
+  xs: "0.5rem"
+  sm: "0.75rem"
+  md: "1rem"
+  lg: "1.5rem"
+  xl: "2rem"
+  section: "3rem"
 components:
   button-primary:
-    backgroundColor: '{colors.cranberry}'
-    textColor: '{colors.paper}'
-    typography: '{typography.action}'
-    rounded: '{rounded.action}'
-    padding: .65rem 1.25rem
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.paper}"
+    typography: "{typography.control}"
+    rounded: "{rounded.control}"
+    padding: "0.6rem 1.2rem"
+  button-primary-hover:
+    backgroundColor: "{colors.primary-hover}"
   button-secondary:
-    backgroundColor: transparent
-    textColor: '{colors.cranberry}'
-    typography: '{typography.action}'
-    rounded: '{rounded.action}'
-    padding: .65rem 1.25rem
-  button-hover:
-    backgroundColor: '{colors.cranberry-hover}'
-    textColor: '{colors.paper}'
-  annotation-replay:
-    backgroundColor: transparent
-    textColor: '{colors.cranberry}'
-    padding: .4rem 0 .4rem .5rem
-  hero-primary:
-    backgroundColor: '{colors.cranberry}'
-    textColor: '{colors.paper}'
-    rounded: '{rounded.hero-action}'
-    width: 100%
-    height: 100%
-  hero-secondary:
-    backgroundColor: transparent
-    textColor: '{colors.cranberry}'
-    rounded: '{rounded.hero-action}'
-    width: 100%
-    height: 100%
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    typography: "{typography.control}"
+    rounded: "{rounded.control}"
+    padding: "0.6rem 1.2rem"
+  button-secondary-hover:
+    backgroundColor: "{colors.rose}"
+  field:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.field}"
+    padding: "0 0.75rem"
+    height: "44px"
   navigation:
-    textColor: '{colors.cranberry}'
-    typography: '{typography.navigation}'
-    padding: 2.5rem 0 1rem
-  decision-chip:
-    textColor: '{colors.cranberry}'
-  specimen:
-    backgroundColor: '{colors.specimen}'
-    textColor: '{colors.ink}'
-    rounded: '{rounded.specimen}'
-    padding: 1.5rem
-  source-disclosure:
-    textColor: '{colors.ink}'
-    typography: '{typography.plan-title}'
-    padding: 1.1rem 0
-  source-quote:
-    backgroundColor: '{colors.specimen}'
-    textColor: '{colors.ink}'
-    typography: '{typography.quote}'
-    padding: 1rem 1.25rem
+    textColor: "{colors.muted-ink}"
+    typography: "{typography.label}"
+  tag-confirmed:
+    backgroundColor: "{colors.confirmed-fill}"
+    textColor: "{colors.confirmed}"
+    rounded: "{rounded.tag}"
+    padding: "0.25rem 0.5rem"
+  paper-panel:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.control}"
+    padding: "1rem"
+  evidence:
+    backgroundColor: "{colors.rose}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.evidence}"
+    padding: "17px 20px"
+  sample-step-control:
+    textColor: "{colors.primary}"
+    rounded: "{rounded.circle}"
+    width: "44px"
+    height: "44px"
+  state-mark:
+    backgroundColor: "{colors.rose}"
+    textColor: "{colors.primary}"
+    rounded: "{rounded.avatar}"
 ---
 
 # Design System: AIDaddy
 
 ## Overview
 
-**Creative North Star: "Family reading table"**
+**Creative North Star: "The family reading table"**
 
-Family reading table is a warm, literary surface: substantial book serif, italic prose, plain factual labels and cranberry handwritten annotations. The plan and its official sentence share the page, like a document a family has read and marked together. The emphasis belongs to useful words and evidence.
+AIDaddy puts useful words and their evidence within reach, with the feeling of a family reading together. Ivory paper, cranberry annotations and literary headings make official material approachable. The product's own words, conversations, plans and quoted sentences supply the picture material.
 
-This system applies only to the reading-table page, which moved from `/` to `/reading` on 14 November (see docs/DECISIONS.md, Sat 08:57). It is implemented in `src/app/reading/page.tsx` and `src/components/landing/`. Its five core color variables and four font variables live on the landing wrapper. This replaces the former station-sign landing system. The reading world uses ink marks, soft marker pigment and paper texture rather than transit signage.
-
-Every other page shares one dark frame since 14 November (docs/DECISIONS.md, Sat 19:00): `SiteShell` in `src/components/site/` gives `/`, `/try`, `/c/[id]`, `/chat`, `/setup`, `/autopilot`, `/demo` and its replays the same header, footer and palette. The palette is the front page's control room, defined in `src/components/hud/hud.css`, described in docs/FRONT_PAGE_PLAN.md and handed to the shared Tailwind tokens inside `.site` by `src/components/site/site.css`. That frame is a separate system from this document: the paper, the four reading fonts and the cranberry palette below are still not extended to those pages, and the dark frame is not applied to `/reading`.
+The world is warm, readable and expressive. Space gives a sentence room; rules and paper tones organize the work. Motion follows a meaningful change: ink draws attention to a thought, a new answer arrives, a source opens, or a replay advances under the reader's control. The person can always pause, inspect and decide.
 
 **Key Characteristics:**
-- One continuous ivory reading surface with calm rules and occasional inset specimens.
-- Dark literary headings, readable prose, sans factual metadata and handwritten marginal notes.
-- A plan and its exact source sentence remain visibly paired.
-- An ink sequence follows the headline, case, plan and source; the words remain immediately readable.
-- Real local paper and ink plates; all words, controls and table data are semantic HTML.
+- Open reading surfaces with a clear heading and one immediate next action.
+- Literary display type, generous prose and precise sans-serif controls.
+- Cranberry ink beside the words or evidence it helps explain.
+- Real HTML text, checked-source links and visible uncertainty.
+- Replayable motion with a complete static reading state.
+
+This documents the accepted Impeccable world as implemented on 15 November 2026. It supersedes the earlier terracotta-and-orb system. The implementation authorities are `src/components/site/site.css`, `src/components/home/warm.css` and `src/components/landing/fonts.ts`; task, listening and replay styles specialize them. The original `/reading` composition is preserved as a separate page. Product capabilities remain in `PRODUCT.md` and its source documents.
 
 ## Colors
 
-Warm neutrals carry the reading; cranberry supplies the purposeful emphasis and interaction.
+One cranberry accent sits on a family of warm paper tones. The frontmatter owns the reusable values; the sidecar extends them with tonal previews, motion and component examples.
 
 ### Primary
-- **Cranberry ink** (`cranberry`): actions, source links, annotations, process titles, open plan titles and quote rules, status symbols, scorecard figures and focus outlines. **Deep cranberry** (`cranberry-hover`) fills hovered primary and secondary actions.
+
+**Cranberry** marks primary actions, links, selected examples, source references and ink annotations. **Deep cranberry** is the filled-button hover. **Rose** supports quotations and selected states; **rose ink** keeps text legible on that tint.
+
+### Secondary
+
+**Garden green** indicates a confirmed or completed state; its pale fill supports a short status or source chip. **Warm ochre** signals a waiting state or a person's next move. These are semantic colors, not alternate brand accents. **Error red** belongs with a concrete failure message.
 
 ### Neutral
-- **Ivory paper** (`paper`): the continuous page ground and reversed action text; the browser theme color follows it. The raster paper texture adds material variation.
-- **Book ink** (`ink`): primary text. **Warm secondary ink** (`muted`): captions, factual metadata and hints.
-- **Paper rule** (`rule`): chapter, plan-row and table dividers. **Source rule** (`source-rule`): the hero's warm vertical rule.
-- **Inset paper** (`specimen`): opened source quotes, factual examples in the trust section and a table row under hover or case-link focus, without a raised card effect.
-- **Selection pink** (`selection`): selected text. Pink and cream marker plates also carry their own pigment; these raster colors are not interchangeable solid-fill UI tokens.
-- **QR white** (`qr-white`): the small QR backing only.
 
-### Named Rules
-**The Evidence Pair Rule.** A plan statement and its supporting sentence belong to the same reading sequence; a colored mark never substitutes for a source label or link.
+**Ivory paper** is the page ground. **Paper panel** distinguishes forms and working containers. **Warm ink** carries primary text and **muted ink** supporting text. **Inset paper** holds family messages, secondary regions and row feedback. **Paper rule** and its softer partner separate content; **field edge** makes editable boundaries visible. **Selection rose** is the selected-text highlight.
+
+**The Evidence Rule.** Give a statement and its supporting sentence a visible relationship. Use placement, a source number and words alongside color.
 
 ## Typography
 
-**Display Font:** Chiron Sung HK, serif fallback. **Body Font:** Lora, serif fallback. **Factual Font:** Inter, sans-serif fallback. **Annotation Font:** Kalam, cursive fallback.
+**Display Font:** Chiron Sung HK, with a serif fallback. **Body Font:** Lora, with a serif fallback. **Control Font:** Inter, with a sans-serif fallback. **Annotation Font:** Kalam, with a cursive fallback.
 
-The four fonts load through `next/font/google` in `fonts.ts` and are applied only by the landing wrapper. Chiron loads weights 400 and 700; Lora loads normal and italic styles; Kalam loads 400. Inter supplies the compact factual voice. These are actual text fonts, never rasterized lettering.
+The homepage promise and section headings use the regular display face; task-page headings and compact titles use its bold weight. Lora carries prose introductions and quotations, including the italic role sentence on the homepage. Inter carries functional copy, dates, navigation, fields, status and tabular figures. Kalam is a brief marginal note or scene number, never a paragraph or a control label.
 
-### Hierarchy
-- **Display:** the portrait hero uses the `display` token relative to its query container. The desktop spread switches to `display-wide`. Wordmark, case title and next-chapter title share its weight and tight tracking, at different optical sizes.
-- **Headline / title:** lower chapter headings use the fluid `headline` token and balanced wrapping; subsection titles use `title`. The closing statement grows from 2.5rem to 4.5rem, capped at 17ch, using the same display voice and headline line height.
-- **Body / statement / lead / hint:** the base reading voice uses `body`; the audience sentence uses the stronger `statement` token, followed by opening paragraphs in `lead`. Running paragraphs often expand to line-height 1.8, while `hint` supplies the softer section introduction. Main reading copy is capped at 68ch.
-- **Label / navigation / evidence figure:** Inter sets captions, sources, dates, navigation and tabular evidence. Captions use `label`; navigation uses `navigation`. The verified-quotes total uses `evidence-figure`, while the other totals remain 1.65rem. Totals use lining and tabular numerals; table figures use tabular numerals.
-- **Note:** short marginal or conversational notes use `note`. Hero annotations scale in container units and rotate slightly, while the role line uses Lora italic.
-- **Action / plan / quote:** `action` sets lower-page actions; `plan-title` and `quote` keep the expandable evidence readable. Hero actions and quotes use Chiron and a separate container-scaled treatment.
+The frontmatter records representative roles, not a single modular scale. Homepage quotations use smaller prose sizes (14–15px), and factual captions are compact. Task introductions read to at most 66ch; working notes to 72ch. Headings balance their lines. Controls and labels use sentence case.
 
-### Named Rules
-**The Four Voices Rule.** Use Chiron Sung HK for display and substantial actions, Lora for reading and italic role copy, Inter for facts, and Kalam for short annotations. Keep handwriting out of long prose and table data.
+Fonts are supplied through `next/font/google` in `src/components/landing/fonts.ts`, using Latin subsets and `display: swap`. Preserve these imports and their source provenance when adjusting type. Geist Mono remains available for code-like material; it is not the interface's label voice.
+
+**The Four Voices Rule.** Use display type for the thought, prose type for reading, sans-serif for operating the product, and handwriting for a short human annotation.
 
 ## Layout
 
-The hero is an annotated portrait with positions derived from an 852 × 1846 reference frame in `reading-layout.css`. Its frame keeps that aspect ratio, is centered and is at most 852px wide. Type uses container units so words and physical marks scale together. This coordinate system belongs to the hero; it is not a reusable layout grid for other pages.
+Every current product route uses `SiteShell` except the preserved `/reading` page. The shell supplies paper texture, skip link, navigation and footer. New task pages use the shared shell and page heading; links into access-controlled flows use `SiteLink` so their access code travels with them.
 
-Between 600px and 999px viewport width, when the viewport aspect ratio is at least 1:2, the hero width is the smaller of the viewport width and `100svh * 852 / 1846`, fitting the portrait sequence to the available height. Taller portrait viewports retain the original width-based frame, including the 852 × 1846 reference. At 1000px and above, it becomes a two-page reading spread, at most 1240px wide and 900px tall: promise and actions on the left, plan and source on the right. The desktop headline marker's vertical position and height are derived from the actual headline size and line height in CSS, rather than a fixed percentage alone. Changes to fonts or wording still require visual verification.
+The homepage is an open reading composition. Its promise sits directly on paper beside a contained illustrative family conversation; the quote inside that conversation comes from the real five-step sample. Below it, rules, a paper document, linked rows and the scorecard move from life event to plan to official sentence to the person's decision. This composition belongs to the homepage; it does not prescribe a two-column hero for every route.
 
-Below 360px, action height, source-link size, marginal labels and the next chapter are adjusted to keep the portrait usable. The lower-page wrapper uses a 1rem side inset at these widths; otherwise it uses 1.5rem and caps at 1160px. Main reading copy is limited to 68ch. Chapters have 4.5rem vertical space, increasing to 5rem from 768px. Rules divide chapters; groups use the extracted spacing steps rather than uniform card tiles.
+The home content spans at most 1200px, with a two-column hero and an 88px gap on wide screens. At 1100px the gap contracts; at 760px the story stacks in reading order with 20px side margins, reduced to 16px below 359px. Task forms and chat occupy a column up to 760px; case files reach 860px. Shared setup, replay and scorecard content uses the 1120px shell width. The mobile shell keeps 16px side margins.
 
-At 768px, the conversation and plan become an `.8fr / 1.2fr` split; process and trust content become two columns, the bot section places its QR beside the text, and privacy becomes three columns. Gaps range from 2.5rem to 4rem. Scorecard totals change from two columns to four. Below 768px, country, quote count and time fold beneath the scenario name; the table retains result, scenario and case-link columns. Navigation wraps in normal document flow.
-
-At 1000px, the opening audience statement and its supporting paragraphs form an `.8fr / 1.2fr` spread with a 4rem gap. Each lower chapter also pairs its heading on the left with its introduction on the right using that split. Smaller widths retain the reading sequence in one column; the hero geometry and primary-action placement stay unchanged.
+Working layouts use 12–32px internal spacing and larger section gaps. Shared split layouts add an aside at 900px; phone replay pages put the phone beside their heading at that breakpoint and below it on narrow screens. The header changes to a named Menu control at 700px. Tables keep their column semantics and scroll or fold supporting facts when space runs out.
 
 ## Elevation & Depth
 
-The surface has no panel shadows. Depth comes from the tiled paper grain, translucent pigment in local raster marks and the warmer specimen inset. Hairline rules organize text without enclosing each item. Text stays sharp during source opening; there is no glass or blur effect.
+Paper tone, fine rules and spacing establish depth. Homepage documents and ordinary task panels are flat; shared task cards have no shadow. The paper texture is a quiet repeating material, not an image of the interface. The exceptional lifted objects are the listening call dialog and the device depicted inside a replay; their exact shadows are in the sidecar.
 
-The paper asset is a clean 55 × 150 sample from the approved composition, mirror-tiled 4 × 4 into a 220 × 600 texture. Fourteen separate transparent ink/marker assets provide the wordmark underline, headline/plan/source highlights, intro and case underlines, sample circle, proof bracket, bracket underline, two arrows, publisher highlight, divider and next-chapter underline. `reading-plates.tsx` imports them from `assets/plates/`; the paper is the wrapper background and the remaining plates are decorative images. Each of the fifteen PNGs contains its exact provenance in the `impeccable:prompt` text chunk; some also have JSON sidecars. Preserve the embedded record rather than inferring origin from filenames or treating a missing sidecar as missing provenance.
-
-### Named Rules
-**The Paper Rule.** Keep depth in paper, pigment and tonal insets. Do not add floating panel shadows to this reading surface.
+**The Paper Rule.** Make a document readable through alignment, whitespace and tonal separation before adding a container. Reserve lifted depth for a dialog or a depicted device.
 
 ## Shapes
 
-The reading surface and rules are square and open. Trust specimens have the small `specimen` radius. Lower actions have the `action` radius; hero actions use a container-relative radius in portrait and `hero-action-wide` in the spread. The soft circle, bracket and arrows are physical artwork with irregular edges, not generic geometric decoration. Source numerals are plain cranberry text, not checkbox states.
+Controls and working panels have gently rounded corners, while the homepage plan reads as a square-edged sheet. The larger illustrative conversation has softer corners; the quoted excerpt inside it has a modest corner. Source chips are compact rectangles, and previous/next sample controls are circles with full touch targets. Fine rules define reading order without turning every paragraph into a card.
 
-Interface icons use Lucide SVG geometry: navigation arrows, replay, calendar, location, check, cross and attention. Source rows use a simple two-stroke SVG expansion sign, with its vertical stroke collapsing in the open state. Lower-page icon strokes are 1.75 units; hero location and calendar strokes are 2. These icons support adjacent words and are hidden from assistive technology when decorative.
+The existing paper and ink assets live in `assets/plates/` and are imported by `reading-plates.tsx`. Keep their embedded provenance and adjacent JSON records intact. They contain decorative material only; words, labels, controls and quotes remain HTML. Existing ink is reused as an underline, highlight or circle tied to nearby content.
 
 ## Components
 
-### Buttons
-Substantial serif links with softened corners.
-- **Primary:** cranberry fill and paper text. **Secondary:** transparent paper ground, cranberry text and a cranberry border. Lower actions use the frontmatter padding and a minimum height of 48px; hero actions fill their positioned region with a minimum height of 44px.
-- **Hover:** both variants use deep cranberry with paper text. With no reduced-motion preference, colors transition over 160ms; action arrows move 3px toward their destination over 180ms using `cubic-bezier(.16,1,.3,1)` on hover or keyboard focus. The hero source-link arrow shares that movement. Reduced motion keeps the color feedback immediate and the arrows still. The controls themselves do not move.
-- **Focus:** links, buttons and summaries receive a 3px cranberry outline with a 5px offset. Preserve this visible state on both action variants.
-- **Routing:** browser actions use `TryLink`, preserving an incoming access-code query value. With no configured sample route, the secondary hero action links to the on-page sample plan and names that destination truthfully.
+### Buttons and fields
 
-**Replay annotations** is a quiet, underlined Inter button at .75rem and weight 500 beside the wordmark, with a 44px minimum target and a 15px replay icon. It appears only after the required browser APIs, fonts and five hero plates are ready, and only without a reduced-motion preference. Clicking restarts the annotation sequence from the beginning; repeated clicks cancel the previous run safely. Its icon rotates -45 degrees over 250ms on hover or keyboard focus, while its text and target stay still.
+Primary buttons use cranberry with ivory text; secondary buttons use paper with a fine rule. Shared action buttons are at least 48px high; the homepage action and research submission are about 52px. The shared border, fill and text color respond quickly to hover. Disabled controls remain identifiable and use their actual disabled state.
 
-### Navigation
-Underlined cranberry links in Inter sit after the conversation. Their flex row wraps, with 1.5rem gaps and 44px minimum link height. There is no fixed or overlay navigation. Ordinary source links also stay underlined; hover increases underline thickness. External links announce a new tab in accessible text.
+Fields use panel paper, a visible field edge and Inter text. Labels remain above them. Text inputs and selectors in the research form have 44px height; the listening settings use 48px. Textareas grow vertically and keep comfortable line spacing. Error messages explain the failed action beside the relevant controls; a failed chat send preserves the draft.
 
-### Chips
-The decision chip is a quiet cranberry text label in Inter at .8rem and weight 500. It has no filled pill or enclosing border. Handwritten “Example” and “Illustrative example” labels mark the nature of material; they are not navigational badges.
+The shared focus treatment is a cranberry outline (3px) offset from the target (4px; 5px within the homepage). Keep focus visible and avoid clipping it in scrolling regions. Maintain at least a 44px touch target for interactive controls. Check local legacy styles rather than assuming every surface inherits the shared rule.
 
-### Cards / Containers
-Trust specimens use inset paper, small corners and 1.5rem padding. An opened source quote uses the same paper inset, square corners and the `source-quote` padding. Conversations, plan rows and the scorecard remain open documents on the main paper, divided by rules. They do not inherit a generic card shadow or padded dashboard shell.
+### Navigation and page headings
 
-### Source disclosures
-A plan row is a native `details`/`summary`, with the plan text and timing on the left and source number plus expansion sign on the right. The shared disclosure name allows one open row; source 5 starts open. Hover underlines the plan in cranberry. An open row keeps its title cranberry and its source numeral at weight 700. The opened quote has an inset paper ground and a 1px cranberry rule, its publisher and host, and a link to the exact source. The hero's source-5 quote is always visible rather than an expandable control.
+The wordmark sets “AI” in cranberry and “Daddy” in ink, as live display text. Navigation uses Inter with an underline for hover/current state; the main action is filled. Mobile navigation has an explicit Menu button and an expanded state. A page opens with its title, optional real status and useful introduction. The current `PageHead` omits the old decorative label row.
 
-With no reduced-motion preference, browsers supporting `interpolate-size:allow-keywords` and `details::details-content` expand and collapse the native content block over 320ms using `cubic-bezier(.16,1,.3,1)`. Other browsers retain a sharp 240ms opening reveal, settling from a -2px vertical offset while its lower 14% is briefly clipped. The SVG expansion sign's vertical stroke collapses over 280ms, and the plan title's color changes over 180ms. Reduced motion makes these state changes immediate while keeping the open-state color and inset. Expansion signs are supplemental affordances; native semantics carry the open state and work without JavaScript.
+### Panels, rows and tags
 
-The hero has one progressive decorative sequence in `ReadingMotion`: the headline highlight draws across (0–500ms), the sample-case circle follows (350–850ms), then the plan highlight (750–1150ms), the supporting bracket downward (1000–1500ms) and the quote highlight (1350–1800ms). Its overlapping strokes use `cubic-bezier(.16,1,.3,1)`. Automatic playback happens once when at least 45% of the quote is visible and the relevant plates and fonts are ready; a 1500ms readiness limit from the first eligible view skips late automatic playback. The explicit replay button remains available after slow assets finish loading. Text and controls never wait on this sequence. The server-rendered marks are complete by default; missing browser APIs, failed assets, no JavaScript and reduced motion all preserve that static view. Leaving the hero, hiding the document or enabling reduced motion cancels playback and restores the finished marks. There is no loop or scroll scrubbing.
+Working panels have a fine edge and a quiet title row. A source, heard sentence or research update can use an inset row with a single leading rule. Tags and source chips carry words or numbers; green means confirmed, ochre means waiting, and cranberry means selected or active. Status dots always accompany text.
 
-The next-chapter underline and the underline beneath the closing word “check.” each use `InkReveal`: a single 650ms stroke across when at least 45% of the mark reaches the reading area, inset 64px from the viewport bottom. They reuse the existing underline plate without changing its geometry. Each requires ready artwork and fonts within the same 1500ms limit; it cancels on leaving the reading area, document hiding or reduced motion. Completed marks stay visible and do not replay on scrolling back.
+### Evidence and disclosures
 
-### Conversation and evidence table
-The conversation is readable prose with named speakers, a handwritten stage direction and a cranberry bot reply. Its caption explicitly identifies an example. The plan and quotes come from `src/data/sample-case.json`; decorative marks do not change their meaning.
+A plan line keeps its deadline, source number, quoted sentence and source link together. Lora distinguishes the quotation from factual labels. Native disclosures retain their keyboard behavior, reveal the evidence in place and indicate open state. In a case file, a source reference moves to the matching evidence and highlights the target. Scorecards retain recorded failures, unavailable links and the explanation of what a pass measures.
 
-The scorecard is a real table with scoped headers, a screen-reader caption, full scenario rows, explicit Pass/Fail words and accompanying SVG symbols. Both results use cranberry; meaning never depends on green/red recognition. Run provenance and time sit above the totals. The adjacent hint states that a pass checks source grounding rather than completeness. Keep failures, error text and missing-case states visible. Data comes from `src/data/scorecard.json`; do not turn table examples in the sidecar into production metrics.
+### The sample conversation and ink
 
-The verified-quotes total leads by type size and a darker, stronger label; all four totals keep their original labels, order and values. Hovering a table row or focusing its case link applies the inset-paper ground to help track that row without adding a panel or changing its result.
+The family conversation is explicitly labelled as an example. Previous/next controls browse the five real sample steps; each step changes its title, date, quoted sentence and official link together. Hidden answers are inert, and an updated answer is announced politely. Without JavaScript, the visible example links to the complete plan below.
 
-### Configuration and limits
-The Telegram section shows a working action and QR only when configured; otherwise it explains availability and offers the browser demo. Privacy and limits remain readable paragraphs on the same paper. The landing has no input-field design to inherit; `/try` retains its own form system.
+The hero's ink reveals in three short strokes and can be replayed. Only the pigment is animated; all words and controls are present before motion runs. Font/image readiness, visibility and reduced-motion preference determine whether the entrance plays. Never delay readable content to complete an entrance.
+
+### State marks and icons
+
+The chat/voice avatar is a typographic “Ai” on a rose tile; the working-page `Core` is a letterpress “a.” with brief activity dots. Voice bars reflect actual playback level, and listening/thinking states have accessible names or adjacent status text. These are typographic state components, not a continuously animated orb.
+
+The public app icon and replay avatar use the existing Lucide service-bell vector in cranberry on ivory (`src/app/icon.svg` and `public/aidaddy-avatar.svg`). Installed-app PNGs are rasterizations of that vector. Preserve their provenance. Interface icons are small vector drawings, with accessible labels on icon-only actions. A typographic state mark and a bell asset have different jobs; do not treat their filenames as a requirement to draw an orb.
+
+### Replays and motion
+
+Replay pages retain a page title, an explicit scripted-replay label, a capability/concept status, duration, caption and Pause/Resume/Replay controls. Chat, browser and calendar scenes depict another interface and keep that scene's own conventions. The kitchen-table phone depicts AIDaddy and uses the warm palette, compact sans-serif transcript, rounded phone silhouette and bell mark. Device framing is specific to replay content, not a general task-page container.
+
+Most state transitions take 160–320ms with a quick settling curve; a task heading settles over 500ms. A new answer moves only a few pixels as it arrives. Timelines stop while paused, offscreen or in a hidden tab. Reduced motion removes decorative transitions and begins scripted replays in their completed reading state; an explicit Replay or table-loop request can start the timeline. Keep that distinction between a static default and user-requested playback. Durations and easing are recorded in the sidecar.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep paper and ink assets local, retaining their embedded provenance when replacing or optimizing them.
-- **Do** keep every quote, label, date, action and scorecard value as accessible text.
-- **Do** pair source numbers with actual evidence; the hero numeral identifies a source, not a completed family task.
-- **Do** preserve visible focus, keyboard disclosure behavior and reduced-motion access to all content.
-- **Do** use the same source data for the illustrated plan and its links, and the complete recorded run for the scorecard.
-- **Do** verify the portrait, short tablet and desktop spread when changing hero text or material positioning.
+
+- Do keep the life event, next step and supporting sentence easy to read together.
+- Do use the shared shell for new product pages and the focused reading column for task flows.
+- Do use existing paper and ink assets with their provenance intact, and keep every word selectable HTML.
+- Do label samples, recorded runs and concepts where the reader encounters them.
+- Do let the reader pause a timeline, inspect evidence and recover from a failed action.
+- Do verify direct loads, keyboard focus, narrow screens and reduced-motion states after visible changes.
 
 ### Don't:
-- **Don't** extend the landing fonts, paper or palette to /try or /c/[id] without a separate design decision.
-- **Don't** replace the page or a functional section with a screenshot.
-- **Don't** substitute CSS-drawn imitation marks for the approved physical ink and marker plates.
-- **Don't** turn every paragraph into a card, or introduce a dark departure-board field.
-- **Don't** use an annotation, color or decorative icon as the only label for meaning or status.
-- **Don't** present sample evidence as a live check, illustrative figures as measured results, or a scorecard pass as completeness.
+
+- Don't restore the terracotta orb identity; use the reading palette and the existing typographic or bell marks in their proper contexts.
+- Don't add decorative kickers, repeated category labels or text glyphs in place of the existing vector icon language.
+- Don't make color or animation the only evidence of a status, selection or result.
+- Don't convert the open homepage promise or every paragraph into a rounded panel.
+- Don't stretch the homepage composition or a replay's device frame into a rule for every page.
+- Don't hide text until an animation finishes or make continuous idle motion part of reading.

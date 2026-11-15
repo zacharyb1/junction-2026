@@ -1,20 +1,12 @@
 import { ArrowDown, ArrowRight, Check, ChevronDown, ExternalLink, Headphones, MessageCircle, Send } from "lucide-react";
-import type { LandingConfig } from "@/components/landing/config";
+import type { LandingConfig } from "@/components/site/config";
 import { ReadingPlate } from "@/components/landing/reading-plates";
-import { caseLink, ranAt, type Scorecard } from "@/components/landing/scorecard-data";
+import { recordedCaseLink, ranAt, type Scorecard } from "@/components/site/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
 import { HeroMotion } from "./hero-motion";
 import { SampleConversation } from "./sample-conversation";
 import sample from "@/data/sample-case.json";
 
-
-/** The same recorded cases are seeded on each deployment, so review links stay in this design. */
-function recordedCaseLink(value: string | null | undefined) {
-  const safe = caseLink(value);
-  if (!safe) return null;
-  const url = new URL(safe, "https://aidaddy.example");
-  return /^\/c\/[A-Za-z0-9_-]{8,40}$/.test(url.pathname) ? url.pathname : safe;
-}
 
 export function WarmHome({ config, card }: { config: LandingConfig; card: Scorecard | null }) {
   return (

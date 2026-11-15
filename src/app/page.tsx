@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { landingConfig } from "@/components/landing/config";
-import { loadScorecard } from "@/components/landing/scorecard-data";
+import { landingConfig } from "@/components/site/config";
+import { loadScorecard } from "@/components/site/scorecard-data";
 import { SiteShell } from "@/components/site/site-shell";
 import { WarmHome } from "@/components/home/warm-home";
 import "@/components/home/warm.css";

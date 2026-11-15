@@ -216,6 +216,19 @@ describe("the listening post", () => {
     expect(post.getSnapshot().jobs[0]).toMatchObject({ state: "done", how: "ping" });
   });
 
+  it("forgets what was heard when asked, and keeps the matters", async () => {
+    const browser = fakeBrowser();
+    browser.answerWith(async () => browser.result(["Read it [1]"]));
+    const post = new ListeningPost(browser.fx);
+    post.type("did you buy milk");
+    post.type("I am pregnant");
+    await settle();
+    post.forget();
+    expect(post.getSnapshot().lines).toEqual([]);
+    expect(post.getSnapshot().jobs).toHaveLength(1);
+    expect(post.getSnapshot().jobs[0].at).toBeTypeOf("number");
+  });
+
   it("stops when asked, and lets the screen sleep again", () => {
     const browser = fakeBrowser();
     const post = new ListeningPost(browser.fx);

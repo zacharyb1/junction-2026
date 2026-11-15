@@ -25,7 +25,9 @@ const nextConfig: NextConfig = {
   headers: async () => [{ source: "/:path*", headers: securityHeaders }],
   // The chat lives at /chat. Its earlier address, /ukk, leads there with its query string, so printed QR codes and
   // shared links keep working.
-  redirects: async () => [{ source: "/ukk", destination: "/chat", permanent: false }],
+  redirects: async () => [
+    { source: "/ukk", destination: "/chat", permanent: false },
+  ],
   // The container runs the traced server; native/Vercel builds keep their current mode.
   ...(process.env.KAVERI_STANDALONE === "1" ? { output: "standalone" as const } : {}),
   // Cache Components is off on purpose: case pages read live storage on every request.

@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { checkedQuotes } from "@/components/autopilot/check";
+import { TryResult } from "@/components/try-result";
 import { Core } from "@/components/hud/core";
 import { browserEffects } from "@/components/listen/effects";
 import { INITIAL, type Job, type Line, ListeningPost, type Snapshot } from "@/components/listen/post";
@@ -55,46 +53,17 @@ function outcome(job: Job): string {
 
 /** One matter a desk took on: what was heard, what the desk is doing, and the plan with its sources. */
 function JobCard({ job, post, busy }: { job: Job; post: ListeningPost; busy: boolean }) {
-  const quotes = job.result ? checkedQuotes(job.result.evidence) : [];
   return (
     <li className="listen-job" data-state={job.state} data-how={job.how}>
       <p className="listen-job-head">
-        <span>{DESKS[job.desk].name}</span>
+        <span>{DESKS[job.desk].name} · heard at {new Date(job.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
         <span className="listen-job-outcome">{outcome(job)}</span>
       </p>
       <p className="listen-job-heard">“{job.heard}”</p>
       {job.progress ? <p className="listen-job-progress">{job.progress}</p> : null}
       {job.result ? (
         <>
-          <h2>{job.result.title}</h2>
-          <ol>
-            {job.result.plan.map((line) => (
-              <li key={line}>
-                <span>{line.replace(/\s*\[\d+\]/g, "")}</span>
-                <span className="listen-sources">
-                  {[...line.matchAll(/\[(\d+)\]/g)].map((match) => {
-                    const quote = quotes.find((item) => item.n === Number(match[1]));
-                    return quote ? (
-                      <a
-                        key={quote.n}
-                        href={quote.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={`“${quote.quote}”`}
-                        aria-label={`Source ${quote.n}: ${quote.host}, opened at the quoted sentence`}
-                      >
-                        {quote.n}
-                      </a>
-                    ) : null;
-                  })}
-                </span>
-              </li>
-            ))}
-          </ol>
-          <p className="listen-job-foot">
-            {job.result.evidenceVerified} of {job.result.evidenceTotal} quotes found on their pages.{" "}
-            <Link href={new URL(job.result.url).pathname}>Open the case file →</Link>
-          </p>
+          <TryResult result={job.result} />
           <button type="button" className="hud-btn" disabled={busy} onClick={() => post.read(job.id)}>
             Hear it
           </button>
@@ -234,7 +203,7 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
               <p className="listen-empty">Nothing yet. Press Start and talk, or type a sentence below.</p>
             ) : (
               <ol>
-                {state.lines.slice(-8).map((line) => (
+                {state.lines.slice(-10).map((line) => (
                   <li key={line.id} data-tag={line.tag}>
                     <p>{line.text}</p>
                     <span>{TAGS[line.tag]}</span>
@@ -243,6 +212,7 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
               </ol>
             )}
             {state.interim ? <p className="listen-interim">{state.interim}…</p> : null}
+            {state.lines.length > 0 ? <button type="button" className="hud-btn" onClick={() => post.forget()}>Forget what was heard</button> : null}
             <form onSubmit={submit} className="listen-type">
               <label htmlFor="listen-typed">Or type what was said</label>
               <div>
@@ -261,15 +231,14 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
           </div>
         </section>
 
-        <section className="hud-panel" aria-labelledby="listen-desks">
+        <section className="listen-results" aria-labelledby="listen-desks">
           <p className="hud-panel-title">
             <span id="listen-desks">Desks at work</span>
             <span>a call for a deadline, a ping for the rest</span>
           </p>
           {state.jobs.length === 0 ? (
             <p className="listen-empty listen-empty--desks">
-              No matter yet. When someone mentions a rent increase, a cancelled flight, a letter from Kela or another life
-              event, a desk starts on its own and comes back here.
+              Nothing yet. When someone mentions a letter, a deadline, a life event or a plan that has rules, a desk looks up the official pages and comes back here.
             </p>
           ) : (
             <ul className="listen-jobs">

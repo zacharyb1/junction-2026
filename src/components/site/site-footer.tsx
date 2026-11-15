@@ -52,7 +52,7 @@ export function SiteFooter() {
             <h2 id="footer-more">More</h2>
             <ul>
               <li>
-                <Link href="/">Front page</Link>
+                <Link href="/scorecard">Research scorecard</Link>
               </li>
               <li>
                 <SiteLink href="/listen">Listen together</SiteLink>

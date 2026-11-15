@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { scrollToEnd, useReplayClock } from "@/components/demo/replay";
+import { ORB_MARK } from "@/components/demo/orb-mark";
 
 /**
  * Issue #35: a scripted replay of a face-to-face conversation while AIDaddy, on the phone on the table,
@@ -85,7 +86,7 @@ export function TalkDemo({ loop = false }: { loop?: boolean }) {
         <div className={`tdemo-card${drafted ? " is-small" : ""}`}>
           <div className="tdemo-card-head">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/aidaddy-avatar.svg" alt="" />
+            <img src={ORB_MARK} alt="" />
             <div>
               <p className="tdemo-card-name">AIDaddy</p>
               <p className="tdemo-card-sub">Rent increase: what the rules say</p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useReplayClock } from "@/components/demo/replay";
+import { ORB_MARK } from "@/components/demo/orb-mark";
 
 /**
  * Issue #36: a scripted replay of AIDaddy planning a birthday found in the calendar (the birthday-planner
@@ -92,7 +93,7 @@ export function CalendarDemo({ loop = false }: { loop?: boolean }) {
       <aside className={`cdemo-panel${panel ? " is-open" : ""}`} aria-hidden={!panel}>
         <div className="cdemo-panel-head">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/aidaddy-avatar.svg" alt="" />
+          <img src={ORB_MARK} alt="" />
           <div>
             <p className="cdemo-name">AIDaddy</p>
             <p className="cdemo-sub">birthday planner</p>

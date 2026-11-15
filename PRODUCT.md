@@ -30,33 +30,35 @@ In a family group it is ambient: a life event can trigger research without a dir
 - A Telegram group chat where the bot is a member. The bot is a separate runtime that calls the research engine.
 - The case file at `/c/[id]`: steps, deadlines, money, numbered quotes with how each was checked, gaps and open questions. Tapping a source number opens the official page at the quoted sentence.
 - The browser demo at `/try`: the same engine without Telegram, with live progress. It needs an access code that the table's QR code carries, unless the deployment sets `DEMO_OPEN=1`, as the server does: then it is open to everyone and rate limited.
-- The landing page at `/`: explains the product, links to the demo and a sample case file, shows the scorecard.
+- The front page at `/`: explains the product, links to the demo and a sample case file, and shows the scorecard's totals. `/scorecard` holds the full table, one row per scenario with its case file.
+- Pages this document does not yet cover: the chat with AIDaddy at `/chat`, `/setup`, `/demo` and its replays, `/autopilot`, and the browser extension.
 - The scorecard: a fixed set of everyday scenarios run through the live engine by `eval/run.mjs`, written to `src/data/scorecard.json`.
 - Official source lists per country in `src/data/official-sources.json`. Twelve countries have a checked list. Elsewhere it searches the open web and labels every source.
 
 ## Capabilities and Constraints
 
-- Three Exa structured searches in parallel per case, official domains first, pinned to country and city. Each cited page is read twice: a live request and Exa Contents.
+- Three Exa structured searches at once per case (what to do, money and entitlements, how to apply), official domains first, pinned to country and city; a fourth search for recent news on the official sites runs while the cited pages are read. Each cited page is read twice: a live request and Exa Contents.
 - When two sources give different figures, the case file shows both.
 - A re-check opens each cited page again and reports a quote that is no longer there.
 - The bot never sends, files, books or pays. Approval comes first.
 - Research with sources, never "legal advice". Do not say "100% accurate".
 - Answer languages and supported countries are a team decision recorded in `src/lib/engine/research.ts`. Do not add languages, countries or examples outside those lists.
 - English is the main language for product copy. Finnish is available as an answer language and for case-page labels.
-- Runtime deployment and measured bot behavior are recorded in `docs/HERMES_HANDOVER.md` and `hermes/CHECKS.md`. The landing says “Needs your decision” and makes no reminder-cancellation or in-chat approval claim; Vlad approved these wording limits for the redesign.
+- Runtime deployment and measured bot behavior are recorded in `docs/HERMES_HANDOVER.md` and `hermes/CHECKS.md`. The site says that a step needing the family's decision waits for them, and makes no reminder-cancellation or in-chat approval claim; Vlad approved these wording limits for the redesign.
 
 ## Brand Commitments
 
 - Name: AIDaddy. Role: a butler.
 - Voice: plain, short sentences, concrete. It says what it could not confirm.
-- No inherited logo or photographs. The product's own interface (the chat, the case file, the scorecard) is the picture material; the selected design adds local paper and annotation assets recorded in `DESIGN.md`.
+- No inherited logo or photographs. The product's own interface (the chat, the case file, the scorecard) is the picture material. The accepted reading world uses paper and ink assets, typographic state marks in the working interface, and a service-bell vector for the app icon and replay avatar, recorded in `DESIGN.md`.
 - Independent hackathon project. Not affiliated with Kela, Vero or Telegram, and must not look as if it were.
 
 ## Evidence on Hand
 
 - `src/data/scorecard.json`: real runs, with a link to the case file each scenario produced. Read it, never retype it.
-- `src/data/sample-case.json`: the sample case (expecting a baby, Espoo). Plan lines and quoted source sentences come from it. The 35%/40% disagreement specimen is explicitly labelled “Illustrative example”; those figures are not sample-case evidence.
-- Case-page labels in `src/lib/i18n.ts`, reused on the landing page so the two cannot drift apart.
+- `src/data/sample-case.json`: the sample case (expecting a baby, Espoo). Plan lines and quoted source sentences come from it.
+- `src/data/replay.json`: one recorded research run (see `scripts/make-replay.mjs`) retained for the research replay. The current homepage conversation and expandable plan use the five steps and quoted sentences in `src/data/sample-case.json`.
+- Case-page labels in `src/lib/i18n.ts`, reused on `/scorecard` so the two cannot drift apart.
 - Numbers the team says aloud, with their sources, in `docs/PITCH.md`.
 - There are no testimonials, customers, press or user counts. Do not invent any.
 

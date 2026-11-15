@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AIDaddyChat } from "@/components/aidaddy-chat";
-import { landingConfig } from "@/components/landing/config";
+import { landingConfig } from "@/components/site/config";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
 import { demoCodeRequired } from "@/lib/cases";

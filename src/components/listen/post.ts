@@ -24,6 +24,8 @@ export type Job = {
   desk: Desk;
   kind: string;
   heard: string;
+  /** When it was heard. */
+  at: number;
   state: "collecting" | "working" | "done" | "nothing" | "failed";
   /** What the desk is doing right now, in the Engine's own words. */
   progress: string;
@@ -274,6 +276,11 @@ export class ListeningPost {
 
   // ---- hearing ----
 
+  /** Drop the sentences that were heard. The matters a desk took on stay. */
+  forget() {
+    this.set({ lines: [], interim: "" });
+  }
+
   /** A typed sentence goes the same way as a heard one. It works without the microphone. */
   type(text: string) {
     this.fx.prime();
@@ -305,7 +312,7 @@ export class ListeningPost {
 
     this.runs.push(now);
     this.lastRun.set(trigger.kind, now);
-    const job: Job = { id: this.nextId++, desk: trigger.desk, kind: trigger.kind, heard: text, state: "collecting", progress: "Listening for what comes next" };
+    const job: Job = { id: this.nextId++, desk: trigger.desk, kind: trigger.kind, heard: text, at: now, state: "collecting", progress: "Listening for what comes next" };
     this.triggers.set(job.id, { trigger, line: line.id });
     this.set({ jobs: [...this.state.jobs, job].slice(-KEEP_JOBS) });
     this.fx.later(() => void this.work(job.id), SETTLE_MS);

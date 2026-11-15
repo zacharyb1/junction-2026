@@ -133,9 +133,9 @@
 
 /*
  * Keyboard focus. The default ring is a light grey at half strength, 1.5:1 on white, too faint to follow.
- * Unlayered, so it also reaches the controls that switch their own outline off. The landing page has its own.
+ * Unlayered, so it also reaches the controls that switch their own outline off.
  */
-:focus-visible:not(.landing *) {
+:focus-visible {
   outline: 2px solid var(--foreground);
   outline-offset: 2px;
 }

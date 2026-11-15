@@ -6,7 +6,7 @@ import { demoCodeRequired } from "@/lib/cases";
 import "@/components/hud/hud.css";
 import "@/components/listen/listen.css";
 
-const title = "AIDaddy listens on this device";
+const title = "Let AIDaddy listen";
 const description =
   "Leave this page open on a phone or a laptop. AIDaddy hears the household, researches a life event on its own, and comes back with a call or a ping.";
 
@@ -35,10 +35,11 @@ export default function ListenPage() {
           <header className="listen-page-head">
             <h1 className="hud-title">A little help, within earshot.</h1>
             <p className="hud-lede">
-              Put a phone or a laptop on the table, on its charger, with this page open. AIDaddy hears the room. Small talk
-              stays on the device. When someone mentions a life event, a desk researches it on its own and comes back: a call
-              when there is a deadline, a ping for everything else.
+              Leave this page open on a phone or a laptop. AIDaddy follows the talk in the room and lets the small talk pass.
+              When it hears a letter, a deadline, a life event or a plan that has rules, a desk looks up the official pages
+              without being asked and comes back: a call when the plan has a deadline, a ping for everything else.
             </p>
+            <p className="hud-note">A first version. It works while this page is open, in Chrome, Edge and Safari.</p>
           </header>
 
           <ListenPost needsCode={demoCodeRequired()} />
@@ -56,7 +57,7 @@ export default function ListenPage() {
                   that, Safari uses Apple&apos;s. AIDaddy never receives sound.
                 </li>
                 <li>
-                  <strong>Sentences are judged on this device.</strong> Only a sentence about a life event, with the two
+                  <strong>Sentences are judged on this device.</strong> Only a sentence AIDaddy notices, with the two
                   sentences before and after it, goes to the research engine.
                 </li>
                 <li>
@@ -84,7 +85,7 @@ export default function ListenPage() {
                   listening again.
                 </li>
                 <li>
-                  <strong>At most five research runs in half an hour,</strong> so a noisy room cannot spend the credit.
+                  <strong>At most five matters in half an hour,</strong> and the same matter not twice in twenty minutes, so a lively room cannot spend the research credit.
                 </li>
                 <li>
                   <strong>It never sends, files, books or pays.</strong> It researches and tells you. This is research with

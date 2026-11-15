@@ -1,10 +1,10 @@
 "use client";
 
-import { CircleAlert, Loader2, Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
+import { CircleAlert, ExternalLink, Loader2, Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { AIDaddyAvatar, type AvatarState } from "@/components/aidaddy-avatar";
 import { CopyButton } from "@/components/copy-button";
-import { linkButtonClasses } from "@/components/landing/link-button";
+import { linkButtonClasses } from "@/components/site/link-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,6 +36,14 @@ function pictureFor(url: string): Promise<string | null> {
   return found;
 }
 
+function pathOf(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return "";
+  }
+}
+
 /**
  * A link in AIDaddy's reply, with the product's picture above it when the link is a product the gift search found, so a
  * gift is seen as well as named. The server knows the picture; the model only has to post the link.
@@ -51,6 +59,7 @@ function ReplyLink({ url }: { url: string }) {
       clearTimeout(wait);
     };
   }, [url]);
+  const caseFile = pathOf(url).startsWith("/c/");
   return (
     <>
       {picture && (
@@ -70,8 +79,10 @@ function ReplyLink({ url }: { url: string }) {
           className="my-1 block size-32 rounded-md border bg-white object-contain"
         />
       )}
-      <a href={url} target="_blank" rel="noreferrer" className="break-all text-primary underline underline-offset-2">
-        {url}
+      <a href={url} target="_blank" rel="noreferrer" title={caseFile ? url : undefined}
+        className="inline-flex min-h-11 items-center gap-1 break-all text-primary underline underline-offset-2">
+        {caseFile ? <>Open the case file <ExternalLink size={14} aria-hidden="true" /></> : url}
+        <span className="sr-only"> (opens in a new tab)</span>
       </a>
     </>
   );

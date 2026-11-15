@@ -1,0 +1,91 @@
+/* The scorecard's own table. The shared layer has no table rule (DESIGN.md, "Not part of the system"). */
+.score-scroll {
+  overflow-x: auto;
+}
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.score-table thead th {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font: 500 0.7rem / 1.3 var(--hud-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hud-dim);
+  white-space: nowrap;
+}
+.score-table tbody th,
+.score-table tbody td {
+  padding: 0.6rem 1rem;
+  border-top: 1px dashed var(--hud-line-soft);
+  vertical-align: top;
+  text-align: left;
+}
+.score-table tbody th[scope="row"] {
+  font-weight: 500;
+  color: var(--hud-text);
+}
+.score-table .score-figure {
+  font-family: var(--hud-ui);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+/* The link keeps its 44px target and lines up with the row's first line of text. */
+.score-table tbody .site-arrow {
+  margin-block: -0.6rem;
+}
+/* A group's name, in the label voice. */
+.score-table .score-group th {
+  padding-top: 1.4rem;
+  font: 500 0.72rem / 1.3 var(--hud-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hud-accent);
+}
+.score-fold,
+.score-error {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.score-fold {
+  color: var(--hud-dim);
+}
+/* The folded line stands in for Country, Quotes verified and Time, which show from 768px. */
+@media (min-width: 768px) {
+  .score-fold {
+    display: none;
+  }
+}
+.score-error {
+  color: var(--hud-amber);
+  overflow-wrap: anywhere;
+}
+.score-note {
+  display: block;
+  margin-top: 0.2rem;
+  letter-spacing: 0.05em;
+  text-transform: none;
+}
+.score-table tbody tr:is(:hover, :focus-within) {
+  background: var(--hud-fill);
+}
+@media (max-width: 639px) {
+  .score-table thead th,
+  .score-table tbody th,
+  .score-table tbody td {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .score-table thead th {
+    white-space: normal;
+  }
+}
+@media (max-width: 639px) {
+  .score-table tr > :first-child {
+    padding-right: 0.25rem;
+  }
+}

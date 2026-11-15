@@ -226,23 +226,6 @@
   line-height: 1.3;
   letter-spacing: 0;
 }
-.listen-job ol {
-  display: grid;
-  counter-reset: step;
-}
-.listen-job ol li {
-  display: grid;
-  grid-template-columns: 1.6rem minmax(0, 1fr);
-  gap: 0.35rem 0.25rem;
-  padding: 0.6rem 0;
-  border-top: 1px dashed var(--hud-line-soft);
-  counter-increment: step;
-}
-.listen-job ol li::before {
-  content: counter(step);
-  font: 500 0.85rem / 1.6 var(--hud-mono);
-  color: var(--hud-amber);
-}
 .listen-sources {
   display: flex;
   flex-wrap: wrap;

@@ -14,8 +14,8 @@ Vlad chose the Impeccable homepage comparison and requested the same design thro
 ## Validation
 
 - Production build, TypeScript and ESLint pass. The Next font build reports missing fallback override values for Chiron Sung HK; its downloaded font loads and renders correctly in browser captures.
-- 264 Vitest tests, 40 Node tests and 112 Python tests pass. Two Python checks skip because their pinned container environment is unavailable locally. Container builds were not rerun for this frontend change.
-- Fourteen routes checked at 1440 × 960 and 390 × 960: `/`, `/try`, `/chat`, a recorded case, `/setup`, `/listen`, `/autopilot`, `/demo`, all four replay routes, a missing route and `/reading`. No horizontal overflow or runtime errors.
+- 269 Vitest tests, 40 Node tests and 112 Python tests pass. Two Python checks skip because their pinned container environment is unavailable locally. Container builds were not rerun for this frontend change.
+- Fifteen routes checked at 1440 × 960 and 390 × 960: `/`, `/try`, `/chat`, a recorded case, `/setup`, `/listen`, `/autopilot`, `/demo`, all four replay routes, a missing route `/reading` and `/scorecard`. No horizontal overflow or runtime errors.
 - Homepage additionally checked at 768px and 320px. Keyboard navigation, access-code routing, no-JavaScript content, reduced motion, repeated replay, disclosure states, form error recovery and chat draft preservation checked.
 - All 19 scorecard cases resolve inside the preview. A fresh local store contains only 25 synthetic records already committed in the evaluation/demo inputs.
 - Asset provenance scan: 19 shipped rasters, none missing origin metadata. Icons are rasterized from the existing Lucide bell vector; paper and ink retain their earlier provenance.
@@ -24,7 +24,7 @@ Vlad chose the Impeccable homepage comparison and requested the same design thro
 
 `UI_PREVIEW=1` adds a review-only banner. The temporary HTTPS preview has no Exa, voice, bot or storage-provider credentials. It supports browsing recorded cases and scripted demos; live research, agent conversations and voice are unavailable there. No production deployment or Telegram gateway was changed.
 
-The review branch overlaps PR #89 and should be compared with it before merge. Browser calling in PR #105 is separate from this design work and does not establish native Telegram live calling.
+PR #89 merged while this work was under review. Its latest setup, extension, listening, case and scorecard changes are incorporated here; the selected Impeccable visual system is applied over them. Browser calling in PR #105 is separate from this design work and does not establish native Telegram live calling.
 
 ## Screenshots
 

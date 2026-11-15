@@ -104,17 +104,16 @@ function due(value: string | undefined, t: Labels) {
 const AMBER = "border-(--hud-amber)/40 bg-(--hud-amber)/10 text-(--hud-amber)";
 const GREEN = "border-(--hud-green)/40 bg-(--hud-green)/10 text-(--hud-green)";
 
-function Refs({ refs, t }: { refs: number[]; t: Labels }) {
+function Refs({ refs, t, verified, row = false }: { refs: number[]; t: Labels; verified: Set<number>; row?: boolean }) {
   if (!refs.length) return null;
   return (
-    <span className="ml-1 inline-flex gap-1 align-baseline">
+    <span className={row ? "mt-2 inline-flex flex-wrap gap-1" : "ml-1 inline-flex flex-wrap gap-1 align-baseline"}>
       {refs.map((n) => (
         <a
           key={n}
           href={`#source-${n}`}
-          aria-label={t.sourceNumber(n)}
-          // 24 px each way: the smallest target a finger can hit without catching its neighbour.
-          className="case-ref min-w-6 rounded-sm border border-primary/30 bg-primary/10 px-1.5 py-1 text-center font-mono text-xs text-primary no-underline hover:bg-primary hover:text-primary-foreground"
+          aria-label={`${t.sourceNumber(n)}${verified.has(n) ? "" : ` — ${t.notConfirmed}`}`}
+          className={`case-ref min-w-11 rounded-sm border px-1.5 py-1 text-center text-xs no-underline hover:bg-primary hover:text-primary-foreground ${verified.has(n) ? "border-(--hud-green)/40 bg-(--hud-green)/10 text-(--hud-green)" : "border-(--hud-amber)/40 bg-(--hud-amber)/10 text-(--hud-amber)"}`}
         >
           {n}
         </a>
@@ -141,8 +140,8 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
       <div className="min-w-0 flex-1">
         <p className="font-medium leading-snug">
           {step.title}
-          <Refs refs={step.evidence} t={t} />
         </p>
+        <Refs refs={step.evidence} t={t} verified={verified} row />
         {step.detail && <p className="mt-1 text-sm text-muted-foreground">{step.detail}</p>}
         {step.conflict && (
           <p className={`mt-2 flex gap-2 rounded-lg border p-2 text-sm ${AMBER}`}>
@@ -151,7 +150,7 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
         )}
         <div className="mt-2 flex flex-wrap gap-2 text-xs">
           {!confirmed && (
-            <Badge className={AMBER}>
+            <Badge className={`${AMBER} whitespace-normal`}>
               <CircleAlert /> {t.notConfirmed}
             </Badge>
           )}
@@ -172,7 +171,7 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
             </Badge>
           )}
           {step.status === "needs_approval" && (
-            <Badge className={AMBER}>{t.approveInChat}</Badge>
+            <Badge className={`${AMBER} whitespace-normal`}>{t.approveInChat}</Badge>
           )}
         </div>
         {deadline && <DeadlineDate step={step} source={step.evidence.find((n) => verified.has(n))} locale={t.locale} t={t.date} />}
@@ -184,13 +183,13 @@ function StepRow({ step, t, verified }: { step: Step; t: Labels; verified: Set<n
 function Mark({ e, t }: { e: Evidence; t: Labels }) {
   if (e.verification === "verified") {
     return (
-      <Badge className={GREEN}>
+      <Badge className={`${GREEN} whitespace-normal`}>
         <BadgeCheck /> {e.checkedVia === "exa" ? t.foundExa : e.checkedVia === "oxylabs" ? t.foundOxylabs : t.foundLive}
       </Badge>
     );
   }
   return (
-    <Badge className={AMBER}>
+    <Badge className={`${AMBER} whitespace-normal`}>
       <CircleAlert /> {e.verification === "unreachable" ? t.unreachable : t.notFound}
     </Badge>
   );
@@ -367,7 +366,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
                   <CardHeader>
                     <CardDescription>
                       {m.label}
-                      <Refs refs={m.evidence} t={t} />
+                      <Refs refs={m.evidence} t={t} verified={verified} />
                     </CardDescription>
                     <CardTitle className="text-base">{m.amount}</CardTitle>
                   </CardHeader>

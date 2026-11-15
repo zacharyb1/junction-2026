@@ -510,3 +510,6 @@
 .demo-stage[data-replay-active="false"] *::before,
 .demo-stage[data-replay-active="false"] *::after { animation-play-state: paused !important; }
 @media (max-width: 559px) { .demo-controls .demo-tag { flex-basis: 100%; } }
+
+.demo-nav-short { display: none; }
+@media (max-width: 559px) { .demo-nav-full { display: none; } .demo-nav-short { display: inline; } }

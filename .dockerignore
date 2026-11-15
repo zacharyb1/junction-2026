@@ -11,10 +11,6 @@
 !src/**
 !public/
 !public/**
-# The landing imports these local images into Next's static asset bundle.
-!assets/
-!assets/plates/
-!assets/plates/*.png
 # Reviewed synthetic recorded cases only; never include arbitrary eval/private runtime output.
 !eval/
 !eval/results/
@@ -27,3 +23,8 @@
 **/.env*
 **/*.pem
 **/*.key
+
+# The shared reading surface and original reading page import these local PNGs.
+!assets/
+!assets/plates/
+!assets/plates/*.png

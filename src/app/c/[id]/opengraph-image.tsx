@@ -70,9 +70,11 @@ function CaseCard({ c }: { c: Case }) {
               lineClamp: 1,
               maxWidth: 560,
               padding: "10px 26px",
-              borderRadius: 999,
+              borderRadius: 6,
               background: tone.muted,
-              fontSize: 30,
+              fontSize: 24,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
             }}
           >
             {place}
@@ -89,14 +91,14 @@ function CaseCard({ c }: { c: Case }) {
               flexShrink: 0,
               whiteSpace: "nowrap",
               padding: "6px 34px 12px",
-              borderRadius: 28,
+              borderRadius: 6,
               background: mark.background,
               color: mark.text,
               fontSize: 92,
               letterSpacing: "-0.03em",
             }}
           >
-            {`${found} of ${total}`}
+            {`${found}/${total}`}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <span style={{ fontSize: 42, letterSpacing: "-0.01em" }}>

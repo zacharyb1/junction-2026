@@ -49,6 +49,8 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
   const [document, setDocument] = useState("");
   const [code, setCode] = useState(initialCode);
   const [busy, setBusy] = useState(false);
+  // Keep the submitted question stable while the visitor edits the next one.
+  const [asked, setAsked] = useState("");
   const [progress, setProgress] = useState<Progress>(NO_PROGRESS);
   const [result, setResult] = useState<ResearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +64,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
     event.preventDefault();
     if (busy) return;
     setBusy(true);
+    setAsked(situation.trim());
     setProgress(NO_PROGRESS);
     setResult(null);
     setError(null);
@@ -150,6 +153,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
             minLength={10}
             maxLength={1500}
             rows={4}
+            className="min-h-28"
             value={situation}
             onChange={(e) => setSituation(e.target.value)}
             placeholder="Write it the way you would text your partner."
@@ -266,6 +270,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
               )}
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm">
+              {asked && <blockquote aria-label="Submitted question" className="border-l border-border pl-3 text-muted-foreground">{asked}</blockquote>}
               {progress.stages.length > 0 && <Timeline progress={progress} busy={busy} finished={Boolean(result)} />}
               {error && (
                 <p className="flex items-start gap-2 text-destructive">
@@ -273,6 +278,21 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
                 </p>
               )}
               {error && liveDown && <EarlierCases situation={situation} failed />}
+              {result && (
+                <dl className="mt-2 grid grid-cols-2 gap-4 border-t pt-4">
+                  {[
+                    ["Exa searches", result.exa.searches],
+                    ["Pages read", progress.pages.length],
+                    ["Quotes found", `${result.evidenceVerified}/${result.evidenceTotal}`],
+                    ["Exa cost", `$${result.exa.costDollars.toFixed(3)}`],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <dt className="text-xs text-muted-foreground">{label}</dt>
+                      <dd className="mt-1 text-lg font-medium tabular-nums">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
             </CardContent>
           </Card>
         )}
