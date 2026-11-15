@@ -22,7 +22,9 @@ Vlad chose the Impeccable homepage comparison and requested the same design thro
 
 ## Preview boundaries
 
-`UI_PREVIEW=1` adds a review-only banner. The temporary HTTPS preview has no Exa, voice, bot or storage-provider credentials. It supports browsing recorded cases and scripted demos; live research, agent conversations and voice are unavailable there. No production deployment or Telegram gateway was changed.
+Review uses the committed screenshots and a local server. Vlad requested no tunnel; the temporary tunnel and its advertised link have been removed.
+
+`UI_PREVIEW=1` adds a review-only banner. The local preview has no Exa, voice, bot or storage-provider credentials. It supports browsing recorded cases and scripted demos; live research, agent conversations and voice are unavailable there. No production deployment or Telegram gateway was changed.
 
 PR #89 merged while this work was under review. Its latest setup, extension, listening, case and scorecard changes are incorporated here; the selected Impeccable visual system is applied over them. Browser calling in PR #105 is separate from this design work and does not establish native Telegram live calling.
 

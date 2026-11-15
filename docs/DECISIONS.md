@@ -144,3 +144,8 @@ The change is based on main at befd42a and is shared as a separate review branch
 ### Integration note, Sun 2026-11-15 03:47 Helsinki
 
 PR #89 merged into main while this version was under review. Its functional setup/extension, listening, research, case and scorecard updates are incorporated into this branch. The selected Impeccable system supersedes its visual styling while preserving its functionality. Its decision to retire `/reading` is superseded by keeping the user’s approved reference and the local paper/ink assets used by the new homepage.
+
+
+## Sun 2026-11-15 04:40 — Review without a tunnel
+
+Vlad instructed “no tunnel”. The earlier temporary HTTPS sharing approach is superseded: its terminal is closed and its URL removed from PR #113. Team review uses the committed screenshots and local run instructions. The local preview points to localhost; no replacement tunnel is started.
