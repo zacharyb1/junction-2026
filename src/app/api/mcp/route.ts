@@ -23,7 +23,7 @@ function handlerFor(origin: string) {
       "prepare_demo_call",
       {
         title: "Prepare a demo phone call",
-        description: "Prepare a real phone call to the operator's configured test recipient, for any everyday task or important update. " +
+        description: "Prepare a real voice call that AIDaddy makes for the person to the operator's configured test recipient, for any everyday task or important update. " +
           "Purchases, bookings and payments are role-play. Pass relevant preferences from this chat's memory or conversation. " +
           "This does not dial. Show the returned proposal and wait for the person's next reply confirming it; do not start in the same turn. " +
           "If unavailable, report the missing configuration instead of pretending to call.",
@@ -37,23 +37,25 @@ function handlerFor(origin: string) {
         title: "Start the confirmed demo call",
         description: "Use only after the person has replied Yes to the exact prepare_demo_call proposal in a subsequent turn. " +
           "An initial request to call is not confirmation. For changes, prepare and confirm a new proposal. " +
-          "Dials only the configured test phone; purchases/payments remain simulated. Never retry an unknown result with a new proposal.",
+          "Dials only the configured test phone; purchases/payments remain simulated. Never retry an unknown result with a new proposal. " +
+          "Where no phone number is set up the result is `ringing` with an answerUrl: the test line rings in a browser. " +
+          "Post that link and say that whoever opens it and taps Answer talks to AIDaddy.",
         inputSchema: z.object({ id: z.string(), confirmed: z.boolean().describe("True only after the person confirmed this exact proposal in their next reply.") }),
       },
-      async ({ id, confirmed }) => text(await startDemoCall(id, confirmed)),
+      async ({ id, confirmed }) => text(await startDemoCall(id, confirmed, origin)),
     );
     server.registerTool(
       "get_demo_call",
       {
         title: "Read a demo call result",
         description: "Read the real calling provider's status and conversation summary. After starting, acknowledge dialing then call this with wait_seconds=60. " +
-          "Report finished only when returned; always explain that any purchase or payment was simulated. If still in progress, offer to check again.",
+          "Report finished only when returned; always explain that any purchase or payment was simulated. If still ringing or in progress, offer to check again.",
         inputSchema: z.object({ id: z.string(), wait_seconds: z.number().int().min(0).max(60).default(0) }),
       },
       async ({ id, wait_seconds }) => {
         const until = Date.now() + wait_seconds * 1000;
         let result = await getDemoCall(id);
-        while (result.status === "in_progress" && Date.now() + 3000 < until) {
+        while ((result.status === "in_progress" || result.status === "ringing") && Date.now() + 3000 < until) {
           await new Promise((resolve) => setTimeout(resolve, 3000));
           result = await getDemoCall(id);
         }
