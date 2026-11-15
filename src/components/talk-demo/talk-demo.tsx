@@ -6,8 +6,8 @@ import { ORB_MARK } from "@/components/demo/orb-mark";
 
 /**
  * Issue #35: a scripted replay of a face-to-face conversation while AIDaddy, on the phone on the table,
- * works in the background. Concept: AIDaddy cannot listen on the phone yet, and in the concept it hears
- * nothing before its name. The research is a real run: kkv.fi, 3 of 3 quotes checked, 7.4 seconds,
+ * works in the background. Concept: a phone that wakes on its name is not built, and in the concept it hears
+ * nothing before its name. The first version that exists (/listen) follows the talk while its page is open. The research is a real run: kkv.fi, 3 of 3 quotes checked, 7.4 seconds,
  * https://86.38.238.136.sslip.io/c/awE0ewNWNgPE_nmE (the drafted complaint is on that case).
  */
 export const CASE_URL = "https://86.38.238.136.sslip.io/c/awE0ewNWNgPE_nmE";

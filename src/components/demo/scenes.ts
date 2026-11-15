@@ -59,7 +59,7 @@ export const REPLAYS: Record<SceneSlug, Scene> = {
     place: "At the kitchen table",
     title: "AIDaddy at the kitchen table",
     story: "Two people talk about a rent increase. AIDaddy checks the rules in the background while they go on talking.",
-    real: "Concept: AIDaddy cannot listen on the phone yet. The research and its quotes come from a real run.",
+    real: "Concept: a phone that wakes on its name is not built yet. A first version listens while its page is open. The research and its quotes come from a real run.",
     tag: "Concept",
     tone: "concept",
     seconds: 38,

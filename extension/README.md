@@ -4,10 +4,12 @@ A Chrome extension. It looks at the page you have open and, when the page is abo
 
 ## Install (two minutes)
 
-1. Open `chrome://extensions` in Chrome.
-2. Switch on **Developer mode** (top right).
-3. Click **Load unpacked** and choose this `extension/` folder.
-4. A welcome page opens. Type the **access code** (the same code as for `/try`), then click **Yes, look at my pages**.
+1. Get the folder: download `aidaddy-extension.zip` from the site's setup page (`/setup`) and unpack it, or use this `extension/` folder of the repository.
+2. Open `chrome://extensions` in Chrome and switch on **Developer mode** (top right).
+3. Click **Load unpacked** and choose the folder.
+4. A welcome page opens. Click **Yes, look at my pages**. The team's server asks for no access code; a server that does answers with a request for it, and the code goes into the same page.
+
+The download is `public/aidaddy-extension.zip`, written by `node scripts/pack-extension.mjs`. Run it after changing a file in this folder; `tests/extension-pack.test.ts` fails while the two differ.
 
 That is the only permission question. From then on AIDaddy looks at every page you open.
 
