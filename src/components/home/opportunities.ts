@@ -33,7 +33,7 @@ export type Detail = {
   url?: string;
   quote?: string;
   primary: string;
-  /** Where the primary button goes: outside (a real page) or a note about what UKK would prepare. */
+  /** Where the primary button goes: outside (a real page) or a note about what AIDaddy would prepare. */
   primaryHref?: string;
   primaryNote?: string;
   secondary: string;
@@ -84,10 +84,10 @@ export const EXAMPLES: Row[] = [
       sourceNote: "Example: the estimate is not a Kela decision",
       url: "https://www.kela.fi/",
       primary: "Prepare the application",
-      primaryNote: "UKK would fill in the form for you to check. In this demo nothing is filled in or sent.",
+      primaryNote: "AIDaddy would fill in the form for you to check. In this demo nothing is filled in or sent.",
       secondary: "Remind me on Friday",
       secondaryNote: "A reminder needs your yes in the family chat. In this demo none is set.",
-      promise: "UKK fills in the form for you to check. Nothing is sent without your yes.",
+      promise: "AIDaddy fills in the form for you to check. Nothing is sent without your yes.",
     },
   },
   {
@@ -123,7 +123,7 @@ export const EXAMPLES: Row[] = [
       primaryNote: "In this demo there is no real shop page behind the example.",
       secondary: "Remind me on Saturday",
       secondaryNote: "A reminder needs your yes in the family chat. In this demo none is set.",
-      promise: "UKK never buys anything. You decide and pay yourself.",
+      promise: "AIDaddy never buys anything. You decide and pay yourself.",
     },
   },
   {
@@ -156,10 +156,10 @@ export const EXAMPLES: Row[] = [
       sourceNote: "Example: times and places are not checked in this demo",
       url: "https://www.hel.fi/",
       primary: "Sign Eino up",
-      primaryNote: "UKK would prepare the sign-up for you to check. In this demo nothing is sent.",
+      primaryNote: "AIDaddy would prepare the sign-up for you to check. In this demo nothing is sent.",
       secondary: "Add to calendar",
       secondaryNote: "Calendar entries need your yes. In this demo none is added.",
-      promise: "UKK prepares the sign-up for you to check. Nothing is sent without your yes.",
+      promise: "AIDaddy prepares the sign-up for you to check. Nothing is sent without your yes.",
     },
   },
   { id: "jazz", title: "Afterwork jazz, Manala", sub: "Thursdays 17–19", value: "Free", money: false, who: "Laura", icon: ICON.music },
@@ -212,9 +212,9 @@ export function liveRow(found: Opportunity, i: number): Row {
       url: o.url,
       primary: "Open the page",
       primaryHref: o.url,
-      secondary: "Ask UKK about it",
+      secondary: "Ask AIDaddy about it",
       secondaryNote: "",
-      promise: "Research with sources, not advice. UKK never sends, books or pays.",
+      promise: "Research with sources, not advice. AIDaddy never sends, books or pays.",
     },
   };
 }

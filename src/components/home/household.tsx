@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * "Your household": twelve family apps around UKK's sound-wave mark, little dots of data flowing in, and what UKK
+ * "Your household": twelve family apps around AIDaddy's sound-wave mark, little dots of data flowing in, and what AIDaddy
  * learns about each person. The apps and facts are examples: this demo does not connect real accounts.
  */
 
 import { useEffect, useState } from "react";
 import { householdFrame, MAP_CENTRE } from "@/lib/home-demo";
 import { AppLogo, BackButton, H1, useNav } from "./ui";
-import { useFound } from "./ukk-app";
+import { useFound } from "./home-app";
 
 const TICK_MS = 700;
 
@@ -44,7 +44,7 @@ export function HouseholdScreen() {
 
   return (
     <>
-      <header className="flex flex-none flex-col gap-1.5 px-6 pb-2 pt-[calc(var(--ukk-top)+4px)]">
+      <header className="flex flex-none flex-col gap-1.5 px-6 pb-2 pt-[calc(var(--aidaddy-top)+4px)]">
         <BackButton label="Back" />
         <H1>Your household</H1>
         <span className="flex h-[18px] items-center gap-1.5 text-sm text-[#7a6e66]" aria-live="polite">
@@ -53,8 +53,8 @@ export function HouseholdScreen() {
         </span>
       </header>
 
-      <div className="ukk-scroll flex min-h-0 flex-1 flex-col">
-        <section aria-label="Apps feeding UKK" className="relative mx-auto mt-1 h-[330px] w-[342px] flex-none">
+      <div className="aidaddy-scroll flex min-h-0 flex-1 flex-col">
+        <section aria-label="Apps feeding AIDaddy" className="relative mx-auto mt-1 h-[330px] w-[342px] flex-none">
           <svg aria-hidden="true" width="342" height="330" viewBox="0 0 342 330" className="absolute inset-0 overflow-visible">
             {f.nodes
               .filter((n) => n.seen || n.now)
@@ -72,14 +72,14 @@ export function HouseholdScreen() {
               )}
           </svg>
           <div
-            className={`ukk-orb absolute ${f.done ? "still" : ""}`}
+            className={`aidaddy-orb absolute ${f.done ? "still" : ""}`}
             role="img"
-            aria-label={`UKK, ${t === 0 ? "connecting" : `${f.learned} learned`}`}
+            aria-label={`AIDaddy, ${t === 0 ? "connecting" : `${f.learned} learned`}`}
             style={{ left: 121, top: 125, width: 100, height: 80 }}
           >
             <div className="absolute inset-0 flex items-center justify-center gap-[5px]">
               {WAVES.map(([h, delay], i) => (
-                <span key={i} className="ukk-wave" style={{ height: h, animationDelay: delay }} />
+                <span key={i} className="aidaddy-wave" style={{ height: h, animationDelay: delay }} />
               ))}
             </div>
           </div>
@@ -92,7 +92,7 @@ export function HouseholdScreen() {
                 app={n.app}
                 size={size}
                 label={n.app}
-                className="ukk-logo absolute"
+                className="aidaddy-logo absolute"
                 style={{ left: n.x, top: n.y, transform: "translate(-50%,-50%)", opacity: lit ? 1 : 0.35, filter: lit ? "none" : "grayscale(1)" }}
               />
             );
@@ -110,16 +110,16 @@ export function HouseholdScreen() {
               </span>
               <span className="flex flex-none gap-1">
                 {p.apps.map((a) => (
-                  <AppLogo key={a} app={a} size={16} label={`From ${a}`} className="ukk-rise" />
+                  <AppLogo key={a} app={a} size={16} label={`From ${a}`} className="aidaddy-rise" />
                 ))}
               </span>
             </div>
           ))}
-          <p className="m-0 py-2 text-[11px] text-[#8f8379]">Demo: example apps and facts. UKK only reads, and nothing is sent without your yes.</p>
+          <p className="m-0 py-2 text-[11px] text-[#8f8379]">Demo: example apps and facts. AIDaddy only reads, and nothing is sent without your yes.</p>
         </div>
       </div>
 
-      <footer className="flex-none px-6 pb-[calc(var(--ukk-bottom)+10px)] pt-3">
+      <footer className="flex-none px-6 pb-[calc(var(--aidaddy-bottom)+10px)] pt-3">
         <button
           type="button"
           disabled={!f.done}

@@ -1,11 +1,11 @@
 "use client";
 
-/** One opportunity: who it is for, the estimate, why the family fits, the source, and what UKK can prepare. */
+/** One opportunity: who it is for, the estimate, why the family fits, the source, and what AIDaddy can prepare. */
 
 import Image from "next/image";
 import { EXAMPLES, TINT } from "./opportunities";
 import { AppLogo, BackButton, Icon, ICON, Main, Spinner, useNav } from "./ui";
-import { useLive } from "./ukk-app";
+import { useLive } from "./home-app";
 
 export function DetailScreen({ id }: { id: string }) {
   const nav = useNav();
@@ -16,7 +16,7 @@ export function DetailScreen({ id }: { id: string }) {
   if (!d) {
     return (
       <>
-        <header className="flex flex-none flex-col gap-2 px-6 pb-3 pt-[calc(var(--ukk-top)+8px)]">
+        <header className="flex flex-none flex-col gap-2 px-6 pb-3 pt-[calc(var(--aidaddy-top)+8px)]">
           <BackButton label="Back to Hidden opportunities" />
           {live.status === "loading" ? (
             <h1 className="m-0 flex items-center gap-2 text-[26px] font-bold">
@@ -25,7 +25,7 @@ export function DetailScreen({ id }: { id: string }) {
           ) : (
             <>
               <h1 className="m-0 text-[26px] font-bold">This find is gone</h1>
-              <p className="m-0 text-sm text-[#7a6e66]">The live list was refreshed. Go back to see what UKK found today.</p>
+              <p className="m-0 text-sm text-[#7a6e66]">The live list was refreshed. Go back to see what AIDaddy found today.</p>
             </>
           )}
         </header>
@@ -46,7 +46,7 @@ export function DetailScreen({ id }: { id: string }) {
   const sourceCls = "flex flex-none items-center gap-3 rounded-[14px] border border-[#efe7dc] bg-white px-3.5 py-3 no-underline";
   return (
     <>
-      <header className="flex flex-none flex-col gap-2 px-6 pb-3 pt-[calc(var(--ukk-top)+8px)]">
+      <header className="flex flex-none flex-col gap-2 px-6 pb-3 pt-[calc(var(--aidaddy-top)+8px)]">
         <BackButton label="Back to Hidden opportunities" />
         <span className="flex flex-wrap gap-1.5">
           <span className="rounded-full px-[9px] py-[3px] text-[11px] font-semibold" style={{ background: TINT[d.who] }}>
@@ -102,7 +102,7 @@ export function DetailScreen({ id }: { id: string }) {
         <span className="h-1 flex-none" />
       </Main>
 
-      <footer className="flex flex-none flex-col gap-2.5 px-6 pb-[calc(var(--ukk-bottom)+10px)] pt-3">
+      <footer className="flex flex-none flex-col gap-2.5 px-6 pb-[calc(var(--aidaddy-bottom)+10px)] pt-3">
         {d.primaryHref ? (
           <a href={d.primaryHref} target="_blank" rel="noreferrer" className="flex h-[52px] items-center justify-center rounded-2xl bg-[#c4572f] text-base font-semibold text-white no-underline">
             {d.primary} ↗

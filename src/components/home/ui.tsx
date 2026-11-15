@@ -35,9 +35,9 @@ export type Nav = {
   push: (r: Route) => void;
   back: () => void;
   tab: (t: Tab) => void;
-  /** The full chat with UKK at /assistant (the Ask tab), with the demo's access code when there is one. */
+  /** The full chat with AIDaddy at /assistant (the Ask tab), with the demo's access code when there is one. */
   askHref: () => string;
-  /** A short note from UKK at the bottom of the screen, for what the demo would do next. */
+  /** A short note from AIDaddy at the bottom of the screen, for what the demo would do next. */
   say: (text: string) => void;
 };
 
@@ -97,17 +97,17 @@ export function BackButton({ label }: { label: string }) {
 }
 
 export function Spinner({ size = 14 }: { size?: number }) {
-  return <span aria-hidden className="ukk-spin box-border block shrink-0 rounded-full border-2 border-[#d9d1c4] border-t-[#c4572f]" style={{ width: size, height: size }} />;
+  return <span aria-hidden className="aidaddy-spin box-border block shrink-0 rounded-full border-2 border-[#d9d1c4] border-t-[#c4572f]" style={{ width: size, height: size }} />;
 }
 
 /** A screen's scrolling middle. */
 export function Main({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <main className={`ukk-scroll flex min-h-0 flex-1 flex-col px-6 ${className}`}>{children}</main>;
+  return <main className={`aidaddy-scroll flex min-h-0 flex-1 flex-col px-6 ${className}`}>{children}</main>;
 }
 
 /** The title block at the top of a tab screen. */
 export function TabHeader({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <header className={`flex flex-none flex-col gap-3.5 px-6 pb-3 pt-[calc(var(--ukk-top)+16px)] ${className}`}>{children}</header>;
+  return <header className={`flex flex-none flex-col gap-3.5 px-6 pb-3 pt-[calc(var(--aidaddy-top)+16px)] ${className}`}>{children}</header>;
 }
 
 export const H1 = ({ children }: { children: ReactNode }) => <h1 className="m-0 text-[26px] font-bold leading-[1.15] tracking-[-0.02em]">{children}</h1>;
@@ -123,7 +123,7 @@ export function TabBar({ current }: { current: Tab }) {
   const nav = useNav();
   const item = "flex flex-col items-center gap-1 text-[10px] no-underline";
   return (
-    <nav aria-label="Sections" className="grid flex-none grid-cols-5 border-t border-[#ece6dc] bg-[#fbf8f3] px-1.5 pb-[var(--ukk-bottom)] pt-2.5">
+    <nav aria-label="Sections" className="grid flex-none grid-cols-5 border-t border-[#ece6dc] bg-[#fbf8f3] px-1.5 pb-[var(--aidaddy-bottom)] pt-2.5">
       {TABS.map((t) =>
         t.tab === current ? (
           <span key={t.tab} aria-current="page" className={`${item} font-semibold text-[#c4572f]`}>
@@ -148,9 +148,9 @@ export function TabBar({ current }: { current: Tab }) {
 /** A short note that slides up from the bottom, for what the demo would do next. */
 export function Toast({ children }: { children: ReactNode }) {
   return (
-    <div role="status" className="ukk-toast absolute inset-x-3.5 bottom-[calc(var(--ukk-bottom)+16px)] z-10 flex items-center gap-3 rounded-2xl bg-[#2a2420] px-3.5 py-3 text-white shadow-[0_10px_30px_rgba(0,0,0,.25)]">
+    <div role="status" className="aidaddy-toast absolute inset-x-3.5 bottom-[calc(var(--aidaddy-bottom)+16px)] z-10 flex items-center gap-3 rounded-2xl bg-[#2a2420] px-3.5 py-3 text-white shadow-[0_10px_30px_rgba(0,0,0,.25)]">
       <span aria-hidden className="flex size-8 flex-none items-center justify-center rounded-full bg-[#c4572f] text-[11px] font-bold">
-        UKK
+        AIDaddy
       </span>
       <span className="flex-1 text-[13px] leading-[1.35]">{children}</span>
     </div>

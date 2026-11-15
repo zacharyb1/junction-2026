@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The desktop "Get it done": a working page, not a chat. The job with its photo, the three steps, every company UKK
+ * The desktop "Get it done": a working page, not a chat. The job with its photo, the three steps, every company AIDaddy
  * reaches with what it said and its price, and the best fit for the parent to approve. It plays the same run as the
  * phone screen (useTaskRun).
  */
@@ -73,7 +73,7 @@ export function DeskTasks({ job }: { job?: string }) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="m-0 text-[28px] font-bold tracking-[-0.01em]">Get it done</h1>
-          <span className="text-[#7a6e66]">AI agents call companies for quotes. You say yes; UKK never pays.</span>
+          <span className="text-[#7a6e66]">AI agents call companies for quotes. You say yes; AIDaddy never pays.</span>
         </div>
         <form onSubmit={start} className="box-border flex h-11 flex-[0_1_420px] items-center gap-2 rounded-full border border-[#e4ddd3] bg-white pl-4 pr-1.5">
           <label htmlFor="job" className="sr-only">
@@ -151,7 +151,7 @@ export function DeskTasks({ job }: { job?: string }) {
                   <span className="text-[#5a4f47]">{pitch}</span>
                   {approved ? (
                     <p role="status" className="m-0 leading-normal">
-                      You said yes to {best.name}, {slot}. In this demo nothing is booked: UKK would confirm with them and put it in your calendar.
+                      You said yes to {best.name}, {slot}. In this demo nothing is booked: AIDaddy would confirm with them and put it in your calendar.
                     </p>
                   ) : (
                     <button type="button" onClick={() => setApproved(true)} className="h-11 rounded-xl bg-[#c4572f] text-[15px] font-semibold text-white">
@@ -167,7 +167,7 @@ export function DeskTasks({ job }: { job?: string }) {
         )}
       </section>
       <p className="m-0 text-xs text-[#8f8379]">
-        {live ? "Companies, phone numbers and listed prices come from their own pages. Calls and quotes are simulated in this demo." : "Demo: search, calls and quotes are simulated."} UKK never books or pays without your yes.
+        {live ? "Companies, phone numbers and listed prices come from their own pages. Calls and quotes are simulated in this demo." : "Demo: search, calls and quotes are simulated."} AIDaddy never books or pays without your yes.
       </p>
     </div>
   );

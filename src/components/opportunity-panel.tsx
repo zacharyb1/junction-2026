@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The household's hidden opportunities on /assistant: kept fresh in the background from what UKK knows about the
+ * The household's hidden opportunities on /assistant: kept fresh in the background from what AIDaddy knows about the
  * family, shown as a tab in the sidebar and as cards in the main area, with the "About you" profile they come from.
  * The best findings are the ones nobody was looking for, so the search does not wait for a question.
  */
@@ -22,7 +22,7 @@ const EXAMPLE: Profile = {
   interests: "jazz, swimming, baking",
 };
 
-const STORE = "ukk-household-profile";
+const STORE = "aidaddy-household-profile";
 const lines = (s: string) => s.split(/[\n,]/).map((x) => x.trim()).filter((x) => x.length >= 2);
 
 const LENS: Record<Opportunity["lens"], { label: string; icon: typeof Heart; color: string }> = {
@@ -196,7 +196,7 @@ function Card({ o, colors, onAsk }: { o: Opportunity; colors: Palette; onAsk: (t
           className="inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium"
           style={{ border: `1px solid ${colors.line}` }}
         >
-          <MessageCircle className="size-4" aria-hidden /> Ask UKK
+          <MessageCircle className="size-4" aria-hidden /> Ask AIDaddy
         </button>
         <span className="ml-auto truncate text-xs" style={{ color: colors.muted }}>
           {o.source}
@@ -217,7 +217,7 @@ export function OpportunityView({ household, colors, onAsk }: { household: House
             <Sparkles className="size-6" style={{ color: colors.accent }} aria-hidden /> Hidden opportunities
           </h1>
           <p suppressHydrationWarning className="text-sm" style={{ color: colors.muted }}>
-            Found for your household in {profile.city || "your city"}, from what UKK knows about you.
+            Found for your household in {profile.city || "your city"}, from what AIDaddy knows about you.
             {scan && !scanning ? ` ${scan.searches} searches, every finding quoted from its own page.` : ""}
           </p>
         </div>
@@ -252,7 +252,7 @@ export function OpportunityView({ household, colors, onAsk }: { household: House
         )}
         {scan && !scan.opportunities.length && !scanning && (
           <p className="text-sm" style={{ color: colors.muted }}>
-            Nothing new this time. Tell UKK more about your household in the sidebar.
+            Nothing new this time. Tell AIDaddy more about your household in the sidebar.
           </p>
         )}
       </div>

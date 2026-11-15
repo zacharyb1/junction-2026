@@ -9,7 +9,7 @@
 import type { CommunityFilter, CommunityRow } from "@/lib/home-demo";
 import { useCommunitySearch } from "./community-search";
 import { H1, Icon, ICON, Main, Spinner, TabBar, TabHeader } from "./ui";
-import { useLive } from "./ukk-app";
+import { useLive } from "./home-app";
 
 export const FILTERS: CommunityFilter[] = ["All", "Forums", "Groups", "Podcasts"];
 export const KIND_ICON: Record<CommunityRow["kind"], string> = { Forums: ICON.chat, Groups: ICON.people, Podcasts: ICON.podcast };
@@ -80,8 +80,8 @@ export function CommunityScreen() {
         ))}
         <p className="m-0 py-2 text-[11px] text-[#8f8379]">
           {live.status === "idle"
-            ? "Examples for the demo question. Ask your own to search live. UKK never posts for you."
-            : "Found on the web today, each with a line from its page. UKK never posts for you."}
+            ? "Examples for the demo question. Ask your own to search live. AIDaddy never posts for you."
+            : "Found on the web today, each with a line from its page. AIDaddy never posts for you."}
         </p>
       </Main>
       <TabBar current="community" />

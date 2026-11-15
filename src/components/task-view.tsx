@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * "Get it done" on /assistant: a household job goes in, UKK finds real local companies, rings them all at once,
+ * "Get it done" on /assistant: a household job goes in, AIDaddy finds real local companies, rings them all at once,
  * compares their quotes with the family's calendar and proposes one booking for the parent to approve, so a busy
  * parent does not spend an evening on the phone.
  *
@@ -16,7 +16,7 @@ import type { Helper, HelperSearch } from "@/lib/engine/helpers";
 
 const JOBS = ["Kitchen tap is leaking", "Babysitter for Friday evening", "Deep clean before moving out", "Fix a washing machine that does not drain"];
 
-// The parent's week, as UKK would read it from the family calendar. An example until a calendar is connected.
+// The parent's week, as AIDaddy would read it from the family calendar. An example until a calendar is connected.
 const SHIFTS: Record<string, string> = { Mon: "7–15 shift", Tue: "", Wed: "7–15 shift", Thu: "7–15 shift", Fri: "" };
 const SLOTS = ["Mon 9:00", "Tue 10:00", "Tue 16:00", "Wed 8:00", "Thu 13:00", "Fri 15:00"];
 const fits = (slot: string) => {
@@ -45,9 +45,9 @@ function simulate(helper: Helper): Omit<Call, "helper" | "stage"> {
 }
 
 const LINES = (c: Call) => [
-  `UKK: Hello, I am calling for Laura in Helsinki about: the job below.`,
+  `AIDaddy: Hello, I am calling for Laura in Helsinki about: the job below.`,
   `${c.helper.name}: Yes, we can do that.${c.helper.price ? ` Our listed price is ${c.helper.price}.` : ""}`,
-  c.discount ? `UKK: Could you do ${c.discount}% less if she books today?` : `UKK: Is that your best price?`,
+  c.discount ? `AIDaddy: Could you do ${c.discount}% less if she books today?` : `AIDaddy: Is that your best price?`,
   `${c.helper.name}: ${c.discount ? `All right, ${c.discount}% off.` : "That is our price."} Earliest ${c.slot}.`,
 ];
 
@@ -115,7 +115,7 @@ export function TaskView({ code, colors, city }: { code: string; colors: Palette
           <Wrench className="size-6" style={{ color: colors.accent }} aria-hidden /> Get it done
         </h1>
         <p className="text-sm" style={{ color: colors.muted }}>
-          Tell UKK what needs doing. He finds local companies, calls them all at once, compares prices with your calendar and books the best one when you say yes.
+          Tell AIDaddy what needs doing. He finds local companies, calls them all at once, compares prices with your calendar and books the best one when you say yes.
         </p>
       </header>
 
@@ -204,7 +204,7 @@ export function TaskView({ code, colors, city }: { code: string; colors: Palette
                     {LINES(c)
                       .slice(0, c.stage)
                       .map((line, i) => (
-                        <li key={i} className={line.startsWith("UKK:") ? "" : "font-medium"}>
+                        <li key={i} className={line.startsWith("AIDaddy:") ? "" : "font-medium"}>
                           {line}
                         </li>
                       ))}
@@ -236,7 +236,7 @@ export function TaskView({ code, colors, city }: { code: string; colors: Palette
               <CalendarCheck className="size-8 shrink-0" style={{ color: colors.accent }} aria-hidden />
               <div className="flex-1">
                 <p className="font-semibold">
-                  {booked ? `Booked: ${best.helper.name}, ${best.slot}, €${best.quote}.` : `UKK suggests ${best.helper.name}, ${best.slot}, €${best.quote}.`}
+                  {booked ? `Booked: ${best.helper.name}, ${best.slot}, €${best.quote}.` : `AIDaddy suggests ${best.helper.name}, ${best.slot}, €${best.quote}.`}
                 </p>
                 <p className="text-sm" style={{ color: colors.muted }}>
                   {booked ? "Added to your calendar and tasks. (Demo: no real booking was made.)" : "Cheapest of the quotes that fits your shifts. Nothing is booked until you say yes."}

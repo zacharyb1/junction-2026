@@ -7,7 +7,7 @@ import { useState } from "react";
 import { type AppName } from "@/lib/home-demo";
 import { EXAMPLES, type Row, TINT, type Who } from "./opportunities";
 import { AppLogo, Icon, Main, Spinner, TabBar, useNav } from "./ui";
-import { useLive } from "./ukk-app";
+import { useLive } from "./home-app";
 
 export type LiveOpps = { status: "loading" | "ok" | "error"; rows: Row[]; error: string };
 
@@ -57,7 +57,7 @@ export function HiddenScreen() {
   const show = (r: Row) => who === "All" || r.who === who;
   return (
     <>
-      <header className="flex flex-none items-center justify-between px-6 pb-5 pt-[calc(var(--ukk-top)+16px)]">
+      <header className="flex flex-none items-center justify-between px-6 pb-5 pt-[calc(var(--aidaddy-top)+16px)]">
         <div className="flex flex-col gap-0.5">
           <span className="text-[15px] text-[#7a6e66]">Hi Laura</span>
           <h1 className="m-0 text-[26px] font-bold leading-[1.15] tracking-[-0.02em]">Hidden opportunities</h1>
@@ -115,7 +115,7 @@ export function HiddenScreen() {
           <h2 className="m-0 mt-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.04em] text-[#8f8379]">
             Found on the web today {live.status === "loading" && <Spinner size={12} />}
           </h2>
-          {live.status === "loading" && <p className="m-0 py-3 text-[13px] text-[#7a6e66]">UKK is reading official pages for Laura&apos;s family…</p>}
+          {live.status === "loading" && <p className="m-0 py-3 text-[13px] text-[#7a6e66]">AIDaddy is reading official pages for Laura&apos;s family…</p>}
           {live.status === "error" && <p className="m-0 py-3 text-[13px] text-[#7a6e66]">Live search is not available right now: {live.error}</p>}
           {live.status === "ok" && live.rows.length === 0 && <p className="m-0 py-3 text-[13px] text-[#7a6e66]">Nothing new with a source today.</p>}
           {live.rows.filter(show).map((r) => (

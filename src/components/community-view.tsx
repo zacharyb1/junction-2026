@@ -93,7 +93,7 @@ export function CommunityView({ code, colors, city }: { code: string; colors: Pa
           <Users className="size-6" style={{ color: colors.accent }} aria-hidden /> Communities
         </h1>
         <p className="text-sm" style={{ color: colors.muted }}>
-          You are not the first parent with this question. UKK finds the forums, groups and podcasts where people talk about it, so you can read what worked and ask them.
+          You are not the first parent with this question. AIDaddy finds the forums, groups and podcasts where people talk about it, so you can read what worked and ask them.
         </p>
       </header>
 

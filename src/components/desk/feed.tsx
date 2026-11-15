@@ -2,7 +2,7 @@
 
 /**
  * The family's hidden opportunities as a feed, shown without being asked: the worked examples as photo posts, then
- * what UKK found on the web today, each with the page it came from. It is the desktop's version of the Hidden tab.
+ * what AIDaddy found on the web today, each with the page it came from. It is the desktop's version of the Hidden tab.
  */
 
 import Image from "next/image";
@@ -141,7 +141,7 @@ export function DeskFeed() {
       <div className="flex w-full max-w-[760px] flex-col gap-5">
         <header className="flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="m-0 text-[22px] font-bold">{count} things your family is missing</h1>
-          <span className="text-[13px] text-[#7a6e66]">found by UKK · from your family&apos;s apps and the web</span>
+          <span className="text-[13px] text-[#7a6e66]">found by AIDaddy · from your family&apos;s apps and the web</span>
         </header>
 
         {lead.detail && <LeadPost row={lead} d={lead.detail} />}
@@ -159,7 +159,7 @@ export function DeskFeed() {
           <h2 className="m-0 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.04em] text-[#8f8379]">
             Found on the web today {live.status === "loading" && <Spinner size={12} />}
           </h2>
-          {live.status === "loading" && <p className="m-0 text-[13px] text-[#7a6e66]">UKK is reading official pages for Laura&apos;s family…</p>}
+          {live.status === "loading" && <p className="m-0 text-[13px] text-[#7a6e66]">AIDaddy is reading official pages for Laura&apos;s family…</p>}
           {live.status === "error" && <p className="m-0 text-[13px] text-[#7a6e66]">Live search is not available right now: {live.error}</p>}
           {live.status === "ok" && live.rows.length === 0 && <p className="m-0 text-[13px] text-[#7a6e66]">Nothing new with a source today.</p>}
           {live.rows.length > 0 && (

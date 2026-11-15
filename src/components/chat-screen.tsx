@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * UKK as a household app, so a busy family on a phone or a laptop is told what it is missing without asking: hidden
+ * AIDaddy as a household app, so a busy family on a phone or a laptop is told what it is missing without asking: hidden
  * opportunities found in the background open first, the chat is one tab away, and the household profile they come
  * from sits in the sidebar.
  *
- * The chat talks to the same /api/aidaddy as the /ukk page and renders replies with the same links and product pictures.
+ * The chat talks to the same /api/aidaddy as the /chat page and renders replies with the same links and product pictures.
  * Household photo: Unsplash (free licence), a mother with her two children at home.
  */
 
@@ -19,10 +19,10 @@ import { TaskView } from "@/components/task-view";
 import { Linked } from "@/components/aidaddy-chat";
 import { readCompletionStream } from "@/lib/chat-stream";
 
-type Turn = { from: "you" | "ukk"; text: string };
+type Turn = { from: "you" | "aidaddy"; text: string };
 type View = "opportunities" | "tasks" | "communities" | "chat";
 
-const TITLES: Record<View, string> = { opportunities: "Hidden opportunities", tasks: "Get it done", communities: "Communities", chat: "Chat with UKK" };
+const TITLES: Record<View, string> = { opportunities: "Hidden opportunities", tasks: "Get it done", communities: "Communities", chat: "Chat with AIDaddy" };
 
 // The page's own palette: warm paper, dark ink, a clay accent.
 const C: Palette = {
@@ -44,7 +44,7 @@ const TOPICS = [
 function Avatar({ size = 32 }: { size?: number }) {
   return (
     <Image
-      src="/ukk-avatar.jpg"
+      src="/aidaddy-avatar.svg"
       alt=""
       width={size}
       height={size}
@@ -88,11 +88,11 @@ export function ChatScreen({ code }: { code: string }) {
     setDraft("");
     setError("");
     setBusy(true);
-    setTurns((t) => [...t, { from: "you", text }, { from: "ukk", text: "" }]);
+    setTurns((t) => [...t, { from: "you", text }, { from: "aidaddy", text: "" }]);
     let full = "";
     const append = (delta: string) => {
       full += delta;
-      setTurns((t) => [...t.slice(0, -1), { from: "ukk", text: t[t.length - 1].text + delta }]);
+      setTurns((t) => [...t.slice(0, -1), { from: "aidaddy", text: t[t.length - 1].text + delta }]);
     };
     // Nothing came back: the message goes back into the box, so it can be sent again without typing it again.
     const giveBack = (why: string) => {
@@ -109,10 +109,10 @@ export function ChatScreen({ code }: { code: string }) {
       });
       if (!res.ok || !res.body) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
-        giveBack(res.status === 401 ? "This demo needs its access code: open /ukk with the code first." : (body.error ?? "UKK cannot answer right now. Please try again."));
+        giveBack(res.status === 401 ? "This demo needs its access code: open /chat with the code first." : (body.error ?? "AIDaddy cannot answer right now. Please try again."));
         return;
       }
-      if ((await readCompletionStream(res.body, append)) === 0) giveBack("UKK did not answer this time. Please send your message again.");
+      if ((await readCompletionStream(res.body, append)) === 0) giveBack("AIDaddy did not answer this time. Please send your message again.");
     } catch {
       giveBack("The connection dropped. Please send your message again.");
     } finally {
@@ -150,12 +150,12 @@ export function ChatScreen({ code }: { code: string }) {
   const tab = (active: boolean) => `flex min-h-11 items-center gap-3 rounded-xl px-3 text-left text-sm font-medium ${active ? "bg-white shadow-sm" : "hover:bg-black/5"}`;
 
   const sidebar = (
-    <nav aria-label="UKK" className="flex h-full flex-col gap-4 overflow-y-auto p-4" style={{ background: C.side, color: C.ink }}>
+    <nav aria-label="AIDaddy" className="flex h-full flex-col gap-4 overflow-y-auto p-4" style={{ background: C.side, color: C.ink }}>
       <div className="flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 rounded-lg py-1">
           <Avatar size={36} />
           <span className="flex flex-col leading-tight">
-            <span className="font-serif text-lg font-semibold">UKK</span>
+            <span className="font-serif text-lg font-semibold">AIDaddy</span>
             <span className="text-xs" style={{ color: C.muted }}>
               The household butler
             </span>
@@ -200,7 +200,7 @@ export function ChatScreen({ code }: { code: string }) {
         </button>
         <button type="button" onClick={() => open("chat")} aria-current={view === "chat" ? "page" : undefined} className={tab(view === "chat")}>
           <MessageCircle className="size-4 shrink-0" style={{ color: C.accent }} aria-hidden />
-          <span className="flex-1">Chat with UKK</span>
+          <span className="flex-1">Chat with AIDaddy</span>
         </button>
       </div>
 
@@ -266,7 +266,7 @@ export function ChatScreen({ code }: { code: string }) {
                       <Avatar size={72} />
                       <h1 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Good day. What does the household need?</h1>
                       <p className="max-w-md text-base" style={{ color: C.muted }}>
-                        A present, a medicine, a repair or a letter: UKK finds it on real pages and shows where every answer comes from.
+                        A present, a medicine, a repair or a letter: AIDaddy finds it on real pages and shows where every answer comes from.
                       </p>
                     </div>
                     <div className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-2">
@@ -302,7 +302,7 @@ export function ChatScreen({ code }: { code: string }) {
                               <Linked text={turn.text} />
                             ) : (
                               <span className="inline-flex items-center gap-2" style={{ color: C.muted }}>
-                                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> UKK is working on it
+                                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> AIDaddy is working on it
                               </span>
                             )}
                           </div>
@@ -324,7 +324,7 @@ export function ChatScreen({ code }: { code: string }) {
                 )}
                 <form onSubmit={submit} className="flex items-end gap-2 rounded-3xl bg-white p-2 pl-4 shadow-md" style={{ border: `1px solid ${C.line}` }}>
                   <label htmlFor="chat-message" className="sr-only">
-                    Message UKK
+                    Message AIDaddy
                   </label>
                   <textarea
                     id="chat-message"
@@ -334,7 +334,7 @@ export function ChatScreen({ code }: { code: string }) {
                     maxLength={1500}
                     onChange={(e) => setDraft(e.target.value)}
                     onKeyDown={onKey}
-                    placeholder="Message UKK"
+                    placeholder="Message AIDaddy"
                     // The rounded box around it is the frame; the field's own outline would be a second one.
                     style={{ outline: "none", color: C.ink }}
                     className="max-h-[200px] flex-1 resize-none bg-transparent py-2 text-base leading-6 placeholder:text-[#9a8c82]"
@@ -350,7 +350,7 @@ export function ChatScreen({ code }: { code: string }) {
                   </button>
                 </form>
                 <p className="text-center text-xs" style={{ color: C.muted }}>
-                  UKK is a made-up character. Research with sources, not legal or medical advice.
+                  AIDaddy is a made-up character. Research with sources, not legal or medical advice.
                 </p>
               </div>
             </footer>

@@ -91,9 +91,9 @@ export function HomeShell({ children }: { children: ReactNode }) {
   return (
     <NavContext.Provider value={nav}>
       <LiveContext.Provider value={value}>
-        <div className="ukk ukk-stage">
-          <div className="ukk-phone">
-            <div key={pathname} className={`ukk-layer ukk-enter-${kind}`}>
+        <div className="aidaddy aidaddy-stage">
+          <div className="aidaddy-phone">
+            <div key={pathname} className={`aidaddy-layer aidaddy-enter-${kind}`}>
               {children}
             </div>
             {note && <Toast>{note}</Toast>}

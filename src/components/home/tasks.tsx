@@ -12,7 +12,7 @@ import { type FormEvent, useState } from "react";
 import { CHANNEL, DEMO_JOB, type Firm, type FirmRow } from "@/lib/home-demo";
 import { useTaskRun } from "./task-run";
 import { AppLogo, H1, Icon, ICON, Main, Spinner, TabBar, TabHeader, useNav } from "./ui";
-import { useLive } from "./ukk-app";
+import { useLive } from "./home-app";
 
 function RowView({ row, picked, best, searching }: { row: FirmRow; picked: boolean; best: Firm | null; searching: boolean }) {
   const f = row.firm;
@@ -31,10 +31,10 @@ function RowView({ row, picked, best, searching }: { row: FirmRow; picked: boole
   const lineColor = row.state === "talking" ? "#2a2420" : row.state === "quoted" && !f.fits ? "#b3261e" : "#7a6e66";
   return (
     <div
-      className="ukk-rise box-border flex min-h-[58px] flex-none items-center gap-3 rounded-[14px] border border-[#ece6dc] bg-white px-3 py-2"
+      className="aidaddy-rise box-border flex min-h-[58px] flex-none items-center gap-3 rounded-[14px] border border-[#ece6dc] bg-white px-3 py-2"
       style={{ opacity: greyed ? 0.6 : picked && row.state === "quoted" ? 0.75 : 1 }}
     >
-      <span aria-hidden className={`relative flex size-[34px] flex-none items-center justify-center rounded-full ${row.state === "reaching" ? "ukk-ring" : ""}`} style={{ background: dot.bg, color: dot.fg }}>
+      <span aria-hidden className={`relative flex size-[34px] flex-none items-center justify-center rounded-full ${row.state === "reaching" ? "aidaddy-ring" : ""}`} style={{ background: dot.bg, color: dot.fg }}>
         <Icon d={icon} size={16} width={2} />
         {row.via && row.state !== "found" && row.state !== "closed" && (
           <AppLogo app={row.via} size={16} className="absolute -bottom-[3px] -right-[3px] rounded-full bg-white p-px" />
@@ -59,16 +59,16 @@ function RowView({ row, picked, best, searching }: { row: FirmRow; picked: boole
       {row.state === "talking" &&
         (row.via ? (
           <span aria-label="Replying" className="flex h-4 flex-none items-center gap-[3px]">
-            <span className="ukk-dot" />
-            <span className="ukk-dot" style={{ animationDelay: ".15s" }} />
-            <span className="ukk-dot" style={{ animationDelay: ".3s" }} />
+            <span className="aidaddy-dot" />
+            <span className="aidaddy-dot" style={{ animationDelay: ".15s" }} />
+            <span className="aidaddy-dot" style={{ animationDelay: ".3s" }} />
           </span>
         ) : (
           <span aria-label="On the call" className="flex h-4 flex-none items-center gap-0.5">
-            <span className="ukk-bar" />
-            <span className="ukk-bar" style={{ animationDelay: "-.2s" }} />
-            <span className="ukk-bar" style={{ animationDelay: "-.45s" }} />
-            <span className="ukk-bar" style={{ animationDelay: "-.1s" }} />
+            <span className="aidaddy-bar" />
+            <span className="aidaddy-bar" style={{ animationDelay: "-.2s" }} />
+            <span className="aidaddy-bar" style={{ animationDelay: "-.45s" }} />
+            <span className="aidaddy-bar" style={{ animationDelay: "-.1s" }} />
           </span>
         ))}
       {row.state === "found" && <span className="flex-none rounded-full bg-[#ffe3cf] px-2 py-[3px] text-[11px] font-semibold text-[#c4572f]">{f.url ? "Has phone" : "Open now"}</span>}
@@ -134,7 +134,7 @@ export function TasksScreen({ job: initial }: { job?: string }) {
 
       <Main className="gap-1.5 pb-3">
         {best && (
-          <section className="ukk-rise flex flex-none flex-col gap-3 rounded-[20px] bg-[#ffe8d6] p-4 text-[#4a2a1a]">
+          <section className="aidaddy-rise flex flex-none flex-col gap-3 rounded-[20px] bg-[#ffe8d6] p-4 text-[#4a2a1a]">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 flex-col gap-[3px]">
                 <span className="text-xs opacity-80">Best fit · cheapest that fits your week</span>
@@ -146,7 +146,7 @@ export function TasksScreen({ job: initial }: { job?: string }) {
             {approved ? (
               <div className="flex flex-col gap-2">
                 <p role="status" className="m-0 rounded-xl bg-white/70 px-3 py-2.5 text-[13px] leading-[1.4]">
-                  You said yes to {best.name}, {slot}. In this demo nothing is booked: UKK would confirm with them and put it in your calendar.
+                  You said yes to {best.name}, {slot}. In this demo nothing is booked: AIDaddy would confirm with them and put it in your calendar.
                 </p>
                 <button type="button" onClick={() => nav.push({ s: "household" })} className="h-11 rounded-xl bg-[#2a2420] text-[15px] font-semibold text-white">
                   That&apos;s not all: see your household →
@@ -183,7 +183,7 @@ export function TasksScreen({ job: initial }: { job?: string }) {
           {live
             ? "Companies, phone numbers and listed prices come from their own pages. Calls and quotes are simulated in this demo."
             : "Demo: search, calls and quotes are simulated."}{" "}
-          UKK never books or pays without your yes.
+          AIDaddy never books or pays without your yes.
         </p>
       </Main>
       <TabBar current="tasks" />

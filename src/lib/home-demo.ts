@@ -59,13 +59,13 @@ export type Firm = {
   answer: number;
   quote: number;
   price: number | null;
-  /** What UKK hears on the call. */
+  /** What AIDaddy hears on the call. */
   heard: string;
   /** The line under the name once the quote is in. */
   result: string;
   /** Whether the offered time fits the parent's week. */
   fits: boolean;
-  /** How the company can be reached; the first is the one UKK uses. */
+  /** How the company can be reached; the first is the one AIDaddy uses. */
   channels: Channel[];
   /** A live search's company page, where its phone number and any listed price come from. */
   url?: string;
@@ -96,7 +96,7 @@ export const DEMO_FIRMS: Firm[] = [
   firm("Putkityö Nieminen", "040 ••• 33 87", "8–16, opens Mon", false, [6, 99, 99], null, "", "closed now", false, ["mail", "phone"]),
 ];
 
-/** Is a job one of the household jobs UKK rings companies for, rather than a question for the chat? */
+/** Is a job one of the household jobs AIDaddy rings companies for, rather than a question for the chat? */
 export const isJob = (text: string) =>
   /\b(leak|leaking|drip|broke|broken|fix|repair|clean|cleaning|plumb|plumber|tap|washer|washing machine|babysit|babysitter|electrician|paint|move|moving)\w*/i.test(text);
 
@@ -158,7 +158,7 @@ export type FirmRow = {
   state: "found" | "closed" | "reaching" | "talking" | "quoted";
   icon: "pin" | "clock" | "phone" | "message" | "check";
   line: string;
-  /** Which channel UKK uses, when it is an app. */
+  /** Which channel AIDaddy uses, when it is an app. */
   via?: AppName;
 };
 
@@ -226,7 +226,7 @@ export function taskFrame(t: number, firms: Firm[], place = "Kallio", trade = "p
 export const MAP_APPS: AppName[] = ["WhatsApp", "Calendar", "Instagram", "Gmail", "Drive", "Telegram", "Photos", "Wilma", "Messenger", "Outlook", "Facebook", "Signal"];
 export const MAP_CENTRE: [number, number] = [171, 165];
 
-/** Twelve apps scattered around UKK at uneven distances, like a hand-drawn map (342 × 330 box). */
+/** Twelve apps scattered around AIDaddy at uneven distances, like a hand-drawn map (342 × 330 box). */
 export const MAP_NODES = MAP_APPS.map((app, i) => {
   const a = ((i * 30 - 80 + [6, -8, 4, -5, 9, -4, 7, -9, 3, -6, 8, -3][i]) * Math.PI) / 180;
   const r = [150, 118, 156, 124, 146, 112, 152, 128, 148, 116, 154, 122][i];
@@ -235,7 +235,7 @@ export const MAP_NODES = MAP_APPS.map((app, i) => {
 
 export type Person = "Laura" | "Eino" | "Aino" | "Home";
 
-/** What UKK learns, in order, and from which app. Examples for the demo household. */
+/** What AIDaddy learns, in order, and from which app. Examples for the demo household. */
 export const FACTS: [AppName, Person, string][] = [
   ["Gmail", "Home", "Renting in Kallio"],
   ["Outlook", "Laura", "Evening shifts"],

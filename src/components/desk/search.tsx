@@ -2,7 +2,7 @@
 
 /**
  * The desktop "Shopping from your chats": things the family needs, noticed in its messages, laid out as a grid of
- * cards. As on the phone page, the messages are the demo's examples and a search shows what UKK would do.
+ * cards. As on the phone page, the messages are the demo's examples and a search shows what AIDaddy would do.
  */
 
 import { type FormEvent, useState } from "react";
@@ -12,7 +12,7 @@ import { AppLogo, Icon, ICON } from "@/components/home/ui";
 export function DeskSearch() {
   const [draft, setDraft] = useState("");
   const [note, setNote] = useState("");
-  const go = (q: string) => setNote(`Demo: UKK would look for “${q}” in shops, each with its price on the shop’s own page. It never buys.`);
+  const go = (q: string) => setNote(`Demo: AIDaddy would look for “${q}” in shops, each with its price on the shop’s own page. It never buys.`);
   function submit(e: FormEvent) {
     e.preventDefault();
     if (draft.trim()) go(draft.trim());
@@ -73,7 +73,7 @@ export function DeskSearch() {
             </li>
           ))}
         </ul>
-        <p className="m-0 text-xs text-[#8f8379]">Example messages for the demo family. In the full app each one is searched in shops, with sources. UKK never buys.</p>
+        <p className="m-0 text-xs text-[#8f8379]">Example messages for the demo family. In the full app each one is searched in shops, with sources. AIDaddy never buys.</p>
       </section>
     </div>
   );

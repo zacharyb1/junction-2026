@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The desktop "Your household": who is in the family on the left, and what UKK learned about the chosen person on the
+ * The desktop "Your household": who is in the family on the left, and what AIDaddy learned about the chosen person on the
  * right, each fact with the app it came from and a photo where one fits. The apps and facts are the demo's examples.
  */
 
@@ -44,7 +44,7 @@ export function DeskHousehold() {
           <span className="flex flex-col gap-0.5">
             <h1 className="m-0 text-base font-semibold">Laura, Eino and Aino · Kallio</h1>
             <span className="text-xs text-[#7a6e66]">
-              {FACTS.length} things UKK learned from {MAP_APPS.length} apps
+              {FACTS.length} things AIDaddy learned from {MAP_APPS.length} apps
             </span>
           </span>
         </div>
@@ -76,7 +76,7 @@ export function DeskHousehold() {
       </section>
 
       <article className="box-border flex min-w-0 flex-[999_1_560px] flex-col gap-[18px] px-10 pb-10 pt-7">
-        <span className="text-xs text-[#7a6e66]">What UKK knows about</span>
+        <span className="text-xs text-[#7a6e66]">What AIDaddy knows about</span>
         <h2 className="m-0 text-[28px] font-bold tracking-[-0.01em]">
           {person.name} {person.age && <span className="font-normal text-[#8f8379]">{person.age}</span>}
         </h2>
@@ -105,7 +105,7 @@ export function DeskHousehold() {
             See {EXAMPLES.length + live.rows.length} hidden finds
           </Link>
           <Link href="/desk/apps" className="flex h-10 items-center rounded-full border border-[#e4ddd3] bg-white px-4 font-semibold no-underline">
-            Choose which apps UKK reads
+            Choose which apps AIDaddy reads
           </Link>
         </div>
       </article>

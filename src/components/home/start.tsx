@@ -2,13 +2,13 @@
 
 /**
  * The start page: what families bring, in their own words, floating over a fan of everyday photos, and one box to say
- * what is on your mind. A household job goes to "Get it done"; anything else goes to the chat with UKK.
+ * what is on your mind. A household job goes to "Get it done"; anything else goes to the chat with AIDaddy.
  */
 
 import Image from "next/image";
 import { type FormEvent, useState } from "react";
 import { isJob } from "@/lib/home-demo";
-import { useFound } from "./ukk-app";
+import { useFound } from "./home-app";
 import { Icon, ICON, useNav } from "./ui";
 
 const WORDS = [
@@ -63,11 +63,11 @@ export function StartScreen() {
       return;
     }
     if (isJob(text)) nav.push({ s: "tasks", job: text });
-    else nav.say("Demo: in the full app UKK answers this in the chat. To see agents at work, try “Kitchen tap is leaking”.");
+    else nav.say("Demo: in the full app AIDaddy answers this in the chat. To see agents at work, try “Kitchen tap is leaking”.");
   }
 
   return (
-    <div className="ukk-scroll flex min-h-0 flex-1 flex-col px-6 pb-[calc(var(--ukk-bottom)+12px)]">
+    <div className="aidaddy-scroll flex min-h-0 flex-1 flex-col px-6 pb-[calc(var(--aidaddy-bottom)+12px)]">
       <div
         role="group"
         aria-label="What families come with"
@@ -92,7 +92,7 @@ export function StartScreen() {
                 type="button"
                 tabIndex={-1}
                 onClick={() => fill(p.text)}
-                className="ukk-phrase absolute whitespace-nowrap border-0 bg-transparent px-0 py-0.5 text-[11px] tracking-[0.1px] text-[#8f8379]"
+                className="aidaddy-phrase absolute whitespace-nowrap border-0 bg-transparent px-0 py-0.5 text-[11px] tracking-[0.1px] text-[#8f8379]"
                 style={{ left: p.x, top: p.y, ["--r" as string]: `${p.r}deg`, transform: `translate(-50%, -50%) rotate(${p.r}deg)`, animationDelay: `${-(i % 7) * 0.8}s` }}
               >
                 {p.text}
@@ -149,7 +149,7 @@ export function StartScreen() {
           enterKeyHint="go"
           className="min-w-0 flex-1 border-0 bg-transparent text-base font-light text-[#2a2420] outline-none placeholder:text-[#8f8379]"
         />
-        <button type="button" aria-label="Add a photo" title="Photos come with the chat" onClick={() => nav.say("Demo: photos of letters and receipts go to UKK in the chat.")} className="flex size-11 items-center justify-center rounded-full">
+        <button type="button" aria-label="Add a photo" title="Photos come with the chat" onClick={() => nav.say("Demo: photos of letters and receipts go to AIDaddy in the chat.")} className="flex size-11 items-center justify-center rounded-full">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7a6e66" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="4" width="18" height="16" rx="4" />
             <circle cx="9" cy="10" r="1.8" />

@@ -14,7 +14,7 @@ import { HOUSEHOLD } from "@/lib/home-demo";
 import type { LiveOpps } from "./hidden";
 import { liveRow } from "./opportunities";
 
-const SCAN_KEY = "ukk-home-opportunities";
+const SCAN_KEY = "aidaddy-home-opportunities";
 const SCAN_TTL_MS = 30 * 60 * 1000;
 
 function readScan(): Opportunity[] | null {

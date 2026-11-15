@@ -103,7 +103,7 @@ export function DeskCommunity() {
               {place.action}
               <span className="sr-only"> (opens {new URL(place.href).hostname} in a new tab)</span>
             </a>
-            <span className="text-xs text-[#7a6e66]">Opens on {new URL(place.href).hostname.replace(/^www\./, "")}. UKK never posts for you.</span>
+            <span className="text-xs text-[#7a6e66]">Opens on {new URL(place.href).hostname.replace(/^www\./, "")}. AIDaddy never posts for you.</span>
           </>
         ) : (
           <p className="m-0 text-[#7a6e66]">Pick a place on the left.</p>

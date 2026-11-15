@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The desktop "Connected apps": the family apps UKK would read, grouped, with switches. As on the phone page, the
+ * The desktop "Connected apps": the family apps AIDaddy would read, grouped, with switches. As on the phone page, the
  * switches show the idea and connect nothing.
  */
 
@@ -19,7 +19,7 @@ export function DeskApps() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex max-w-[640px] flex-col gap-1.5">
           <h1 className="m-0 text-[28px] font-bold tracking-[-0.01em]">Connected apps</h1>
-          <p className="m-0 leading-normal text-[#7a6e66]">The more UKK knows, the more it finds for you. It only reads. Nothing is sent, booked or paid without your yes.</p>
+          <p className="m-0 leading-normal text-[#7a6e66]">The more AIDaddy knows, the more it finds for you. It only reads. Nothing is sent, booked or paid without your yes.</p>
         </div>
         <Link href="/desk/household" className="flex h-11 items-center rounded-full bg-[#c4572f] px-5 font-semibold text-white no-underline">
           Done · {count} connected
