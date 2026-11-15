@@ -9,10 +9,10 @@ import { type FormEvent, useState } from "react";
 import type { AppName } from "@/lib/home-demo";
 import { AppLogo, H1, Icon, ICON, Main, TabBar, TabHeader, useNav } from "./ui";
 
-const QUICK = ["Gift for Eino", "Boots for Aino", "Weekend with kids", "Dinner ideas"];
-const APPS: AppName[] = ["WhatsApp", "Telegram", "Gmail", "Calendar", "Wilma"];
+export const QUICK = ["Gift for Eino", "Boots for Aino", "Weekend with kids", "Dinner ideas"];
+export const APPS: AppName[] = ["WhatsApp", "Telegram", "Gmail", "Calendar", "Wilma"];
 
-const ROWS: [AppName, string, string, string][] = [
+export const ROWS: [AppName, string, string, string][] = [
   ["Calendar", "A gift for Eino's 5th birthday", "Eino turns 5 on 12 Dec", "A birthday present for Eino, he turns 5 and loves drawing, under €40"],
   ["WhatsApp", "Winter boots for Aino", "“Her boots are too small again”", "Warm winter boots for a 9-month-old, size 20, in Helsinki"],
   ["Wilma", "Rain clothes for daycare", "“Please bring rain clothes on Friday”", "Rain clothes for a 4-year-old for daycare"],
