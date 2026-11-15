@@ -194,6 +194,32 @@ describe("research applicability with preserved domestic-move context", () => {
     expect(result.openQuestions).toEqual([unknownStatus]);
     expect(result.plan[0]).toContain(domestic.title);
   });
+
+  it.each([
+    "I live in Helsinki, Finland. My partner is moving from India to Finland to join me.",
+    "I live in Helsinki, Finland. My partner needs to complete a residence permit application.",
+  ])("preserves initial-arrival work explicitly supplied in the household: %s", async (household) => {
+    extraction([internationalOnly[0], domestic]);
+    const result = await researchCase({
+      ...input,
+      situation: "We are moving to a new home in Tampere next month. What paperwork is needed?",
+      household,
+    }, "https://case.example");
+    expect(result.plan.some((line) => line.startsWith(internationalOnly[0].title))).toBe(true);
+    expect(result.unverified).toEqual([]);
+  });
+
+  it("preserves an address-change alternative in the same sentence as country arrival", async () => {
+    const combined = {
+      ...domestic,
+      quote: "Notify the authorities when moving to Finland or when your address changes.",
+      pageTitle: "Moving to Finland",
+    };
+    extraction([combined]);
+    const result = await researchCase(input, "https://case.example");
+    expect(result.plan).toHaveLength(1);
+    expect(result.evidence[0].quote).toBe(combined.quote);
+  });
 });
 
 describe("the deliberately limited current-residence prerequisite check", () => {
@@ -330,6 +356,12 @@ describe("the deliberately limited current-residence prerequisite check", () => 
     const check = applicabilityFor({ situation: task, household: "Home: Helsinki, Finland." }, "Finland");
     expect(check.exclusion({ title: domestic.title, quote: "Notify the authorities when your address changes.", sourceTitle: "Moving to Finland" })).toBeUndefined();
     expect(check.exclusion({ title: "Register your new address", quote: "Upon arrival in Finland, register your new address.", sourceTitle: "Moving to Finland" })).toBe("arrival_in_current_country");
+  });
+
+  it("keeps an arrival prerequisite that governs the address-change condition", () => {
+    const check = applicabilityFor({ situation: task, household: "Home: Helsinki, Finland." }, "Finland");
+    expect(check.exclusion({ title: domestic.title, quote: "Upon arrival in Finland, notify the authorities when your address changes." })).toBe("arrival_in_current_country");
+    expect(check.exclusion({ title: domestic.title, quote: "Upon arrival in Finland, notify the authorities when your passport expires or when your address changes." })).toBe("arrival_in_current_country");
   });
 
   it("drops plural citizenship questions from discarded arrival rules but preserves a retained eligibility condition", () => {

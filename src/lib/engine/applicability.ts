@@ -18,6 +18,8 @@ const PERMIT_DEPENDENCY = /\b(?:after|once|when)\b[^.!?\n]{0,70}\bresidence perm
 const MAINTENANCE = /\b(?:renew\w*|extend\w*|extension|replace\w*|lost|stolen)\b/i;
 const PENDING_APPLICATION = /\b(?:residence permit|visa|immigration|municipality of residence)\b[^.!?\n]{0,70}\b(?:pending|in progress|unfinished|not yet|incomplete)\b/i;
 const ELIGIBILITY_CONDITIONS = [/\b(?:permanent(?:ly)?|temporar(?:y|ily))\b/i, /\b(?:work|working|employed|employment|salary|wages)\b/i];
+const ADDRESS_NOTIFICATION = /\b(?:notify|notification|register|registration|report|inform|tell)\b/i;
+const ADDRESS_CHANGE = /\b(?:address (?:has )?changes?|change(?:d)? (?:your|the) address|change of address|new address)\b/i;
 
 function currentResidence(text: string, country: RegExp): boolean {
   return text.split(/[.!?;\n]+/).some((sentence) => {
@@ -41,7 +43,9 @@ export function applicabilityFor(input: Situation, countryName: string) {
   const name = escaped(countryName);
   const country = new RegExp(`\\b${name}\\b`, "i");
   const facts = `${input.situation}\n${input.household ?? ""}`;
-  const request = `${input.situation}\n${input.document ?? ""}`;
+  // One person's current home does not establish that every family member is
+  // already resident. Household facts can also describe the immigration task.
+  const request = `${facts}\n${input.document ?? ""}`;
   // An explicit destination country can describe an international or return
   // move even when another family member already lives there. Do not override it.
   const enteringCountry = new RegExp(`\\b(?:to|into)\\s+(?:the\\s+)?${name}\\b`, "i");
@@ -70,14 +74,21 @@ export function applicabilityFor(input: Situation, countryName: string) {
   const exclusion = (claim: Claim): string | undefined => {
     if (!active || MAINTENANCE.test(claim.title ?? "")) return undefined;
     const text = [claim.title, claim.detail, claim.quote].filter(Boolean).join("\n");
+    const quote = claim.quote ?? "";
+    const addressChangeRule = ADDRESS_NOTIFICATION.test(quote) && ADDRESS_CHANGE.test(quote);
+    const alternatives = quote.split(/\bor\s+(?=(?:when|if|whenever)\b)/i);
+    const actionAt = quote.search(/\b(?:notify|register|report|inform|tell)\b/i);
+    // "Notify when arriving OR when the address changes" has an independent
+    // address condition. A leading "Upon arrival, notify ..." still governs it.
+    const addressAlternative = addressChangeRule && alternatives.length > 1
+      && actionAt >= 0 && actionAt < quote.search(arrival)
+      && alternatives.some((part) => !arrival.test(part) && /\b(?:when|if|whenever)\b/i.test(part) && ADDRESS_CHANGE.test(part));
     // A shared rule can expressly cover both domestic moves and arrivals. Its
     // arrival wording is then an alternative, not a prerequisite for the action.
-    if (domesticScope.test(claim.quote ?? "")) return undefined;
+    if (domesticScope.test(quote) || addressAlternative) return undefined;
     if (arrival.test(text)) return "arrival_in_current_country";
     // A sentence lifted from an arrival-only guide can omit its page's scope.
     // Preserve titles expressly covering both domestic and international moves.
-    const addressChangeRule = /\b(?:notify|notification|register|registration|report|inform|tell)\b/i.test(claim.quote ?? "")
-      && /\b(?:address (?:has )?changes?|change(?:d)? (?:your|the) address|change of address|new address)\b/i.test(claim.quote ?? "");
     if (arrival.test(claim.sourceTitle ?? "") && !domesticScope.test(claim.sourceTitle ?? "") && !addressChangeRule) return "arrival_source_in_current_country";
     if (PERMIT_DEPENDENCY.test(text)) return "unrequested_initial_permit_process";
     // An application to obtain a country-level municipality-of-residence status
