@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { BUDGET, COOLDOWN_MS, type Effects, ListeningPost, ResearchFailed, RING_MS, SETTLE_MS } from "@/components/listen/post";
+import { BUDGET, COOLDOWN_MS, type Effects, ListeningPost, QUIET_MS, ResearchFailed, RING_MS, SETTLE_MS } from "@/components/listen/post";
 import type { ResearchResult } from "@/lib/engine/research";
 
 /** A browser that is not there: it records what the post asks of it. */
@@ -44,6 +44,12 @@ function fakeBrowser(over: Partial<Effects> = {}) {
     askPings: async () => "on",
     say(_result, _language, done) {
       log.push("say");
+      sayDone = done;
+      return () => done();
+    },
+    ready: (language, number) => log.push(`ready:${language}:${number}`),
+    warn(kind, language, number, done) {
+      log.push(`warn:${kind}:${language}:${number}`);
       sayDone = done;
       return () => done();
     },
@@ -227,6 +233,74 @@ describe("the listening post", () => {
     expect(post.getSnapshot().lines).toEqual([]);
     expect(post.getSnapshot().jobs).toHaveLength(1);
     expect(post.getSnapshot().jobs[0].at).toBeTypeOf("number");
+  });
+
+  it("speaks up at once in an emergency, without research, and listens again afterwards", async () => {
+    const browser = fakeBrowser();
+    const post = new ListeningPost(browser.fx);
+    post.start();
+    expect(browser.log).toContain("ready:en:112");
+    browser.say("Someone is shaking and not answering");
+    // No waiting for what follows: the words are said in the same moment.
+    expect(browser.log).toContain("warn:seizure:en:112");
+    expect(browser.log).toContain("notify:AIDaddy: call 112 now");
+    expect(post.getSnapshot().alarm).toMatchObject({ kind: "seizure", speaking: true });
+    expect(post.getSnapshot().lines.at(-1)?.tag).toBe("emergency");
+    expect(post.getSnapshot().status).toBe("paused");
+    await settle();
+    expect(browser.asked).toHaveLength(0);
+    expect(post.getSnapshot().jobs).toHaveLength(0);
+
+    browser.finishSaying();
+    expect(post.getSnapshot().alarm).toMatchObject({ speaking: false });
+    expect(post.getSnapshot().status).toBe("listening");
+  });
+
+  it("does not repeat the same emergency while people talk to the operator, and speaks again for a new one", () => {
+    const browser = fakeBrowser();
+    const post = new ListeningPost(browser.fx);
+    post.start();
+    browser.say("She's having a seizure");
+    browser.finishSaying();
+    vi.advanceTimersByTime(10_000);
+    browser.say("Yes, she is still having a seizure");
+    expect(browser.log.filter((entry) => entry.startsWith("warn:"))).toHaveLength(1);
+    expect(post.getSnapshot().lines.at(-1)?.tag).toBe("repeat");
+
+    browser.say("Now she's not breathing");
+    expect(browser.log.filter((entry) => entry.startsWith("warn:"))).toEqual(["warn:seizure:en:112", "warn:unresponsive:en:112"]);
+    browser.finishSaying();
+
+    vi.advanceTimersByTime(QUIET_MS + 1_000);
+    browser.say("He is having a seizure");
+    expect(browser.log.filter((entry) => entry.startsWith("warn:"))).toHaveLength(3);
+  });
+
+  it("uses the language and the number of the settings, says it again on a button and closes", () => {
+    const browser = fakeBrowser();
+    const post = new ListeningPost(browser.fx);
+    post.change({ language: "fi", country: "US" });
+    post.type("Hän kouristelee");
+    expect(browser.log).toContain("warn:seizure:fi:911");
+    post.hangUp();
+    expect(post.getSnapshot().alarm?.speaking).toBe(false);
+    post.again();
+    expect(browser.log.filter((entry) => entry.startsWith("warn:"))).toHaveLength(2);
+    post.dismiss();
+    expect(post.getSnapshot().alarm).toBeNull();
+  });
+
+  it("drops a ringing call for an emergency", async () => {
+    const browser = fakeBrowser();
+    const post = new ListeningPost(browser.fx);
+    post.start();
+    browser.say("Our landlord wants to raise the rent");
+    await settle();
+    expect(post.getSnapshot().ringing).not.toBeNull();
+    post.type("He's choking");
+    expect(post.getSnapshot().ringing).toBeNull();
+    expect(browser.log).toContain("ring:false");
+    expect(post.getSnapshot().alarm).toMatchObject({ kind: "choking", speaking: true });
   });
 
   it("stops when asked, and lets the screen sleep again", () => {

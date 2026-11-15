@@ -2,6 +2,7 @@
 
 import { progressLine, readResearchStream } from "@/components/autopilot/check";
 import { DEFAULTS, type Effects, ResearchFailed, type Settings, type Snapshot } from "@/components/listen/post";
+import { type Emergency, emergencySpeech } from "@/lib/emergency";
 import { spoken } from "@/lib/listen";
 
 /**
@@ -39,6 +40,23 @@ const NOTHING = /^(I could not find anything to research|En löytänyt viestist�
 let sound: AudioContext | null = null;
 let ringing: number | null = null;
 let screenLock: { release(): Promise<void> } | null = null;
+
+/**
+ * The emergency words in AIDaddy's voice (public/listen/emergency), decoded when listening starts.
+ * They then play at once, without a tap and without the network. They exist for the number 112.
+ */
+const clips = new Map<string, AudioBuffer>();
+const clipUrl = (kind: Emergency, language: Settings["language"]) => `/listen/emergency/${kind}-${language}.mp3`;
+
+async function loadClip(url: string) {
+  if (!sound || clips.has(url)) return;
+  try {
+    const res = await fetch(url);
+    if (res.ok) clips.set(url, await sound.decodeAudioData(await res.arrayBuffer()));
+  } catch {
+    // no clip: the browser's own voice says the words
+  }
+}
 
 function tone(frequency: number, from: number, length: number, volume = 0.15) {
   if (!sound) return;
@@ -287,6 +305,49 @@ export function browserEffects(): Effects {
       return () => {
         audio.pause();
         stopBrowserVoice?.();
+        finish();
+      };
+    },
+
+    ready(language, number) {
+      if (number !== "112") return;
+      for (const kind of ["seizure", "unresponsive", "choking", "help"] as const) void loadClip(clipUrl(kind, language));
+    },
+
+    warn(kind, language, number, done) {
+      let over = false;
+      let stop: (() => void) | null = null;
+      const finish = () => {
+        if (over) return;
+        over = true;
+        done();
+      };
+      // Three short high tones, then the words.
+      for (const from of [0, 0.22, 0.44]) tone(880, from, 0.16, 0.3);
+      navigator.vibrate?.([200, 100, 200, 100, 200]);
+      const clip = number === "112" ? clips.get(clipUrl(kind, language)) : undefined;
+      if (clip && sound?.state === "running") {
+        const source = sound.createBufferSource();
+        source.buffer = clip;
+        source.connect(sound.destination);
+        source.onended = finish;
+        source.start(sound.currentTime + 0.75);
+        stop = () => {
+          source.onended = null;
+          try {
+            source.stop();
+          } catch {
+            // already over
+          }
+        };
+      } else {
+        const timer = window.setTimeout(() => {
+          stop = sayWithBrowserVoice(emergencySpeech(kind, language, number), language, finish);
+        }, 750);
+        stop = () => window.clearTimeout(timer);
+      }
+      return () => {
+        stop?.();
         finish();
       };
     },
