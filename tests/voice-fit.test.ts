@@ -159,3 +159,74 @@ describe("the front page's narration", () => {
     expect(existsSync(new URL("../public/hud/plan.mp3", import.meta.url))).toBe(true);
   });
 });
+
+describe("when ElevenLabs says no", () => {
+  beforeEach(() => {
+    vi.stubEnv("ELEVENLABS_API_KEY", "test-key");
+    vi.stubEnv("DEMO_OPEN", "1");
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+  const answer = (status: number, body: unknown) =>
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } })));
+
+  it("names the short code of the answer, so the operator can read the cause", async () => {
+    answer(404, { detail: { type: "not_found", code: "voice_not_found", status: "voice_not_found", message: "A voice with voice_id 'x' was not found." } });
+    await expect(renderSpeech("Hello.")).rejects.toThrow("ElevenLabs answered 404 (voice_not_found)");
+    answer(401, { detail: { status: "missing_permissions", message: "The API key you used is missing the permission text_to_speech" } });
+    await expect(renderSpeech("Hello.")).rejects.toThrow("ElevenLabs answered 401 (missing_permissions)");
+  });
+
+  it("passes on the status alone when the answer has no short code", async () => {
+    answer(500, "<html>upstream error</html>");
+    await expect(renderSpeech("Hello.")).rejects.toThrow(/^ElevenLabs answered 500$/);
+    answer(400, { detail: { message: "a long sentence that is not a code, with the text of the request in it ".repeat(3) } });
+    await expect(renderSpeech("Hello.")).rejects.toThrow(/^ElevenLabs answered 400$/);
+  });
+
+  it("gives the chat page its sentence and the operator the reason", async () => {
+    answer(404, { detail: { status: "voice_not_found" } });
+    const res = await speak(new Request("https://aidaddy.example/api/aidaddy/speak", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "Hello there." }) }));
+    expect(res.status).toBe(502);
+    expect(await res.json()).toEqual({
+      error: "AIDaddy lost its voice for a moment. The reply is still in the chat.",
+      reason: "ElevenLabs answered 404 (voice_not_found)",
+    });
+  });
+});
+
+describe("the voice id an operator typed", () => {
+  const sent: string[] = [];
+  beforeEach(() => {
+    sent.length = 0;
+    vi.stubEnv("ELEVENLABS_API_KEY", "test-key");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        sent.push(url);
+        return new Response(new Uint8Array([1]), { headers: { "content-type": "audio/mpeg" } });
+      }),
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it("is used without the quotes, spaces or line ending pasted along with it", async () => {
+    vi.stubEnv("ELEVENLABS_VOICE_ID", ' "JBFqnCBsd6RMkjVDRZzb"\r');
+    await renderSpeech("Hello.");
+    expect(sent[0]).toContain("/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?");
+  });
+
+  it("gives AIDaddy's own voice when it is empty or not a voice id", async () => {
+    for (const typed of ["", " ", "<voice id>", "AIDaddy", "your-voice-id-here"]) {
+      vi.stubEnv("ELEVENLABS_VOICE_ID", typed);
+      await renderSpeech("Hello.");
+    }
+    expect(sent).toHaveLength(5);
+    for (const url of sent) expect(url).toContain(`/v1/text-to-speech/${AIDADDY_VOICE}?`);
+  });
+});

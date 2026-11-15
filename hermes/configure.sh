@@ -110,6 +110,10 @@ if [ "$RUNTIME" = web ]; then
   set_key api_server.max_concurrent_runs 4
   # Anonymous visitors research, read and search shops; they cannot change, re-check or publish anyone's case.
   set_key mcp_servers.casefile.tools.include '["research_case", "case_get", "find_products"]'
+  # Explicit operator opt-in for a rehearsed web call. Default anonymous web stays read-only.
+  if [ "${KAVERI_DEMO_CALLS:-0}" = 1 ]; then
+    set_key mcp_servers.casefile.tools.include '["research_case", "case_get", "find_products", "prepare_demo_call", "start_demo_call", "get_demo_call"]'
+  fi
 else
   # Slash commands (/sethome, /new, /model ...) only for the owner. Without this every user the bot
   # answers can run them, which matters once TELEGRAM_ALLOW_ALL_USERS is on (CHECKS.md, U10).

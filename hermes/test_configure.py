@@ -115,6 +115,16 @@ class ConfigureAdminTest(unittest.TestCase):
         calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
         self.assertFalse([call for call in calls if "mcp_servers.casefile.tools" in " ".join(call)])
 
+    def test_web_calls_need_explicit_operator_opt_in(self):
+        self.environment.update(KAVERI_RUNTIME="web", KAVERI_DEMO_CALLS="1")
+        result = self.run_script()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in self.calls_file.read_text().splitlines()]
+        settings = {call[2]: call[3] for call in calls if call[:2] == ["config", "set"]}
+        self.assertEqual(json.loads(settings["mcp_servers.casefile.tools.include"]), [
+            "research_case", "case_get", "find_products", "prepare_demo_call", "start_demo_call", "get_demo_call",
+        ])
+
     def test_telegram_runtime_still_requires_admins(self):
         self.environment["KAVERI_RUNTIME"] = "telegram"
         result = self.run_script()

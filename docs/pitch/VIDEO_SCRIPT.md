@@ -33,7 +33,7 @@ The words say "Next" once, in line 03, and again at the start of line 07. Everyt
 | Desks and routines | Skills of the Telegram bot: legal, finance and travel desks with their own memory, and a routine after the third request, which an operator approves. |
 | Mail, calendar and the school app | Design only. |
 | Money you never applied for | Design only. |
-| Phoning companies for quotes | Design only. A separate draft makes one confirmed call that is answered in a browser. |
+| Phoning companies for quotes | Design only. What exists is the demo call of `docs/DEMO_CALLS.md`: one confirmed call in AIDaddy's own voice to a test line, answered in a browser, when the operator has switched it on. |
 | Calling your boss in your own voice | Concept: the scripted scene `/demo/call`. The ElevenLabs account may copy a voice, but no voice is copied and no phone number is connected, so nothing can ring a phone. In the scene the first sentence of the call says that an assistant is speaking with a copy of the voice. |
 | Asking parents like you | Design only. |
 | The nudge back to the tax form | A prototype extension in `extension/aidaddy-focus`. |

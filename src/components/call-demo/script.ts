@@ -1,8 +1,9 @@
 /**
  * The script of /demo/call: someone asks AIDaddy to call their boss, in their own voice.
  *
- * Concept. AIDaddy cannot copy a voice or ring a phone number today; a separate draft lets it make one
- * confirmed call that is answered in a browser. The scene shows the rules such a call would keep:
+ * Concept. AIDaddy cannot copy a voice or ring someone's phone number today. What exists is the demo call of
+ * docs/DEMO_CALLS.md: one confirmed call in AIDaddy's own voice, to a test line. The scene shows the rules a
+ * call in the person's voice would keep:
  *   1. it asks for the number, it never looks one up;
  *   2. it shows the exact words and waits for a yes before anything rings;
  *   3. its first sentence on the call says that an assistant is speaking with a copy of the person's voice.
