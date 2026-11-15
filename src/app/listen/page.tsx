@@ -39,7 +39,7 @@ export default function ListenPage() {
               </>
             }
             title="Let AIDaddy listen."
-            lede="Leave this page open on a phone or a laptop. AIDaddy follows the talk in the room and lets the small talk pass. When it hears a letter, a deadline, a life event or a plan that has rules, a desk looks up the official pages without being asked and comes back: a call when the plan has a deadline, a ping for everything else."
+            lede="Leave this page open on a phone or a laptop. AIDaddy follows the talk in the room and lets the small talk pass. When it hears a letter, a deadline, a life event or a plan that has rules, a desk looks up the official pages without being asked and comes back: a call when the plan has a deadline, a ping for everything else. In an emergency, such as a seizure or someone who does not wake up, it speaks up at once: call 112, then what to do."
           >
             <p className="site-note">
               A first version. It works while this page is open, in Chrome, Edge and Safari. The other connections are on{" "}

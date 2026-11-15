@@ -2,8 +2,9 @@
 """Rehearse Telegram context with the real gate hook and pinned Hermes model.
 
 The classifier, Engine tools and Telegram delivery are synthetic fixtures. This
-checks that suppressed messages reach the real agent and that its research,
-proposal and approval sequence uses them. It never starts a gateway or sends to
+loads every skill configured by Telegram startup and checks that suppressed
+messages reach the real agent and its research arguments. Canned Engine results
+do not establish relevance of real research. It never starts a gateway or sends to
 Telegram. Run in the pinned Hermes image with NVIDIA_API_KEY only.
 """
 from __future__ import annotations
@@ -20,7 +21,7 @@ import time
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from rehearsal_prompt import verify_skill_prompt
+from rehearsal_prompt import configured_skill_sources, verify_skill_prompt
 
 
 CHAT = "-100101"
@@ -115,13 +116,20 @@ def assert_official_form(report: dict, presented: str) -> None:
     assert not re.search(r"(?im)^\s*(?:to\s*:\s*|dear\s+)(?:dvv|digital and population)", presented), "Preparation notes were addressed as an official filing."
     # A household may submit the verified official form. Reject sending a made-up
     # letter/checklist, including advice to write and send a draft that failed to save.
+    # Exempt only this complete negated clause; "nothing else ... except" and
+    # affirmative claims in neighboring clauses must still reach the detector.
+    filing_claims = re.sub(
+        r"\bthere\s+is\s+nothing\s+for\s+me\s+to\s+draft\s+and\s+send"
+        r"(?:\s+on\s+your\s+behalf)?(?=\s*(?:[.!?]|$))",
+        "", presented, flags=re.I,
+    )
     assert not re.search(
         r"(?<!not )(?<!n't )(?<!never )\b(?:send|submit|file|post|email|hand[ -]in)\s+(?:(?:this|these|the|your|a|an)\s+)*(?:drafts?|letters?|notes?|checklists?)\b"
         r"|(?<!not )(?<!n't )(?<!never )\b(?:write|draft|prepare)\s+and\s+(?:send|submit|file|post|email)\b"
         r"|\b(?:you can|you should|please)\s+(?:write|draft)\s+(?:(?:a|the|your|dvv|official|move|moving)\s+)*(?:letter|notice|notification)\b(?!\s+(?:checklist|notes))"
         r"|\bsending\s+(?:waits|awaits)\b|\b(?:ready|waiting|awaiting)\s+(?:for\s+)?(?:sending|submission|filing)\b"
         r"|\b(?:i(?:'ve| have)?|we(?:'ve| have)?|aidaddy)\s+(?:drafted|prepared|wrote|written|created)\s+(?:(?:a|an|the|your|dvv|official|move|moving)\s+)*(?:letter|notice|notification|filing)\b(?!\s+(?:checklist|notes))",
-        presented, re.I,
+        filing_claims, re.I,
     ), "The reply presented preparation notes as a submission."
     for event in report["timeline"]:
         if event["kind"] == "clarify":
@@ -224,11 +232,12 @@ def main() -> None:
     stamp = Path("/opt/hermes/install-stamp.json")
     if not stamp.is_file() or json.loads(stamp.read_text()).get("commit") != "3b421578588243f920886e6fe79a6faa87ea026e":
         parser.error("Run this rehearsal in the project's pinned Hermes v0.23.1 image.")
+    expected_skills = configured_skill_sources(args.repo)
     home = Path(tempfile.mkdtemp(prefix="aidaddy-telegram-context-"))
     os.environ.update(HERMES_HOME=str(home), HERMES_NO_AUTO_UPDATE="1", HERMES_DISABLE_PORTAL="1")
     config = {
         "model": {"provider": "nvidia", "default": "nvidia/nemotron-3.5-super-vl-120b-a12b"},
-        "skills": {"external_dirs": [str(args.repo / "hermes/skills")], "auto_load": ["life-event-butler"], "write_approval": True},
+        "skills": {"external_dirs": [str(args.repo / "hermes/skills")], "auto_load": list(expected_skills), "write_approval": True},
         "auxiliary": {"background_review": {"enabled": False}},
         "agent": {"reasoning_effort": "low"},
         "tools": {"tool_search": {"enabled": "off"}},
@@ -382,7 +391,7 @@ def main() -> None:
     built_prompt = build_system_prompt(agent, system_message=system_message)
     skill_preflight = verify_skill_prompt(
         built_prompt,
-        {"life-event-butler": (args.repo / "hermes/skills/butler/life-event-butler/SKILL.md").read_text()},
+        expected_skills,
         agent._auto_load_skills_result[1],
     )
 
@@ -413,7 +422,7 @@ def main() -> None:
 
     started = time.monotonic()
     result = asyncio.run(run_bound_agent())
-    report = {"scenario": "telegram-context", "limits": "Real gate-hook plumbing and Hermes model; synthetic gate classification, Engine results and Telegram delivery. No live Telegram or Exa claim.",
+    report = {"scenario": "telegram-context", "limits": "Real gate-hook plumbing and Hermes model with the startup-configured skills; synthetic gate classification, Engine results and Telegram delivery. Research tool arguments are captured, but canned Engine results do not establish real research relevance. No live Telegram or Exa claim.",
               "case_scenario": args.scenario, "research_fixture": research,
               "skill_preflight": skill_preflight,
               "plugin_preflight": {"native_dispatch": True, "version": loaded.manifest.version,

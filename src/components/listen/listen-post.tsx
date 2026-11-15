@@ -2,10 +2,11 @@
 
 import { type FormEvent, useState, useSyncExternalStore } from "react";
 import { browserEffects } from "@/components/listen/effects";
-import { INITIAL, type Job, type Line, ListeningPost, type Snapshot } from "@/components/listen/post";
+import { type Alarm, INITIAL, type Job, type Line, ListeningPost, type Settings, type Snapshot } from "@/components/listen/post";
 import { useAccessCode } from "@/components/site/access-code";
 import { Core } from "@/components/site/core";
 import { TryResult } from "@/components/try-result";
+import { emergencyNumber, emergencyWords, SOURCES } from "@/lib/emergency";
 import { DESKS } from "@/lib/listen";
 
 const COUNTRIES = [
@@ -37,9 +38,14 @@ const TAGS: Record<Line["tag"], string> = {
   event: "Noticed: a matter for AIDaddy",
   repeat: "Let pass: already on it",
   rest: "Let pass: enough research for this half hour",
+  emergency: "Emergency: AIDaddy spoke up",
+  checking: "Checking with the model",
+  model: "Noticed by the model: a matter for AIDaddy",
 };
 
 const field = "h-11 w-full rounded-lg border border-input bg-input/30 px-3 text-base outline-none transition-colors focus-visible:border-ring md:text-sm";
+
+const noticed = (line: Line) => line.tag === "event" || line.tag === "emergency";
 
 const clock = (at: number) => new Date(at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
@@ -111,12 +117,63 @@ function Call({ job, speaking, post }: { job: Job; speaking: boolean; post: List
 }
 
 /**
+ * An emergency AIDaddy heard: it says at once what to do, and shows the same words. The words are fixed and follow
+ * the Finnish Red Cross (src/lib/emergency.ts). AIDaddy cannot call the emergency number; the button opens the phone.
+ */
+function Emergency({ alarm, settings, post }: { alarm: Alarm; settings: Settings; post: ListeningPost }) {
+  const number = emergencyNumber(settings.country);
+  const words = emergencyWords(alarm.kind, settings.language, number);
+  const source = SOURCES[alarm.kind];
+  return (
+    <div className="listen-call" role="alertdialog" aria-modal="true" aria-labelledby="listen-alarm-title">
+      <div className="listen-call-box listen-alarm">
+        <p className="site-eyebrow listen-alarm-eyebrow">{alarm.speaking ? "AIDaddy is telling you what to do" : "Emergency"}</p>
+        <h2 id="listen-alarm-title" className="listen-alarm-number">
+          Call {number} now
+        </h2>
+        <p className="site-note">It heard: “{alarm.heard}”</p>
+        <ol className="listen-alarm-steps">
+          {words.lines.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ol>
+        <a className="site-btn listen-alarm-call listen-call-wide" href={`tel:${number}`}>
+          Open the phone to call {number}
+        </a>
+        <div className="listen-call-buttons">
+          {alarm.speaking ? (
+            <button type="button" className="site-btn" onClick={() => post.hangUp()}>
+              Stop talking
+            </button>
+          ) : (
+            <button type="button" className="site-btn" onClick={() => post.again()}>
+              Say it again
+            </button>
+          )}
+          <button type="button" className="site-btn" onClick={() => post.dismiss()}>
+            Close
+          </button>
+        </div>
+        <p className="site-note">
+          AIDaddy cannot call for you. These are first aid words from{" "}
+          <a href={source.url} target="_blank" rel="noreferrer" className="underline">
+            {source.name}
+          </a>
+          , not a diagnosis.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
  * The listening page (/listen): one device, left open, that hears the household and comes back with a plan.
  *
  * It listens only after Start is pressed and only while this page is open and on screen. The browser turns speech
  * into text; the rules in src/lib/listen.ts decide here which sentence is a matter for AIDaddy; only that sentence
  * and its close neighbours go to the research Engine. A result comes back as a call when the plan has a deadline or
- * the matter is urgent, and as a ping otherwise. See post.ts for the whole flow.
+ * the matter is urgent, and as a ping otherwise. An emergency is answered at once, aloud, with fixed first aid words.
+ * See post.ts for the whole flow.
  */
 export function ListenPost({ needsCode }: { needsCode: boolean }) {
   // One post per page. It touches the browser only when something is pressed.
@@ -161,7 +218,12 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
             <div className="flex items-center gap-4">
               <Core state={working ? "active" : state.jobs.some((job) => job.state === "done") ? "done" : "idle"} className="hud-core--tiny" />
               <div className="min-w-0 flex-1">
-                <p>{state.note || MIC_TEXT[state.status]}</p>
+                <p>
+                  {state.note ||
+                    (state.status === "listening" && state.settings.model
+                      ? "Listening on this device. Sentences the phrase list misses go to the model check."
+                      : MIC_TEXT[state.status])}
+                </p>
                 {state.interim ? <p className="site-status mt-1 line-clamp-2 text-muted-foreground">… {state.interim}</p> : null}
               </div>
             </div>
@@ -204,6 +266,19 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
                 </select>
               </label>
             </div>
+            <label className="flex items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1 size-4 accent-current"
+                checked={state.settings.model}
+                onChange={(event) => post.change({ model: event.target.checked })}
+              />
+              <span>
+                Model check. A sentence of four or more words that the phrase list lets pass goes to the AI model on
+                AIDaddy&apos;s server, which decides whether it is a matter. It catches more, but those sentences leave this
+                device. Nothing is stored. Off: only matters leave the device.
+              </span>
+            </label>
             <form className="grid gap-2" onSubmit={submit}>
               <label htmlFor="listen-typed" className="text-sm">
                 No microphone, or a loud room? Type a sentence the way it would be said.
@@ -253,9 +328,9 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
             {state.lines.length === 0 ? <p className="site-note">Nothing yet.</p> : null}
             <ul className="grid grid-cols-1 gap-2 text-sm">
               {state.lines.slice(-10).map((line) => (
-                <li key={line.id} className={line.tag === "event" ? "site-row site-row--amber" : "site-row"}>
-                  <p className={line.tag === "event" ? "site-eyebrow site-eyebrow--amber" : "site-eyebrow site-eyebrow--dim"}>{TAGS[line.tag]}</p>
-                  <p className={line.tag === "event" ? undefined : "text-muted-foreground"}>{line.text}</p>
+                <li key={line.id} className={noticed(line) ? "site-row site-row--amber" : "site-row"}>
+                  <p className={noticed(line) ? "site-eyebrow site-eyebrow--amber" : "site-eyebrow site-eyebrow--dim"}>{TAGS[line.tag]}</p>
+                  <p className={noticed(line) ? undefined : "text-muted-foreground"}>{line.text}</p>
                 </li>
               ))}
             </ul>
@@ -275,6 +350,11 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
             <li>Small talk stays on this page. Only a sentence AIDaddy notices, with the two sentences before and after it, is sent to the research engine.</li>
             <li>It listens while this page is open and in front. Press stop, or close the page, and nothing is heard. It hears everyone near the device, so tell the people in the room.</li>
             <li>What was heard is gone when the page closes. A plan is kept as a case file under a link nobody can guess.</li>
+            <li>
+              In an emergency (a seizure, someone who does not wake up or is not breathing, choking, a cry for an ambulance) AIDaddy speaks up at once,
+              without being asked: call the emergency number first, then the Finnish Red Cross first aid steps. Those words are fixed and stored on
+              this page; nothing is sent. AIDaddy cannot call the emergency number for you.
+            </li>
             <li>The call rings on this device. It cannot ring a phone number or reach your other devices.</li>
             <li>At most five matters in half an hour, and the same matter not twice in twenty minutes, so a lively room cannot spend the research credit.</li>
             <li>AIDaddy looks things up and tells you. It never sends, files, books or pays.</li>
@@ -282,7 +362,8 @@ export function ListenPost({ needsCode }: { needsCode: boolean }) {
         </section>
       </div>
 
-      {calling ? <Call job={calling} speaking={state.speaking === calling.id} post={post} /> : null}
+      {calling && !state.alarm ? <Call job={calling} speaking={state.speaking === calling.id} post={post} /> : null}
+      {state.alarm ? <Emergency alarm={state.alarm} settings={state.settings} post={post} /> : null}
     </>
   );
 }

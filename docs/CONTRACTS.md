@@ -123,6 +123,8 @@ Response `200`:
 
 - `plan`: at most 5 short lines, ready to paste into a chat message. Numbers in brackets are citation numbers on the case page.
 - Lines whose quote failed verification are not in `plan`. They appear under `unverified`.
+- Quote verification establishes that the words were on the page, not that every rule applies to the family. Research extraction receives the full situation and household. A separate, conservative prerequisite check recognises English current-residence and arrival wording in claims and source titles: it excludes unsupported first-arrival processes from an ordinary move when the supplied facts establish current residence in that same country. Mixed domestic/international guidance and explicit address-change rules remain usable. It does not infer a city's country, citizenship, permanent residence or benefit eligibility. International/return moves, explicit immigration work and unrecognised wording require the ordinary extraction/review path; this is not a general eligibility check. If a claim is discarded, its extracted summary is replaced with a neutral description of the supplied situation.
+- A time period enters Money only when its verified sentence supports an entitlement, payment/leave duration, or someone else's duty. Unrelated photo-age and document-validity periods stay out of Money; quote verification and same-page numeric support still apply.
 - `evidence`: the sentence behind every citation number of the case, so a client can show the quote under the plan line
   it supports without loading the case. `quote` is the stored sentence, in the page's own words. `sourceType` is `official`
   or `secondary`. `verification` and `checkedVia` are the marks described under "Case tools"; `checkedVia` is absent
@@ -382,6 +384,13 @@ address straight to Telegram as a voice message, and the case page plays it behi
 - Errors: `404` unknown case, or `ELEVENLABS_API_KEY` is not set (the button is then not shown), `429` rate limited
   (only requests that would render new audio count), `502` ElevenLabs failed or took longer than 20 seconds.
 
+## Swarm calls: one question, several phones at once
+
+MCP tools `prepare_swarm_call`, `start_swarm_call`, `get_swarm_call`, `cancel_swarm_call`, and the same under
+`/api/swarm` with the server secret. Twilio supplies the number, imported into ElevenLabs; an ElevenLabs batch dials
+every recipient in parallel with the agent "AIDaddy swarm". Recipients come only from `SWARM_CALL_RECIPIENTS`.
+One confirmation starts one batch, never twice. Shapes, statuses and setup: [SWARM_CALLS.md](SWARM_CALLS.md).
+
 ## Page readers
 
 Finding is always Exa. Reading a cited page to check a quote can go three ways:
@@ -425,6 +434,8 @@ The bot does not do the research itself unless `research_case` fails. Fallback: 
 | `OXYLABS_API_KEY` | Vercel, optional | third page reader for sites that refuse our request |
 | `ELEVENLABS_API_KEY` | Vercel, optional | turns on the spoken plan: `GET /api/cases/:id/audio` and the button on the case page |
 | `ELEVENLABS_VOICE_ID` | Vercel, optional | voice for everything the app speaks: the spoken plan and AIDaddy's replies on `/chat`. Default `UWUOFJTWwuSmZFHzbMpM`, AIDaddy's own designed voice, which lives in the team's ElevenLabs account: set it when the key belongs to another account |
+| `ELEVENLABS_SWARM_AGENT_ID`, `ELEVENLABS_PHONE_NUMBER_ID` | server, optional | swarm calls: the agent and the imported Twilio number, printed by `scripts/setup-swarm-calls.mjs` |
+| `SWARM_CALL_RECIPIENTS`, `SWARM_CALLS_ENABLED` | server, optional | swarm calls: the operator's test phones (`Name:+number,...`) and the switch; see [SWARM_CALLS.md](SWARM_CALLS.md) |
 | `BLOB_READ_WRITE_TOKEN` | Vercel, set by the Blob store | case storage |
 | `PUBLIC_BASE_URL` | Vercel, optional | overrides the origin used in case links |
 | `NEXT_PUBLIC_BOT_USERNAME` | Vercel | QR code and links to the Telegram bot |

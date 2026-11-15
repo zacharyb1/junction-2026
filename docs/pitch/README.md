@@ -31,7 +31,7 @@ The recordings of 15 November were not made with this recorder: its browser sess
 
 ## Pitch deck
 
-[aidaddy-pitch-deck.pdf](aidaddy-pitch-deck.pdf) is the ten-slide deck for the submission form; the form's text is in [../SUBMISSION_TEXT.md](../SUBMISSION_TEXT.md). Rebuild it with:
+[aidaddy-pitch-deck.pdf](aidaddy-pitch-deck.pdf) is the eleven-slide deck for the submission form; the form's text is in [../SUBMISSION_TEXT.md](../SUBMISSION_TEXT.md). Rebuild it with:
 
 ```sh
 node scripts/make-deck.mjs

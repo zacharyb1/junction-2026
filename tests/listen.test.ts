@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { emergencyIn, emergencyNumber, emergencySpeech, emergencyWords } from "@/lib/emergency";
 import { decide, DESKS, hasDeadline, importance, isAddressed, situation, spoken, withoutName } from "@/lib/listen";
 
 describe("what the listening post makes of a sentence", () => {
@@ -59,7 +60,8 @@ describe("what the listening post makes of a sentence", () => {
   });
 
   it("researches a question addressed to it, and ignores its bare name", () => {
-    expect(decide("AIDaddy, how do I register my address in Espoo")).toMatchObject({ kind: "asked", addressed: true });
+    expect(decide("AIDaddy, how do saunas work in Finland")).toMatchObject({ kind: "asked", addressed: true });
+    expect(decide("AIDaddy, how do I register my address in Espoo")).toMatchObject({ kind: "register", addressed: true });
     expect(decide("AI daddy, our flight was cancelled")).toMatchObject({ kind: "travel", addressed: true });
     expect(decide("AIDaddy")).toBeNull();
     expect(decide("hey AI daddy thanks")).toBeNull();
@@ -130,4 +132,99 @@ describe("call or ping", () => {
     const text = spoken({ title: "Rent increase", plan: ["Object in writing: within two (2) weeks [1][2]"], evidenceVerified: 2, evidenceTotal: 2 }, "en");
     expect(text).toBe("Rent increase. Object in writing: within two weeks. 2 of 2 quotes were found on their pages. The sources are on the screen.");
   });
+});
+
+describe("an emergency", () => {
+  it("hears a seizure, however it is said", () => {
+    for (const said of [
+      "Someone is shaking and not answering",
+      "He's shaking and he won't respond",
+      "I think she's having a seizure",
+      "Dad is convulsing",
+      "Hän kouristelee",
+      "Hän tärisee eikä vastaa",
+    ])
+      expect(emergencyIn(said), said).toBe("seizure");
+  });
+
+  it("hears someone who does not wake up, choking and a cry for help", () => {
+    expect(emergencyIn("She's not breathing")).toBe("unresponsive");
+    expect(emergencyIn("Grandpa just collapsed")).toBe("unresponsive");
+    expect(emergencyIn("He won't wake up")).toBe("unresponsive");
+    expect(emergencyIn("Hän ei hengitä")).toBe("unresponsive");
+    expect(emergencyIn("He's choking")).toBe("choking");
+    expect(emergencyIn("Somebody call an ambulance")).toBe("help");
+    expect(emergencyIn("Soittakaa ambulanssi")).toBe("help");
+  });
+
+  it("leaves ordinary talk alone", () => {
+    for (const said of [
+      "I'm shaking from the cold",
+      "He's not answering his phone",
+      "She is not responding to my emails",
+      "The deal collapsed last week",
+      "Shake the bottle before you open it",
+      "What should we have for dinner?",
+      "Our flight to Lisbon was cancelled",
+    ])
+      expect(emergencyIn(said), said).toBeNull();
+  });
+
+  it("names the number of the country", () => {
+    expect(emergencyNumber("FI")).toBe("112");
+    expect(emergencyNumber("US")).toBe("911");
+    expect(emergencyNumber("GB")).toBe("999");
+  });
+
+  it("says the call first, and the number digit by digit", () => {
+    for (const kind of ["seizure", "unresponsive", "help"] as const) {
+      expect(emergencyWords(kind, "en", "112").lines[0]).toMatch(/call 112 now/);
+      expect(emergencyWords(kind, "fi", "112").lines[0]).toMatch(/soita heti hätänumeroon 112/);
+    }
+    expect(emergencyWords("choking", "en", "911").lines.join(" ")).toMatch(/calls 911 now/);
+    const speech = emergencySpeech("seizure", "en", "112");
+    expect(speech).toMatch(/call one one two now/);
+    expect(speech).not.toMatch(/\d|\{n\}/);
+    expect(emergencySpeech("seizure", "fi", "112")).toMatch(/yksi yksi kaksi/);
+  });
+
+  it("protects the airway in a seizure by turning the person, never by reaching into the mouth", () => {
+    const en = emergencyWords("seizure", "en", "112").lines;
+    expect(en[0]).toMatch(/call 112 now/);
+    expect(en.join(" ")).toMatch(/do not put anything in their mouth/);
+    expect(en.join(" ")).toMatch(/recovery position on the floor.*tongue cannot block their breathing/);
+    const fi = emergencyWords("seizure", "fi", "112").lines.join(" ");
+    expect(fi).toMatch(/äläkä laita mitään hänen suuhunsa/);
+    expect(fi).toMatch(/lattialla kylkiasentoon.*kieli ei tuki hengitystä/);
+  });
+});
+
+describe("everyday ways of saying a matter", () => {
+  it.each([
+    ["the dishwasher is broken again", "consumer"],
+    ["the washing machine won't start", "consumer"],
+    ["astianpesukone ei toimi", "consumer"],
+    ["the rent is going up again next month", "rent"],
+    ["we need to register our new address", "register"],
+    ["where do I get a bank ID", "register"],
+    ["I need to see a doctor about my back", "health"],
+    ["grandpa passed away last night", "death"],
+    ["we're getting divorced", "divorce"],
+    ["I had a car accident this morning", "accident"],
+    ["the insurance won't pay for it", "accident"],
+    ["it's mum's birthday next week", "occasion"],
+    ["our son starts school in August", "school"],
+    ["we got a bill from the hospital", "letter"],
+    ["I got a new job", "job"],
+    ["we have to do our taxes", "tax"],
+  ])("%s -> %s", (text, kind) => {
+    expect(decide(text)?.kind).toBe(kind);
+  });
+
+  it.each(["the dishwasher is done", "I'm going to the shop", "the kids are asleep", "what's for dinner", "I'm broke until Friday"])(
+    "small talk stays small talk: %s",
+    (text) => {
+      expect(decide(text)).toBeNull();
+    },
+  );
 });
