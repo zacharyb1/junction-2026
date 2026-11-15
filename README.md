@@ -57,7 +57,7 @@ flowchart TD
     Bot --> Followup[Approved drafts and Hermes reminders]
 ```
 
-The gate filters group text before a cloud call. Direct messages, addressed messages and media take rule-based wake paths; an active conversation also has a three-minute open window. This means neither all small talk nor all photos stay local. The measured limits are in the handover.
+The gate filters group text before a cloud call. Authorized Telegram messages can wait in a small recent-context buffer for the same chat and topic; the next trigger carries those earlier facts into the conversation so the family need not repeat them. Direct messages, addressed messages and media take rule-based wake paths; an active topic also has a three-minute open window. This means neither all small talk nor all photos stay local. The runtime posts a start notice for research, then the bot posts its sourced result before offering next actions. See [the Telegram contract](docs/CONTRACTS.md#telegram-context-and-work-notices) and [the live demo procedure](docs/TELEGRAM_DEMO.md).
 
 | Part / tool | Role and code |
 |---|---|

@@ -29,7 +29,7 @@ export const CONNECTIONS: Connection[] = [
     label: "Connection 01",
     title: "In your group chat",
     description:
-      "AIDaddy joins your family or flat group in Telegram and reads along. Small talk is dropped on our own server. When paperwork comes up, it answers with a plan and the official sentence behind every line.",
+      "AIDaddy joins your family or flat group in Telegram and reads along. It stays quiet during small talk, then uses recent messages from the same chat and topic when paperwork comes up, and answers with a plan and the official sentence behind every line.",
     status: "live",
     control: "Remove it from the group and it reads nothing. Say \"forget everything\" and it wipes what it remembers about your household.",
     limits: "Telegram groups and direct chats. It never sends, files, books or pays: sending anything waits for your click.",

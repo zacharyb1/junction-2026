@@ -1,7 +1,9 @@
 """AIDaddy gate: decide on this machine whether a family-group message may wake the cloud model.
 
-A small local Gemma (through Ollama) labels each message. Small talk is dropped here and never
-leaves the laptop. Decided behaviour (docs/DECISIONS.md, Fri 23:15):
+A small local Gemma (through Ollama) labels each message. Small talk does not wake the cloud
+model by itself. The Telegram hook retains bounded recent authorized messages locally and
+can attach them as background to the next trigger. Decided gate behaviour (docs/DECISIONS.md,
+Fri 23:15):
   - a wake pattern matches        -> wake the bot, no model call
   - the gate is unsure            -> wake the bot (a missed life event is the worse failure)
   - the gate is down or too slow  -> the runbook's wake patterns alone decide,

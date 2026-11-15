@@ -11,7 +11,7 @@ Issue #39. One of AIDaddy's three specialist desks. It takes a matter where the 
 
 ## Procedure
 
-1. Acknowledge in one line, with your first tool call: "A matter for the legal desk. Reading what the law's own pages say." On bad news (a dismissal, an eviction) no ceremony: "I'm sorry. The legal desk is checking your rights first."
+1. Follow SOUL's work-notice rule: the Telegram runtime announces research; elsewhere acknowledge briefly with the first tool call.
 2. Read this desk's memory line for this chat (see Memory). Use it as context only. Country and city come from the message or the household basics.
 3. Call `mcp__casefile__research_case`: `situation` = the person's words, then "What are my rights here, what is the time limit to object or appeal, and which authority handles it?"; `country`, `region`, `language`; `scope` `official`; `household` from the household basics plus this desk's line. Pass a shared letter's text as `document`.
 4. Post one message: the line "From the legal desk, in N articles:" (none on bad news), then up to 5 plan lines exactly as returned, citation numbers included. Put a line that states a time limit first. Then "N of M quotes checked on their pages", each unverified item as "AIDaddy could not confirm this: …", and the case link.
