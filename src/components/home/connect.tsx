@@ -6,7 +6,7 @@ import { useState } from "react";
 import type { AppName } from "@/lib/home-demo";
 import { AppLogo, BackButton, useNav } from "./ui";
 
-const GROUPS: { title: string; apps: [AppName, string, string?][] }[] = [
+export const GROUPS: { title: string; apps: [AppName, string, string?][] }[] = [
   { title: "Messages", apps: [["WhatsApp", "The family group"], ["Telegram", "Chats you add UKK to"]] },
   { title: "Email and calendar", apps: [["Gmail", "Bills, bookings, letters"], ["Calendar", "Birthdays, shifts, free time", "Google Calendar"]] },
   { title: "School and daycare", apps: [["Wilma", "Messages from school and daycare"]] },
