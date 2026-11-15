@@ -11,7 +11,7 @@ import { Wordmark } from "@/components/site/wordmark";
  */
 const NAV: { href: string; label: string; short?: string; under: string[] }[] = [
   { href: "/demo", label: "Demos", under: ["/demo", "/autopilot"] },
-  { href: "/try", label: "Try it live", under: ["/try", "/c/"] },
+  { href: "/try", label: "Try AIDaddy without setup", under: ["/try", "/c/"] },
   { href: "/chat", label: "Talk to AIDaddy", short: "Talk", under: ["/chat"] },
   { href: "/setup", label: "Set up", under: ["/setup"] },
 ];

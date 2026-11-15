@@ -1157,7 +1157,7 @@
   background: var(--hud-cyan);
 }
 
-/* On a phone the four links take their own row under the name. */
+/* On a phone the four links go under the name and wrap onto two rows, so none is pushed off the screen. */
 @media (max-width: 639px) {
   .site-header-row {
     padding-top: 0.25rem;
@@ -1165,10 +1165,9 @@
   .site-nav {
     width: 100%;
     margin-left: 0;
-    justify-content: space-between;
-    gap: 0 0.6rem;
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0 1.1rem;
   }
   .site-nav a {
     letter-spacing: 0.06em;

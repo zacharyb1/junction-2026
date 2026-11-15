@@ -1,5 +1,5 @@
 import { allow } from "@/lib/rate-limit";
-import { renderSpeech, speechHash, spokenLanguage, spokenText } from "@/lib/speech";
+import { renderSpeech, speechHash, spokenDelivery, spokenLanguage, spokenText } from "@/lib/speech";
 import { loadAudio, loadCase, saveAudio } from "@/lib/store";
 
 export const maxDuration = 30;
@@ -10,8 +10,8 @@ const notFound = () => Response.json({ error: "not found" }, { status: 404 });
 const rendering = new Map<string, Promise<Buffer>>();
 
 /** Phones ask for a byte range before they play anything, so ranges are answered. */
-function audioResponse(req: Request, audio: Buffer): Response {
-  const headers = { "content-type": "audio/mpeg", "cache-control": "private, max-age=3600", "accept-ranges": "bytes" };
+function audioResponse(req: Request, audio: Buffer, voice: Record<string, string>): Response {
+  const headers = { "content-type": "audio/mpeg", "cache-control": "private, max-age=3600", "accept-ranges": "bytes", ...voice };
   const size = audio.length;
   const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.get("range") ?? "");
   if (!range || (!range[1] && !range[2])) {
@@ -38,10 +38,13 @@ export async function GET(req: Request, ctx: RouteContext<"/api/cases/[id]/audio
   if (!c) return notFound();
 
   const text = spokenText(c);
+  // The voice fits the case: read in the case's language, gently after bad news, brighter after good news.
   const language = spokenLanguage(c);
-  const hash = speechHash(text, language);
+  const delivery = spokenDelivery(c);
+  const voice = { "x-spoken-language": language ?? "as written", "x-spoken-delivery": delivery };
+  const hash = speechHash(text, language, delivery);
   const stored = await loadAudio(id, hash);
-  if (stored) return audioResponse(req, stored);
+  if (stored) return audioResponse(req, stored, voice);
 
   const key = `${id}-${hash}`;
   let job = rendering.get(key);
@@ -50,7 +53,7 @@ export async function GET(req: Request, ctx: RouteContext<"/api/cases/[id]/audio
     if (!allow(req, false)) {
       return Response.json({ error: "The demo is busy. Please try again in a minute." }, { status: 429 });
     }
-    job = renderSpeech(text, language)
+    job = renderSpeech(text, { language, delivery })
       .then(async (audio) => {
         // A failed save only means the next request renders again.
         await saveAudio(id, hash, audio).catch(() => {});
@@ -60,7 +63,7 @@ export async function GET(req: Request, ctx: RouteContext<"/api/cases/[id]/audio
     rendering.set(key, job);
   }
   try {
-    return audioResponse(req, await job);
+    return audioResponse(req, await job, voice);
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "speech failed" }, { status: 502 });
   }

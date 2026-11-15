@@ -321,10 +321,22 @@ address straight to Telegram as a voice message, and the case page plays it behi
   No summary, no advice, nothing rephrased. A step with a `conflict` gets the fixed sentence
   "Two different figures were found for this step. See the case file." The connecting words are Finnish for a Finnish case.
 - At most 1,500 characters. A longer plan loses whole steps from the end, never part of a sentence.
-- Model `eleven_flash_v2_5`. A Finnish case is sent with `language_code: "fi"`, so the voice does not change language
-  on its own for an English phrase quoted inside the plan. Other cases are sent without a language.
+- The voice fits the case (`spokenLanguage`, `spokenDelivery` in `src/lib/speech.ts`), chosen from the stored case,
+  never by a model:
+  - **Language.** A case in Finnish, Swedish, German, Spanish, French, Ukrainian or Estonian is sent with its
+    `language_code`, so the voice does not change language on its own for an English phrase quoted inside the plan.
+    English cases are sent without a language. Model `eleven_flash_v2_5`; Estonian uses `eleven_v4_turbo`, because
+    the fast model answers 400 for it.
+  - **Delivery.** `gentle` (stability 0.7, speed 0.92) when the event or title names bad news: a dismissal, a fine,
+    an eviction, an illness, a cancellation. `bright` (stability 0.4, speed 1.02) for good news: a baby, a wedding,
+    a new job. `plain`, the voice as designed, for everything else. Bad news wins when a case holds both. The case
+    page says "Read slowly and calmly." or "Read in a lighter voice." under the button.
+  - **The name.** "AIDaddy" is sent to the voice as "AI Daddy": as one word it was heard as "Hey, Daddy" in English
+    and "iDaddy" in Finnish.
+  - The answer carries `x-spoken-language` (a code, or `as written`) and `x-spoken-delivery`.
 - Each version of the spoken text is rendered once and stored next to the case (`audio/<id>-<hash>.mp3`), so a second
-  request costs nothing. An updated case gets new audio on the next request.
+  request costs nothing. An updated case gets new audio on the next request, and so does a case whose language,
+  model or delivery is now different.
 - Supports `Range` requests. Sends `cache-control: private, max-age=3600`.
 - Errors: `404` unknown case, or `ELEVENLABS_API_KEY` is not set (the button is then not shown), `429` rate limited
   (only requests that would render new audio count), `502` ElevenLabs failed or took longer than 20 seconds.

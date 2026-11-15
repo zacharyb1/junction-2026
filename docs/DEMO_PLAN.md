@@ -4,7 +4,7 @@ Written Saturday 14 November, 09:05 Helsinki, at Zachary's request. Freeze is 20
 
 This plan uses the new front page. Its run of show replaces the video table in [PITCH.md](PITCH.md), whose numbers are older. The story, the criteria table and the judge answers in PITCH.md still hold.
 
-Demo facts refreshed Sunday 15 November for the archive recovery and chat UI fixes (#72 and #77). Check that those revisions are deployed before rehearsing. The current landing replay is a new 10.3-second run with 9 of 9 quotes verified; the published 19-case scorecard below is a separate, unchanged measurement. Live voice still needs account setup and production acceptance under #76 and #75. The former homepage narration describes the old replay, so its button has been removed.
+Demo facts refreshed Sunday 15 November for the archive recovery and chat UI fixes (#72 and #77). Check that those revisions are deployed before rehearsing. The current landing replay is a new 10.3-second run with 9 of 9 quotes verified; the published 19-case scorecard below is a separate, unchanged measurement. Live voice still needs account setup and production acceptance under #76 and #75. The front page's "Hear the plan" button is back with narration rendered from the current replay case (35 seconds); it is a recording, so it works without the server key.
 
 ## 1. One sentence
 
@@ -49,7 +49,7 @@ Same order as the table above, without the judge's turn:
 6. **1:40 to 2:00:** the gauges, the one sentence, the QR code.
 
 - **Record the screen at 1280 by 800.** The page is built for that width, and for a phone.
-- **Voiceover:** the existing files are earlier recordings, not narration for this refreshed replay. Check every line against the chosen footage, including line 07's scorecard figures, before using them. Re-render changed lines only when ElevenLabs is configured; the current run of show does not depend on live voice or the removed homepage audio button.
+- **Voiceover:** the existing files are earlier recordings, not narration for this refreshed replay. Check every line against the chosen footage, including line 07's scorecard figures, before using them. Re-render changed lines only when ElevenLabs is configured; the current run of show does not depend on live voice. The front page's "Hear the plan" button plays a recording of the current replay case and can be used.
 - **Record a backup of every live part today.** The web is live and the venue network is shared.
 
 ## 5. The table
