@@ -107,7 +107,7 @@ function ReplyLink({ url }: { url: string }) {
 const MARKDOWN_IMAGE = /!\[[^\]\n]*\]\(https?:\/\/[^\s)]*\)?\n?/g;
 
 /** Reply text with its URLs as links (case files, official pages and shops). */
-function Linked({ text }: { text: string }) {
+export function Linked({ text }: { text: string }) {
   return (
     <>
       {text
