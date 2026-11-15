@@ -59,6 +59,7 @@ describe("messages", () => {
       details: "practical details",
       rule: "what the law or customs rule says",
       conditions: "limits, permits and penalties",
+      agent: "Exa Agent, research in several steps",
     });
     expect(m.pinnedOpen(finland)).toBe(
       "Pinned to Espoo, Finland. This is a choice, not a rule, so searching the open web and labelling each source.",

@@ -38,7 +38,12 @@ export const ResearchInput = z.object({
   language: z.string().trim().min(2).max(20).default("en").describe("Language to write the plan in, e.g. en, fi, sv."),
   household: z.string().trim().max(600).optional().describe("Known facts about the household: who works where, residence status."),
   document: z.string().trim().max(6000).optional().describe("Text of a letter or document the family shared."),
-  depth: z.enum(["fast", "deep"]).default("fast").describe("fast: about 6 to 12 seconds. deep: more questions and Exa deep search."),
+  depth: z
+    .enum(["fast", "deep", "agent"])
+    .default("fast")
+    .describe(
+      "fast: about 6 to 12 seconds. deep: more questions and Exa deep search. agent: one Exa Agent run that researches in several steps, about 30 to 60 seconds.",
+    ),
   scope: z
     .enum(["auto", "official", "open"])
     .default("auto")
@@ -65,6 +70,11 @@ export type EngineEvent =
       tookMs: number;
       ms: number;
     }
+  /**
+   * The first pages on the topic, from one Exa lite search, while the structured searches are still running.
+   * Pointers to look at, not checked claims: nothing from them enters the plan.
+   */
+  | { type: "glance"; pages: { url: string; title: string; official: boolean }[]; tookMs: number; ms: number }
   /** One cited page, as soon as it has been read. `via` is the most direct reader that opened it. */
   | { type: "page"; url: string; title: string; official: boolean; via: PageReader; ms: number }
   /** Sent once the case is stored: how many quoted sentences were confirmed on their pages. */
@@ -114,6 +124,13 @@ type ExaSearchResponse = {
   output?: { content?: unknown; grounding?: Grounding[] };
   costDollars?: { total?: number };
 };
+/** A finished Exa Agent run, as far as the engine reads it. */
+type ExaAgentRun = {
+  id: string;
+  status: string;
+  output?: { structured?: unknown; grounding?: Grounding[] } | null;
+  costDollars?: { total?: number } | null;
+};
 
 // Ten properties in total, nesting depth two: the limits of Exa's structured search output.
 const OUTPUT_SCHEMA = {
@@ -148,6 +165,14 @@ const OUTPUT_SCHEMA = {
   },
   required: ["title", "summary", "steps"],
 } as const;
+
+/** The same shape for an Exa Agent run. The Agent API asks for a bound on every list. */
+const AGENT_SCHEMA = {
+  ...OUTPUT_SCHEMA,
+  properties: { ...OUTPUT_SCHEMA.properties, steps: { ...OUTPUT_SCHEMA.properties.steps, maxItems: 8 } },
+};
+/** How long one Agent run may take before the usual searches take over. */
+const AGENT_TIMEOUT_MS = 100_000;
 
 /** The date a page prints for itself: "Published 18/11/2025", "Julkaistu 13.5.2026". ISO form, or null. */
 function statedDate(text: string): string | null {
@@ -602,6 +627,32 @@ export async function researchCase(
   const questions: string[] = [];
   const given = `${input.situation}\n${input.document ?? ""}\n${input.household ?? ""}`;
 
+  /** The steps a search or an agent run proposed, as candidates for the page check. */
+  const candidates = (out: RawOutput | null, graded: Map<number, Confidence>): Candidate[] =>
+    (out?.steps ?? [])
+      .map((s, index) => ({ ...s, confidence: graded.get(index) }))
+      .filter((s) => s.title && s.quote && s.sourceUrl && /^https?:\/\//.test(s.sourceUrl) && !JUNK.test(s.title))
+      .map((s) => {
+        // A value the family told us themselves (for example the rent in their letter) is not a claim to verify.
+        const own = (value: string | undefined) => (value && contains(given, value) ? undefined : value);
+        const due = own(tidy(s.due));
+        const amount = realAmount(own(tidy(s.amount)), due);
+        const url = s.sourceUrl!.trim();
+        const quote = clip(s.quote, LIMITS.quote);
+        const facts: Fact[] = [];
+        if (due) facts.push({ kind: "deadline", value: due, url, quote });
+        if (amount) facts.push({ kind: "amount", value: amount, url, quote });
+        return {
+          confidence: s.confidence,
+          title: clip(s.title, 140),
+          detail: JUNK.test(s.detail ?? "") ? undefined : clip(s.detail, 600) || undefined,
+          facts,
+          quote,
+          url,
+          official: isOfficial(url, j),
+        };
+      });
+
   async function search(focus: Focus, restrict: boolean): Promise<Candidate[]> {
     stage("search", m.searching(Boolean(restrict && official.length), focus.name));
     usage.searches++;
@@ -655,31 +706,97 @@ export async function researchCase(
         graded.set(Number(m[1]), g.confidence);
       }
     }
-    const proposed = (out?.steps ?? [])
-      .map((s, index) => ({ ...s, confidence: graded.get(index) }))
-      .filter((s) => s.title && s.quote && s.sourceUrl && /^https?:\/\//.test(s.sourceUrl) && !JUNK.test(s.title))
-      .map((s) => {
-        // A value the family told us themselves (for example the rent in their letter) is not a claim to verify.
-        const own = (value: string | undefined) => (value && contains(given, value) ? undefined : value);
-        const due = own(tidy(s.due));
-        const amount = realAmount(own(tidy(s.amount)), due);
-        const url = s.sourceUrl!.trim();
-        const quote = clip(s.quote, LIMITS.quote);
-        const facts: Fact[] = [];
-        if (due) facts.push({ kind: "deadline", value: due, url, quote });
-        if (amount) facts.push({ kind: "amount", value: amount, url, quote });
-        return {
-          confidence: s.confidence,
-          title: clip(s.title, 140),
-          detail: JUNK.test(s.detail ?? "") ? undefined : clip(s.detail, 600) || undefined,
-          facts,
-          quote,
-          url,
-          official: isOfficial(url, j),
-        };
-      });
+    const proposed = candidates(out, graded);
     report("done", proposed.length, new Set(proposed.map((c) => c.url)).size);
     return proposed;
+  }
+
+  /**
+   * One Exa Agent run in place of the separate searches: the agent searches, reads and reasons in several steps
+   * and returns the same fields. What it proposes goes through the same page check as any search result.
+   */
+  async function agentSearch(asks: Focus[]): Promise<Candidate[]> {
+    stage("search", m.agentSearching);
+    usage.searches++;
+    const began = Date.now();
+    const report = (status: "running" | "done" | "failed", steps = 0, pages = 0) =>
+      // The agent is told which sites to prefer, but nothing limits it to them: "open" is the honest label.
+      emit({ type: "search", focus: m.focus.agent, web: "open", status, steps, pages, tookMs: Date.now() - began, ms: since() });
+    report("running");
+    const named = official.filter((d) => !d.startsWith("*")).slice(0, 40);
+    const query = [
+      context,
+      `Research task: ${asks.map((a) => a.ask).join(" ")}`,
+      // One run covers what three searches cover, so it may return more steps than one search does.
+      system.replace("At most five steps", "At most eight steps"),
+      named.length ? `Search these official sites first and prefer them over any other source: ${named.join(", ")}.` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+    let id = "";
+    try {
+      const created = (await withRetry(() =>
+        exa.agent.runs.create({ query, effort: "low", outputSchema: AGENT_SCHEMA } as never),
+      )) as unknown as ExaAgentRun;
+      id = created.id;
+      const done = (await exa.agent.runs.pollUntilFinished(id, {
+        pollInterval: 2_000,
+        timeoutMs: AGENT_TIMEOUT_MS,
+      })) as unknown as ExaAgentRun;
+      // Only a completed run carries results. A failed or cancelled one must not look like an empty success.
+      if (done.status !== "completed") throw new Error(`Exa Agent run ended as ${done.status}`);
+      usage.costDollars += done.costDollars?.total ?? 0;
+      const grounding = done.output?.grounding ?? [];
+      for (const g of grounding) for (const c of g.citations ?? []) if (c.title && !titles.has(c.url)) titles.set(c.url, c.title);
+      const out = parseOutput(done.output?.structured);
+      if (out) head = { title: out.title, summary: out.summary };
+      for (const q of out?.questions ?? []) if (q) questions.push(q);
+      const graded = new Map<number, Confidence>();
+      for (const g of grounding) {
+        const at = g.field.match(/^(?:structured\.)?steps\[(\d+)\](?:\.quote)?$/);
+        if (at && (g.confidence === "low" || g.confidence === "medium" || g.confidence === "high")) {
+          graded.set(Number(at[1]), g.confidence);
+        }
+      }
+      const proposed = candidates(out, graded);
+      report("done", proposed.length, new Set(proposed.map((c) => c.url)).size);
+      return proposed;
+    } catch (error) {
+      report("failed");
+      // A run that is still going after the time limit would keep spending. Stopping it is best effort.
+      if (id) void exa.agent.runs.cancel(id).catch(() => {});
+      throw error;
+    }
+  }
+
+  /**
+   * A first look while the research runs: Exa lite answers from its index in well under a second.
+   * The pages are shown as pointers. Nothing from them enters the plan, which only holds checked quotes.
+   */
+  async function firstLook(): Promise<void> {
+    const began = Date.now();
+    usage.searches++;
+    const res = (await exa.search(
+      `${clip(input.situation, 300)} ${where}`,
+      {
+        type: "lite",
+        numResults: 5,
+        userLocation: j.code,
+        contents: { highlights: true },
+        ...(official.length ? { includeDomains: official } : {}),
+      } as never,
+      { timeout: 5_000 } as never,
+    )) as unknown as ExaSearchResponse;
+    usage.costDollars += res.costDollars?.total ?? 0;
+    const pages = (res.results ?? [])
+      .filter((r) => /^https?:\/\//.test(r.url))
+      .slice(0, 5)
+      .map((r) => ({ url: r.url, title: clip(r.title ?? "", 200) || hostOf(r.url), official: isOfficial(r.url, j) }));
+    if (!pages.length) return;
+    for (const page of pages) if (!titles.has(page.url)) titles.set(page.url, page.title);
+    const tookMs = Date.now() - began;
+    trailEvents.push({ ms: since(), detail: m.firstLook([...new Set(pages.map((p) => hostOf(p.url)))], (tookMs / 1000).toFixed(1)) });
+    emit({ type: "glance", pages, tookMs, ms: since() });
   }
 
   // One failed search must not sink the case: the others still carry it.
@@ -732,7 +849,22 @@ export async function researchCase(
       .filter((n) => n.date >= since.slice(0, 10));
   }
   const asks = scope === "open" ? choiceFocuses(m.focus) : ruleCheck ? ruleFocuses(m.focus) : focuses(input, m.focus);
-  let found = await run(asks, true);
+  // Runs beside the research and never holds it up. A failed first look costs nothing but the look.
+  const glance = firstLook().catch(() => {});
+  let found: Candidate[] = [];
+  if (input.depth === "agent") {
+    found = await agentSearch(asks).catch((error: unknown) => {
+      lastError = error;
+      return [];
+    });
+    // Too little from the agent: the usual searches run too, so this mode never returns less than the fast one.
+    if (found.length < 3) {
+      stage("search", m.agentFellBack);
+      found = [...found, ...(await run(asks, true))];
+    }
+  } else {
+    found = await run(asks, true);
+  }
   // Too little from official sites: widen to the open web once.
   if (found.length < 3 && official.length) found = [...found, ...(await run(asks.slice(0, 2), false))];
   if (!found.length) {
@@ -750,6 +882,8 @@ export async function researchCase(
       throw new EngineError(m.nothingToResearch, 422);
     }
   }
+  // The first look finished long ago, or gave up after its five seconds. Its cost and trail line belong to this case.
+  await glance;
   const searchMs = since();
 
   // Official sources first (stable sort keeps the lead focus on top), then merge near-duplicates.
