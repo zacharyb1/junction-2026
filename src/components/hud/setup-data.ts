@@ -41,10 +41,10 @@ export const CONNECTIONS: Connection[] = [
     label: "Connection 02",
     title: "Listening on your phone or laptop",
     description:
-      "Leave AIDaddy open on a device in the room. It follows what is said and lets small talk pass. When it hears a letter, a deadline, a life event or a plan that has rules, it looks up the official pages and shows what to do, before anyone asks.",
+      "Leave AIDaddy open on a device in the room. It follows what is said and lets small talk pass. When it hears a letter, a deadline, a life event or a plan that has rules, it looks up the official pages before anyone asks, and comes back with a call or a ping.",
     status: "first version",
     control: "It hears only while its page is open, and one button stops it. What it heard stays on the device and is gone when the page closes.",
-    limits: "Chrome, Edge and Safari, while the page is open and in front. It cannot listen from a locked phone, and the browser's own speech service turns the sound into text.",
+    limits: "Chrome, Edge and Safari, while the page is open and in front. It cannot listen from a locked phone, the call rings on that device only, and the browser's own speech service turns the sound into text.",
     action: { label: "Let AIDaddy listen", href: "/listen", kind: "page" },
     replay: { href: "/demo/talk", of: "AIDaddy at the kitchen table" },
   },
