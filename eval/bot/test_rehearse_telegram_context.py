@@ -1,6 +1,9 @@
 """The live rehearsal must fail when a transcript hides an unfinished step."""
 import unittest
+from pathlib import Path
+import tempfile
 
+import rehearsal_prompt
 from rehearsal_prompt import verify_skill_prompt
 from rehearse_telegram_context import (
     CASE_ID, CASE_URL, CHAT, CONTEXT, FORM_PLAN, FORM_PORTAL, PLAN,
@@ -14,6 +17,31 @@ INVALID_DVV_LETTER = {
     "kind": "letter", "title": "Notification of move to DVV",
     "body": "To: DVV\nSubject: Notification of move\nWe notify you of our move from Helsinki to Tampere on 1 December 2026. Please update our address.\n[Household names]",
 }
+
+
+class ConfiguredSkillsTest(unittest.TestCase):
+    def test_rehearsal_reads_all_skills_from_the_deployed_configuration(self):
+        sources = rehearsal_prompt.configured_skill_sources(Path(__file__).resolve().parents[2])
+        self.assertEqual(list(sources), ["life-event-butler", "letter-decoder", "deadline-keeper",
+                                         "birthday-planner", "law-check", "product-finder"])
+        proof = verify_skill_prompt("\n".join(sources.values()), sources, list(sources))
+        self.assertEqual(set(proof["skills"]), set(sources))
+
+    def test_missing_configured_skill_stops_before_rehearsal(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            (repo / "hermes").mkdir()
+            (repo / "hermes/configure.sh").write_text('set_key skills.auto_load \'["missing-skill"]\'\n')
+            with self.assertRaisesRegex(ValueError, "current SKILL.md.*missing-skill"):
+                rehearsal_prompt.configured_skill_sources(repo)
+
+    def test_dynamic_configuration_cannot_silently_fall_back_to_one_skill(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            (repo / "hermes").mkdir()
+            (repo / "hermes/configure.sh").write_text('set_key skills.auto_load "$AUTO_LOAD"\n')
+            with self.assertRaisesRegex(ValueError, "one literal skills.auto_load"):
+                rehearsal_prompt.configured_skill_sources(repo)
 
 
 class ContextRehearsalEvidenceTest(unittest.TestCase):
@@ -136,6 +164,28 @@ class ContextRehearsalEvidenceTest(unittest.TestCase):
             " — no letter draft is needed; you submit it yourselves. I never send anything on your behalf."
         )
         assert_rehearsal(report)
+
+    def test_accepts_explicitly_negated_drafting_and_sending(self):
+        report = self.form_report()
+        report["timeline"][2]["text"] += (
+            "\nSubmission route: the official online move service, or the paper form from an official service point"
+            " — no letter route is confirmed by the sources, so there is nothing for me to draft and send on your behalf."
+        )
+        assert_rehearsal(report)
+
+    def test_negation_does_not_hide_affirmative_filing_or_exceptions(self):
+        for claim in (
+            "I will draft and send a letter on your behalf.",
+            "There is nothing else for me to do except draft and send a letter on your behalf.",
+            "There is nothing for me to draft and send on your behalf, except this DVV notification.",
+            "There is nothing for me to draft and send on your behalf. I will draft and send a letter.",
+            "No letter route is confirmed by the sources, but I will draft and send a letter.",
+        ):
+            with self.subTest(claim=claim):
+                report = self.form_report()
+                report["timeline"][2]["text"] += "\n" + claim
+                with self.assertRaisesRegex(AssertionError, "preparation notes as a submission"):
+                    assert_rehearsal(report)
 
     def test_rejects_recommending_an_unsaved_filing_letter(self):
         report = self.form_report("unconfirmed-route")

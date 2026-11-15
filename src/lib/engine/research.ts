@@ -2,6 +2,7 @@ import Exa from "exa-js";
 import { z } from "zod";
 import { type CaseInput, type Evidence, type EvidenceInput, LIMITS } from "@/lib/case";
 import { publishCase } from "@/lib/cases";
+import { applicabilityFor } from "@/lib/engine/applicability";
 import {
   bestSupport,
   contains,
@@ -218,7 +219,7 @@ function systemPrompt(j: Jurisdiction, language: string): string {
   // Unlisted languages fall back to English.
   const lang = LANGUAGE_NAMES[language.toLowerCase().slice(0, 2)] ?? "English";
   return [
-    `You are preparing a practical checklist for a family living in ${j.region ? `${j.region}, ` : ""}${j.name}.`,
+    `You are preparing a practical checklist under the rules of ${j.region ? `${j.region}, ` : ""}${j.name}. The family's current residence and destination are the facts stated in their situation, not assumptions from this jurisdiction label.`,
     `Use the rules that apply in ${j.name} today. Prefer the authority's own pages over news, blogs or forums.`,
     "For every step, copy one sentence word for word from the source page into `quote`, in the page's own language, and give that page's exact URL in `sourceUrl`.",
     "Choose the sentence that states the rule, deadline or amount itself, so a reader can check the step from the quote alone.",
@@ -229,6 +230,7 @@ function systemPrompt(j: Jurisdiction, language: string): string {
     "The summary says only what the steps say, in plain words, with no urgency and no advice beyond the steps. Do not ask a question that the situation already answers.",
     `When the authority publishes the page in ${lang}, cite that version of the page.`,
     "Include only steps that directly help with this exact situation. Skip general information about neighbouring topics, and anything the sources do not cover.",
+    "For each rule, check its prerequisites against the full situation and household. An authentic quote about arriving in a country does not establish a requirement for someone already living there and changing address. Do not assume citizenship, permanent residence or a pending application. Keep the conditions of relevant benefits explicit.",
     "At most five steps, in the order the family does them. Five well-sourced steps beat ten vague ones. One step per separate application or notice the family must file.",
     "`detail` restates what the quote says in plain words and adds nothing the page does not say.",
     "When a rule differs by contract date, permit type or another fact you do not have, give one step per branch and name the branch in its title. Prefer the national authority's page over an EU-level page when both cover the rule.",
@@ -248,7 +250,8 @@ const withoutOrders = (document: string) =>
 function frame(input: ResearchInput, j: Jurisdiction): string {
   const where = `${j.region ? `${j.region}, ` : ""}${j.name}`;
   return [
-    `Situation of a family living in ${where}: ${input.situation}`,
+    `Research jurisdiction: ${where}. The stated origin and destination below take precedence over this search location.`,
+    `Family's situation: ${input.situation}`,
     input.household ? `About the household: ${input.household}` : "",
     input.document ? `They received this document:\n"""\n${withoutOrders(input.document).slice(0, 3000)}\n"""` : "",
   ]
@@ -517,12 +520,23 @@ const MONEY = /[€$£%]|\b(eur|euros?|euroa|usd|dollars?|pounds?|gbp|sek|nok|dk
 const TIMING =
   /\b(before|after|within|no later|at the latest|deadline|by the end|prior to|as soon as|week \d|weeks? of|ennen|viimeistään|kuluessa|menness|jälkeen|senast|innan|inom|efter)\b/i;
 
-/** The model sometimes repeats the deadline in `amount`. Keep only real amounts and durations. */
+// A duration belongs in Money only when its verified sentence states a payment,
+// leave entitlement or someone else's duty. A photo age or document validity is
+// still useful source text, but being a verified period does not make it money.
+const ENTITLEMENT_PERIOD =
+  /\b(paid|payable|entitled|entitlement|maksetaan|betalas|gezahlt|bezahlt)\b|\b(receive|get|grant)\w*\b[^.;:!?]{0,80}\b(allowances?|benefits?|compensation|leave)\b|\b(parental|maternity|paternity|annual|sick|paid) leave\b/i;
+
+function moneyContext(value: string, sentence: string): boolean {
+  if (MONEY.test(value) || !["day", "week", "month", "year"].includes(unitOf(value))) return true;
+  return ENTITLEMENT_PERIOD.test(sentence) || (OTHERS_DUTY.test(sentence) && !OWN_DUTY.test(sentence)) || WAITING.test(sentence);
+}
+
+/** Reject malformed or duplicate amounts here; classify periods against their verified sentence later. */
 function realAmount(amount: string | undefined, due: string | undefined): string | undefined {
   if (!amount) return undefined;
   if (due && sameThing(amount, due)) return undefined;
-  // With a deadline already set, a second timing phrase is the deadline again. Without one it is a period
-  // someone else must keep, such as a notice period, which is an entitlement.
+  // With a deadline already set, a second timing phrase is the deadline again.
+  // Otherwise keep the candidate until its verified sentence establishes its role.
   if (due && TIMING.test(amount) && !MONEY.test(amount)) return undefined;
   if (/free of charge|income/i.test(amount)) return amount;
   // A bare number is not an amount: "14A" is a form, "112" a phone number. It needs money or a length of time.
@@ -605,7 +619,8 @@ export async function researchCase(
   const usage = { searches: 0, contents: 0, costDollars: 0 };
   const scope = resolveScope(input);
   const official = scope === "official" ? j.officialDomains : [];
-  const context = frame(input, j);
+  const applicability = applicabilityFor(input, j.name);
+  const context = [applicability.instructions, frame(input, j)].filter(Boolean).join("\n");
   const where = `${j.region ? `${j.region}, ` : ""}${j.name}`;
   const ruleCheck = scope === "official" && isRuleCheck(input);
   const system =
@@ -626,12 +641,18 @@ export async function researchCase(
   let head: RawOutput = {};
   const questions: string[] = [];
   const given = `${input.situation}\n${input.document ?? ""}\n${input.household ?? ""}`;
+  const inapplicable = new Set<string>();
 
   /** The steps a search or an agent run proposed, as candidates for the page check. */
   const candidates = (out: RawOutput | null, graded: Map<number, Confidence>): Candidate[] =>
     (out?.steps ?? [])
       .map((s, index) => ({ ...s, confidence: graded.get(index) }))
       .filter((s) => s.title && s.quote && s.sourceUrl && /^https?:\/\//.test(s.sourceUrl) && !JUNK.test(s.title))
+      .filter((s) => {
+        if (!applicability.exclusion({ ...s, sourceTitle: titles.get(s.sourceUrl!.trim()) })) return true;
+        inapplicable.add(s.title!);
+        return false;
+      })
       .map((s) => {
         // A value the family told us themselves (for example the rent in their letter) is not a claim to verify.
         const own = (value: string | undefined) => (value && contains(given, value) ? undefined : value);
@@ -696,7 +717,7 @@ export async function researchCase(
       for (const c of g.citations ?? []) if (c.title && !titles.has(c.url)) titles.set(c.url, c.title);
     }
     const out = parseOutput(res.output?.content);
-    if (out && (focus.lead || !head.title)) head = { title: out.title, summary: out.summary };
+    if (out && (focus.lead || !head.title)) head = { title: applicability.narrative(out.title), summary: applicability.narrative(out.summary) };
     for (const q of out?.questions ?? []) if (q) questions.push(q);
     // Exa grades how well each field is grounded in the pages it read.
     const graded = new Map<number, Confidence>();
@@ -749,7 +770,7 @@ export async function researchCase(
       const grounding = done.output?.grounding ?? [];
       for (const g of grounding) for (const c of g.citations ?? []) if (c.title && !titles.has(c.url)) titles.set(c.url, c.title);
       const out = parseOutput(done.output?.structured);
-      if (out) head = { title: out.title, summary: out.summary };
+      if (out) head = { title: applicability.narrative(out.title), summary: applicability.narrative(out.summary) };
       for (const q of out?.questions ?? []) if (q) questions.push(q);
       const graded = new Map<number, Confidence>();
       for (const g of grounding) {
@@ -871,6 +892,7 @@ export async function researchCase(
     if (lastError) {
       throw new EngineError(m.searchFailed(lastError instanceof Error ? lastError.message : String(lastError)), 502);
     }
+    if (inapplicable.size) throw new EngineError(m.nothingConfirmed, 502);
     // Nothing to research, or nothing found. Not a server fault, so the caller gets a message it can show.
     throw new EngineError(m.nothingToResearch, 422);
   }
@@ -964,7 +986,7 @@ export async function researchCase(
 
   stage("verify", m.checking);
   const evidence: EvidenceInput[] = [];
-  const unverified: string[] = [];
+  const unverified: string[] = [...inapplicable].map((title) => m.arrivalNotEstablished(title));
   /** Returns the citation number, or null when the case already holds as many sources as it may. */
   const cite = (url: string, quote: string): number | null => {
     const existing = evidence.find((e) => e.url === url && (contains(e.quote, quote) || contains(quote, e.quote)));
@@ -1121,6 +1143,7 @@ export async function researchCase(
       }
       const sentence = evidence.find((e) => e.n === n)?.quote ?? "";
       if (fact.kind === "deadline" && notOurDeadline(sentence)) {
+        if (!moneyContext(fact.value, sentence)) continue;
         // The time limit binds someone else, or is a waiting time or an example: it is listed under its own sentence.
         const label = sentenceLabel(n);
         if (money.length < LIMITS.money && !money.some((x) => x.label === label || sameFigure(x.amount, fact.value))) {
@@ -1142,6 +1165,7 @@ export async function researchCase(
           differ(target.due, first, fact.value, n);
         }
       } else {
+        if (!moneyContext(fact.value, sentence)) continue;
         // Two amounts for one step that share a unit but not a figure are shown side by side.
         const seen = amounts.get(target) ?? [];
         const clash = seen.find((a) => !sameNumbers(a.value, fact.value) && unitOf(a.value) === unitOf(fact.value));
@@ -1194,6 +1218,7 @@ export async function researchCase(
     const figures = figuresIn(evidence.find((e) => e.n === step.evidence[0])?.quote ?? "").filter((f) => !contains(given, f));
     const quote = evidence.find((e) => e.n === step.evidence[0])?.quote ?? "";
     const takes = (figure: string) => {
+      if (!moneyContext(figure, quote)) return;
       if (money.length >= LIMITS.money || money.some((m) => sameFigure(m.amount, figure))) return;
       const own = numbersIn(figure);
       // Already inside a line that rests on the same sentence ("€250" within "€250, €400 or €600").
@@ -1348,12 +1373,17 @@ export async function researchCase(
       .split(/(?<=[.!?])\s+/)
       .filter((part) => !disputed.some((d) => unitOf(d) && tokens(part).includes(unitOf(d)) && numbersIn(d).some((n) => numbersIn(part).includes(n))))
       .join(" ");
+  const retainedClaims = steps.map((step) => [step.title, step.detail,
+    ...step.evidence.map((n) => evidence.find((item) => item.n === n)?.quote),
+  ].filter(Boolean).join(" ")).join("\n");
   const caseInput: CaseInput = {
     title,
     event: key(title).split(" ").slice(0, 4).join("_").slice(0, 60) || "case",
     language: input.language,
     jurisdiction: { country: j.name, region: j.region },
-    summary: backed(withoutDisputed(clip(head.summary, 800)), cited) ?? m.sourcedPlan(clip(input.situation, 200)),
+    // The extracted summary may still paraphrase a discarded prerequisite even
+    // when its wording no longer names that prerequisite. Do not reuse it then.
+    summary: (!inapplicable.size && backed(withoutDisputed(clip(head.summary, 800)), cited)) || m.sourcedPlan(clip(input.situation, 200)),
     steps,
     money,
     evidence,
@@ -1361,6 +1391,7 @@ export async function researchCase(
     news: news.length ? news : undefined,
     unverified: dedupe(unverified, 6).map((u) => u.slice(0, 300)),
     openQuestions: questions
+      .filter((q) => applicability.keepQuestion(q, retainedClaims))
       .filter((q) => q.trim().endsWith("?") && backed(q, cited) === q.trim())
       // A question whose words are mostly in the family's own message has been answered already.
       .filter((q) => {

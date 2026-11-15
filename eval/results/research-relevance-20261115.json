@@ -1,0 +1,208 @@
+{
+  "issue": 123,
+  "date": "2026-11-15",
+  "limits": [
+    "Real Exa plus independent page readers, using a memory-only Case store. No Telegram or production Case writes.",
+    "The model rehearsal uses synthetic Engine results; its captured research arguments were then replayed through the real Engine.",
+    "These checks concern the observed first-arrival and Money defects, not general eligibility or all possible wording.",
+    "The raw final replay still contains two redundant origin-question phrasings. They are retained below unchanged; final deterministic regressions verify their removal. Formal registration status is unknown and is not inferred."
+  ],
+  "same_input_comparison": {
+    "input": {
+      "situation": "Home for us is Helsinki, Finland. It's just me and my partner, no children. We're moving to Tampere on 1 December 2026 and haven't checked what paperwork needs doing.",
+      "country": "Finland",
+      "region": "Tampere",
+      "language": "en",
+      "household": "Two adults, partners, no children. Current home: Helsinki, Finland. Moving to Tampere on 1 December 2026.",
+      "depth": "fast",
+      "scope": "auto"
+    },
+    "before": {
+      "verdict": "failed: initial-arrival tasks with complete domestic-move context",
+      "raw_report_sha256": "f5230001eda66acdb3451c396df9c26f13868f5b5c1b10065dfb25a82cb4ae4f",
+      "ms": 6626,
+      "cost_dollars": 0.032,
+      "plan": [
+        "Submit notification of move: at the latest one week after the move [1][2]",
+        "Apply for municipality of residence registration: within one month of sending the form [3]",
+        "Apply for Kela benefits after moving to Tampere: EUR 800.02 per month [4]",
+        "Notify Kela of your move to Tampere [5]",
+        "Apply for general housing allowance if needed: up to 70% of your housing costs [6]"
+      ],
+      "steps": [
+        {
+          "title": "Submit notification of move",
+          "detail": "You must submit a notification of move to both Posti and the Population Information System when you move.",
+          "due": "at the latest one week after the move"
+        },
+        {
+          "title": "Apply for municipality of residence registration",
+          "detail": "If you have a Finnish personal identity code and intend to stay in Finland for more than a year, you must apply to register your municipality of residence and visit a DVV service location in person.",
+          "due": "within one month of sending the form"
+        },
+        {
+          "title": "Apply for Kela benefits after moving to Tampere",
+          "detail": "If you do not live in Finland permanently, you can qualify for Kela benefits if you work in Finland and earn at least this amount.",
+          "due": null
+        },
+        {
+          "title": "Notify Kela of your move to Tampere",
+          "detail": "You need to notify Kela that you have moved to Finland by submitting a notification in the OmaKela e-service.",
+          "due": null
+        },
+        {
+          "title": "Apply for general housing allowance if needed",
+          "detail": "If your income is low, you can apply for general housing allowance through the OmaKela service or on a form.",
+          "due": null
+        },
+        {
+          "title": "Apply for a residence permit (if required)",
+          "detail": "If you are a citizen of a country outside the Nordic countries, EU, Liechtenstein, or Switzerland, you must apply for a residence permit from the Finnish Immigration Service before moving.",
+          "due": null
+        },
+        {
+          "title": "Apply for a Finnish ID card",
+          "detail": "Once you have a personal identity number from DVV, you can apply for a Finnish ID card at a police station.",
+          "due": null
+        }
+      ],
+      "money": [
+        {
+          "label": "Apply for Kela benefits after moving to Tampere",
+          "amount": "EUR 800.02 per month",
+          "evidence": [
+            4
+          ]
+        },
+        {
+          "label": "Apply for general housing allowance if needed",
+          "amount": "up to 70% of your housing costs",
+          "evidence": [
+            6
+          ]
+        }
+      ],
+      "verified": 8,
+      "evidence_total": 8,
+      "source_urls": [
+        "https://dvv.fi/en/-/tips-for-submitting-a-change-of-address-notification",
+        "https://infofinland.fi/moving-to-finland/moving-to-finland-checklist",
+        "https://lomakkeet.dvv.fi/lomakkeet/6889/lomakkeet.html?rinnakkaislomake=en",
+        "https://www.kela.fi/general-housing-allowance",
+        "https://www.kela.fi/moving-to-finland",
+        "https://www.suomi.fi/citizen/rights-and-participation-in-society/welcome-to-adulthood/guide/moving-to-your-first-own-home",
+        "https://www.suomi.fi/guides/work-in-finland/before-finland/life-in-finland",
+        "https://www.tampere.fi/en/relocation-guide-tampere/moving-tampere"
+      ],
+      "open_questions_as_returned": [
+        "Do you hold citizenship from a Nordic country, the EU, Liechtenstein, or Switzerland?",
+        "Are you moving for work or to live with a family member already in Finland?",
+        "Do you currently have a Finnish personal identity code?"
+      ],
+      "unverified": []
+    },
+    "after": {
+      "verdict": "passed targeted plan checks: domestic notification and conditional housing benefit; no first-arrival tasks or photo-age Money",
+      "raw_report_sha256": "2b257d93f5dd4a072eb72ad6d0557982b17f886b12c85ddeb238d438c5730750",
+      "ms": 7845,
+      "cost_dollars": 0.025,
+      "plan": [
+        "Apply for general housing allowance [1]",
+        "Submit a notification of move to DVV: no later than one week after the move [2]"
+      ],
+      "steps": [
+        {
+          "title": "Apply for general housing allowance",
+          "detail": "If you have a low income, you may apply for general housing allowance through the OmaKela e-service or by using a form.",
+          "due": null
+        },
+        {
+          "title": "Submit a notification of move to DVV",
+          "detail": "You must notify the Digital and Population Data Services Agency (DVV) of your new address in Tampere. You can submit this notification online at muuttoilmoitus.fi.",
+          "due": "no later than one week after the move"
+        }
+      ],
+      "money": [],
+      "verified": 2,
+      "evidence_total": 2,
+      "source_urls": [
+        "https://dvv.fi/en/-/tips-for-submitting-a-change-of-address-notification",
+        "https://www.kela.fi/general-housing-allowance"
+      ],
+      "open_questions_as_returned": [
+        "Are you Nordic, EU, or non-EU citizens?"
+      ],
+      "unverified": [
+        "Register your address with DVV in Tampere: left out because the family already lives in this country and this move does not establish the source's arrival or initial-application prerequisite.",
+        "Apply for general housing allowance: \"up to 70% of your housing costs\" is on the cited page (kela.fi), but not in a sentence about this step, so it is not shown with it."
+      ]
+    }
+  },
+  "model_report": "telegram-six-skills-20261115.json",
+  "captured_model_request": {
+    "situation": "Moving from Helsinki to Tampere on 1 December 2026, Finland. Just me and my partner, no children. Haven't checked what paperwork needs doing for the move.",
+    "country": "Finland",
+    "region": "Tampere",
+    "language": "en",
+    "household": "Home: Helsinki, Finland. Household: me and partner, no children. Moving to Tampere on 1 December 2026.",
+    "depth": "fast",
+    "scope": "auto"
+  },
+  "captured_request_replay": {
+    "verdict": "passed targeted plan checks: no first-arrival tasks or photo-age Money; all four quotes verified",
+    "raw_report_sha256": "0cb3e69e992e4c5e21d5b503879d1cb9ce420c5c815b2f9c44682d5904c35aad",
+    "ms": 8634,
+    "cost_dollars": 0.032,
+    "plan": [
+      "Submit notification of move to DVV: one week after the move [1]",
+      "Give notice on current rental dwelling [2]",
+      "Notify your building manager [3]",
+      "Apply for general housing allowance: maximum of 70 percent of housing costs [4]"
+    ],
+    "steps": [
+      {
+        "title": "Submit notification of move to DVV",
+        "detail": "You must submit a notification of move to the Digital and Population Data Services Agency. This can be done online or via a paper form at service locations.",
+        "due": "one week after the move"
+      },
+      {
+        "title": "Give notice on current rental dwelling",
+        "detail": "If you are currently living in a rental apartment, notify your landlord of your departure, generally observing one month's notice.",
+        "due": null
+      },
+      {
+        "title": "Notify your building manager",
+        "detail": "If you are moving from a block of flats or terraced house, you must inform the property manager of your move.",
+        "due": null
+      },
+      {
+        "title": "Apply for general housing allowance",
+        "detail": "General housing allowance is available for rental apartments and is calculated based on household size and location. You must pay at least 30 percent of your housing costs yourself.",
+        "due": null
+      }
+    ],
+    "money": [
+      {
+        "label": "Apply for general housing allowance",
+        "amount": "maximum of 70 percent of housing costs",
+        "evidence": [
+          4
+        ]
+      }
+    ],
+    "verified": 4,
+    "evidence_total": 4,
+    "source_urls": [
+      "https://infofinland.fi/housing/moving-house",
+      "https://www.kela.fi/documents/d/guest/selkokielinen-esite-yleinen-asumistuki"
+    ],
+    "open_questions_as_returned": [
+      "Are you already registered as a resident in Finland?",
+      "Is your current address in Finland?",
+      "Are you moving to Finland from abroad or moving within Finland?"
+    ],
+    "unverified": [
+      "Register at DVV service location: left out because the family already lives in this country and this move does not establish the source's arrival or initial-application prerequisite."
+    ]
+  }
+}
