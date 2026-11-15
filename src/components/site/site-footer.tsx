@@ -47,6 +47,9 @@ export function SiteFooter() {
                 <Link href="/demo/calendar">In the calendar</Link>
               </li>
               <li>
+                <Link href="/demo/call">On the phone</Link>
+              </li>
+              <li>
                 <SiteLink href="/autopilot">One step ahead</SiteLink>
               </li>
             </ul>

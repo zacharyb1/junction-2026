@@ -1,0 +1,222 @@
+/*
+ * /demo/call: AIDaddy calls someone's boss in a copy of their voice. A concept, drawn as AIDaddy's own screen on a phone,
+ * in the site's warm palette by hand. Every selector is prefixed calldemo-.
+ * The page around the phone (ground, heading, scene line, caption) is the shared frame in src/components/demo/demo.css.
+ */
+.calldemo {
+  position: relative;
+  display: flex;
+  width: min(390px, 100%);
+  /* --demo-chrome is how much of the screen's height the frame around the phone takes. The scene line and the caption take 5rem more. */
+  height: min(800px, calc(100dvh - var(--demo-chrome, 4rem) - 5rem));
+  min-height: min(480px, 100dvh);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e5dccf;
+  border-radius: 30px;
+  background: #fbf8f3;
+  box-shadow:
+    0 1px 2px rgb(60 40 25 / 0.06),
+    0 30px 80px rgb(60 40 25 / 0.18);
+  color: #211b17;
+}
+.calldemo-status {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 2.2rem 1rem 0.9rem;
+  border-bottom: 1px solid #efe8dd;
+  color: #6b625b;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.calldemo-light {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 50%;
+  background: #a39685;
+}
+.calldemo-light.is-live {
+  background: #b84f2a;
+  animation: calldemo-pulse 1.2s ease-in-out infinite;
+}
+.calldemo-scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow-y: auto;
+  padding: 0.9rem 0.9rem 1rem;
+  scrollbar-width: none;
+}
+.calldemo-line,
+.calldemo-said {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-width: 88%;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(60 40 25 / 0.06);
+  font-size: 0.92rem;
+  line-height: 1.38;
+  animation: calldemo-in 0.35s ease-out;
+}
+.calldemo-line--mikko {
+  align-self: flex-end;
+  background: #f1ebe2;
+}
+.calldemo-who {
+  color: #6b625b;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.calldemo-line--aidaddy .calldemo-who,
+.calldemo-said--aidaddy .calldemo-who {
+  color: #9d4122;
+}
+.calldemo-card {
+  padding: 0.85rem 0.9rem;
+  border: 1px solid #e5dccf;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(60 40 25 / 0.05), 0 8px 24px rgb(60 40 25 / 0.05);
+  animation: calldemo-in 0.4s ease-out;
+}
+.calldemo-card.is-settled {
+  opacity: 0.8;
+}
+.calldemo-card--done {
+  border-color: rgb(46 139 87 / 0.4);
+  background: #f3f9f5;
+}
+.calldemo-card-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9d4122;
+}
+.calldemo-card--done .calldemo-card-title {
+  color: #23744a;
+}
+.calldemo-facts {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+}
+.calldemo-facts dt {
+  color: #6b625b;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.calldemo-facts dd {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.38;
+}
+.calldemo-buttons {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+}
+.calldemo-buttons span {
+  flex: 1;
+  padding: 0.55rem 0.3rem;
+  border: 1px solid #e5dccf;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+}
+.calldemo-buttons span.is-primary {
+  border-color: #b84f2a;
+  background: #b84f2a;
+  color: #fff;
+}
+.calldemo-buttons span.is-pressed {
+  border-color: rgb(46 139 87 / 0.4);
+  background: #e3f1e8;
+  color: #23744a;
+}
+.calldemo-call {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 16px;
+  background: #fdf3ee;
+  animation: calldemo-in 0.4s ease-out;
+}
+.calldemo-call-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.calldemo-call-head img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+.calldemo-call-head img.is-ringing {
+  animation: calldemo-ring 0.9s ease-in-out infinite;
+}
+.calldemo-call-head img.is-talking {
+  animation: calldemo-pulse 1.4s ease-in-out infinite;
+}
+.calldemo-call-name {
+  margin: 0;
+  font-weight: 650;
+}
+.calldemo-call-state {
+  margin: 0;
+  color: #6b625b;
+  font-size: 0.8rem;
+}
+.calldemo-said--sari {
+  align-self: flex-end;
+  background: #f1ebe2;
+}
+.calldemo-result {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.38;
+  list-style: disc;
+}
+.site .calldemo-scroll:focus-visible {
+  outline-offset: -3px;
+}
+@keyframes calldemo-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes calldemo-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes calldemo-ring {
+  25% {
+    transform: rotate(-9deg);
+  }
+  75% {
+    transform: rotate(9deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .calldemo,
+  .calldemo * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

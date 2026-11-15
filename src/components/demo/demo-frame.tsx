@@ -16,7 +16,7 @@ export function demoMode(params: DemoParams): { loop: boolean; bare: boolean } {
 }
 
 /**
- * The frame the four replays share: the site's header and footer, the links between the replays, the scene's
+ * The frame the replays share: the site's header and footer, the links between the replays, the scene's
  * name, what kind of thing it is, a Replay button, the stage and the caption.
  *
  * `shape` is the thing on the stage: a phone stands beside its heading on a wide screen, a wide window sits under it.

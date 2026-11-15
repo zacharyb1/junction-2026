@@ -5,6 +5,7 @@
  *   node scripts/make-deck.mjs                 photographs the live site, then builds the deck
  *   node scripts/make-deck.mjs --no-shots      keeps the pictures in docs/pitch/deck/img
  *   node scripts/make-deck.mjs --base http://localhost:3000
+ *   node scripts/make-deck.mjs --no-story      leaves out the opening slide about Saturday night
  *
  * Every figure on a slide is read from a file a script wrote: src/data/scorecard.json (the eval harness),
  * eval/results/gate-gemma3-1b.json (the gate's labelled set), src/data/replay.json (one recorded run) and
@@ -129,7 +130,8 @@ const FLOW = [
 ];
 
 const slides = [
-  slide(
+  // The opening slide is the team's own account of Saturday night. --no-story builds the deck without it.
+  ...(process.argv.includes("--no-story") ? [] : [slide(
     "story",
     "Saturday night · Junction 2026",
     `<div class="story">
@@ -141,14 +143,14 @@ const slides = [
       <p class="story-aside">Sorry. We came up with the name before the emergency.</p>
     </div>`,
     "slide--dark",
-  ),
+  )]),
   slide(
     "title",
     "Junction 2026 · Exa: The Internet Butler",
     `<div class="title">
       <div>
         <h1>The assistant<br><em>you don't have to ask.</em></h1>
-        <p class="lede">Every other AI waits for a prompt. AIDaddy listens to your family's chat and your kitchen table, lets the small talk pass, and steps in when life happens: with a plan in which every line points at a sentence on an official page.</p>
+        <p class="lede">Other AIs make you connect your data, set them up, and then wait for a prompt. AIDaddy is always on. It reads your chats, listens to the room and sees the pages you open. When life happens it steps in, and every line of its plan points at a sentence on an official page.</p>
         <p class="url">AIDaddy is here to AID.</p>
       </div>
       <div class="orb"></div>
@@ -161,9 +163,9 @@ const slides = [
     `<h2>We don't know what we don't know.</h2>
     <div class="cols">
       <ul class="points">
-        <li><strong>Every other AI waits for a prompt.</strong> You connect your data, you set it up, and then you still have to ask.</li>
+        <li><strong>Other AIs wait for a prompt.</strong> You connect your data, you set them up, and then you still have to ask.</li>
         <li><strong>What costs you money is what you never knew to ask about.</strong> A deadline on an invoice. A benefit nobody mentioned.</li>
-        <li><strong>Nobody prompts about what they missed.</strong> You don't realize you filed your taxes wrong. You forget your wedding anniversary. Or you are just too lazy to prompt.</li>
+        <li><strong>Nobody prompts about what they missed.</strong> You don't realize you filed your taxes wrong. You forget your friend's wedding. Or you are just too lazy to prompt.</li>
       </ul>
       <div class="panel">
         <p class="eyebrow">Said in a family chat. Nobody asked AIDaddy.</p>
@@ -178,17 +180,34 @@ const slides = [
     "The product",
     `<div class="cols cols--pic">
       <div>
-        <h2>One butler, three moves.</h2>
+        <h2>Always on. You never ask it anything.</h2>
         <ol class="moves">
           <li><strong>It stays silent.</strong> Dinner, keys, who picks up the kids: a small model lets that pass. Nobody has to ask it anything.</li>
           <li><strong>It goes to work.</strong> When someone mentions a life event or shares an official letter, it searches the official sites of the right country.</li>
           <li><strong>It answers with a plan you can check.</strong> What to do, by when, and the official sentence that says so. Tap a number and the page opens at that sentence.</li>
         </ol>
-        <p class="note"><strong>In an emergency it speaks at once,</strong> without research: call 112 first, then the Red Cross first aid steps. Fixed words, never written by a model.</p>
         <p class="note">It never sends, files, books or pays. It prepares, and the family decides.</p>
       </div>
       <figure class="pic pic--phone"><img src="img/chat.jpg" alt=""><figcaption>A replay with a fictional family. The plan is from a real run.</figcaption></figure>
     </div>`,
+  ),
+  slide(
+    "acts",
+    "What it does for you · today and next",
+    `<h2>You can't always ask for help. So it doesn't wait.</h2>
+    <div class="cols">
+      <ul class="points">
+        <li><strong>It calls the clinic and books your appointment.</strong> Today: it shows its exact words, waits for your yes, and rings our own test line. A real clinic is next.</li>
+        <li><strong>It finds the money you never claimed.</strong> Today: the household app lists what your family is missing, and the plan names what you are owed, with the official sentence.</li>
+        <li><strong>It catches the scam before you tap it.</strong> Next: a check of every link and sender in the chat.</li>
+      </ul>
+      <ul class="points">
+        <li><strong>It fills the form you abandoned.</strong> Today: a prototype brings you back to the tax form you left. Filling it in is next.</li>
+        <li><strong>It remembers birthdays and orders a thoughtful gift.</strong> Today: it finds gifts with real prices on shop pages. The order is simulated.</li>
+        <li><strong>In an emergency it speaks first.</strong> Today: call 112, then the Red Cross first aid steps, aloud and at once, in fixed words no model wrote.</li>
+      </ul>
+    </div>
+    <p class="note">Each of these stops at the family's yes. Nothing is sent, booked or paid on its own.</p>`,
   ),
   slide(
     4,
@@ -238,7 +257,7 @@ const slides = [
   slide(
     7,
     "Where it works today",
-    `<h2>Wherever the household is.</h2>
+    `<h2>It reads your chats, listens to the room, sees the pages you open.</h2>
     <figure class="pic pic--wide"><img src="img/setup.jpg" alt=""></figure>
     <ul class="row">
       <li><strong>Telegram group: live.</strong> Text and photos of letters.</li>
@@ -279,7 +298,7 @@ const slides = [
         <h2>Next.</h2>
         <ul class="points">
           <li><strong>A watch on every cited page,</strong> so a rule change reaches the family the day it happens.</li>
-          <li><strong>Calendar and mail,</strong> behind the same approval.</li>
+          <li><strong>Mail, calendar, real bookings and scam checks,</strong> behind the same approval.</li>
           <li><strong>More countries.</strong> Official site lists exist for ${facts.countries}; Finland is tested in depth.</li>
           <li><strong>A phone app,</strong> so listening works with the screen off.</li>
         </ul>
@@ -291,8 +310,8 @@ const slides = [
     "Try it",
     `<div class="title title--end">
       <div>
-        <h1>AIDaddy is here<br><em>to AID.</em></h1>
-        <p class="lede">You don't have to ask. But you can: type what happened and where you live, and the same engine answers on the live web in a few seconds.</p>
+        <h1>You can't always<br><em>ask for help.</em></h1>
+        <p class="lede">AIDaddy is there when it matters. You never have to ask. But you can: type what happened and where you live, and the same engine answers on the live web in a few seconds.</p>
         <p class="url">${esc(site)}/try</p>
         <p class="note">Team: Zachary, Milan, Vlad · Built at Junction 2026 with Exa, Hermes Agent, NVIDIA Nemotron, Gemma, ElevenLabs and Verda.</p>
       </div>
