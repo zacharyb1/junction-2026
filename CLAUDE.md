@@ -24,7 +24,7 @@ The team uses Claude Code with its own workflows and tools. This repository does
 - Local Cases follow the Engine's working directory. Preserve `.data/cases` and backups before moving/removing an Engine; Case backups do not include Hermes memories or reminders. Builds/type generation write `.next`, so they can disrupt a running server using that directory.
 - Secrets, private Case data, Hermes homes and family logs stay out of commits. A shared Blob token means shared Case storage; changing a bot token alone does not isolate copied reminder state.
 - For UI work, shadcn uses Base UI: link-styled buttons use `LinkButton`/`linkButtonClasses`, not `asChild`. Cache Components are intentionally off.
-- Every page except `/reading` renders inside `SiteShell` (`src/components/site/`), which supplies the shared header, footer and dark palette; a new page uses it, and links to `/try`, `/chat` or `/autopilot` use `SiteLink` so the demo's access code travels along. AIDaddy is the one name for the product and its butler.
+- Every page renders inside `SiteShell` (`src/components/site/`), which supplies the shared header, footer and dark palette; a new page uses it with `PageHead` and the `site-` classes of `site.css` (see DESIGN.md), and links to `/try`, `/chat` or `/autopilot` use `SiteLink` so the demo's access code travels along. AIDaddy is the one name for the product and its butler.
 
 ## Checks and decision history
 

@@ -34,6 +34,15 @@ describe("what the listening post makes of a sentence", () => {
     expect(decide("Migristä tuli päätös oleskeluluvasta")).toMatchObject({ kind: "permit" });
   });
 
+  it("notices a plan that has rules, and leaves an ordinary plan alone", () => {
+    for (const text of ["I'll just bring ten cartons of cigarettes from Tallinn", "we can just sublet the flat while we are away", "I'm not going to declare that income"]) {
+      expect(decide(text), text).toMatchObject({ kind: "plan", desk: "rules", urgent: false });
+    }
+    for (const text of ["I'll bring milk on the way home", "we'll park behind the school", "let's cancel dinner", "I'll work late tonight"]) {
+      expect(decide(text), text).toBeNull();
+    }
+  });
+
   it("does not match a word that only contains a trigger", () => {
     expect(decide("the visage of that actor")).toBeNull();
     expect(decide("skeleton costumes for everyone")).toBeNull(); // "kela" inside a word
@@ -79,6 +88,13 @@ describe("what is sent to research", () => {
     expect(text).not.toContain("pasta"); // more than two sentences later
     expect(text).not.toMatch(/ai daddy/i);
     expect(text.length).toBeLessThanOrEqual(1500);
+  });
+
+  it("asks whether a plan is allowed only when nobody in the room did", () => {
+    expect(situation([{ text: "I'll just bring ten cartons of cigarettes from Tallinn", at: 0 }], 0, "rules")).toBe(
+      "I'll just bring ten cartons of cigarettes from Tallinn. Is it allowed, and what are the rules?",
+    );
+    expect(situation([{ text: "can we just sublet the flat while we are away?", at: 0 }], 0, "rules")).toBe("can we just sublet the flat while we are away?");
   });
 
   it("leaves out a sentence that was said too long before", () => {

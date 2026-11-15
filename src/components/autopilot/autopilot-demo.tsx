@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { type CheckedQuote, checkedQuotes, progressLine, QUESTION, readResearchStream, RECORDED, refusal, summary } from "@/components/autopilot/check";
+import { Core, type CoreState } from "@/components/site/core";
 import type { ResearchResult } from "@/lib/engine/research";
 
 /**
@@ -130,7 +131,7 @@ export function AutopilotDemo({ code: linkCode, needsCode }: { code: string; nee
   const lawyer = () => {
     if (check.state === "running") {
       return (
-        <p className="hud-autopilot-status" role="status">
+        <p className="hud-autopilot-status hud-autopilot-status--run" role="status">
           <span className="hud-autopilot-pulse" aria-hidden="true" />
           Checking live: {check.line}
         </p>
@@ -194,79 +195,102 @@ export function AutopilotDemo({ code: linkCode, needsCode }: { code: string; nee
 
   const running = playing && shown < SCRIPT.length;
 
+  // The core beside the panel carries the live check, in the site's state code. Its word repeats the status line.
+  const lawyerShown = SCRIPT.slice(0, shown).some((step) => step.kind === "specialist" && step.check);
+  const station: { core: CoreState; className: string; text: string } =
+    check.state === "running"
+      ? { core: "active", className: "site-state site-state--cyan site-state--working", text: "Checking live" }
+      : check.state === "done"
+        ? { core: "done", className: "site-state site-state--green", text: "Checked live" }
+        : check.state === "failed" || lawyerShown
+          ? { core: "idle", className: "site-state site-state--amber", text: "Recorded run" }
+          : { core: "idle", className: "site-state", text: "Standing by" };
+
   return (
-    <div className="hud-panel hud-autopilot">
-      <div className="hud-autopilot-consent">
-        <p>
-          <strong>Demo.</strong> The chat, AIDaddy&apos;s routing and the suggestion are a fixed script. Nothing listens to you,
-          nothing reads your browser, and nothing is sent on your behalf or paid. One part is real: the lawyer&apos;s check sends
-          its one fixed question to the research engine, which searches official sites with Exa and opens every page it quotes.
-        </p>
-        <label>
-          <input type="checkbox" checked={suggestions} onChange={(event) => setSuggestions(event.target.checked)} />
-          Let AIDaddy suggest next steps
-        </label>
-      </div>
+    <div className="site-split">
+      <div className="hud-panel hud-autopilot">
+        <div className="hud-autopilot-consent">
+          <p>
+            <strong>Demo.</strong> The chat, AIDaddy&apos;s routing and the suggestion are a fixed script. Nothing listens to you,
+            nothing reads your browser, and nothing is sent on your behalf or paid. One part is real: the lawyer&apos;s check sends
+            its one fixed question to the research engine, which searches official sites with Exa and opens every page it quotes.
+          </p>
+          <label>
+            <input type="checkbox" checked={suggestions} onChange={(event) => setSuggestions(event.target.checked)} />
+            Let AIDaddy suggest next steps
+          </label>
+        </div>
 
-      <div className="hud-autopilot-actions">
-        <button type="button" className="hud-btn hud-btn--primary" onClick={play} disabled={running}>
-          {running ? "Playing" : playing ? "Play again" : "Play the demo"}
-        </button>
-      </div>
+        <div className="hud-autopilot-actions">
+          <button type="button" className="hud-btn hud-btn--primary" onClick={play} disabled={running}>
+            {running ? "Playing" : playing ? "Play again" : "Play the demo"}
+          </button>
+        </div>
 
-      <ol className="hud-autopilot-feed" aria-live="polite">
-        {!playing ? <li className="hud-note">Press play to see the script. Suggestions appear only if the box above is ticked.</li> : null}
-        {SCRIPT.slice(0, shown).map((step, index) => {
-          if (step.kind === "proposal" && !suggestions) {
+        <ol className="hud-autopilot-feed" aria-live="polite">
+          {!playing ? <li className="hud-note">Press play to see the script. Suggestions appear only if the box above is ticked.</li> : null}
+          {SCRIPT.slice(0, shown).map((step, index) => {
+            if (step.kind === "proposal" && !suggestions) {
+              return (
+                <li key={index} className="hud-note">
+                  A suggestion was held back because suggestions are off. Tick the box above and play again to see it.
+                </li>
+              );
+            }
             return (
-              <li key={index} className="hud-note">
-                A suggestion was held back because suggestions are off. Tick the box above and play again to see it.
+              <li key={index} className={`hud-autopilot-${step.kind}`}>
+                {step.kind === "chat" ? (
+                  <>
+                    <span className="hud-flow-tech">{step.who}, family chat</span>
+                    <p>{step.text}</p>
+                  </>
+                ) : null}
+                {step.kind === "orchestrator" ? (
+                  <>
+                    <span className="hud-flow-tech">AIDaddy</span>
+                    <p>{step.text}</p>
+                  </>
+                ) : null}
+                {step.kind === "specialist" ? (
+                  <>
+                    <span className="hud-flow-tech">Specialist · {step.name}</span>
+                    <p>{step.text}</p>
+                    {step.check ? lawyer() : null}
+                  </>
+                ) : null}
+                {step.kind === "proposal" ? (
+                  <>
+                    <span className="hud-flow-tech">Suggestion, not sent</span>
+                    <p>{step.text}</p>
+                    {decisions[index] ? (
+                      <p className="hud-note">You chose: {decisions[index]}. Demo only, nothing was set.</p>
+                    ) : (
+                      <div className="hud-actions">
+                        <button type="button" className="site-btn site-btn--amber" onClick={() => setDecisions({ ...decisions, [index]: "approved" })}>
+                          Approve
+                        </button>
+                        <button type="button" className="hud-btn" onClick={() => setDecisions({ ...decisions, [index]: "declined" })}>
+                          Not now
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : null}
               </li>
             );
-          }
-          return (
-            <li key={index} className={`hud-autopilot-${step.kind}`}>
-              {step.kind === "chat" ? (
-                <>
-                  <span className="hud-flow-tech">{step.who}, family chat</span>
-                  <p>{step.text}</p>
-                </>
-              ) : null}
-              {step.kind === "orchestrator" ? (
-                <>
-                  <span className="hud-flow-tech">AIDaddy</span>
-                  <p>{step.text}</p>
-                </>
-              ) : null}
-              {step.kind === "specialist" ? (
-                <>
-                  <span className="hud-flow-tech">Specialist · {step.name}</span>
-                  <p>{step.text}</p>
-                  {step.check ? lawyer() : null}
-                </>
-              ) : null}
-              {step.kind === "proposal" ? (
-                <>
-                  <span className="hud-flow-tech">Suggestion, not sent</span>
-                  <p>{step.text}</p>
-                  {decisions[index] ? (
-                    <p className="hud-note">You chose: {decisions[index]}. Demo only, nothing was set.</p>
-                  ) : (
-                    <div className="hud-actions">
-                      <button type="button" className="hud-btn hud-btn--primary" onClick={() => setDecisions({ ...decisions, [index]: "approved" })}>
-                        Approve
-                      </button>
-                      <button type="button" className="hud-btn" onClick={() => setDecisions({ ...decisions, [index]: "declined" })}>
-                        Not now
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
+          })}
+        </ol>
+      </div>
+      <div className="site-rail site-rail--sticky">
+        <div className="site-station">
+          <div className="site-orb">
+            <Core state={station.core} />
+          </div>
+          <p aria-hidden="true" className={station.className}>
+            {station.text}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

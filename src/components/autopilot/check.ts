@@ -1,4 +1,4 @@
-import { highlightUrl, hostOf } from "@/components/landing/sample";
+import { highlightUrl, hostOf } from "@/components/site/sample";
 import recording from "@/data/autopilot-check.json";
 import type { EngineEvent, ResearchResult } from "@/lib/engine/research";
 

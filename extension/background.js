@@ -47,20 +47,22 @@ async function research({ url, question, country }) {
   if (stored) return { ok: true, result: stored, cached: true };
 
   const { engine, code, language } = await settings();
-  if (!code) return { ok: false, error: "no-code" };
+  // A server that is open to everyone asks for no code. One that asks answers 401, and the panel says what to do.
+  const headers = { "content-type": "application/json" };
+  if (code) headers["x-demo-code"] = code;
 
   let job = running.get(url);
   if (!job) {
     job = fetch(`${engine.replace(/\/$/, "")}/api/research`, {
       method: "POST",
-      headers: { "content-type": "application/json", "x-demo-code": code },
+      headers,
       body: JSON.stringify({ situation: question, country, language }),
       signal: AbortSignal.timeout(90_000),
     })
       .then(async (res) => {
         const body = await res.json().catch(() => ({}));
         if (res.status === 422) return { ok: false, error: "nothing" };
-        if (res.status === 401) return { ok: false, error: "bad-code" };
+        if (res.status === 401) return { ok: false, error: code ? "bad-code" : "no-code" };
         if (res.status === 429) return { ok: false, error: "busy" };
         if (!res.ok) return { ok: false, error: body.error || `The Engine answered ${res.status}` };
         const result = {

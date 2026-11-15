@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { type Beat, DURATION, PEOPLE, SCRIPT } from "@/components/chat-demo/script";
 import { scrollToEnd, useReplayClock } from "@/components/demo/replay";
+import { ORB_MARK } from "@/components/demo/orb-mark";
 
 /** A scripted replay of AIDaddy in a family group chat (issue #33). Original styling, no app branding. */
 export function ChatDemo({ loop = false }: { loop?: boolean }) {
@@ -68,7 +69,7 @@ export function ChatDemo({ loop = false }: { loop?: boolean }) {
 function Avatar({ who }: { who: "aino" | "mikko" | "aidaddy" }) {
   if (who === "aidaddy") {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img className="chatdemo-avatar" src="/aidaddy-avatar.svg" alt="" />;
+    return <img className="chatdemo-avatar" src={ORB_MARK} alt="" />;
   }
   return (
     <span className="chatdemo-avatar" style={{ background: PEOPLE[who].color }}>

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Core } from "@/components/hud/core";
 import type { PlanRow } from "@/components/hud/data";
 import { HearPlan } from "@/components/hud/hear-plan";
-import type { Scorecard } from "@/components/landing/scorecard-data";
+import type { Scorecard } from "@/components/site/scorecard-data";
 import { SiteLink } from "@/components/site/site-link";
 import planAudio from "@/data/plan-audio.json";
 
@@ -44,7 +44,7 @@ export function Hero({ botUrl, sites, card }: { botUrl: string | null; sites: nu
             </p>
             <div className="hud-actions">
               <SiteLink href="/setup" className="hud-btn hud-btn--primary">
-                Set up AIDaddy
+                Get your own AIDaddy
               </SiteLink>
               <SiteLink href="/try" className="hud-btn">
                 Try AIDaddy without setup
@@ -220,7 +220,7 @@ export function PlanPanel({ title, caseHref, rows }: { title: string; caseHref: 
 }
 
 type Place = {
-  status: "Live" | "Concept" | "Replay";
+  status: "Live" | "First version" | "Concept" | "Replay";
   name: string;
   text: string;
   /** `of` finishes a label for screen readers where several rows carry the same words. */
@@ -228,8 +228,9 @@ type Place = {
 };
 
 /**
- * Where AIDaddy meets a household, each with what it is today. "Live" works now, "Concept" is an idea shown as a
- * scripted replay or a mockup, "Replay" is a recording or a fixed script. The words match /setup and the demo pages.
+ * Where AIDaddy meets a household, each with what it is today. "Live" works now, "First version" works on the
+ * person's own device and is new, "Concept" is an idea shown as a scripted replay, "Replay" is a recording or a
+ * fixed script. The words match /setup and the demo pages.
  */
 const PLACES: Place[] = [
   {
@@ -242,13 +243,16 @@ const PLACES: Place[] = [
     ],
   },
   {
-    status: "Concept",
+    status: "First version",
     name: "In the browser",
-    text: "When someone is stuck on an official form, AIDaddy points at the rule that applies.",
-    links: [{ href: "/demo/browser", label: "Watch the replay", of: "the browser" }],
+    text: "A browser extension looks at the page you have open. On an official page or a form, it points at the rule that applies, without being asked.",
+    links: [
+      { href: "/demo/browser", label: "Watch the replay", of: "the browser" },
+      { href: "/setup#browser", label: "Get the extension" },
+    ],
   },
   {
-    status: "Live",
+    status: "First version",
     name: "At the kitchen table",
     text: "A phone or a laptop lies on the table with the listening page open. It hears a life event, researches it on its own, and comes back with a call or a ping. It listens only while that page is open.",
     links: [
@@ -269,14 +273,14 @@ const PLACES: Place[] = [
     links: [{ href: "/autopilot", label: "Play the demo" }],
   },
   {
-    status: "Concept",
-    name: "What it may follow",
-    text: "You choose what AIDaddy may read or hear. Of the setup screen's three channels, Telegram and listening on this device work today.",
-    links: [{ href: "/setup", label: "Open the setup" }],
+    status: "Live",
+    name: "Your own AIDaddy",
+    text: "You choose what AIDaddy may read, hear or see. Three connections, each with its own off switch: the Telegram group, the microphone, the browser.",
+    links: [{ href: "/setup", label: "Get your own AIDaddy" }],
   },
 ];
 
-const STATUS_TONE = { Live: "hud-label--green", Concept: "hud-label--amber", Replay: "" };
+const STATUS_TONE = { Live: "hud-label--green", "First version": "", Concept: "hud-label--amber", Replay: "" };
 
 export function Places() {
   return (
@@ -382,7 +386,7 @@ export function Readouts({ card }: { card: Scorecard }) {
       </ul>
       <p className="hud-note hud-reveal">
         Latest run of our own test set{ran ? `, ${ran}` : ""}. The web is live, so runs differ: recent runs passed 17 to 19 of{" "}
-        {card.totals.scenarios}. <Link href="/reading#scorecard">See every scenario and its case file →</Link>
+        {card.totals.scenarios}. <Link href="/scorecard">See every scenario and its case file →</Link>
       </p>
     </>
   );
