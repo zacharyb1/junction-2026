@@ -4,6 +4,8 @@ Written Saturday 14 November, 09:05 Helsinki, at Zachary's request. Freeze is 20
 
 This plan uses the new front page. Its run of show replaces the video table in [PITCH.md](PITCH.md), whose numbers are older. The story, the criteria table and the judge answers in PITCH.md still hold.
 
+Demo facts refreshed Sunday 15 November for the archive recovery and chat UI fixes (#72 and #77). Check that those revisions are deployed before rehearsing. The current landing replay is a new 10.3-second run with 9 of 9 quotes verified; the published 19-case scorecard below is a separate, unchanged measurement. Live voice still needs account setup and production acceptance under #76 and #75. The former homepage narration describes the old replay, so its button has been removed.
+
 ## 1. One sentence
 
 > AIDaddy is the butler in your family's group chat. It is silent until it matters, and then every line of its plan points at a sentence on an official page.
@@ -15,7 +17,7 @@ Say it first and say it last.
 | Moment | What happens | Why a judge remembers it | If it fails |
 |---|---|---|---|
 | **The silence** | Small talk passes in the chat and nothing answers. Then "I'm pregnant" and the core lights up. | Every other bot has to be asked. | The front page plays it from real test messages. |
-| **The sentence** | Tap source 5. Kela's own page opens with the quoted sentence highlighted. | It is proof, not a claim, and it takes two seconds. | Open the case file: the quote and "found on the live page" stand next to it. |
+| **The sentence** | Tap source 4. Kela's own page opens with the quoted sentence highlighted. | It is proof, not a claim, and it takes two seconds. | Open the case file: the quote and "found on the live page" stand next to it. |
 | **Your question** | The judge types their own life event and country into `/try`. | It is criterion five, "works on live queries", done by the judge. | The five stored example cases under the form, each a real run. |
 
 ## 3. Two minutes at the table
@@ -26,11 +28,11 @@ One laptop shows the front page. One phone is in the presenter's hand.
 |---|---|---|
 | 0:00 | Front page, first screen | "This is AIDaddy. It lives in your family's group chat, and most days it says nothing." |
 | 0:10 | Scroll to the chat. Messages pass, then the pregnancy message. | "Dinner, keys, who picks up the kids. A small model on the family's own machine lets that pass. Then this." |
-| 0:25 | The research replay runs: 7.6 seconds | "This is a real run at its real speed. Four Exa searches on Finland's official sites. Six pages opened again by our own server. Nine quotes looked up on those pages." |
-| 0:45 | The plan. Tap source 5. | "Four steps, three deadlines. Tap a number: Kela's page, at the sentence." |
-| 0:55 | Press "Hear the plan" for five seconds | "It can read the plan to you. It says only what the file shows." |
+| 0:25 | The research replay runs: 10.3 seconds | "This is a real run at its real speed. Four Exa searches on Finland's official sites. Six pages opened again by our own server. Nine quotes looked up on those pages." |
+| 0:45 | The plan. Tap source 4. | "Four steps, three deadlines. Tap a number: Kela's page, at the sentence." |
+| 0:55 | Open the full Case for this run | "The plan and its evidence stay together, so you can come back to the sources." |
 | 1:05 | Hand over the phone, `/try` open | "Now yours. What happened, and in which country?" |
-| 1:35 | While it runs: the four gauges | "We test it on the live web: 17 of 19 scenarios in the latest run, 95 of 95 quotes found, and 6 of 6 messages with nothing to research were refused. Recent runs passed 17 to 19." |
+| 1:35 | While it runs: the four gauges | "We test it on the live web: 19 of 19 scenarios in the latest run, 98 of 98 quotes found, and 6 of 6 messages with nothing to research were refused. Recent runs passed 17 to 19." |
 | 1:50 | Telegram: the bot in the family group | "And this is where it lives. It never sends, files, books or pays. You decide." |
 
 **If the bot is not online by the rehearsal at 16:00:** the last line is shown from a recorded clip, and the presenter says it is a recording.
@@ -40,14 +42,14 @@ One laptop shows the front page. One phone is in the presenter's hand.
 Same order as the table above, without the judge's turn:
 
 1. **0:00 to 0:10:** the first screen, then the chat.
-2. **0:10 to 0:40:** the replay at full length. It is the product working, and it is under nine seconds.
+2. **0:10 to 0:40:** the replay at full length. This recorded run takes 10.3 seconds.
 3. **0:40 to 1:00:** the plan, tap a source, the official page opens at the sentence.
 4. **1:00 to 1:20:** `/try` with a letter in Finnish (the rent increase), live.
 5. **1:20 to 1:40:** the bot in Telegram, if it is online. Otherwise the case file on a phone: source re-check and "Two figures found".
 6. **1:40 to 2:00:** the gauges, the one sentence, the QR code.
 
 - **Record the screen at 1280 by 800.** The page is built for that width, and for a phone.
-- **Voiceover:** line 07 in `docs/pitch/voiceover.json` holds old scorecard numbers. Change it to the numbers above and render it again with `node scripts/voiceover.mjs --only 07-numbers`.
+- **Voiceover:** the existing files are earlier recordings, not narration for this refreshed replay. Check every line against the chosen footage, including line 07's scorecard figures, before using them. Re-render changed lines only when ElevenLabs is configured; the current run of show does not depend on live voice or the removed homepage audio button.
 - **Record a backup of every live part today.** The web is live and the venue network is shared.
 
 ## 5. The table
@@ -56,7 +58,7 @@ Same order as the table above, without the judge's turn:
 - **QR code 1:** the front page address with the access code, so `/try` opens without typing. Print it large.
 - **QR code 2:** the Telegram bot, only if the bot is online and renamed.
 - **Phone:** on mobile data, not venue Wi-Fi. Keep one stored case file open in a tab.
-- **A card with the one sentence** and the three numbers: 17 of 19, 95 of 95, 6 of 6.
+- **A card with the one sentence** and the three numbers: 19 of 19, 98 of 98, 6 of 6.
 
 ## 6. Questions judges ask
 
@@ -68,7 +70,7 @@ Same order as the table above, without the judge's turn:
 | "What if two pages disagree?" | "It shows both with their sources. It does not choose." |
 | "Is this legal advice?" | "No. It is research with sources. It shows the sentence is on the page, not that the rule fits your case." |
 | "Why Finland?" | "We are here, and an international family in Finland gets letters in a language it does not read. The engine has official site lists for 12 countries." |
-| "What does it cost?" | "About three cents of Exa search per case, and about six seconds." |
+| "What does it cost?" | "This recorded case used $0.028 of Exa calls and took 10.3 seconds. The separate 19-case scorecard has a 5.6-second median." |
 
 ## 7. What not to say
 

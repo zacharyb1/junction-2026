@@ -135,11 +135,6 @@ const ALLOWLIST: Allowed[] = [
     pattern: /your earlier names "UKK" and "Kaveri"/,
     why: "the persona line that tells the bot which earlier names are still addressed to it",
   },
-  // The four demo videos, by name. Whoever re-records one removes the old file and deletes its entry here.
-  { file: "docs/pitch/ukk-browser-demo.mp4", pattern: /^ukk-browser-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
-  { file: "docs/pitch/ukk-calendar-demo.mp4", pattern: /^ukk-calendar-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
-  { file: "docs/pitch/ukk-talk-demo.mp4", pattern: /^ukk-talk-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
-  { file: "docs/pitch/ukk-telegram-demo.mp4", pattern: /^ukk-telegram-demo\.mp4$/, why: "recorded before the rename, not re-recorded yet" },
 ];
 
 // ---- What is read -----------------------------------------------------------------------------------------------

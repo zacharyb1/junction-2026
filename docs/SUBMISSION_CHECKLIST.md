@@ -22,7 +22,10 @@ Review [the event rules](PLAYBOOK.md#rules-that-disqualify) before submission: p
 ## Demo hygiene
 - [ ] Deployed URL opens in < 3 s, no console errors on the demo path
 - [ ] Seed/demo data present so the first screen is not empty
-- [ ] API keys set in Vercel env, not in the repo
+- [ ] API keys set in the production server's private runtime configuration, not in the repo
+- [ ] After #72/#77 deploy, current recorded links pass `node scripts/check-recorded-cases.mjs --origin https://86.38.238.136.sslip.io`; check the rendered homepage sample link separately if an environment setting overrides it
+- [ ] Use the refreshed replay's 10.3 seconds and 9/9 quotes; keep the separate scorecard's 19/19 scenarios, 98/98 quotes and 6/6 refusals distinct
+- [ ] Run the text-and-sources demo without the removed homepage narration; claim live voice only after the production playback/transcription checks in #75/#76 pass
 - [ ] Works on the venue Wi‑Fi and on a phone hotspot (fallback)
 - [ ] A recorded backup video of the live demo path exists (in case Wi‑Fi dies at the table)
 - [ ] README: what it is, screenshot, how to run, team

@@ -1,16 +1,16 @@
 {
-  "label": "Run 13: on the Verda server, after the AIDaddy rename",
-  "ranAt": "2026-11-14T23:54:02.190Z",
-  "base": "https://86.38.238.136.sslip.io",
+  "label": "Run 12: audit, security and accessibility fixes",
+  "ranAt": "2026-11-14T05:01:11.265Z",
+  "base": "http://localhost:3100",
   "depth": "fast",
   "totals": {
     "scenarios": 19,
-    "passed": 17,
-    "verifiedQuotes": 95,
-    "totalQuotes": 95,
+    "passed": 19,
+    "verifiedQuotes": 98,
+    "totalQuotes": 98,
     "unsourcedClaims": 0,
-    "medianMs": 7401,
-    "p90Ms": 9819
+    "medianMs": 5629,
+    "p90Ms": 7861
   },
   "refusals": {
     "passed": 6,
@@ -26,8 +26,8 @@
       "verified": 9,
       "evidence": 9,
       "official": 9,
-      "ms": 7203,
-      "url": "https://86.38.238.136.sslip.io/c/xcK1MJMo9KiDnP5K",
+      "ms": 7861,
+      "url": "https://86.38.238.136.sslip.io/c/FdHM2ekOG9Qk9GhJ",
       "error": null
     },
     {
@@ -36,11 +36,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 4,
-      "evidence": 4,
-      "official": 4,
-      "ms": 8809,
-      "url": "https://86.38.238.136.sslip.io/c/HSL99m1jxsSH5KWp",
+      "verified": 6,
+      "evidence": 6,
+      "official": 6,
+      "ms": 6788,
+      "url": "https://86.38.238.136.sslip.io/c/zMepFyDo5lCalcB8",
       "error": null
     },
     {
@@ -49,11 +49,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 8,
-      "evidence": 8,
-      "official": 8,
-      "ms": 10100,
-      "url": "https://86.38.238.136.sslip.io/c/pSYzx_MQbCh21jDL",
+      "verified": 6,
+      "evidence": 6,
+      "official": 6,
+      "ms": 5524,
+      "url": "https://86.38.238.136.sslip.io/c/eT_B-peVDrJYjP-b",
       "error": null
     },
     {
@@ -65,8 +65,8 @@
       "verified": 6,
       "evidence": 6,
       "official": 6,
-      "ms": 8048,
-      "url": "https://86.38.238.136.sslip.io/c/nDWfO8gcE7svZc48",
+      "ms": 6197,
+      "url": "https://86.38.238.136.sslip.io/c/VhewardpGKIjnrL9",
       "error": null
     },
     {
@@ -75,11 +75,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 5,
-      "evidence": 5,
-      "official": 5,
-      "ms": 8366,
-      "url": "https://86.38.238.136.sslip.io/c/sLJ2cCT0CPMb2qvf",
+      "verified": 4,
+      "evidence": 4,
+      "official": 4,
+      "ms": 4551,
+      "url": "https://86.38.238.136.sslip.io/c/-zV7UCXUI8vMVev4",
       "error": null
     },
     {
@@ -88,11 +88,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 3,
-      "evidence": 3,
-      "official": 3,
-      "ms": 7107,
-      "url": "https://86.38.238.136.sslip.io/c/jv8NvAV4vPz1v-9G",
+      "verified": 4,
+      "evidence": 4,
+      "official": 4,
+      "ms": 5533,
+      "url": "https://86.38.238.136.sslip.io/c/DiGrTgrzeM-J-B78",
       "error": null
     },
     {
@@ -101,11 +101,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 5,
-      "evidence": 5,
-      "official": 5,
-      "ms": 7952,
-      "url": "https://86.38.238.136.sslip.io/c/zaoFQuGlP5AdkciQ",
+      "verified": 4,
+      "evidence": 4,
+      "official": 4,
+      "ms": 4944,
+      "url": "https://86.38.238.136.sslip.io/c/ygp5x7Qqr5wgK7Zv",
       "error": null
     },
     {
@@ -114,11 +114,11 @@
       "group": "finland",
       "country": "FI",
       "pass": true,
-      "verified": 8,
-      "evidence": 8,
-      "official": 8,
-      "ms": 7795,
-      "url": "https://86.38.238.136.sslip.io/c/jAq-7UPM2hAyUSpt",
+      "verified": 4,
+      "evidence": 4,
+      "official": 4,
+      "ms": 6390,
+      "url": "https://86.38.238.136.sslip.io/c/kI88fy7Y3a-4dR6J",
       "error": null
     },
     {
@@ -126,12 +126,12 @@
       "title": "Parking fine that looks wrong",
       "group": "finland",
       "country": "FI",
-      "pass": false,
-      "verified": 1,
-      "evidence": 1,
-      "official": 1,
-      "ms": 5346,
-      "url": "https://86.38.238.136.sslip.io/c/4eyw_Rr_tQG9JRWl",
+      "pass": true,
+      "verified": 2,
+      "evidence": 2,
+      "official": 2,
+      "ms": 9739,
+      "url": "https://86.38.238.136.sslip.io/c/TwohPlOU1xXq-uLv",
       "error": null
     },
     {
@@ -143,8 +143,8 @@
       "verified": 4,
       "evidence": 4,
       "official": 4,
-      "ms": 7401,
-      "url": "https://86.38.238.136.sslip.io/c/pqgAZcq2kRh7NRm3",
+      "ms": 5629,
+      "url": "https://86.38.238.136.sslip.io/c/FCWLNrJv3IOwOwFY",
       "error": null
     },
     {
@@ -153,11 +153,11 @@
       "group": "everyday",
       "country": "FI",
       "pass": true,
-      "verified": 5,
-      "evidence": 5,
-      "official": 5,
-      "ms": 7191,
-      "url": "https://86.38.238.136.sslip.io/c/aNR6-kHYwFzBZ7y6",
+      "verified": 7,
+      "evidence": 7,
+      "official": 7,
+      "ms": 6152,
+      "url": "https://86.38.238.136.sslip.io/c/NWnhQF_YE9kD5Q6b",
       "error": null
     },
     {
@@ -166,11 +166,11 @@
       "group": "everyday",
       "country": "FI",
       "pass": true,
-      "verified": 3,
-      "evidence": 3,
+      "verified": 4,
+      "evidence": 4,
       "official": 0,
-      "ms": 6199,
-      "url": "https://86.38.238.136.sslip.io/c/oTRRoYvKc-dJSRbU",
+      "ms": 6748,
+      "url": "https://86.38.238.136.sslip.io/c/tlytGvB6UGJvtDpC",
       "error": null
     },
     {
@@ -179,11 +179,11 @@
       "group": "everyday",
       "country": "FI",
       "pass": true,
-      "verified": 6,
-      "evidence": 6,
-      "official": 6,
-      "ms": 8215,
-      "url": "https://86.38.238.136.sslip.io/c/lzXuiVBPXf9iQINI",
+      "verified": 4,
+      "evidence": 4,
+      "official": 4,
+      "ms": 5338,
+      "url": "https://86.38.238.136.sslip.io/c/y9mp76BOxbKVHhme",
       "error": null
     },
     {
@@ -192,11 +192,11 @@
       "group": "everyday",
       "country": "FI",
       "pass": true,
-      "verified": 3,
-      "evidence": 3,
-      "official": 3,
-      "ms": 6592,
-      "url": "https://86.38.238.136.sslip.io/c/qhXvWRNgTH62NS5Y",
+      "verified": 5,
+      "evidence": 5,
+      "official": 5,
+      "ms": 6044,
+      "url": "https://86.38.238.136.sslip.io/c/9_w-PnIA0GdRekOr",
       "error": null
     },
     {
@@ -208,8 +208,8 @@
       "verified": 8,
       "evidence": 8,
       "official": 8,
-      "ms": 6884,
-      "url": "https://86.38.238.136.sslip.io/c/53lyUI9BmgGt83V5",
+      "ms": 5397,
+      "url": "https://86.38.238.136.sslip.io/c/G-KEwHhG6JFn0LP6",
       "error": null
     },
     {
@@ -218,11 +218,11 @@
       "group": "judge",
       "country": "GB",
       "pass": true,
-      "verified": 3,
-      "evidence": 3,
-      "official": 3,
-      "ms": 5734,
-      "url": "https://86.38.238.136.sslip.io/c/rmq5yRucPMIsIkfg",
+      "verified": 5,
+      "evidence": 5,
+      "official": 5,
+      "ms": 5407,
+      "url": "https://86.38.238.136.sslip.io/c/K8vXOH7TiGP1s9BV",
       "error": null
     },
     {
@@ -231,11 +231,11 @@
       "group": "judge",
       "country": "DE",
       "pass": true,
-      "verified": 4,
-      "evidence": 4,
-      "official": 4,
-      "ms": 9819,
-      "url": "https://86.38.238.136.sslip.io/c/QeB4ozjAyg4FbTzo",
+      "verified": 6,
+      "evidence": 6,
+      "official": 6,
+      "ms": 6114,
+      "url": "https://86.38.238.136.sslip.io/c/qZO-om10fu8qyO_7",
       "error": null
     },
     {
@@ -243,12 +243,12 @@
       "title": "Lost passport while abroad",
       "group": "judge",
       "country": "NL",
-      "pass": false,
+      "pass": true,
       "verified": 6,
       "evidence": 6,
       "official": 6,
-      "ms": 6273,
-      "url": "https://86.38.238.136.sslip.io/c/0OWyb9maG2ACW5ek",
+      "ms": 5376,
+      "url": "https://86.38.238.136.sslip.io/c/ZKBAsktuJwL4jrSK",
       "error": null
     },
     {
@@ -260,8 +260,8 @@
       "verified": 4,
       "evidence": 4,
       "official": 4,
-      "ms": 8631,
-      "url": "https://86.38.238.136.sslip.io/c/279N-ymJNkojXXqn",
+      "ms": 4770,
+      "url": "https://86.38.238.136.sslip.io/c/R3hsYNzufql1OPST",
       "error": null
     }
   ]

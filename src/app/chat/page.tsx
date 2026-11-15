@@ -33,7 +33,7 @@ export default async function ChatPage({ searchParams }: PageProps<"/chat">) {
             title="Talk to AIDaddy"
             lede="Tell AIDaddy about a life event or an official letter, and it answers with a plan and quotes from official pages."
           />
-          <AIDaddyChat code={code} needsCode={demoCodeRequired()} />
+          <AIDaddyChat code={code} needsCode={demoCodeRequired()} voiceAvailable={Boolean(process.env.ELEVENLABS_API_KEY)} />
           <p className="site-note">
             Prefer Telegram?{" "}
             <a href={`https://t.me/${bot}`} target="_blank" rel="noreferrer">
@@ -42,6 +42,14 @@ export default async function ChatPage({ searchParams }: PageProps<"/chat">) {
             </a>
             . Or <SiteLink href="/try">run one research case</SiteLink> without the chat.
           </p>
+          <details className="site-panel p-4 text-sm">
+            <summary className="min-h-11 content-center cursor-pointer font-medium">Add AIDaddy to your home screen</summary>
+            <div className="mt-3 space-y-2 leading-relaxed text-muted-foreground">
+              <p>On Android or desktop, open your browser menu and choose Install app or Add to home screen.</p>
+              <p>On iPhone or iPad, open this page in Safari, tap Share, then Add to Home Screen.</p>
+              <p>AIDaddy opens straight into the chat in its own window. An internet connection is required.</p>
+            </div>
+          </details>
         </div>
       </main>
     </SiteShell>

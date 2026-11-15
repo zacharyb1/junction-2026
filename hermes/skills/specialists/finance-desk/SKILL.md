@@ -24,7 +24,7 @@ Issue #39. One of AIDaddy's three specialist desks. It takes a matter about the 
 - The chat ID is the exact Telegram numeric ID from trusted session context. Read and write only the line with this chat's ID.
 - Keep: the kind of matter, the office (Vero, Kela, a bank), the tax year, the stage, the case ID. Never keep: income, salary, debts, account or card numbers, identity numbers, the amounts on a letter.
 - The finance desk does not read the legal or travel desk's line. If a matter needs another desk, say "Passing this to the legal desk" and let that skill start fresh from the message.
-- Matter finished or "forget everything": remove the line.
+- Matter finished or "forget everything": remove the line. After a successful removal, reply only: "This chat’s finance desk entry is removed." A failed removal is reported as a failure. Memory-tool results are internal state: never quote the remaining memory or entries for another desk or chat.
 
 ## Rules
 

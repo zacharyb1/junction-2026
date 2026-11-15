@@ -11,6 +11,14 @@
 !src/**
 !public/
 !public/**
+# Reviewed synthetic recorded cases only; never include arbitrary eval/private runtime output.
+!eval/
+!eval/results/
+!eval/results/2026-11-14T05-01-11-265Z.json
+!scripts/
+!scripts/prepare-recorded-seed.mjs
+!scripts/restore-recorded-seed.mjs
+!scripts/restore-cases.mjs
 # Keep future env/key files out even if added under an allowed source directory.
 **/.env*
 **/*.pem

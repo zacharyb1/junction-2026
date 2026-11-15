@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: { default: "AIDaddy", template: "%s · AIDaddy" },
   description,
+  applicationName: "AIDaddy",
+  appleWebApp: { capable: true, title: "AIDaddy", statusBarStyle: "default" },
+  icons: { apple: { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" } },
   // A page below the front page that sets its own openGraph replaces this one as a whole, image included:
   // it repeats siteName and brings an opengraph-image file of its own (see src/app/try).
   openGraph: { title: "AIDaddy", description, siteName: "AIDaddy", type: "website" },

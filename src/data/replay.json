@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-11-14T23:53:07.658Z",
+  "recordedAt": "2026-11-14T23:20:09.762Z",
   "request": {
     "situation": "I'm pregnant!! Took two tests this morning and both are positive. If I counted right the baby is due in July, and we both work full time.",
     "country": "FI",
@@ -11,13 +11,13 @@
       "type": "stage",
       "name": "plan",
       "detail": "Pinned to Finland. Searching 87 official sites first.",
-      "ms": 2
+      "ms": 1
     },
     {
       "type": "stage",
       "name": "search",
       "detail": "Exa search on official sites: actions and deadlines",
-      "ms": 2
+      "ms": 1
     },
     {
       "type": "search",
@@ -26,14 +26,14 @@
       "status": "running",
       "steps": 0,
       "pages": 0,
-      "tookMs": 1,
-      "ms": 3
+      "tookMs": 0,
+      "ms": 1
     },
     {
       "type": "stage",
       "name": "search",
       "detail": "Exa search on official sites: money and entitlements",
-      "ms": 8
+      "ms": 5
     },
     {
       "type": "search",
@@ -43,13 +43,13 @@
       "steps": 0,
       "pages": 0,
       "tookMs": 0,
-      "ms": 8
+      "ms": 5
     },
     {
       "type": "stage",
       "name": "search",
       "detail": "Exa search on official sites: how and where to apply",
-      "ms": 9
+      "ms": 5
     },
     {
       "type": "search",
@@ -59,27 +59,7 @@
       "steps": 0,
       "pages": 0,
       "tookMs": 0,
-      "ms": 9
-    },
-    {
-      "type": "search",
-      "focus": "actions and deadlines",
-      "web": "official",
-      "status": "done",
-      "steps": 4,
-      "pages": 4,
-      "tookMs": 4458,
-      "ms": 4460
-    },
-    {
-      "type": "search",
-      "focus": "how and where to apply",
-      "web": "official",
-      "status": "done",
-      "steps": 4,
-      "pages": 4,
-      "tookMs": 4761,
-      "ms": 4770
+      "ms": 5
     },
     {
       "type": "search",
@@ -87,29 +67,49 @@
       "web": "official",
       "status": "done",
       "steps": 3,
-      "pages": 1,
-      "tookMs": 4952,
-      "ms": 4960
+      "pages": 2,
+      "tookMs": 5187,
+      "ms": 5192
+    },
+    {
+      "type": "search",
+      "focus": "how and where to apply",
+      "web": "official",
+      "status": "done",
+      "steps": 4,
+      "pages": 4,
+      "tookMs": 6241,
+      "ms": 6246
+    },
+    {
+      "type": "search",
+      "focus": "actions and deadlines",
+      "web": "official",
+      "status": "done",
+      "steps": 4,
+      "pages": 3,
+      "tookMs": 6257,
+      "ms": 6258
     },
     {
       "type": "stage",
       "name": "search",
       "detail": "Exa search on official sites: pages published in the last four months",
-      "ms": 4965
+      "ms": 6264
     },
     {
       "type": "stage",
       "name": "read",
       "detail": "Opening 6 cited pages: our own live request plus Exa Contents",
-      "ms": 4966
+      "ms": 6265
     },
     {
       "type": "page",
-      "url": "https://infofinland.fi/family/financial-support-for-families/support-during-pregnancy",
-      "title": "InfoFinland - Support during pregnancy",
+      "url": "https://infofinland.fi/health/pregnancy-and-childbirth",
+      "title": "InfoFinland - Pregnancy and childbirth",
       "official": true,
       "via": "live",
-      "ms": 5099
+      "ms": 6978
     },
     {
       "type": "page",
@@ -117,15 +117,15 @@
       "title": "Pregnancy and life with a baby   | Hello Espoo – Welcome to Espoo | City of Espoo",
       "official": true,
       "via": "live",
-      "ms": 5236
+      "ms": 6984
     },
     {
       "type": "page",
-      "url": "https://www.kela.fi/during-pregnancy",
-      "title": "During pregnancy | Our Services | Kela",
+      "url": "https://infofinland.fi/family/financial-support-for-families/support-during-pregnancy",
+      "title": "InfoFinland - Support during pregnancy",
       "official": true,
       "via": "live",
-      "ms": 5454
+      "ms": 6986
     },
     {
       "type": "page",
@@ -133,7 +133,15 @@
       "title": "Maternity package or cash benefit | Our Services | Kela",
       "official": true,
       "via": "live",
-      "ms": 5541
+      "ms": 7043
+    },
+    {
+      "type": "page",
+      "url": "https://www.kela.fi/during-pregnancy",
+      "title": "During pregnancy | Our Services | Kela",
+      "official": true,
+      "via": "live",
+      "ms": 7063
     },
     {
       "type": "page",
@@ -141,43 +149,35 @@
       "title": "Family leaves and benefits - Having a child – Guide for those wishing for a child - Suomi.fi",
       "official": true,
       "via": "live",
-      "ms": 6115
-    },
-    {
-      "type": "page",
-      "url": "https://tem.fi/en/pregnancy-parental-childcare-leave",
-      "title": "Pregnancy leave, parental leave and childcare leave -             Ministry of Economic Affairs and Employment",
-      "official": true,
-      "via": "live",
-      "ms": 6156
+      "ms": 8182
     },
     {
       "type": "stage",
       "name": "verify",
       "detail": "Checking every quote, amount and deadline against the page text",
-      "ms": 6160
+      "ms": 8186
     },
     {
       "type": "stage",
       "name": "publish",
       "detail": "Building the case file",
-      "ms": 7091
+      "ms": 9713
     },
     {
       "type": "verified",
       "verified": 9,
       "total": 9,
-      "ms": 7329
+      "ms": 10050
     }
   ],
   "result": {
-    "id": "cfN1g_9dG4lCrqsB",
-    "title": "Pregnancy checklist for Espoo residents",
+    "id": "wksufX66aFxP-8m2",
+    "title": "Pregnancy Checklist for Families",
     "plan": [
-      "Book an appointment at a maternity clinic in Espoo [1]",
-      "Apply for maternity grant from Kela: at least two months before the due date [2][3]",
-      "Notify employer of pregnancy leave: no later than two months before the start of your leave [4][5]",
-      "Apply for pregnancy allowance from Kela: within two months of the start of your pregnancy leave at the latest [6][8]"
+      "Book appointment at Espoo maternity clinic [1]",
+      "Apply for maternity grant from Kela: at least two months before the child’s due date [2][3][4]",
+      "Notify employer of pregnancy leave: no later than two months before the start of your leave [5][6][7]",
+      "Apply for pregnancy allowance from Kela: no later than two months after your pregnancy allowance period starts [8]"
     ],
     "evidence": [
       {
@@ -191,6 +191,15 @@
       },
       {
         "n": 2,
+        "url": "https://infofinland.fi/health/pregnancy-and-childbirth",
+        "title": "InfoFinland - Pregnancy and childbirth",
+        "quote": "Apply for a maternity grant from Kela at least two months before the child’s due date.",
+        "sourceType": "official",
+        "verification": "verified",
+        "checkedVia": "live"
+      },
+      {
+        "n": 3,
         "url": "https://infofinland.fi/family/financial-support-for-families/support-during-pregnancy",
         "title": "InfoFinland - Support during pregnancy",
         "quote": "Apply for maternity grant from Kela at least two months before the due date.",
@@ -199,7 +208,7 @@
         "checkedVia": "live"
       },
       {
-        "n": 3,
+        "n": 4,
         "url": "https://www.kela.fi/maternity-package-or-cash-benefit",
         "title": "Maternity package or cash benefit | Our Services | Kela",
         "quote": "You should apply for the maternity grant no later than two months before the expected date of birth of the child.",
@@ -208,19 +217,10 @@
         "checkedVia": "live"
       },
       {
-        "n": 4,
-        "url": "https://tem.fi/en/pregnancy-parental-childcare-leave",
-        "title": "Pregnancy leave, parental leave and childcare leave - Ministry of Economic Affairs and Employment",
-        "quote": "As a rule, the employer must be notified of a pregnancy leave, parental leave or childcare leave no later than two months before the start of the leave.",
-        "sourceType": "official",
-        "verification": "verified",
-        "checkedVia": "live"
-      },
-      {
         "n": 5,
-        "url": "https://infofinland.fi/family/financial-support-for-families/support-during-pregnancy",
-        "title": "InfoFinland - Support during pregnancy",
-        "quote": "Remember to notify your employer about your pregnancy leave at least two (2) months before it begins.",
+        "url": "https://infofinland.fi/health/pregnancy-and-childbirth",
+        "title": "InfoFinland - Pregnancy and childbirth",
+        "quote": "If you have a job, give your employer written notification at least two months before you begin your pregnancy leave.",
         "sourceType": "official",
         "verification": "verified",
         "checkedVia": "live"
@@ -229,34 +229,34 @@
         "n": 6,
         "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
         "title": "suomi.fi",
-        "quote": "You must apply for your pregnancy allowance within two months of the start of your pregnancy leave at the latest.",
+        "quote": "Agree with your employer on the start date of your pregnancy leave no later than two months before it is set to begin.",
         "sourceType": "official",
         "verification": "verified",
         "checkedVia": "live"
       },
       {
         "n": 7,
-        "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
-        "title": "suomi.fi",
-        "quote": "The length of the pregnancy leave is 40 working days.",
+        "url": "https://www.kela.fi/during-pregnancy",
+        "title": "During pregnancy | Our Services | Kela",
+        "quote": "If you are working, you must inform your employer of your pregnancy leave no later than two months before the start of your leave.",
         "sourceType": "official",
         "verification": "verified",
         "checkedVia": "live"
       },
       {
         "n": 8,
-        "url": "https://www.kela.fi/during-pregnancy",
-        "title": "During pregnancy | Our Services | Kela",
-        "quote": "Apply for the allowance within 2 months of the start of your pregnancy leave at the latest.",
+        "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
+        "title": "suomi.fi",
+        "quote": "You must apply for your pregnancy allowance within two months of the start of your pregnancy leave at the latest.",
         "sourceType": "official",
         "verification": "verified",
         "checkedVia": "live"
       },
       {
         "n": 9,
-        "url": "https://www.kela.fi/during-pregnancy",
-        "title": "During pregnancy | Our Services | Kela",
-        "quote": "Kela pays pregnancy allowance for a total of 40 days (Monday to Saturday, excluding mid-week holidays).",
+        "url": "https://www.suomi.fi/guides/having-a-child/family-benefits-and-working-life/family-leaves-and-benefits",
+        "title": "suomi.fi",
+        "quote": "The length of the pregnancy leave is 40 working days.",
         "sourceType": "official",
         "verification": "verified",
         "checkedVia": "live"
@@ -265,7 +265,7 @@
     "evidenceVerified": 9,
     "evidenceTotal": 9,
     "news": [],
-    "ms": 7564,
+    "ms": 10332,
     "exa": {
       "searches": 4,
       "contents": 6,

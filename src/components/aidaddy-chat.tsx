@@ -118,7 +118,7 @@ function Linked({ text }: { text: string }) {
   );
 }
 
-export function AIDaddyChat({ code, needsCode }: { code: string; needsCode: boolean }) {
+export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string; needsCode: boolean; voiceAvailable: boolean }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -258,18 +258,22 @@ export function AIDaddyChat({ code, needsCode }: { code: string; needsCode: bool
               {STATE_WORD[avatarState].text}
             </p>
             <p className="site-note">
-              {voice.recording
-                ? "Recording. Tap the square to stop."
-                : voice.transcribing
-                  ? "Turning your voice note into text."
-                  : voice.speaking
-                    ? "AIDaddy is reading its reply aloud."
-                    : "Talk to AIDaddy by voice or text. Its voice is made with ElevenLabs."}
+              {!voiceAvailable
+                ? "Type your message to AIDaddy. Voice is unavailable in this demo."
+                : voice.recording
+                  ? "Recording. Tap the square to stop."
+                  : voice.transcribing
+                    ? "Turning your voice note into text."
+                    : voice.speaking
+                      ? "AIDaddy is reading its reply aloud."
+                      : "Talk to AIDaddy by voice or text. Its voice is made with ElevenLabs."}
             </p>
-            <Button type="button" variant="outline" size="sm" onClick={voice.toggleSpeech} aria-pressed={voice.enabled}>
-              {voice.enabled ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
-              {voice.enabled ? "Voice on" : "Voice off"}
-            </Button>
+            {voiceAvailable && (
+              <Button type="button" variant="outline" size="sm" onClick={voice.toggleSpeech} aria-pressed={voice.enabled}>
+                {voice.enabled ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
+                {voice.enabled ? "Voice on" : "Voice off"}
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -327,20 +331,22 @@ export function AIDaddyChat({ code, needsCode }: { code: string; needsCode: bool
               // On a phone the empty box is 66px tall and drops to 44px at the first key; 44px from 640px.
               className="max-h-40 min-h-[4.25rem] px-3 sm:min-h-11"
             />
-            <Button
-              type="button"
-              size="icon-lg"
-              variant="outline"
-              onClick={listen}
-              disabled={voice.transcribing}
-              aria-pressed={voice.recording}
-              aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
-              // Amber while the microphone is live: the person's move, the same colour as the ring around the avatar.
-              data-tone="amber"
-              className="h-11 w-11"
-            >
-              {voice.recording ? <Square aria-hidden /> : <Mic aria-hidden />}
-            </Button>
+            {voiceAvailable && (
+              <Button
+                type="button"
+                size="icon-lg"
+                variant="outline"
+                onClick={listen}
+                disabled={voice.transcribing}
+                aria-pressed={voice.recording}
+                aria-label={voice.recording ? "Stop recording" : "Record a voice note"}
+                // Amber while the microphone is live: the person's move, the same colour as the ring around the avatar.
+                data-tone="amber"
+                className="h-11 w-11"
+              >
+                {voice.recording ? <Square aria-hidden /> : <Mic aria-hidden />}
+              </Button>
+            )}
             <Button type="submit" size="icon-lg" className="h-11 w-11" disabled={busy || !draft.trim()} aria-label="Send">
               <Send aria-hidden />
             </Button>
