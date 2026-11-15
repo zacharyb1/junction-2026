@@ -76,7 +76,7 @@ The scaffold's `/api/chat` and `src/lib/ai.ts` remain in the repository but are 
 
 ### The site, page by page
 
-AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page except `/reading` is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try it live, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
+AIDaddy is both the product and the butler, one thing with one name. It sits in a family's group chat, silent until it matters, and speaks on Telegram and on the web. Every page except `/reading` is drawn inside one shared frame, [`src/components/site/`](src/components/site/): the same header (Demos, Try AIDaddy without setup, Talk to AIDaddy, Set up), the same footer and the front page's dark colours. A new page should use `SiteShell` from that folder. The last column says what a visitor is really looking at.
 
 | Page | What a visitor gets | What it is |
 |---|---|---|

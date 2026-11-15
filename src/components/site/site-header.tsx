@@ -8,7 +8,7 @@ import { Wordmark } from "@/components/site/wordmark";
 /** The four places a visitor can go. `under` lists the paths that count as being there. */
 const NAV = [
   { href: "/demo", label: "Demos", under: ["/demo", "/autopilot"] },
-  { href: "/try", label: "Try it live", under: ["/try", "/c/"] },
+  { href: "/try", label: "Try AIDaddy without setup", under: ["/try", "/c/"] },
   { href: "/chat", label: "Talk to AIDaddy", under: ["/chat"] },
   { href: "/setup", label: "Set up", under: ["/setup"] },
 ];

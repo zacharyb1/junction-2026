@@ -9,9 +9,11 @@
  * the result, a few messages from the gate test set and the gate's measured counts to src/data/replay.json.
  * Nothing in that file is invented: the page plays back what happened.
  *
- * A new recording needs new narration before a "Hear the plan" button can be shown. Never reuse
- * public/hud/plan.mp3 from an older case. With ELEVENLABS_API_KEY configured, generate matching narration:
+ * The front page's "Hear the plan" button plays public/hud/plan.mp3 only for the case named in
+ * src/data/plan-audio.json, so after a new recording the button is gone until matching narration exists.
+ * With ELEVENLABS_API_KEY configured, render it and name the new case:
  *   curl -o public/hud/plan.mp3 <base>/api/cases/<new case id>/audio
+ *   then set caseId and seconds in src/data/plan-audio.json
  */
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
