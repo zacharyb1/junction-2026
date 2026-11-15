@@ -3,8 +3,10 @@ import { DeskTasks } from "@/components/desk/tasks";
 
 export const metadata: Metadata = { title: "Get it done" };
 
-/** AI agents call for quotes. ?job=... starts with another job. */
+/** Real companies for a job and calls for quotes to the team's test phones. ?job=... starts with another job. */
 export default async function DeskTasksPage({ searchParams }: PageProps<"/desk/tasks">) {
   const { job } = await searchParams;
-  return <DeskTasks job={typeof job === "string" ? job.slice(0, 300) : undefined} />;
+  const asked = typeof job === "string" ? job.slice(0, 300) : undefined;
+  // Keyed by the job, so another job starts with a fresh search and no calls from the last one.
+  return <DeskTasks key={asked ?? ""} job={asked} />;
 }
