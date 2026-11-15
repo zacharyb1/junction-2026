@@ -76,7 +76,13 @@ export function HomeShell({ children }: { children: ReactNode }) {
           router.push(parentOf(window.location.pathname));
         }
       },
-      askHref: () => (code ? `/assistant?code=${encodeURIComponent(code)}` : "/assistant"),
+      askHref: (question) => {
+        const params = new URLSearchParams();
+        if (code) params.set("code", code);
+        if (question) params.set("q", question);
+        const query = params.toString();
+        return query ? `/assistant?${query}` : "/assistant";
+      },
       say: (text) => {
         setNote(text);
         if (hide.current) clearTimeout(hide.current);

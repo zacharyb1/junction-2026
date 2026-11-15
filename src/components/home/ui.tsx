@@ -36,7 +36,7 @@ export type Nav = {
   back: () => void;
   tab: (t: Tab) => void;
   /** The full chat with AIDaddy at /assistant (the Ask tab), with the demo's access code when there is one. */
-  askHref: () => string;
+  askHref: (question?: string) => string;
   /** A short note from AIDaddy at the bottom of the screen, for what the demo would do next. */
   say: (text: string) => void;
 };

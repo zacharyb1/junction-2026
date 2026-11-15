@@ -54,7 +54,7 @@ function Avatar({ size = 32 }: { size?: number }) {
   );
 }
 
-export function ChatScreen({ code }: { code: string }) {
+export function ChatScreen({ code, first }: { code: string; first?: string }) {
   const household = useOpportunities(code);
   const [view, setView] = useState<View>("opportunities");
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -120,6 +120,15 @@ export function ChatScreen({ code }: { code: string }) {
       box.current?.focus();
     }
   }
+
+  // A question sent from another screen (?q=...) is asked once, as soon as the chat opens.
+  const sentFirst = useRef(false);
+  useEffect(() => {
+    if (!first || sentFirst.current) return;
+    sentFirst.current = true;
+    void send(first);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, for the question the page opened with
+  }, [first]);
 
   function open(next: View) {
     setView(next);
