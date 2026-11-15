@@ -12,6 +12,7 @@ import { type FormEvent, useEffect, useState } from "react";
 import type { HelperSearch } from "@/lib/engine/helpers";
 import { CHANNEL, DEMO_FIRMS, DEMO_JOB, type Firm, type FirmRow, firmsFromHelpers, HOUSEHOLD, isDemoJob, taskFrame } from "@/lib/home-demo";
 import { AppLogo, H1, Icon, ICON, Main, Spinner, TabBar, TabHeader, useNav } from "./ui";
+import { useLive } from "./ukk-app";
 
 type Run = { job: string; mode: "demo" } | { job: string; mode: "live"; status: "searching" | "ready" | "error"; firms: Firm[]; error: string };
 
@@ -86,8 +87,9 @@ function RowView({ row, picked, best, searching }: { row: FirmRow; picked: boole
   );
 }
 
-export function TasksScreen({ job: initial, code }: { job?: string; code: string }) {
+export function TasksScreen({ job: initial }: { job?: string }) {
   const nav = useNav();
+  const { code } = useLive();
   const first = initial?.trim() || DEMO_JOB;
   const [draft, setDraft] = useState(first);
   const [run, setRun] = useState<Run>(() => (isDemoJob(first) ? { job: first, mode: "demo" } : { job: first, mode: "live", status: "searching", firms: [], error: "" }));

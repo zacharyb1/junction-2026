@@ -17,12 +17,28 @@ export type Route =
 
 export type Tab = "hidden" | "tasks" | "search" | "community";
 
+/** Every screen is its own page under /home, so it can be linked, reloaded and shared. */
+export function hrefFor(r: Route): string {
+  switch (r.s) {
+    case "start":
+      return "/home";
+    case "opp":
+      return `/home/hidden/${encodeURIComponent(r.id)}`;
+    case "tasks":
+      return r.job ? `/home/tasks?job=${encodeURIComponent(r.job)}` : "/home/tasks";
+    default:
+      return `/home/${r.s}`;
+  }
+}
+
 export type Nav = {
   push: (r: Route) => void;
   back: () => void;
   tab: (t: Tab) => void;
-  /** Leaves the app for the full chat with UKK at /assistant, with a first question when there is one. */
-  askHref: (question?: string) => string;
+  /** The full chat with UKK at /assistant (the Ask tab), with the demo's access code when there is one. */
+  askHref: () => string;
+  /** A short note from UKK at the bottom of the screen, for what the demo would do next. */
+  say: (text: string) => void;
 };
 
 export const NavContext = createContext<Nav | null>(null);

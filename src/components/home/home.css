@@ -33,34 +33,16 @@
   background: var(--ukk-bg);
 }
 
-.ukk-caption {
-  display: none;
-}
-
-/* On a laptop or a projector the app sits in a phone, with what the presenter says beside it. */
-@media (min-width: 760px) and (min-height: 560px) {
+/* Built for a phone. Wider screens get the same phone-width column, centred. */
+@media (min-width: 480px) {
   .ukk-stage {
     background: #f6efe6;
-    align-items: center;
     justify-content: center;
-    gap: 6vw;
-    padding: 24px 6vw;
   }
   .ukk-phone {
     flex: none;
     width: 390px;
-    height: min(844px, calc(100dvh - 48px));
-    border-radius: 48px;
-    box-shadow:
-      0 0 0 12px #1d1a18,
-      0 40px 90px rgba(60, 40, 20, 0.28);
-    --ukk-top: 44px;
-    --ukk-bottom: 24px;
-  }
-  .ukk-caption {
-    display: block;
-    max-width: 520px;
-    order: -1;
+    box-shadow: 0 0 0 1px #ece6dc, 0 20px 60px rgba(60, 40, 20, 0.12);
   }
 }
 

@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { householdFrame, MAP_CENTRE } from "@/lib/home-demo";
 import { AppLogo, BackButton, H1, useNav } from "./ui";
+import { useFound } from "./ukk-app";
 
 const TICK_MS = 700;
 
@@ -28,8 +29,9 @@ const WAVES: [number, string][] = [
   [13, "-.1s"],
 ];
 
-export function HouseholdScreen({ found }: { found: number }) {
+export function HouseholdScreen() {
   const nav = useNav();
+  const found = useFound();
   const [t, setT] = useState(0);
 
   // One fact every 0.7 s; the finished map then stays put.

@@ -8,6 +8,7 @@
 import Image from "next/image";
 import { type FormEvent, useState } from "react";
 import { isJob } from "@/lib/home-demo";
+import { useFound } from "./ukk-app";
 import { Icon, ICON, useNav } from "./ui";
 
 const WORDS = [
@@ -45,8 +46,9 @@ const PHOTOS: [string, string, number, number, number, number, number, number][]
   ["play", "Kids playing with bubbles", 332, 182, 92, 22, 16, 1],
 ];
 
-export function StartScreen({ found }: { found: number }) {
+export function StartScreen() {
   const nav = useNav();
+  const found = useFound();
   const [query, setQuery] = useState("");
   const fill = (t: string) => setQuery(t.replace("…", "").replace(/\?$/, "?").trim());
 
@@ -61,7 +63,7 @@ export function StartScreen({ found }: { found: number }) {
       return;
     }
     if (isJob(text)) nav.push({ s: "tasks", job: text });
-    else window.location.assign(nav.askHref(text));
+    else nav.say("Demo: in the full app UKK answers this in the chat. To see agents at work, try “Kitchen tap is leaking”.");
   }
 
   return (
@@ -147,7 +149,7 @@ export function StartScreen({ found }: { found: number }) {
           enterKeyHint="go"
           className="min-w-0 flex-1 border-0 bg-transparent text-base font-light text-[#2a2420] outline-none placeholder:text-[#8f8379]"
         />
-        <button type="button" aria-label="Add a photo" title="Photos come with the chat" onClick={() => window.location.assign(nav.askHref())} className="flex size-11 items-center justify-center rounded-full">
+        <button type="button" aria-label="Add a photo" title="Photos come with the chat" onClick={() => nav.say("Demo: photos of letters and receipts go to UKK in the chat.")} className="flex size-11 items-center justify-center rounded-full">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7a6e66" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="4" width="18" height="16" rx="4" />
             <circle cx="9" cy="10" r="1.8" />

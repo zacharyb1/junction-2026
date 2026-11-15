@@ -3,27 +3,31 @@
 /** One opportunity: who it is for, the estimate, why the family fits, the source, and what UKK can prepare. */
 
 import Image from "next/image";
-import { useRef, useState } from "react";
-import { type Row, TINT } from "./opportunities";
-import { AppLogo, BackButton, Icon, ICON, Main, Toast, useNav } from "./ui";
+import { EXAMPLES, TINT } from "./opportunities";
+import { AppLogo, BackButton, Icon, ICON, Main, Spinner, useNav } from "./ui";
+import { useLive } from "./ukk-app";
 
-export function DetailScreen({ row }: { row: Row | undefined }) {
+export function DetailScreen({ id }: { id: string }) {
   const nav = useNav();
-  const [note, setNote] = useState("");
-  const hide = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const say = (text: string) => {
-    setNote(text);
-    if (hide.current) clearTimeout(hide.current);
-    hide.current = setTimeout(() => setNote(""), 4500);
-  };
+  const { live } = useLive();
+  const say = nav.say;
+  const row = [...EXAMPLES, ...live.rows].find((r) => r.id === id);
   const d = row?.detail;
   if (!d) {
     return (
       <>
         <header className="flex flex-none flex-col gap-2 px-6 pb-3 pt-[calc(var(--ukk-top)+8px)]">
           <BackButton label="Back to Hidden opportunities" />
-          <h1 className="m-0 text-[26px] font-bold">This find is gone</h1>
-          <p className="m-0 text-sm text-[#7a6e66]">The live list was refreshed. Go back to see what UKK found today.</p>
+          {live.status === "loading" ? (
+            <h1 className="m-0 flex items-center gap-2 text-[26px] font-bold">
+              <Spinner size={18} /> Loading the find…
+            </h1>
+          ) : (
+            <>
+              <h1 className="m-0 text-[26px] font-bold">This find is gone</h1>
+              <p className="m-0 text-sm text-[#7a6e66]">The live list was refreshed. Go back to see what UKK found today.</p>
+            </>
+          )}
         </header>
       </>
     );
@@ -113,13 +117,12 @@ export function DetailScreen({ row }: { row: Row | undefined }) {
             {d.secondary}
           </button>
         ) : (
-          <a href={nav.askHref(`Tell me more about this: ${d.title}${d.url ? ` (${d.url})` : ""}`)} className="flex h-11 items-center justify-center rounded-[14px] border border-[#efe7dc] bg-white text-[15px] font-semibold no-underline">
+          <a href={nav.askHref()} className="flex h-11 items-center justify-center rounded-[14px] border border-[#efe7dc] bg-white text-[15px] font-semibold no-underline">
             {d.secondary}
           </a>
         )}
         <span className="text-center text-xs text-[#8a7f76]">{d.promise}</span>
       </footer>
-      {note && <Toast>{note}</Toast>}
     </>
   );
 }

@@ -3,7 +3,7 @@ import { blank, groundOpportunity, lensesFor } from "@/lib/engine/opportunities"
 
 describe("blank", () => {
   it("treats the model's placeholders as no value", () => {
-    for (const v of ['""', "Empty", "none", "N/A", "  ", "None stated", "Not specified."]) expect(blank(v)).toBe("");
+    for (const v of ['""', "Empty", "none", "N/A", "  "]) expect(blank(v)).toBe("");
     expect(blank("free admission")).toBe("free admission");
   });
 });

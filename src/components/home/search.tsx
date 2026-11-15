@@ -24,7 +24,7 @@ const ROWS: [AppName, string, string, string][] = [
 export function SearchScreen() {
   const nav = useNav();
   const [draft, setDraft] = useState("");
-  const go = (q: string) => window.location.assign(nav.askHref(q));
+  const go = (q: string) => nav.say(`Demo: UKK would look for “${q}” in shops, each with its price on the shop’s own page. It never buys.`);
   function submit(e: FormEvent) {
     e.preventDefault();
     if (draft.trim()) go(draft.trim());
@@ -64,7 +64,7 @@ export function SearchScreen() {
           </span>
         </div>
         {ROWS.map(([app, title, from, ask]) => (
-          <a key={title} href={nav.askHref(ask)} className="flex flex-none gap-3 border-b border-[#ece6dc] py-3 no-underline">
+          <button key={title} type="button" onClick={() => go(ask)} className="flex flex-none gap-3 border-b border-[#ece6dc] py-3 text-left">
             <span className="box-border flex size-9 flex-none items-center justify-center rounded-[10px] border border-[#ece6dc] bg-white p-1.5">
               <AppLogo app={app} size={24} />
             </span>
@@ -75,9 +75,9 @@ export function SearchScreen() {
               </span>
             </span>
             <Icon d={ICON.chevron} size={18} stroke="#b0a99e" width={2} className="flex-none self-center" />
-          </a>
+          </button>
         ))}
-        <p className="m-0 py-2 text-[11px] text-[#8f8379]">Example messages for the demo family. Each opens the chat, which searches shops with sources. UKK never buys.</p>
+        <p className="m-0 py-2 text-[11px] text-[#8f8379]">Example messages for the demo family. In the full app each one is searched in shops, with sources. UKK never buys.</p>
       </Main>
       <TabBar current="search" />
     </>

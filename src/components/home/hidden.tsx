@@ -7,6 +7,7 @@ import { useState } from "react";
 import { type AppName } from "@/lib/home-demo";
 import { EXAMPLES, type Row, TINT, type Who } from "./opportunities";
 import { AppLogo, Icon, Main, Spinner, TabBar, useNav } from "./ui";
+import { useLive } from "./ukk-app";
 
 export type LiveOpps = { status: "loading" | "ok" | "error"; rows: Row[]; error: string };
 
@@ -48,8 +49,9 @@ function OppRow({ r }: { r: Row }) {
   );
 }
 
-export function HiddenScreen({ live }: { live: LiveOpps }) {
+export function HiddenScreen() {
   const nav = useNav();
+  const { live } = useLive();
   const [who, setWho] = useState<(typeof PEOPLE)[number]>("All");
   const count = EXAMPLES.length + live.rows.length;
   const show = (r: Row) => who === "All" || r.who === who;

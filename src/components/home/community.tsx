@@ -10,13 +10,15 @@ import { type FormEvent, useState } from "react";
 import type { CommunitySearch } from "@/lib/engine/communities";
 import { type CommunityFilter, type CommunityRow, communityRow, DEMO_COMMUNITIES, DEMO_QUESTION, HOUSEHOLD } from "@/lib/home-demo";
 import { H1, Icon, ICON, Main, Spinner, TabBar, TabHeader } from "./ui";
+import { useLive } from "./ukk-app";
 
 const FILTERS: CommunityFilter[] = ["All", "Forums", "Groups", "Podcasts"];
 const KIND_ICON: Record<CommunityRow["kind"], string> = { Forums: ICON.chat, Groups: ICON.people, Podcasts: ICON.podcast };
 
 type Live = { status: "idle" | "searching" | "ok" | "error"; question: string; rows: CommunityRow[]; error: string };
 
-export function CommunityScreen({ code }: { code: string }) {
+export function CommunityScreen() {
+  const { code } = useLive();
   const [draft, setDraft] = useState(DEMO_QUESTION);
   const [filter, setFilter] = useState<CommunityFilter>("All");
   const [live, setLive] = useState<Live>({ status: "idle", question: "", rows: [], error: "" });

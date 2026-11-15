@@ -18,7 +18,5 @@ export const metadata: Metadata = {
 export default async function AssistantPage({ searchParams }: PageProps<"/assistant">) {
   const params = await searchParams;
   const code = typeof params.code === "string" ? params.code.trim() : "";
-  // A first question from the /home app's Ask tab or start box.
-  const ask = typeof params.ask === "string" ? params.ask.trim().slice(0, 500) : "";
-  return <ChatScreen code={code} ask={ask} />;
+  return <ChatScreen code={code} />;
 }

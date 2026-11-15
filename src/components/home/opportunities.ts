@@ -176,7 +176,10 @@ const LENS: Record<Opportunity["lens"], { who: Who; kind: string; icon: string }
 const money = (v: string) => /€|eur|%|\d/i.test(v) && !/^free$/i.test(v.trim());
 
 /** A live finding from the Engine, as a row with its own detail page. Every fact on it comes from the page. */
-export function liveRow(o: Opportunity, i: number): Row {
+export function liveRow(found: Opportunity, i: number): Row {
+  // The model sometimes writes "None stated" for a field the page does not fill.
+  const none = (v: string) => (/^(none|not) (stated|given|specified|mentioned)\.?$/i.test(v.trim()) ? "" : v);
+  const o = { ...found, value: none(found.value), deadline: none(found.deadline) };
   const lens = LENS[o.lens];
   const kids = o.lens === "children";
   const who: Who = kids && /baby|infant|vauva|toddler|9 months/i.test(`${o.title} ${o.why}`) ? "Aino" : lens.who;

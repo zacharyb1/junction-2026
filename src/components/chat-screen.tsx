@@ -54,7 +54,7 @@ function Avatar({ size = 32 }: { size?: number }) {
   );
 }
 
-export function ChatScreen({ code, ask = "" }: { code: string; ask?: string }) {
+export function ChatScreen({ code }: { code: string }) {
   const household = useOpportunities(code);
   const [view, setView] = useState<View>("opportunities");
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -132,20 +132,6 @@ export function ChatScreen({ code, ask = "" }: { code: string; ask?: string }) {
     open("chat");
     box.current?.focus();
   }
-
-  // A first question handed over from /home (?ask=...) is sent once, then dropped from the address so a reload
-  // does not send it again.
-  const asked = useRef(false);
-  useEffect(() => {
-    if (!ask || asked.current) return;
-    asked.current = true;
-    const url = new URL(window.location.href);
-    url.searchParams.delete("ask");
-    window.history.replaceState(window.history.state, "", url);
-    queueMicrotask(() => void send(ask));
-    // Only on the first render: send changes every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ask]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
