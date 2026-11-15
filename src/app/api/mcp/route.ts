@@ -4,6 +4,7 @@ import { CaseInput, CasePatch } from "@/lib/case";
 import { baseUrl, isAuthorised, loadCase, publishCase, recheckCase, updateCase } from "@/lib/cases";
 import { findGifts, GiftInput } from "@/lib/engine/gifts";
 import { EngineError, ResearchInput, researchCase } from "@/lib/engine/research";
+import { cancelSwarm, getSwarm, prepareSwarm, startSwarm, SwarmInput } from "@/lib/swarm-calls";
 
 export const maxDuration = 300;
 
@@ -121,6 +122,55 @@ function handlerFor(origin: string) {
           ? text({ id, changed: result.changed, unreachable: result.unreachable, url: `${origin}/c/${id}` })
           : text(`No case with id ${id}.`);
       },
+    );
+
+    server.registerTool(
+      "prepare_swarm_call",
+      {
+        title: "Prepare calls to several recipients at once",
+        description:
+          "Prepare one task to be asked of several people at the same time by phone, so their answers can be compared " +
+          "(\"ask the three test shops whether they have it in stock\"). AIDaddy's voice agent makes every call. " +
+          "Recipients come only from the operator's list; pass their names in `recipients` or omit it to call everyone. " +
+          "Nothing rings yet. Show the returned task, preferences and recipients, say purchases and payments are simulated, " +
+          "and wait for a new Yes before start_swarm_call.",
+        inputSchema: SwarmInput,
+      },
+      async (input) => text(await prepareSwarm(input)),
+    );
+
+    server.registerTool(
+      "start_swarm_call",
+      {
+        title: "Start a confirmed swarm of calls",
+        description:
+          "Ring every recipient of a prepared swarm at once. Only after the person confirmed that exact proposal in a new " +
+          "message; set `confirmed` to true. A proposal starts at most once: never call this again to retry.",
+        inputSchema: z.object({ id: z.string(), confirmed: z.boolean() }),
+      },
+      async ({ id, confirmed }) => text(await startSwarm(id, confirmed)),
+    );
+
+    server.registerTool(
+      "get_swarm_call",
+      {
+        title: "Read a swarm's results",
+        description:
+          "Progress of a swarm of calls and, when every call ended, each recipient's answer side by side in `comparison`. " +
+          "Results come from the calls themselves. Set `transcript` for what was said.",
+        inputSchema: z.object({ id: z.string(), transcript: z.boolean().optional() }),
+      },
+      async ({ id, transcript }) => text(await getSwarm(id, { transcript })),
+    );
+
+    server.registerTool(
+      "cancel_swarm_call",
+      {
+        title: "Cancel a swarm of calls",
+        description: "Cancel a prepared swarm, or stop the calls of a running one that have not ended. Use when the person says stop.",
+        inputSchema: z.object({ id: z.string() }),
+      },
+      async ({ id }) => text(await cancelSwarm(id)),
     );
   });
 }
