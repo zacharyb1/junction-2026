@@ -43,6 +43,7 @@ const en = {
 
   // Gap notes, listed under "What I could not confirm". `title` is the step's title.
   pageNotOpened: (title: string, host: string) => `${title}: the cited page could not be opened (${host}).`,
+  arrivalNotEstablished: (title: string) => `${title}: left out because the family already lives in this country and this move does not establish the source's arrival or initial-application prerequisite.`,
   quoteNotFound: (title: string, host: string) => `${title}: the quoted sentence was not found on ${host}.`,
   figureNotOnPage: (title: string, host: string) => `${title}: this figure is not on ${host}, so the step is left out.`,
   factNotStated: (title: string, value: string, host: string) =>
@@ -122,6 +123,7 @@ const fi: Messages = {
   building: "Kootaan tapaussivu",
 
   pageNotOpened: (title, host) => `${title}: lähdesivua ei voitu avata (${host}).`,
+  arrivalNotEstablished: (title) => `${title}: jätetty pois, koska perhe asuu jo tässä maassa eikä tämä muutto osoita lähteen edellyttämää maahantuloa tai ensimmäistä hakemusta.`,
   quoteNotFound: (title, host) => `${title}: lainattua lausetta ei löytynyt sivustolta ${host}.`,
   figureNotOnPage: (title, host) => `${title}: tätä lukua ei ole sivustolla ${host}, joten vaihe on jätetty pois.`,
   factNotStated: (title, value, host) =>

@@ -42,6 +42,9 @@ skills:
     - life-event-butler
     - letter-decoder
     - deadline-keeper
+    - birthday-planner
+    - law-check
+    - product-finder
   write_approval: true     # the bot may not rewrite skills on its own; changes wait in /skills pending
   # Not auto-loaded, on purpose: the three desks (legal-desk, travel-desk, finance-desk) and routine-maker are
   # loaded with skill_view when a matter needs them, so every other conversation stays as fast as it was measured.
