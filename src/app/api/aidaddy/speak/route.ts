@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { mayResearch, readJson } from "@/lib/cases";
 import { allow } from "@/lib/rate-limit";
-import { renderSpeech, speakable } from "@/lib/speech";
+import { renderSpeech, replyLanguage, speakable } from "@/lib/speech";
 
 export const maxDuration = 30;
 
@@ -22,7 +22,8 @@ export async function POST(req: Request) {
   if (!text) return json({ error: "Nothing to read aloud." }, 400);
   if (!allow(req, false)) return json({ error: "AIDaddy is busy, try again in a minute." }, 429);
   try {
-    const audio = await renderSpeech(text);
+    // AIDaddy answers in the language it was written to, and the reply is spoken as that language.
+    const audio = await renderSpeech(text, { language: replyLanguage(text) });
     return new Response(new Uint8Array(audio), { headers: { "content-type": "audio/mpeg", "cache-control": "no-store" } });
   } catch (error) {
     console.error("AIDaddy speech failed", error);

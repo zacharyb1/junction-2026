@@ -13,11 +13,14 @@ export function ListenButton({
   label,
   loadingLabel,
   errorLabel,
+  note,
 }: {
   src: string;
   label: string;
   loadingLabel: string;
   errorLabel: string;
+  /** How the voice reads this case, when it is not the plain reading: "Read slowly and calmly." */
+  note?: string;
 }) {
   const audio = useRef<HTMLAudioElement>(null);
   const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -49,6 +52,7 @@ export function ListenButton({
           {state === "loading" ? loadingLabel : label}
         </Button>
       )}
+      {note && <p className="text-sm text-muted-foreground">{note}</p>}
       {state === "error" && (
         <p role="alert" className="text-sm text-destructive">
           {errorLabel}

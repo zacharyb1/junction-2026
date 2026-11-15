@@ -4,6 +4,7 @@
  *
  *   ELEVENLABS_API_KEY=... node scripts/voiceover.mjs            every line in docs/pitch/voiceover.json
  *   ELEVENLABS_API_KEY=... node scripts/voiceover.mjs --only 07-numbers
+ *   ... --voice <voice id> --out docs/pitch/voiceover-aidaddy     the same lines in another voice, in another folder
  *
  * In a Claude cloud session the key is injected by a proxy: run with NODE_USE_ENV_PROXY=1 and no key.
  * Output: docs/pitch/voiceover/<id>.mp3, one file per line, so each can be placed on the video timeline.
@@ -13,8 +14,10 @@ import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(path.join(ROOT, "docs/pitch/voiceover.json"), "utf8"));
-const outDir = path.join(ROOT, "docs/pitch/voiceover");
-const only = process.argv.includes("--only") ? process.argv[process.argv.indexOf("--only") + 1] : null;
+const flag = (name) => (process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : null);
+const outDir = path.resolve(ROOT, flag("--out") ?? "docs/pitch/voiceover");
+const only = flag("--only");
+const voice = flag("--voice") ?? config.voiceId;
 const key = process.env.ELEVENLABS_API_KEY ?? "proxy-injected";
 
 await mkdir(outDir, { recursive: true });
@@ -25,7 +28,7 @@ for (const line of config.lines) {
   // Neighbouring lines let the voice keep one tone across separately rendered files.
   const i = main.findIndex((l) => l.id === line.id);
   const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${config.voiceId}?output_format=mp3_44100_128`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_128`,
     {
       method: "POST",
       headers: { "xi-api-key": key, "content-type": "application/json" },
