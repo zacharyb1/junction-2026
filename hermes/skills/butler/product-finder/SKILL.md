@@ -13,6 +13,7 @@ Issue #30, widened from gifts to any product. Someone wants to buy something ("I
 
 - A message asks to find, compare, choose or buy a product, a gift, a present or a non-prescription medicine. Birthday ideas from the `birthday-planner` reminder job also go here for the gift part.
 - Not for rules, rights or benefits: those go to `research_case`.
+- If the person asks you to phone someone to arrange a purchase, follow the Demo phone calls procedure in SOUL.md: confirm remembered preferences, then call only the configured test recipient. Ordering and payment are simulated. Product searches and ordinary shop links still follow the steps below.
 
 ## Steps
 

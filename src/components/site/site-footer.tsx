@@ -24,6 +24,9 @@ export function SiteFooter() {
                 <SiteLink href="/chat">Talk to AIDaddy</SiteLink>
               </li>
               <li>
+                <SiteLink href="/call">Let AIDaddy call</SiteLink>
+              </li>
+              <li>
                 <Link href="/setup">Set up</Link>
               </li>
             </ul>
