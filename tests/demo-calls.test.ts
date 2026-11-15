@@ -242,12 +242,16 @@ describe("demo calls on the browser line", () => {
     expect(await getDemoCall(call.id)).toMatchObject({ status: "in_progress" });
     network.mockResolvedValueOnce(response({
       status: "done", transcript_summary: "The office moved the collection to Saturday at 10.", call_successful: "success",
-      messages: [{ role: "agent", message: "Hello, this is AIDaddy." }, { role: "user", message: " Saturday at ten works. " }, { role: "agent", message: null }],
+      // The agent's tone marks are for the voice; "[B12]" is not one and stays.
+      messages: [
+        { role: "agent", message: "[happy] Hello, this is AIDaddy." }, { role: "user", message: " Saturday at ten works for [B12]. " },
+        { role: "agent", message: null }, { role: "agent", message: "[thoughtful]" },
+      ],
     }));
     const result = await getDemoCall(call.id, { transcript: true });
     expect(result).toMatchObject({
       status: "finished", outcome: "success", summary: "The office moved the collection to Saturday at 10.",
-      transcript: [{ speaker: "aidaddy", text: "Hello, this is AIDaddy." }, { speaker: "recipient", text: "Saturday at ten works." }],
+      transcript: [{ speaker: "aidaddy", text: "Hello, this is AIDaddy." }, { speaker: "recipient", text: "Saturday at ten works for [B12]." }],
     });
     expect("notice" in result && result.notice).toContain("simulated");
     // The chat tool gets the summary; the transcript is for the web page.

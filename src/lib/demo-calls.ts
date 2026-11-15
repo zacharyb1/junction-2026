@@ -234,6 +234,12 @@ export async function startDemoCall(id: string, confirmed: boolean, origin = "")
   return { ...view(call), next: "Report the actual status. Use get_demo_call for the result after the conversation; never say the task is finished just because dialing started." };
 }
 
+/**
+ * The words of one turn. The agent marks its tone for the voice with tags such as "[happy]"; they are
+ * directions for the speech model, never spoken, so they do not belong in what was said.
+ */
+const spoken = (text: string) => text.replace(/\[[a-z]+(?: [a-z]+){0,2}\]\s*/g, "").trim().slice(0, 1000);
+
 /** What the agent is told for this call. The names match the agent's prompt in scripts/setup-call-agent.mjs. */
 const variables = (call: Call) => ({ task: call.task, preferences: call.preferences || "No preference supplied", demo_notice: notice });
 
@@ -322,13 +328,10 @@ export async function getDemoCall(id: string, options: { transcript?: boolean } 
       call.status = summary.status === "done" ? "finished" : "failed";
       call.summary = summary.transcript_summary || "No conversation summary was returned.";
       call.outcome = summary.call_successful || "unknown";
-      const said = (summary.messages ?? []).filter((turn) => turn.message?.trim());
-      if (said.length) {
-        call.transcript = said.slice(0, 80).map((turn) => ({
-          speaker: turn.role === "agent" ? "aidaddy" as const : "recipient" as const,
-          text: turn.message!.trim().slice(0, 1000),
-        }));
-      }
+      const said = (summary.messages ?? [])
+        .map((turn) => ({ speaker: turn.role === "agent" ? "aidaddy" as const : "recipient" as const, text: spoken(turn.message ?? "") }))
+        .filter((turn) => turn.text);
+      if (said.length) call.transcript = said.slice(0, 80);
       await save(call);
     }
     return shown();

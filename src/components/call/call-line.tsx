@@ -80,6 +80,8 @@ export function CallLine({ answerId }: { answerId: string }) {
         signedUrl: given.signedUrl!,
         connectionType: "websocket",
         dynamicVariables: given.dynamicVariables,
+        // The agent's tone marks, such as "[happy]", are for the voice; the captions show only the words.
+        stripAudioTags: true,
         onConnect: () => setStage("live"),
         onDisconnect: () => {
           session.current = null;
