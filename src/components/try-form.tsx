@@ -139,7 +139,7 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
 
   return (
     <div className="flex flex-col gap-6 wrap-anywhere">
-      <form onSubmit={run} className="flex flex-col gap-4">
+      <form onSubmit={run} className="try-form flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <label htmlFor="situation" className="text-sm font-medium">
             What happened?
@@ -154,13 +154,14 @@ export function TryForm({ code: initialCode, needsCode }: { code: string; needsC
             onChange={(e) => setSituation(e.target.value)}
             placeholder="Write it the way you would text your partner."
           />
-          <div className="flex flex-wrap gap-2">
+          <div className="try-examples flex flex-wrap gap-2">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex.label}
                 type="button"
                 onClick={() => setSituation(ex.text)}
-                className="min-h-11 rounded-md border px-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-foreground motion-reduce:transition-none sm:min-h-9 sm:text-xs"
+                aria-pressed={situation === ex.text}
+                className="min-h-11 rounded-md border px-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-foreground motion-reduce:transition-none sm:text-xs"
               >
                 {ex.label}
               </button>

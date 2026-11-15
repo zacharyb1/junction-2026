@@ -95,6 +95,7 @@ function Linked({ text }: { text: string }) {
 export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string; needsCode: boolean; voiceAvailable: boolean }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
+  const composer = useRef<HTMLTextAreaElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   // The server refused the code: the error line then also offers the way to type another one.
@@ -222,7 +223,7 @@ export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string;
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4 rounded-lg border bg-card p-3">
+      <div className="chat-status flex items-center gap-4 rounded-lg border bg-card p-3">
         <AIDaddyAvatar state={avatarState} level={voice.level} size={72} />
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-muted-foreground">
@@ -252,7 +253,7 @@ export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string;
           )}
         </div>
       </div>
-      <ol className="flex flex-col gap-3" aria-live="polite">
+      <ol className="chat-thread flex flex-col gap-3" aria-live="polite">
         {turns.length === 0 && (
           <li className={FROM_AIDADDY}>
             AIDaddy here. Tell me what is on your plate: a move, a new job, a letter you cannot read.
@@ -270,13 +271,23 @@ export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string;
           </li>
         ))}
       </ol>
+      {turns.length === 0 && (
+        <div className="chat-suggestions" aria-label="Ideas for a conversation">
+          {["We’re moving to Finland.", "I received a letter I don’t understand.", "We’re expecting a baby."].map((suggestion) => (
+            <button key={suggestion} type="button" onClick={() => {
+              setDraft(suggestion);
+              composer.current?.focus();
+            }}>{suggestion}</button>
+          ))}
+        </div>
+      )}
       {/* The newest message stops above the message box, which stays at the bottom of the screen. */}
       <div ref={last} className="scroll-mb-28" />
       {/*
         Kept at the bottom of the screen while the conversation is longer than the screen, so the message box is
         always in reach. An error travels with it, so it is never hidden behind the box.
       */}
-      <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mx-0 sm:px-0">
+      <div className="chat-composer sticky bottom-0 -mx-4 flex flex-col gap-3 bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mx-0 sm:px-0">
         {error && (
           <p className="flex items-start gap-2 text-sm text-destructive" role="alert">
             <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
@@ -293,6 +304,7 @@ export function AIDaddyChat({ code, needsCode, voiceAvailable }: { code: string;
         )}
         <form onSubmit={send} className="flex items-end gap-2">
           <Textarea
+            ref={composer}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {

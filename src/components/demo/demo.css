@@ -16,16 +16,16 @@
   border: 1px solid;
   border-radius: 0.3rem;
   font: 500 0.72rem / 1.2 var(--hud-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   white-space: nowrap;
 }
 .demo-tag--real {
-  border-color: rgb(61 220 151 / 0.4);
+  border-color: rgb(56 96 74 / 0.4);
   color: var(--hud-green);
 }
 .demo-tag--concept {
-  border-color: rgb(255 181 71 / 0.45);
+  border-color: rgb(134 85 27 / 0.45);
   color: var(--hud-amber);
 }
 
@@ -39,7 +39,7 @@
   padding: 0 1.1rem;
   border: 1px solid var(--hud-line);
   border-radius: 0.3rem;
-  background: rgb(79 216 255 / 0.05);
+  background: rgb(152 17 44 / 0.05);
   color: var(--hud-text);
   font: 500 0.92rem / 1 var(--font-sans);
   text-decoration: none;
@@ -51,16 +51,16 @@
 .demo-replay:hover,
 .demo-btn:hover {
   border-color: var(--hud-cyan);
-  background: rgb(79 216 255 / 0.14);
+  background: rgb(152 17 44 / 0.14);
 }
 .demo-btn--primary {
   border-color: var(--hud-cyan);
   background: var(--hud-cyan);
-  color: #03131c;
+  color: #fffaf1;
   font-weight: 600;
 }
 .demo-btn--primary:hover {
-  background: #8ae6ff;
+  background: #740b22;
 }
 
 /* ---------- the links between the replays ---------- */
@@ -358,7 +358,7 @@
   transition: background-color 0.2s;
 }
 .demo-scene-row:hover {
-  background: rgb(79 216 255 / 0.05);
+  background: rgb(152 17 44 / 0.05);
 }
 .demo-scene-no {
   padding-top: 0.42rem;
@@ -411,8 +411,8 @@
 }
 .demo-scene-kind {
   font: 500 0.72rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-dim);
 }
 .demo-scene-go {
@@ -477,3 +477,36 @@
     transform: none;
   }
 }
+
+/* The programme reads like a set of short family stories. */
+.demo-hub { padding-block: clamp(2.5rem, 6vw, 5rem); }
+.demo-hub h1, .demo-head h1, .demo-scene-row h2 { font-family: var(--font-reading-display), serif; font-weight: 700; line-height: 1.18; }
+.demo-hub h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin: 0; }
+.demo-hub-lede, .demo-story { font-family: var(--font-reading-body), serif; line-height: 1.8; }
+.demo-hub-lede { max-width: 68ch; }
+.demo-programme { margin-top: 3rem; }
+.demo-scene-row { padding-block: 1.75rem; }
+.demo-scene-row h2 { font-size: 1.65rem; }
+.demo-scene-no { font-family: var(--font-reading-hand), cursive; font-size: 1.35rem; letter-spacing: 0; padding-top: .1rem; }
+.demo-scene-story { line-height: 1.7; }
+.demo-tag { font-size: .76rem; border: 0; border-radius: 0; padding: 0; white-space: normal; }
+.demo-tag::before { content: ""; width: 5px; height: 5px; margin-right: .45rem; border-radius: 50%; background: currentColor; }
+.demo-scene-kind { font-size: .78rem; }
+.demo-btn, .demo-replay { border-radius: 12px; min-height: 48px; font-family: var(--font-reading-sans), sans-serif; }
+.demo-btn--primary { color: #fffaf1; }
+.demo-replay svg { transition: transform 400ms cubic-bezier(.16,1,.3,1); }
+.demo-replay:hover svg { transform: rotate(-45deg); }
+.demo-page { padding-block: 2.5rem 4rem; }
+.demo-head h1 { margin-top: 0; }
+.demo-provenance { margin-top: 1rem; font: 400 .8rem / 1.6 var(--font-reading-sans), sans-serif; color: var(--hud-dim); }
+.demo-controls { margin-top: .6rem; }
+.demo-nav { background: #f5ecdd; }
+.demo-nav a { min-height: 52px; }
+.demo-caption { font-family: var(--font-reading-body), serif; line-height: 1.8; }
+.demo-scene-row:focus-within { background: #f5ecdd; }
+@media (prefers-reduced-motion: reduce) { .demo-replay svg { transition: none; } .demo-replay:hover svg { transform: none; } }
+/* A held or offscreen replay also pauses its small typing/ringing animations. */
+.demo-stage[data-replay-active="false"] *,
+.demo-stage[data-replay-active="false"] *::before,
+.demo-stage[data-replay-active="false"] *::after { animation-play-state: paused !important; }
+@media (max-width: 559px) { .demo-controls .demo-tag { flex-basis: 100%; } }

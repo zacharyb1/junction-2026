@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 /** The setup screen (issue #42). Telegram and listening on this device are real; the browser extension is built but not published. The page says so. */
 export default function SetupPage() {
@@ -24,11 +24,8 @@ export default function SetupPage() {
       <div className="hud">
         <main className="hud-wrap hud-setup">
           <header className="hud-setup-header">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/aidaddy-avatar.svg" alt="" width={64} height={64} className="hud-setup-avatar" />
             <div>
-              <p className="hud-label">Setup</p>
-              <h1 className="hud-title hud-setup-h1">Give AIDaddy eyes and ears.</h1>
+              <h1 className="hud-title hud-setup-h1">A place in your everyday life.</h1>
               <p className="hud-lede">
                 Choose what AIDaddy may follow. Nothing switches on without you, and you can switch any of it off again.
               </p>
@@ -41,7 +38,7 @@ export default function SetupPage() {
             <p className="hud-note">
               Of these three, the Telegram chat and listening work today. Listening runs as a web page on the device where
               you start it, and stops when that page is closed. The browser extension is built but not published, so its
-              switch here connects nothing. AIDaddy is an independent hackathon project, not an official service.
+              connection is not available here yet. AIDaddy is an independent hackathon project, not an official service.
             </p>
             <p className="hud-note">
               You can also <SiteLink href="/chat">talk to AIDaddy on the web</SiteLink>.

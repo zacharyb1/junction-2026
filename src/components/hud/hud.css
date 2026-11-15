@@ -1,48 +1,23 @@
 /*
- * The front page: AIDaddy as a quiet control room.
- * Everything is scoped to .hud, so no other page changes. Colours are checked for WCAG AA on the dark ground.
- * Motion is slow and has a meaning: the core turns fast only while AIDaddy researches.
+ * The working pages share the family reading table: paper, cranberry ink and literary headings.
+ * Legacy class names remain so real listening, research and consent behavior stay intact.
  */
 
 :root:has(.hud) {
-  background: #05080d;
-  color-scheme: dark;
+  background: #fffaf1;
+  color-scheme: light;
   scroll-behavior: smooth;
 }
 
 .hud {
-  --hud-bg: #05080d;
-  --hud-line: rgb(79 216 255 / 0.22);
-  --hud-line-soft: rgb(79 216 255 / 0.08);
-  --hud-cyan: #4fd8ff;
-  --hud-amber: #ffb547;
-  --hud-green: #3ddc97;
-  --hud-text: #e6f1ff;
-  --hud-dim: #9db0c9;
-  --hud-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
-
   position: relative;
   isolation: isolate;
   flex: 1;
   overflow-x: clip;
-  background: var(--hud-bg);
+  background: transparent;
   color: var(--hud-text);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-reading-sans), system-ui, sans-serif;
   line-height: 1.55;
-}
-
-/* A faint grid and two lights: cold from the machine, warm from the family. */
-.hud::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 55% at 78% 8%, rgb(79 216 255 / 0.13), transparent 70%),
-    radial-gradient(45% 40% at 5% 70%, rgb(255 181 71 / 0.06), transparent 70%),
-    linear-gradient(var(--hud-line-soft) 1px, transparent 1px) 0 0 / 100% 56px,
-    linear-gradient(90deg, var(--hud-line-soft) 1px, transparent 1px) 0 0 / 56px 100%;
 }
 
 .hud a {
@@ -88,7 +63,6 @@
 .hud h1 em {
   font-style: normal;
   color: var(--hud-cyan);
-  text-shadow: 0 0 42px rgb(79 216 255 / 0.55);
 }
 .hud h2 {
   font-size: clamp(1.8rem, 5vw, 3rem);
@@ -116,8 +90,8 @@
 
 .hud-label {
   font: 500 0.72rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-cyan);
 }
 .hud-label--amber {
@@ -149,11 +123,11 @@
   padding: 0 1.2rem;
   border: 1px solid var(--hud-line);
   border-radius: 3px;
-  background: rgb(79 216 255 / 0.05);
+  background: rgb(152 17 44 / 0.05);
   color: var(--hud-text);
   font: 500 0.8rem / 1 var(--hud-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   text-decoration: none;
   cursor: pointer;
   transition:
@@ -163,19 +137,17 @@
 }
 .hud .hud-btn:hover {
   border-color: var(--hud-cyan);
-  background: rgb(79 216 255 / 0.14);
+  background: rgb(152 17 44 / 0.14);
   text-decoration: none;
 }
 .hud .hud-btn--primary {
   border-color: var(--hud-cyan);
   background: var(--hud-cyan);
-  color: #03131c;
+  color: #fffaf1;
   font-weight: 600;
-  box-shadow: 0 0 30px rgb(79 216 255 / 0.35);
 }
 .hud .hud-btn--primary:hover {
-  background: #8ae6ff;
-  box-shadow: 0 0 44px rgb(79 216 255 / 0.55);
+  background: #740b22;
 }
 
 /* ---------- panels ---------- */
@@ -184,30 +156,8 @@
   position: relative;
   border: 1px solid var(--hud-line);
   border-radius: 3px;
-  background: linear-gradient(180deg, rgb(13 24 38 / 0.92), rgb(8 14 23 / 0.92));
+  background: #fffdf7;
 }
-.hud-panel::before,
-.hud-panel::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--hud-cyan);
-  pointer-events: none;
-}
-.hud-panel::before {
-  top: -1px;
-  left: -1px;
-  border-right: 0;
-  border-bottom: 0;
-}
-.hud-panel::after {
-  right: -1px;
-  bottom: -1px;
-  border-top: 0;
-  border-left: 0;
-}
-
 .hud-panel-title {
   display: flex;
   flex-wrap: wrap;
@@ -216,141 +166,40 @@
   padding: 0.7rem 1rem;
   border-bottom: 1px solid var(--hud-line-soft);
   font: 500 0.7rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-dim);
 }
 .hud-panel-title span:first-child {
   color: var(--hud-cyan);
 }
 
-/* ---------- the core ---------- */
-
+/* The assistant's letterpress mark changes with its real state. */
 .hud-core {
   position: relative;
+  display: grid;
+  place-items: center;
   width: 100%;
   aspect-ratio: 1;
   color: var(--hud-cyan);
-  transition: color 0.8s;
+  background: #f7e9e5;
+  border-radius: 16px;
+  transform: rotate(-3deg);
+  transition: background-color 250ms, transform 450ms cubic-bezier(.16,1,.3,1);
 }
-.hud-core[data-state="done"] {
-  color: var(--hud-green);
+.hud-core-letter {
+  font: 700 clamp(2rem, 9vw, 6rem) / 1 var(--font-reading-display), serif;
+  transform: rotate(3deg);
 }
-.hud-core svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.hud-core-glow,
-.hud-ring,
-.hud-core-marks,
-.hud-core-heart {
-  position: absolute;
-  inset: 0;
-}
-.hud-core-glow {
-  inset: -18%;
-  background: radial-gradient(circle, currentColor, transparent 62%);
-  opacity: 0.16;
-  transition: opacity 0.8s;
-}
-.hud-core[data-state="active"] .hud-core-glow {
-  opacity: 0.34;
-}
-.hud-core-marks {
-  opacity: 0.5;
-}
-
-.hud-ring,
-.hud-boost {
-  will-change: transform;
-}
-.hud-ring {
-  animation: hud-spin 80s linear infinite;
-  opacity: 0.6;
-  transition: opacity 0.8s;
-}
-.hud-core[data-state="active"] .hud-ring,
-.hud-core[data-state="done"] .hud-ring {
-  opacity: 1;
-}
-.hud-ring--1 {
-  animation-duration: 46s;
-  animation-direction: reverse;
-}
-.hud-ring--2 {
-  animation-duration: 30s;
-}
-.hud-ring--3 {
-  animation-duration: 64s;
-  animation-direction: reverse;
-}
-.hud-ring--4 {
-  animation-duration: 22s;
-}
-
-/* The second, fast turn: it runs only while AIDaddy is researching. */
-.hud-boost {
-  animation: hud-spin 5s linear infinite paused;
-}
-.hud-ring--1 .hud-boost {
-  animation-duration: 3.2s;
-  animation-direction: reverse;
-}
-.hud-ring--2 .hud-boost {
-  animation-duration: 2.4s;
-}
-.hud-ring--3 .hud-boost {
-  animation-duration: 6s;
-  animation-direction: reverse;
-}
-.hud-ring--4 .hud-boost {
-  animation-duration: 1.8s;
-}
-.hud-core[data-state="active"] .hud-boost {
-  animation-play-state: running;
-}
-
-/* The warm arc is the family: it shows while their question is being worked on. */
-.hud-core .hud-ring--family {
-  color: var(--hud-amber);
-  opacity: 0;
-  animation-duration: 12s;
-}
-.hud-ring--family .hud-boost {
-  animation-duration: 2s;
-}
-.hud-core[data-state="active"] .hud-ring--family {
-  opacity: 1;
-}
-
-.hud-core-heart {
-  inset: 34%;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0%, currentColor 26%, transparent 70%);
-  animation: hud-breathe 5s ease-in-out infinite;
-}
-.hud-core[data-state="active"] .hud-core-heart {
-  animation-duration: 1.1s;
-}
-
-@keyframes hud-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes hud-breathe {
-  0%,
-  100% {
-    transform: scale(0.82);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
+.hud-core[data-state="active"] { transform: rotate(0deg); background: #f3d8d7; }
+.hud-core[data-state="done"] { color: var(--hud-green); background: #e8eee4; }
+.hud-core-activity { position: absolute; bottom: 18%; display: flex; gap: 5px; }
+.hud-core-activity i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.hud-core[data-state="active"] .hud-core-activity i { animation: hud-writing 900ms cubic-bezier(.16,1,.3,1) 3; }
+.hud-core-activity i:nth-child(2) { animation-delay: 120ms !important; }
+.hud-core-activity i:nth-child(3) { animation-delay: 240ms !important; }
+@keyframes hud-writing { 50% { transform: translateY(-5px); } }
+@keyframes hud-breathe { 50% { opacity: .6; } }
 
 .hud-core--small {
   width: min(13rem, 52vw);
@@ -393,8 +242,8 @@
   display: grid;
   gap: 0.2rem;
   font: 400 0.7rem / 1.5 var(--hud-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-dim);
 }
 .hud-boot li {
@@ -457,8 +306,8 @@
   .hud-orbit {
     display: block;
     font: 500 0.66rem / 1.2 var(--hud-mono);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--hud-dim);
   }
   /* The labels sit in the corners of the core's square, where the rings leave room. */
@@ -562,7 +411,7 @@
 .hud-tag {
   font: 400 0.68rem / 1.3 var(--hud-mono);
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--hud-dim);
 }
 .hud-msg--trigger {
@@ -570,8 +419,7 @@
 }
 .hud-msg--trigger p {
   border-color: var(--hud-amber);
-  background: rgb(255 181 71 / 0.1);
-  box-shadow: 0 0 32px rgb(255 181 71 / 0.22);
+  background: rgb(134 85 27 / 0.1);
 }
 .hud-msg--trigger .hud-tag {
   color: var(--hud-amber);
@@ -584,8 +432,8 @@
 }
 .hud-quiet-state {
   font: 500 0.75rem / 1 var(--hud-mono);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-dim);
 }
 .hud-quiet-state[data-awake="true"] {
@@ -651,7 +499,6 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   color: var(--hud-cyan);
-  text-shadow: 0 0 28px rgb(79 216 255 / 0.45);
   transition: color 0.6s;
 }
 .hud-clock span {
@@ -661,14 +508,13 @@
 }
 .hud-replay[data-done="true"] .hud-clock {
   color: var(--hud-green);
-  text-shadow: 0 0 28px rgb(61 220 151 / 0.4);
 }
 
 .hud-status-line {
   min-height: 3.1em;
   padding: 0.6rem 0.8rem;
-  border-left: 2px solid var(--hud-cyan);
-  background: rgb(79 216 255 / 0.05);
+  border-left: 1px solid var(--hud-cyan);
+  background: rgb(152 17 44 / 0.05);
   font: 400 0.8rem / 1.45 var(--hud-mono);
   color: var(--hud-text);
 }
@@ -720,13 +566,12 @@
   grid-area: bar;
   height: 3px;
   overflow: hidden;
-  background: rgb(79 216 255 / 0.14);
+  background: rgb(152 17 44 / 0.14);
 }
 .hud-bar span {
   display: block;
   height: 100%;
   background: var(--hud-cyan);
-  box-shadow: 0 0 10px var(--hud-cyan);
   transform-origin: left;
 }
 
@@ -740,8 +585,8 @@
   grid-template-areas: "host tags" "title title";
   gap: 0.1rem 0.75rem;
   padding: 0.5rem 0.7rem;
-  border-left: 2px solid var(--hud-cyan);
-  background: rgb(79 216 255 / 0.06);
+  border-left: 1px solid var(--hud-cyan);
+  background: rgb(152 17 44 / 0.06);
   opacity: 0;
   transform: translateX(16px);
   transition:
@@ -764,7 +609,7 @@
   grid-area: tags;
   font: 400 0.66rem / 1.5 var(--hud-mono);
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--hud-dim);
 }
 .hud-page-title {
@@ -805,13 +650,12 @@
 }
 .hud .hud-chip[data-shown="true"] {
   border-color: var(--hud-green);
-  background: rgb(61 220 151 / 0.08);
+  background: rgb(56 96 74 / 0.08);
   color: var(--hud-green);
 }
 .hud .hud-chip[aria-pressed="true"] {
   background: var(--hud-green);
-  color: #03140c;
-  box-shadow: 0 0 18px rgb(61 220 151 / 0.4);
+  color: #fffaf1;
 }
 .hud-quote {
   display: grid;
@@ -849,8 +693,8 @@
 }
 .hud-totals dt {
   font: 400 0.66rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-dim);
 }
 
@@ -936,7 +780,7 @@
   height: 44px;
   border: 1px solid var(--hud-green);
   border-radius: 3px;
-  background: rgb(61 220 151 / 0.08);
+  background: rgb(56 96 74 / 0.08);
   color: var(--hud-green);
   font: 500 0.8rem / 1 var(--hud-mono);
   text-decoration: none;
@@ -944,7 +788,7 @@
 }
 .hud .hud-sources a:hover {
   background: var(--hud-green);
-  color: #03140c;
+  color: #fffaf1;
 }
 .hud-answer-foot {
   padding: 1rem;
@@ -980,7 +824,7 @@
   display: grid;
   gap: 0.4rem;
   padding-left: 1rem;
-  border-left: 2px solid var(--hud-cyan);
+  border-left: 1px solid var(--hud-cyan);
 }
 .hud-rules p {
   color: var(--hud-dim);
@@ -1080,13 +924,13 @@
   color: var(--hud-dim);
 }
 .hud-gauge-ring--plain {
-  border: 2px solid rgb(79 216 255 / 0.2);
+  border: 2px solid rgb(152 17 44 / 0.2);
   border-radius: 50%;
 }
 .hud-gauge h3 {
   font: 500 0.74rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-cyan);
 }
 .hud-gauge > p {
@@ -1138,12 +982,11 @@
   background: var(--hud-bg);
   color: var(--hud-cyan);
   font: 500 0.68rem / 1 var(--hud-mono);
-  box-shadow: 0 0 14px rgb(79 216 255 / 0.3);
 }
 .hud-flow-tech {
   font: 500 0.7rem / 1.4 var(--hud-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--hud-amber);
 }
 .hud-flow li > p:last-child {
@@ -1248,16 +1091,6 @@
 
 /* ---------- motion preferences ---------- */
 
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .hud-reveal {
-      animation: hud-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 45%;
-    }
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   :root:has(.hud) {
     scroll-behavior: auto;
@@ -1308,8 +1141,8 @@
   display: grid;
   gap: 0.35rem;
   padding: 0.85rem 1rem;
-  border-left: 2px solid var(--hud-cyan);
-  background: rgb(79 216 255 / 0.04);
+  border-left: 1px solid var(--hud-cyan);
+  background: rgb(152 17 44 / 0.04);
   animation: hud-rise 0.5s ease both;
 }
 .hud-autopilot-feed > li.hud-note {
@@ -1348,7 +1181,7 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .hud-autopilot-pulse {
-    animation: hud-autopilot-pulse 1.1s ease-in-out infinite;
+    animation: hud-autopilot-pulse 1.1s ease-in-out 3;
   }
 }
 @keyframes hud-autopilot-pulse {
@@ -1372,7 +1205,7 @@
   padding: 0 0.75rem;
   border: 1px solid var(--hud-line);
   border-radius: 3px;
-  background: rgb(79 216 255 / 0.05);
+  background: rgb(152 17 44 / 0.05);
   color: var(--hud-text);
   font: inherit;
 }
@@ -1403,7 +1236,6 @@
   height: 64px;
   border-radius: 50%;
   border: 1px solid var(--hud-line);
-  box-shadow: 0 0 0 4px rgb(79 216 255 / 0.08);
 }
 .hud .hud-setup-h1 {
   margin-block: 0.5rem 0.75rem;
@@ -1422,12 +1254,12 @@
   transition: border-color 0.3s ease;
 }
 .hud-setup-card.is-on {
-  border-color: rgb(79 216 255 / 0.5);
+  border-color: rgb(152 17 44 / 0.5);
 }
 .hud-setup-badge {
   font: 500 0.66rem / 1.3 var(--hud-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .hud-setup-badge.is-live {
   color: var(--hud-green);
@@ -1475,11 +1307,9 @@
 }
 .hud-setup-card.is-on .hud-setup-dot {
   background: var(--hud-green);
-  box-shadow: 0 0 8px rgb(61 220 151 / 0.7);
 }
 .hud-setup-card.is-on:has(.is-concept) .hud-setup-dot {
   background: var(--hud-amber);
-  box-shadow: 0 0 8px rgb(255 181 71 / 0.7);
 }
 /* A 44 px tall target; on/off is shown by position and colour together. */
 .hud-setup-switch {
@@ -1502,7 +1332,7 @@
 }
 .hud-setup-switch[aria-checked="true"]::before {
   border-color: var(--hud-cyan);
-  background: rgb(79 216 255 / 0.35);
+  background: rgb(152 17 44 / 0.35);
 }
 .hud-setup-knob {
   position: absolute;
@@ -1536,3 +1366,37 @@
     transition: none;
   }
 }
+
+/* Working pages use the same four voices as the approved reading page. */
+.hud :is(h1, h2, h3) { font-family: var(--font-reading-display), serif; font-weight: 700; line-height: 1.18; }
+.hud h1.hud-title { font-size: clamp(2.5rem, 5vw, 4rem); max-width: 19ch; line-height: 1.12; }
+.hud-lede { font-family: var(--font-reading-body), serif; line-height: 1.8; max-width: 68ch; }
+.hud .hud-btn { border-radius: 12px; font: 600 1rem / 1.3 var(--font-reading-sans), sans-serif; padding-block: .7rem; }
+.hud-label, .hud-panel-title { font-size: .82rem; line-height: 1.5; }
+.hud-panel { border-radius: 12px; }
+.hud-setup { gap: 2.5rem; }
+.hud-setup-header { max-width: 48rem; }
+.hud-setup-grid { display: block; border-bottom: 1px solid var(--hud-line); }
+.hud-setup-card { display: grid; grid-template-columns: 1fr; gap: 1rem 3rem; border: 0; border-top: 1px solid var(--hud-line); border-radius: 0; padding: 2rem 0; background: transparent; }
+.hud-setup-card-heading { display: flex; gap: 1rem; align-items: flex-start; }
+.hud-setup-card-heading > svg { flex: none; margin-top: .35rem; color: var(--hud-cyan); }
+.hud .hud-setup-title { font-size: 1.6rem; line-height: 1.25; }
+.hud-setup-badge { display: block; margin-top: .5rem; font-size: .8rem; letter-spacing: 0; }
+.hud-setup-body { padding: 0; gap: 1rem; }
+.hud-setup-desc { max-width: 64ch; line-height: 1.7; }
+.hud-setup-help { color: var(--hud-dim); font-size: .9rem; }
+.hud-setup-help summary { width: fit-content; min-height: 44px; display: flex; align-items: center; gap: .5rem; cursor: pointer; color: var(--hud-cyan); }
+.hud-setup-help summary::after { content: "+"; font-size: 1.4rem; transition: transform 250ms; }
+.hud-setup-help[open] summary::after { transform: rotate(45deg); }
+.hud-setup-help p { max-width: 64ch; padding: .6rem 1rem 1rem; background: #f5ecdd; border-radius: 6px; }
+.hud-autopilot { max-width: 56rem; padding: clamp(1.25rem, 4vw, 2rem); }
+.hud-autopilot-consent input { width: 20px; height: 20px; flex: none; accent-color: var(--hud-cyan); }
+.hud-autopilot-feed > li { padding: 1rem 1.25rem; border-left: 1px solid var(--hud-line); background: #f5ecdd; animation: hud-page-arrive 450ms cubic-bezier(.16,1,.3,1); }
+.hud-autopilot-feed > li.hud-autopilot-chat { background: transparent; }
+.hud-autopilot-feed > li.hud-autopilot-proposal { background: #f7e9e5; }
+.hud-autopilot-feed p { line-height: 1.65; }
+.hud-autopilot-code input { background: #fffdf7; border-radius: 8px; }
+.hud-section-head .hud-label { margin-top: .75rem; }
+@keyframes hud-page-arrive { from { clip-path: inset(0 0 25% 0); transform: translateY(8px); } to { clip-path: inset(0); transform: none; } }
+@media (min-width: 850px) { .hud-setup-card { grid-template-columns: .8fr 1.2fr; } }
+@media (prefers-reduced-motion: reduce) { .hud-autopilot-feed > li { animation: none; } .hud-core { transform: none; } .hud-core-letter { transform: none; } }

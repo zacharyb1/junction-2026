@@ -1,12 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import { readingDisplay, readingBody, readingSans, readingHand } from "@/components/landing/fonts";
 import { baseUrl } from "@/lib/cases";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -39,13 +35,13 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "AIDaddy", description },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${readingSans.variable} ${readingDisplay.variable} ${readingBody.variable} ${readingHand.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

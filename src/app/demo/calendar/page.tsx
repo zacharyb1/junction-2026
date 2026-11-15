@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 /** Issue #36: a replay for the demo video. ?loop=1 repeats it; ?bare=1 shows it without the site around it. */
 export default async function CalendarDemoPage({ searchParams }: PageProps<"/demo/calendar">) {

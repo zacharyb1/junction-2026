@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { AUTOPILOT, REPLAY_ORDER, REPLAYS, type Scene } from "@/components/demo/scenes";
 import { SiteLink } from "@/components/site/site-link";
 import { SiteShell } from "@/components/site/site-shell";
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
     "Five short scenes of AIDaddy at work: four scripted replays and one demo with a live check. Each says what in it comes from a real research run.",
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 const SCENES: Scene[] = [...REPLAY_ORDER.map((slug) => REPLAYS[slug]), AUTOPILOT];
 
@@ -21,7 +22,6 @@ export default function DemoHub() {
     <SiteShell>
       <main className="demo-hub">
         <div className="site-wrap">
-          <p className="site-eyebrow">Demos</p>
           <h1>See AIDaddy at work</h1>
           <p className="demo-hub-lede">
             AIDaddy is a butler for your family&apos;s group chat. Here are five short scenes of it at work. Four are scripted
@@ -47,7 +47,7 @@ export default function DemoHub() {
                   <span className="demo-scene-kind">{scene.seconds ? `Replay · ${scene.seconds} s` : "Fixed script"}</span>
                 </p>
                 <span className="demo-scene-go" aria-hidden="true">
-                  →
+                  <ArrowRight size={18} />
                 </span>
               </li>
             ))}

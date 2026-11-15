@@ -26,12 +26,9 @@ export default async function ChatPage({ searchParams }: PageProps<"/chat">) {
   return (
     <SiteShell>
       {/* The same column and the same head as /try and the case file. */}
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-10 sm:py-14">
+      <main className="task-page">
         <header className="flex flex-col gap-3">
-          <p className="site-eyebrow">One step ahead</p>
           <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/aidaddy-avatar.svg" alt="" width={48} height={48} className="size-12 rounded-full border" />
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Talk to AIDaddy</h1>
           </div>
           <p className="leading-relaxed text-muted-foreground">

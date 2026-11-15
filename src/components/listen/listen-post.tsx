@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useState, useSyncExternalStore } from "react";
+import { ArrowRight } from "lucide-react";
+import { type FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { checkedQuotes } from "@/components/autopilot/check";
 import { Core } from "@/components/hud/core";
 import { browserEffects } from "@/components/listen/effects";
@@ -105,11 +106,18 @@ function JobCard({ job, post, busy }: { job: Job; post: ListeningPost; busy: boo
 
 /** AIDaddy calling: a ring, then the plan read aloud. Shown over the whole page, like a phone call. */
 function Call({ job, speaking, post }: { job: Job; speaking: boolean; post: ListeningPost }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    const previous = document.activeElement;
+    element?.showModal();
+    return () => { element?.close(); if (previous instanceof HTMLElement) previous.focus(); };
+  }, []);
+  useEffect(() => { dialog.current?.querySelector("button")?.focus(); }, [speaking]);
   return (
-    <div className="listen-call" role="dialog" aria-modal="true" aria-labelledby="listen-call-title">
+    <dialog ref={dialog} className="listen-call" aria-labelledby="listen-call-title" onCancel={(event) => { event.preventDefault(); if (speaking) post.hangUp(); else post.decline(job.id); }}>
       <div className="listen-call-box">
         <Core state="active" className="listen-call-core" />
-        <p className="hud-label hud-label--amber">{speaking ? "On the call" : "Incoming call"}</p>
         <h2 id="listen-call-title">AIDaddy {speaking ? "is telling you" : "is calling"}</h2>
         <p className="listen-call-about">{job.result?.title}</p>
         <p className="listen-call-heard">It heard: “{job.heard}”</p>
@@ -128,7 +136,7 @@ function Call({ job, speaking, post }: { job: Job; speaking: boolean; post: List
           </div>
         )}
       </div>
-    </div>
+    </dialog>
   );
 }
 

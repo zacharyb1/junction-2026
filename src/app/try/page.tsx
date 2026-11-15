@@ -24,10 +24,9 @@ export default async function TryPage({ searchParams }: PageProps<"/try">) {
         The same column and the same head as the case file and the chat with AIDaddy.
         The shared badge is a pill; here it gets the site's crisp corner.
       */}
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-10 sm:py-14 [&_.rounded-4xl]:rounded-sm">
+      <main className="task-page">
         <header className="flex flex-col gap-3">
-          <p className="site-eyebrow">Try AIDaddy without setup</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">Try it on your own life</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">What’s on your plate?</h1>
           <p className="leading-relaxed text-muted-foreground">
             The same engine AIDaddy uses in the family chat. It searches the live web with Exa, official sites first, opens
             every page it cites, and keeps only what it can point at.

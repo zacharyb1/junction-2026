@@ -12,16 +12,16 @@
   aspect-ratio: 16 / 9;
   overflow: clip;
   border-radius: 12px;
-  background: #f5f6f8;
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
-  color: #1b2430;
+  background: #fffdf7;
+  box-shadow: 0 16px 48px rgb(65 37 23 / 0.12);
+  color: #211b1d;
 }
 .bdemo-chrome {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 0.6rem 1rem;
-  background: #dfe3e8;
+  background: #eee4d5;
   font-size: 0.85rem;
 }
 .bdemo-dots {
@@ -43,7 +43,7 @@
 .bdemo-tab {
   padding: 0.35rem 0.9rem;
   border-radius: 8px 8px 0 0;
-  background: #f5f6f8;
+  background: #fffdf7;
   font-weight: 500;
 }
 .bdemo-url {
@@ -51,7 +51,7 @@
   padding: 0.35rem 0.8rem;
   border-radius: 999px;
   background: #fff;
-  color: #5b6672;
+  color: #65544e;
 }
 .bdemo-body {
   display: flex;
@@ -67,7 +67,7 @@
   padding: 2.2rem 3rem;
 }
 .bdemo-step {
-  color: #5b6672;
+  color: #65544e;
   font-size: 0.85rem;
 }
 .bdemo-h {
@@ -80,17 +80,17 @@
   gap: 0.3rem;
   max-width: 460px;
   font-size: 0.85rem;
-  color: #3b4652;
+  color: #65544e;
 }
 .bdemo-field output {
   display: flex;
   align-items: center;
   min-height: 44px;
   padding: 0 0.8rem;
-  border: 1px solid #c3cad2;
+  border: 1px solid #c4b19e;
   border-radius: 8px;
   background: #fff;
-  color: #1b2430;
+  color: #211b1d;
   font-size: 1rem;
   transition: border-color 0.4s, background 0.4s;
 }
@@ -112,7 +112,7 @@
   width: 2px;
   height: 1.2em;
   margin-left: 2px;
-  background: #1b2430;
+  background: #211b1d;
   animation: bdemo-blink 1s steps(1) infinite;
 }
 .bdemo-stuck {
@@ -132,11 +132,11 @@
   font-weight: 600;
 }
 .bdemo-back {
-  border: 1px solid #c3cad2;
+  border: 1px solid #c4b19e;
   background: #fff;
 }
 .bdemo-submit {
-  background: #2a5c8a;
+  background: #98112c;
   color: #fff;
 }
 .bdemo-submit.is-waiting {
@@ -154,7 +154,7 @@
   gap: 0.8rem;
   overflow: hidden;
   padding: 1.5rem 0;
-  border-left: 1px solid #d5dbe1;
+  border-left: 1px solid #dfcdb8;
   background: #fff;
   transition: width 0.6s ease, padding 0.6s ease;
 }
@@ -177,7 +177,7 @@
   font-weight: 650;
 }
 .bdemo-panel-sub {
-  color: #5b6672;
+  color: #65544e;
   font-size: 0.8rem;
 }
 .bdemo-msg,
@@ -188,12 +188,12 @@
 }
 .bdemo-rule {
   padding: 0.6rem 0.75rem;
-  border-left: 3px solid #2a5c8a;
+  border-left: 1px solid #98112c;
   border-radius: 4px;
-  background: #f1f5f9;
+  background: #f5ecdd;
 }
 .bdemo-rule sup {
-  color: #2a5c8a;
+  color: #98112c;
   font-weight: 600;
 }
 .bdemo-fix {
@@ -201,7 +201,7 @@
   padding: 0.6rem 1.1rem;
   border-radius: 8px;
   /* White text on this green is 5.3:1. */
-  background: #1f7a4b;
+  background: #38604a;
   color: #fff;
   font-weight: 600;
   animation: bdemo-in 0.4s ease-out;
@@ -225,8 +225,8 @@
   gap: 0.4rem;
   padding: 2rem 1.4rem 1.4rem;
   border-radius: 28px;
-  background: rgb(18 26 36 / 0.96);
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  background: #fffaf1;
+  box-shadow: 0 16px 48px rgb(65 37 23 / 0.12);
   color: #fff;
   transform: translate(-50%, -50%);
   animation: bdemo-pop 0.4s ease-out;
@@ -245,7 +245,7 @@
   font-weight: 600;
 }
 .bdemo-call-state {
-  color: #a9b8c7;
+  color: #65544e;
   font-size: 0.9rem;
 }
 .bdemo-captions {
@@ -353,7 +353,7 @@
     display: flex;
     width: auto;
     padding: 1.3rem 1.1rem 1.5rem;
-    border-top: 1px solid #d5dbe1;
+    border-top: 1px solid #dfcdb8;
     border-left: 0;
     animation: bdemo-in 0.4s ease-out;
   }
@@ -382,3 +382,8 @@
     transition: none !important;
   }
 }
+
+.bdemo-call { color: #211b1d; }
+.bdemo-concept { color: #86551b; }
+.bdemo-call-buttons { color: #fff; }
+.bdemo-captions p:not(:last-child) { opacity: 1; color: #65544e; }

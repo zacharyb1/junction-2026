@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
-export const viewport: Viewport = { themeColor: "#05080d" };
+export const viewport: Viewport = { themeColor: "#fffaf1" };
 
 // Whether the demo asks for a code is the server's setting at the time of the visit, not at build time.
 export const dynamic = "force-dynamic";
@@ -33,8 +33,7 @@ export default function ListenPage() {
       <div className="hud">
         <main className="hud-wrap listen-page">
           <header className="listen-page-head">
-            <p className="hud-label">Listening post · works in this browser</p>
-            <h1 className="hud-title">Leave it listening.</h1>
+            <h1 className="hud-title">A little help, within earshot.</h1>
             <p className="hud-lede">
               Put a phone or a laptop on the table, on its charger, with this page open. AIDaddy hears the room. Small talk
               stays on the device. When someone mentions a life event, a desk researches it on its own and comes back: a call

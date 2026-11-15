@@ -6,22 +6,22 @@ import type { ReactNode } from "react";
  */
 
 /**
- * The site's dark palette (src/components/site/site.css) as hex, because the renderer does not read CSS variables.
+ * The site's warm palette (src/components/site/site.css) as hex, because the renderer does not read CSS variables.
  * A case link posted in a chat shows this card, so it is drawn in the same colours as the page it opens.
  */
 export const tone = {
-  background: "#05080d",
-  foreground: "#e6f1ff",
-  primary: "#4fd8ff",
-  primaryForeground: "#03131c",
-  muted: "#0e1a28",
-  // The site's dim text. A preview is shown small, and this is 9:1 on the ground.
-  soft: "#9db0c9",
-  // The site's hairline, cyan at 18%, mixed onto the ground.
-  border: "#122d39",
-  // The green and amber of the badges on the case page, as text on a dark tint of themselves.
-  found: { background: "#0c2b22", text: "#3ddc97" },
-  open: { background: "#33260f", text: "#ffb547" },
+  background: "#fffaf1",
+  foreground: "#211b1d",
+  primary: "#98112c",
+  primaryForeground: "#fffaf1",
+  muted: "#f5ecdd",
+  // The site's dim text. A preview is shown small, and this is more than 6:1 on the ground.
+  soft: "#65544e",
+  // The site's warm paper rule.
+  border: "#dfcdb8",
+  // The green and amber of the badges on the case page, as text on a light tint of themselves.
+  found: { background: "#e8eee3", text: "#38604a" },
+  open: { background: "#f5ecdd", text: "#86551b" },
 };
 
 /** Line height and tracking of a large heading. */
@@ -39,7 +39,7 @@ const NO_GLYPH =
  */
 export const printable = (text: string) => text.normalize("NFC").replace(NO_GLYPH, " ").replace(/\s+/g, " ").trim();
 
-/** Lucide's concierge bell on a cyan tile, then the name with "AI" in the accent colour, as in the site's header. */
+/** Lucide's concierge bell on a cranberry tile, then the name with "AI" in the accent colour, as in the site's header. */
 function Wordmark() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
@@ -78,7 +78,7 @@ function Wordmark() {
   );
 }
 
-/** Dark card with the wordmark on top and the promise at the bottom. `aside` sits opposite the wordmark. */
+/** Warm card with the wordmark on top and the promise at the bottom. `aside` sits opposite the wordmark. */
 export function PreviewCard({ aside, children }: { aside?: ReactNode; children: ReactNode }) {
   return (
     <div

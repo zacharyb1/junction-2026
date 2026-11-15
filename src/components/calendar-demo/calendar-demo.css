@@ -11,8 +11,8 @@
   overflow: clip;
   border-radius: 14px;
   background: #fff;
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
-  color: #1b2430;
+  box-shadow: 0 16px 48px rgb(65 37 23 / 0.12);
+  color: #211b1d;
 }
 .cdemo-cal {
   position: relative;
@@ -33,7 +33,7 @@
   font-weight: 650;
 }
 .cdemo-cal-head span {
-  color: #66717d;
+  color: #65544e;
   font-size: 0.85rem;
 }
 .cdemo-grid {
@@ -43,14 +43,14 @@
   /* The row of weekday names is only as tall as its text; the weeks share the rest. */
   grid-template-rows: auto;
   grid-auto-rows: 1fr;
-  border-top: 1px solid #e3e7ec;
-  border-left: 1px solid #e3e7ec;
+  border-top: 1px solid #dfcdb8;
+  border-left: 1px solid #dfcdb8;
 }
 .cdemo-dow {
   padding: 0.4rem 0.5rem;
-  border-right: 1px solid #e3e7ec;
-  border-bottom: 1px solid #e3e7ec;
-  color: #66717d;
+  border-right: 1px solid #dfcdb8;
+  border-bottom: 1px solid #dfcdb8;
+  color: #65544e;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -61,12 +61,12 @@
   gap: 0.25rem;
   min-height: 0;
   padding: 0.35rem 0.4rem;
-  border-right: 1px solid #e3e7ec;
-  border-bottom: 1px solid #e3e7ec;
+  border-right: 1px solid #dfcdb8;
+  border-bottom: 1px solid #dfcdb8;
   transition: background 0.5s;
 }
 .cdemo-day.is-out {
-  background: #f7f8fa;
+  background: #f5ecdd;
 }
 .cdemo-num {
   font-size: 0.8rem;
@@ -78,7 +78,7 @@
   height: 24px;
   place-items: center;
   border-radius: 50%;
-  background: #2a5c8a;
+  background: #98112c;
   color: #fff;
 }
 .cdemo-day.is-spot {
@@ -106,14 +106,14 @@
   position: relative;
   z-index: 1;
   width: calc(200% + 0.8rem);
-  border: 1.5px dashed #2a5c8a;
-  background: #eef4fa;
-  color: #1f4a70;
+  border: 1.5px dashed #98112c;
+  background: #f7e9e5;
+  color: #740b22;
   animation: cdemo-in 0.4s ease-out;
 }
 .cdemo-event--plan.is-added {
   border-style: solid;
-  background: #dceaf6;
+  background: #f3ddd8;
 }
 .cdemo-hint {
   position: absolute;
@@ -135,8 +135,8 @@
   gap: 0.75rem;
   overflow: hidden;
   padding: 1.4rem 0;
-  border-left: 1px solid #e3e7ec;
-  background: #f8fafc;
+  border-left: 1px solid #dfcdb8;
+  background: #f5ecdd;
   transition: width 0.6s ease, padding 0.6s ease;
 }
 .cdemo-panel.is-open {
@@ -158,7 +158,7 @@
   font-weight: 650;
 }
 .cdemo-sub {
-  color: #66717d;
+  color: #65544e;
   font-size: 0.8rem;
 }
 .cdemo-msg,
@@ -169,7 +169,7 @@
   animation: cdemo-in 0.4s ease-out;
 }
 .cdemo-progress {
-  color: #2a5c8a;
+  color: #98112c;
   font-style: italic;
 }
 .cdemo-meta {
@@ -193,11 +193,11 @@
   display: block;
 }
 .cdemo-options span {
-  color: #3d4955;
+  color: #65544e;
 }
 .cdemo-draft {
   padding: 0.6rem 0.75rem;
-  border-left: 3px solid #f0a04b;
+  border-left: 1px solid #f0a04b;
   border-radius: 4px;
   background: #fff;
   font-size: 0.84rem;
@@ -212,7 +212,7 @@
   align-self: flex-start;
   padding: 0.55rem 1rem;
   border-radius: 8px;
-  background: #2a5c8a;
+  background: #98112c;
   color: #fff;
   font-size: 0.88rem;
   font-weight: 600;
@@ -220,7 +220,7 @@
 }
 .cdemo-add.is-done {
   /* White text on this green is 5.3:1. */
-  background: #1f7a4b;
+  background: #38604a;
 }
 @keyframes cdemo-in {
   from {
@@ -275,7 +275,7 @@
     display: flex;
     width: auto;
     padding: 1.3rem 1.1rem 1.5rem;
-    border-top: 1px solid #e3e7ec;
+    border-top: 1px solid #dfcdb8;
     border-left: 0;
     animation: cdemo-in 0.4s ease-out;
   }

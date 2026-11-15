@@ -12,16 +12,16 @@ export function SiteFooter() {
         <div className="site-footer-grid">
           <div className="site-footer-about">
             <Wordmark />
-            <p>A butler for your family&apos;s group chat. It stays silent until it matters.</p>
+            <p>A little help with life’s bigger moments. In your family chat, and here when you need it.</p>
           </div>
           <nav aria-labelledby="footer-use">
             <h2 id="footer-use">Use it</h2>
             <ul>
               <li>
-                <SiteLink href="/try">Try AIDaddy without setup</SiteLink>
+                <SiteLink href="/try">Make a plan</SiteLink>
               </li>
               <li>
-                <SiteLink href="/chat">Talk to AIDaddy</SiteLink>
+                <SiteLink href="/chat">Have a chat</SiteLink>
               </li>
               <li>
                 <Link href="/setup">Set up</Link>
@@ -55,7 +55,10 @@ export function SiteFooter() {
                 <Link href="/">Front page</Link>
               </li>
               <li>
-                <Link href="/reading">Front page, paper edition</Link>
+                <SiteLink href="/listen">Listen together</SiteLink>
+              </li>
+              <li>
+                <Link href="/reading">The original reading page</Link>
               </li>
               {repoUrl ? (
                 <li>
@@ -70,7 +73,7 @@ export function SiteFooter() {
         <div className="site-footer-legal">
           <p>
             Built at Junction 2026 for the Exa challenge. Research with sources, not legal advice. AIDaddy is an independent
-            hackathon project, not an official service. It is not affiliated with Kela, Vero, Telegram or any film studio.
+            hackathon project, not an official service. It is not affiliated with Kela, Vero, Telegram or other government agencies.
           </p>
         </div>
       </div>

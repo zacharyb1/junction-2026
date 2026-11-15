@@ -114,7 +114,7 @@ function Refs({ refs, t }: { refs: number[]; t: Labels }) {
           href={`#source-${n}`}
           aria-label={t.sourceNumber(n)}
           // 24 px each way: the smallest target a finger can hit without catching its neighbour.
-          className="min-w-6 rounded-sm border border-primary/30 bg-primary/10 px-1.5 py-1 text-center font-mono text-xs text-primary no-underline hover:bg-primary hover:text-primary-foreground"
+          className="case-ref min-w-6 rounded-sm border border-primary/30 bg-primary/10 px-1.5 py-1 text-center font-mono text-xs text-primary no-underline hover:bg-primary hover:text-primary-foreground"
         >
           {n}
         </a>
@@ -214,7 +214,7 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
             href={e.url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-6 items-center gap-1 font-medium leading-snug underline-offset-4 hover:text-primary hover:underline"
+            className="inline-flex min-h-11 items-center gap-1 font-medium leading-snug underline-offset-4 hover:text-primary hover:underline"
           >
             {e.title} <ExternalLink className="size-3.5 shrink-0" />
             <span className="sr-only">({t.newTab})</span>
@@ -225,14 +225,14 @@ function EvidenceCard({ e, t }: { e: Evidence; t: Labels }) {
           </p>
         </div>
       </div>
-      <blockquote className="mt-3 border-l-2 border-primary/50 pl-3 text-sm leading-relaxed italic">“{e.quote}”</blockquote>
+      <blockquote className="mt-3 border-l border-primary/50 pl-3 text-sm leading-relaxed italic">“{e.quote}”</blockquote>
       {e.quoteTranslation && <p className="mt-2 pl-3.5 text-sm text-muted-foreground">{e.quoteTranslation}</p>}
       {e.verification === "verified" && highlightUrl(e.url, e.quote) && (
         <a
           href={highlightUrl(e.url, e.quote) ?? e.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-flex min-h-6 items-center gap-1 pl-3.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="mt-2 inline-flex min-h-11 items-center gap-1 pl-3.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
         >
           <Highlighter className="size-3.5 shrink-0" /> {t.showOnPage}
           {/* Every source has this link, so a screen reader also hears which one it belongs to. */}
@@ -294,14 +294,14 @@ function Header({ c, t }: { c: Case; t: Labels }) {
   return (
     // The same head as /try and /chat: a small label, the title, one paragraph.
     <header className="flex flex-col gap-3">
-      <p className="site-eyebrow flex flex-wrap items-center gap-x-2 gap-y-1">
+      <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{c.title}</h1>
+      <p className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1">
         <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
         <span>{place}</span>
         <span className="text-muted-foreground">
           · {t.updated} {when(c.updatedAt, t)}
         </span>
       </p>
-      <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{c.title}</h1>
       <p className="leading-relaxed text-muted-foreground">{c.summary}</p>
       {process.env.ELEVENLABS_API_KEY && (
         <ListenButton
@@ -345,7 +345,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
       */}
       <main
         lang={langOf(c.language)}
-        className="mx-auto flex w-full max-w-2xl flex-col gap-10 px-4 py-10 wrap-anywhere sm:py-14 [&_.rounded-4xl]:rounded-sm"
+        className="case-file mx-auto flex w-full max-w-2xl flex-col gap-10 px-4 py-10 wrap-anywhere sm:py-14 [&_.rounded-4xl]:rounded-sm"
       >
         <Header c={c} t={t} />
 
@@ -434,7 +434,7 @@ export default async function CasePage({ params }: PageProps<"/c/[id]">) {
                     href={n.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex min-h-6 items-start gap-1 font-medium leading-snug underline-offset-4 hover:text-primary hover:underline"
+                    className="inline-flex min-h-11 items-start gap-1 font-medium leading-snug underline-offset-4 hover:text-primary hover:underline"
                   >
                     {n.title} <ExternalLink className="mt-0.5 size-3.5 shrink-0" />
                     <span className="sr-only">({t.newTab})</span>

@@ -15,7 +15,6 @@ export default function NotFound() {
   return (
     <SiteShell>
       <main className="site-wrap flex flex-1 flex-col justify-center gap-6 py-16 sm:py-24">
-        <p className="site-eyebrow">Error 404</p>
         <h1 className="max-w-[16ch] text-4xl font-semibold tracking-tight text-balance sm:text-6xl">This page is not here.</h1>
         <p className="max-w-[58ch] text-lg text-muted-foreground">
           If a link to a case file brought you here, the case is not stored on this server. It may have been removed, or it

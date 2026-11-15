@@ -1,16 +1,25 @@
 "use client";
 
-import { createContext, Fragment, type ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, Fragment, type ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { Pause, Play } from "lucide-react";
 
 /** How many times the visitor has pressed Replay, and the way to press it. */
-const ReplayContext = createContext<{ run: number; replay: () => void }>({ run: 0, replay: () => {} });
+const ReplayContext = createContext<{ run: number; paused: boolean; replay: () => void; toggle: () => void }>({ run: 0, paused: false, replay: () => {}, toggle: () => {} });
 
 const lessMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /** Holds the Replay count for one scene, so the button and the stage can sit in different parts of the page. */
 export function ReplayProvider({ children }: { children: ReactNode }) {
   const [run, setRun] = useState(0);
-  return <ReplayContext.Provider value={{ run, replay: () => setRun((n) => n + 1) }}>{children}</ReplayContext.Provider>;
+  const [paused, setPaused] = useState(false);
+  return <ReplayContext.Provider value={{ run, paused, replay: () => { setPaused(false); setRun((n) => n + 1); }, toggle: () => setPaused((value) => !value) }}>{children}</ReplayContext.Provider>;
+}
+
+/** Visitors can hold a scene to read the source or conversation at their own pace. */
+export function PauseButton() {
+  const { paused, toggle } = useContext(ReplayContext);
+  const Icon = paused ? Play : Pause;
+  return <button type="button" className="demo-replay" onClick={toggle} aria-pressed={paused}><Icon size={16} aria-hidden="true" />{paused ? "Resume" : "Pause"}</button>;
 }
 
 /** The stage: a new key on every Replay mounts the scene again, which starts its clock and its animations from zero. */
@@ -45,26 +54,43 @@ export function ReplayButton() {
  * choice to watch it play. The frame is cancelled on unmount and no frame is requested after the end.
  */
 export function useReplayClock(duration: number, loop: boolean): number {
-  const { run } = useContext(ReplayContext);
+  const { run, paused } = useContext(ReplayContext);
   const [now, setNow] = useState(0);
+  const elapsed = useRef(0);
   useEffect(() => {
     // ?loop=1 is itself a request to play, so the screen at the table never stands still.
     const still = run === 0 && !loop && lessMotion();
-    let start = performance.now();
     let frame = 0;
+    let last = performance.now();
+    let inView = true;
+    let active = false;
     const tick = () => {
       if (still) {
         setNow(duration);
         return;
       }
-      const t = performance.now() - start;
-      if (t > duration && loop) start = performance.now();
-      setNow(Math.min(t, duration));
-      if (t < duration || loop) frame = requestAnimationFrame(tick);
+      const time = performance.now();
+      elapsed.current += time - last;
+      last = time;
+      if (elapsed.current > duration && loop) elapsed.current = 0;
+      setNow(Math.min(elapsed.current, duration));
+      if (elapsed.current < duration || loop) frame = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [duration, loop, run]);
+    const update = () => {
+      const next = !paused && inView && !document.hidden;
+      stage?.setAttribute("data-replay-active", String(next));
+      if (next === active) return;
+      active = next;
+      cancelAnimationFrame(frame);
+      if (active) { last = performance.now(); frame = requestAnimationFrame(tick); }
+    };
+    const stage = document.querySelector(".demo-stage");
+    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; update(); });
+    if (stage) observer?.observe(stage);
+    document.addEventListener("visibilitychange", update);
+    update();
+    return () => { cancelAnimationFrame(frame); observer?.disconnect(); document.removeEventListener("visibilitychange", update); };
+  }, [duration, loop, run, paused]);
   return now;
 }
 
