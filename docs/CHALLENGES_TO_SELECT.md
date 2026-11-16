@@ -6,7 +6,7 @@ Handover updated Sunday 15 November for #72 and #77: the refreshed landing repla
 
 **The rule we follow:** select a challenge only when its technology does real work in the demo. A judge who opens the project and cannot find their product will mark it down, and that costs more than the entry gains.
 
-Demo address for every note below: <https://86.38.238.136.sslip.io>
+Demo address for every note below: `https://86.38.238.136.sslip.io`
 
 ## 1. Select now (4)
 

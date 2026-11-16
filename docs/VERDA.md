@@ -6,7 +6,7 @@ A summary for the Verda Compute Track at Junction 2026. Written Saturday 14 Nove
 
 AIDaddy is a butler for a household's group chat. It stays silent on small talk. When someone mentions a life event or shares an official letter, it researches the live web with Exa and answers with a plan in which every line points at a sentence on an official page.
 
-Live: <https://86.38.238.136.sslip.io>
+Live during the hackathon at `https://86.38.238.136.sslip.io`. After the event the demo was stopped, and the server is being shut down.
 
 ## What runs on Verda
 

@@ -4,11 +4,13 @@ This is an operational reference for the current implementation, not a roadmap o
 
 ## What runs where
 
-**Production since Saturday 14 November, 09:00 Helsinki:** the whole runtime runs on one Verda CPU server with Compose from `/opt/kaveri` (branch `ops/server-compose`): the web app and Engine at <https://86.38.238.136.sslip.io>, Hermes with the shared token, and the Gemma gate. Services restart after a crash or reboot. **The shared Telegram token is in use there; do not start it on another machine.** Ask in the team chat for SSH access. The table below describes the parts in general.
+**After the hackathon (16 November):** the demo is stopped and the Verda server is being shut down, so nothing below runs any more. The Deploy workflow no longer runs on merges to `main`.
+
+**Production since Saturday 14 November, 09:00 Helsinki:** the whole runtime runs on one Verda CPU server with Compose from `/opt/kaveri` (branch `ops/server-compose`): the web app and Engine at `https://86.38.238.136.sslip.io`, Hermes with the shared token, and the Gemma gate. Services restart after a crash or reboot. **The shared Telegram token is in use there; do not start it on another machine.** Ask in the team chat for SSH access. The table below describes the parts in general.
 
 | Part | Current implementation / recorded state |
 |---|---|
-| Web app and Engine | Next.js in Compose on the Verda server, at `https://86.38.238.136.sslip.io`. The Vercel project `junction-2026` was deleted on Saturday 14 November at 15:51 Helsinki; `https://junction-2026.vercel.app` no longer serves this app. Cases live in the server's `case-data` volume. Merges to `main` reach the server through the Deploy workflow, which needs `DEPLOY_SSH_KEY` (see below). Nothing runs the daily source re-check from `vercel.json` any more. |
+| Web app and Engine | Next.js in Compose on the Verda server, at `https://86.38.238.136.sslip.io`. The Vercel project `junction-2026` was deleted on Saturday 14 November at 15:51 Helsinki; `https://junction-2026.vercel.app` no longer serves this app. Cases live in the server's `case-data` volume. Until 16 November, merges to `main` reached the server through the Deploy workflow; it now runs only by hand and needs `DEPLOY_SSH_KEY` (see below). Nothing runs the daily source re-check from `vercel.json` any more. |
 | Hermes | A separate persistent process on a laptop/server, using Telegram polling and calling the Engine's MCP endpoint. It is not started by a Vercel deployment. The former local installation was removed after its source merged; its remaining Engine and gate processes were stopped at 05:48 EET on 14 November. No gateway or scheduler from that installation was running. |
 | Local gate | Ollama with Gemma, used by the Hermes plugin. Setup installs the plugin into each Hermes home; its presence alone does not establish a running model service. |
 | Case data | Private Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set; otherwise `.data/cases` under the Engine's working directory. The five former local test Cases are no longer available from the removed installation. |
@@ -20,11 +22,13 @@ The whole runtime can also run in Docker: see [CONTAINERS.md](CONTAINERS.md) for
 
 ## Automatic deployment
 
-Every push to `main` that passes CI is deployed to the production server by [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Merging a pull request is a push to `main`. Vercel keeps deploying `main` on its own as before.
+**Turned off on 16 November, after the hackathon:** merges to `main` are no longer deployed, because the server is being shut down and a merge must not restart it. The workflow can still be run by hand (below). What follows describes how it worked.
+
+Every push to `main` that passed CI was deployed to the production server by [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Merging a pull request is a push to `main`.
 
 How it works:
 
-1. The workflow runs when the CI workflow succeeds for a push to `main`. Deploys run one at a time, in order.
+1. The workflow ran when the CI workflow succeeded for a push to `main` (until 16 November; now by hand only). Deploys run one at a time, in order.
 2. It sends the exact commit to the server as a git bundle over SSH. The server has no GitHub access.
 3. On the server, the deploy key can only run [`scripts/deploy/server-deploy.sh`](../scripts/deploy/server-deploy.sh), installed as `/usr/local/sbin/kaveri-deploy`. It checks out the commit, builds, and restarts only the containers whose image or settings changed. A change outside `hermes/` and `containers/hermes/` does not restart the bot.
 4. The deploy passes when `/api/health` reports the new commit and the bot stays up for 30 seconds. Otherwise the previous commit is deployed again and the workflow run fails. Bot memory, reminders, Cases and models are in volumes and survive either way.
@@ -71,7 +75,7 @@ The existing Git-connected Vercel project is the normal shared deployment. A tea
 1. In the Vercel dashboard, open the existing project. Confirm the repository, root directory (this repo's root), Next.js framework and production branch. The repo specifies `fra1` in `vercel.json`; Node 22 is the version used in CI, and `package.json` pins pnpm.
 2. Configure the variables below for the intended environment. Existing values can be retained; a newly generated `CASEFILE_SECRET` must also be supplied to every bot/client that writes to that environment.
 3. Connect a **private Blob store** and ensure `BLOB_READ_WRITE_TOKEN` is present. This application's storage switch explicitly checks that token; an OIDC-only connection does not select Blob in the current code. The local fallback is for development, not persistent storage on Vercel. See [Vercel's Blob connection instructions](https://vercel.com/docs/vercel-blob/using-blob-sdk).
-4. Deploy the intended revision through the team's usual Vercel/Git workflow. On the existing integration, production-branch pushes deploy production and other branches create previews. Environment changes require a new deployment. [Vercel Git deployments](https://vercel.com/docs/git) and [environment guidance](https://vercel.com/docs/deployments/environments) describe those behaviors.
+4. Deploy the intended revision through the team's usual Vercel/Git workflow. The Vercel project `junction-2026` was deleted on 14 November, so this applies to a new project: in a Git-connected project, production-branch pushes deploy production and other branches create previews. Environment changes require a new deployment. [Vercel Git deployments](https://vercel.com/docs/git) and [environment guidance](https://vercel.com/docs/deployments/environments) describe those behaviors.
 5. Open `/try?code=<the environment's demo code>`, run one test situation, and open its returned `/c/<id>` page from another device. Confirm the stored Case is readable at `/api/cases/<id>`. An authenticated bot/MCP call needs a separate check; a public landing page or passing CI does not establish that path.
 
 For a separate deployment, import the repository into a new Vercel project with the same root/framework settings and configure its own values. The Hermes scripts/docs merged into `main` through PR #6 (`318f760`); the independent verifier changes remain on `review-grounding` in draft #7. GitHub CI passed for the merge, but its Vercel deployment was blocked by project access. Repository access and successful checks do not establish a successful production deployment.

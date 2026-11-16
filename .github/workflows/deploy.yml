@@ -1,12 +1,9 @@
 name: Deploy
 
-# Deploys main to the production server after CI passes on main. Run it by hand from the Actions tab
-# to redeploy main. See docs/DEPLOYMENT.md#automatic-deployment.
+# Deploys main to the production server, by hand only: GitHub, Actions, Deploy, Run workflow.
+# It no longer runs after CI on main (16 November, after the hackathon): the demo server is being
+# shut down, and a merge must not restart it. See docs/DEPLOYMENT.md#automatic-deployment.
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
 
 # One deploy at a time, in order. A newer one waits instead of cancelling a deploy halfway.
@@ -19,18 +16,13 @@ permissions:
 
 jobs:
   deploy:
-    if: >-
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_repository.full_name == github.repository)
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # DEPLOY_SSH_KEY lives in this environment, which only main may use, so a workflow on another
     # branch cannot read the key.
     environment:
       name: production
-      url: https://86.38.238.136.sslip.io
     env:
       DEPLOY_HOST: 86.38.238.136
       # The server's public host key, so the job only ever talks to that machine.
@@ -39,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Check the deploy key is configured

@@ -2,7 +2,9 @@
 
 A butler in a family's Telegram group. It notices a life event or an official letter, researches the live web with Exa, and returns a short plan with checked quotes and a case file the family can inspect.
 
-Built for international families in Finland at Junction 2026, Espoo, 13–15 November. The main challenge is **Exa — The Internet Butler / Your Personal Assistant**. [Web demo](https://86.38.238.136.sslip.io) · [Challenge brief](docs/CHALLENGE.md) · [Submission checklist](docs/SUBMISSION_CHECKLIST.md) · [MIT license](LICENSE)
+Built for international families in Finland at Junction 2026, Espoo, 13–15 November. The main challenge is **Exa — The Internet Butler / Your Personal Assistant**. [Demo videos and pitch deck](docs/pitch/) · [Challenge brief](docs/CHALLENGE.md) · [Submission checklist](docs/SUBMISSION_CHECKLIST.md) · [MIT license](LICENSE)
+
+**After the hackathon (16 November):** the demo is stopped and its Verda server is being shut down, so the web demo and the Telegram bot no longer run. The [demo videos and pitch deck](docs/pitch/) show the product. Old server and Vercel addresses in these docs are kept as plain text, not links: `junction-2026.vercel.app` now belongs to an unrelated app, and the server's address can pass to someone else.
 
 ## Start here
 
