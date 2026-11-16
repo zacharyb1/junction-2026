@@ -20,7 +20,7 @@ Examples they name: is a rent increase legal, which benefits a family qualifies 
 - 3rd: $500 cash, $1,000 credits, hoodie each.
 
 ## What Exa provides
-- $50 credits per person, code `EXA50JUNCTION`, redeem at dashboard.exa.ai/billing.
+- $50 credits per person through a promo code (removed from this public repo after the event), redeemed at dashboard.exa.ai/billing.
 - Search API (fast, balanced, deep), Contents API (text, highlights, summaries, subpages).
 - Filters by date, domain, category. Structured JSON output. Past versions of pages.
 - Websets, Monitors, hosted MCP server, Python and JS SDKs. Demos at demos.exa.ai.

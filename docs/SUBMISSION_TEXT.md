@@ -26,7 +26,7 @@ Longer alternative (15 words): The always-listening family assistant you don't h
 
 **How we use Exa.** Exa Search `auto` with an output schema runs the structured searches on official sites, plus one search limited to pages published in the last four months. Exa Search `lite` gives a first look at the official pages in under a second, shown while the research runs. Exa Contents is the second reader of every cited page. Exa Agent is a second research mode on `/try`: one agent run searches, reads and reasons in steps, and its quotes pass the same page check.
 
-**What is real in the demo.** The website, the research engine, the verifier and the case files are live at https://86.38.238.136.sslip.io, on one Verda server; anyone can type a situation at `/try` and get a checked plan in a few seconds. The Telegram bot runs on the same server. In the latest run of our own test set, 19 of 19 life events were researched correctly, 98 of 98 quotes were found on the pages they cite, 6 of 6 messages with nothing to research got no made-up plan, and the median time was 5.6 seconds. The web is live, so runs differ: recent runs passed 17 to 19 of 19. On 60 labelled messages the gate missed 0 of 20 life events and woke by mistake on 1 of 40 small-talk messages; that is our own development set, not a blind test. The listening page and the browser extension are first versions. The chat replays on the site use a fictional family with plans from real runs, and say so.
+**What is real in the demo.** The website, the research engine, the verifier and the case files are live at `https://86.38.238.136.sslip.io`, on one Verda server; anyone can type a situation at `/try` and get a checked plan in a few seconds. The Telegram bot runs on the same server. In the latest run of our own test set, 19 of 19 life events were researched correctly, 98 of 98 quotes were found on the pages they cite, 6 of 6 messages with nothing to research got no made-up plan, and the median time was 5.6 seconds. The web is live, so runs differ: recent runs passed 17 to 19 of 19. On 60 labelled messages the gate missed 0 of 20 life events and woke by mistake on 1 of 40 small-talk messages; that is our own development set, not a blind test. The listening page and the browser extension are first versions. The chat replays on the site use a fictional family with plans from real runs, and say so.
 
 **What is next.** A watch on every cited page, so a rule change reaches the family the day it happens. Calendar and mail behind the same approval step. More countries: official site lists exist for 12, and Finland is tested in depth. A phone app, so listening works with the screen off.
 
@@ -47,6 +47,6 @@ The form asks which model, what it does, why it matters and how its output was i
 
 ## Links
 
-- Demo: https://86.38.238.136.sslip.io
-- Try it without setup: https://86.38.238.136.sslip.io/try
+- Demo: `https://86.38.238.136.sslip.io`
+- Try it without setup: `https://86.38.238.136.sslip.io/try`
 - Which challenges to select: [CHALLENGES_TO_SELECT.md](CHALLENGES_TO_SELECT.md)

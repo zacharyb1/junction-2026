@@ -11,7 +11,7 @@ Review [the event rules](PLAYBOOK.md#rules-that-disqualify) before submission: p
 - [ ] Challenge(s) selected (you may submit to multiple challenges)
 - [ ] Technologies used
 - [ ] **Video pitch ≤ 2:00** uploaded (YouTube/Vimeo, viewable by everyone, not private). Check length to the second.
-- [ ] Demo link (<https://86.38.238.136.sslip.io>, works from a fresh browser with no login)
+- [ ] Demo link (`https://86.38.238.136.sslip.io`, works from a fresh browser with no login)
 - [ ] Source code link (GitHub repo, MIT license file present). The repo is private while we build: make it public, or add the organizers as collaborators, before setting the submission to FINAL.
 - [ ] Source code publicity answered
 - [ ] "Do you want to be credited?" answered
